@@ -1,0 +1,14 @@
+[package]
+name = "counter"
+version = "1.0.0"
+authors = [
+  "Dietmar Maurer <dietmar@proxmox.com>",
+]
+license = "AGPLv3"
+edition = "2021"
+
+[dependencies]
+gloo-console = "0.2"
+yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
+pwt = { path = "../../" }
+wasm-bindgen = "0.2"

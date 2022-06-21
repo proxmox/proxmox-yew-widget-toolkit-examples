@@ -1,0 +1,68 @@
+use gloo_console as console;
+use yew::prelude::*;
+use pwt::prelude::*;
+
+use pwt::widget::{Column, Button, Panel, Toolbar};
+
+pub enum Msg {
+    Increment,
+    Decrement,
+}
+
+pub struct App {
+    value: i64, // counter value
+}
+
+impl Component for App {
+    type Message = Msg;
+    type Properties = ();
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self { value: 0 }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::Increment => {
+                self.value += 1;
+                console::log!("plus one");
+            }
+            Msg::Decrement => {
+                self.value -= 1;
+                console::log!("minus one");
+            }
+        }
+        true
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+
+        let toolbar = Toolbar::new()
+            .border((false, false, true, false))
+            .with_child(
+                Button::new("Increment")
+                    .onclick(ctx.link().callback(|_| Msg::Increment))
+            )
+            .with_child(
+                Button::new("Decrement")
+                    .onclick(ctx.link().callback(|_| Msg::Decrement))
+            );
+
+        let content = Column::new()
+            .padding(2)
+            .with_child("The current counter value is: ")
+            .with_child(self.value);
+
+        Panel::new()
+            .margin(4)
+            .title("A simple Counter inside a Panel")
+            .with_child(toolbar)
+            .with_child(content)
+            .into()
+    }
+
+}
+
+fn main() {
+    yew::Renderer::<App>::new().render();
+}
