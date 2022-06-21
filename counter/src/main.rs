@@ -7,6 +7,7 @@ use pwt::widget::{Column, Button, Panel, Toolbar};
 pub enum Msg {
     Increment,
     Decrement,
+    Reset,
 }
 
 pub struct App {
@@ -31,6 +32,10 @@ impl Component for App {
                 self.value -= 1;
                 console::log!("minus one");
             }
+            Msg::Reset => {
+                self.value = 0;
+                console::log!("reset to zero");
+            }
         }
         true
     }
@@ -46,6 +51,11 @@ impl Component for App {
             .with_child(
                 Button::new("Decrement")
                     .onclick(ctx.link().callback(|_| Msg::Decrement))
+            )
+            .with_flex_spacer()
+            .with_child(
+                Button::new("Reset")
+                    .onclick(ctx.link().callback(|_| Msg::Reset))
             );
 
         let content = Column::new()
