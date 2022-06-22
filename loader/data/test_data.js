@@ -1,0 +1,4 @@
+{
+    "firstname": "Max",
+    "lastname": "Mustermann"
+}
