@@ -1,0 +1,40 @@
+use yew::prelude::*;
+use pwt::prelude::*;
+
+use pwt::widget::{Column, Panel, ThemeLoader, ThemeSelector, Toolbar};
+
+pub struct App {}
+
+impl Component for App {
+    type Message = ();
+    type Properties = ();
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
+    }
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+
+        let toolbar = Toolbar::new()
+            .border((false, false, true, false))
+            .with_flex_spacer()
+            .with_child(ThemeSelector::new());
+
+        let content = Column::new()
+            .padding(2)
+            .with_child("Please press the theme selector button to change the theme.");
+ 
+        let panel = Panel::new()
+            .margin(4)
+            .title("A simple Panel")
+            .with_child(toolbar)
+            .with_child(content);
+
+        ThemeLoader::new(panel).into()
+    }
+
+}
+
+fn main() {
+    yew::Renderer::<App>::new().render();
+}
