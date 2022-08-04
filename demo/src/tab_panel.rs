@@ -16,8 +16,8 @@ pub fn TabPanelDemo() -> Html {
 
     TabPanel::new()
         .class("pwt-fit")
-        //.title("This is a simple Tab Panel")
-        //.tool(Button::new("?").class("rounded").disabled(true))
+        .title("This is a simple Tab Panel")
+        .tool(Button::new("?").class("rounded").disabled(true))
         .with_item(
             "tab1",
             "Tab 1",
