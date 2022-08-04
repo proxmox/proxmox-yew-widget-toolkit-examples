@@ -13,7 +13,7 @@ use yew_router::HashRouter;
 use pwt::prelude::*;
 
 use pwt::component::{NavigationMenu, MenuItem};
-use pwt::widget::{Panel};
+use pwt::widget::{Panel, ThemeLoader, ThemeSelector};
 
 #[function_component]
 fn MainMenu() -> Html {
@@ -48,11 +48,13 @@ fn MainMenu() -> Html {
 
 #[function_component]
 fn DemoApp() -> Html {
-    Panel::new()
+    let panel = Panel::new()
         .class("pwt-viewport")
         .title("Proxmox Yew Widget Toolkit Demo Application")
-        .with_child(html!{<MainMenu/>})
-        .into()
+        .tool(ThemeSelector::new())
+        .with_child(html!{<MainMenu/>});
+
+    ThemeLoader::new(panel).into()
 }
 
 #[function_component]
