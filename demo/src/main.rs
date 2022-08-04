@@ -4,6 +4,9 @@ use buttons::ButtonsDemo;
 mod tab_panel;
 use tab_panel::TabPanelDemo;
 
+mod tooltip;
+pub use tooltip::TooltipDemo;
+
 use yew::prelude::*;
 use yew_router::HashRouter;
 
@@ -16,6 +19,14 @@ use pwt::widget::{Panel};
 fn MainMenu() -> Html {
     NavigationMenu::new()
         .with_item(
+            MenuItem::new(
+                "tooltip_panel",
+                "Tooltips",
+                None::<&str>,
+                |_| { html!{<TooltipDemo/>} },
+            )
+        )
+         .with_item(
             MenuItem::new(
                 "tab_panel",
                 "Tab Panel",
