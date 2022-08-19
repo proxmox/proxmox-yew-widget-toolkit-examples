@@ -3,7 +3,7 @@ use anyhow::bail;
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Container, Panel};
+use pwt::widget::{Container, Panel, Row};
 use pwt::widget::form2::*;
 
 
@@ -60,7 +60,19 @@ impl Component for MyForm {
                 })
                 .with_child(html!{
                     <div style="grid-column-start: 2; grid-column-end: 3">{
-                        Reset::new()
+                        Row::new()
+                            .gap(2)
+                            .with_child(Reset::new())
+                            .with_child(
+                                Submit::new()
+                                    .on_submit({
+                                        let form_ctx = form_ctx.clone();
+                                        move |_|  {
+                                            let data = form_ctx.get_submit_data();
+                                            log::info!("Submit {:?}", data);
+                                        }
+                                    })
+                            )
                     }</div>
                 })
                 .into()
