@@ -64,6 +64,17 @@ impl Component for MyForm {
                         Checkbox::new("checkbox1").default(true)
                     }</div>
                 })
+                .with_child(html!{<span style="grid-column-start: 1; grid-column-end: 2">{"Combobox1"}</span>})
+                .with_child(html!{
+                    <div style="grid-column-start: 2; grid-column-end: 3">{
+                        Combobox::new("combobox1")
+                            .submit_empty(true)
+                            //.editable(true)
+                            .with_item("Option 1")
+                            .with_item("Option 2")
+                            .with_item("Option 3")
+                    }</div>
+                })
                .with_child(html!{
                     <div style="grid-column-start: 2; grid-column-end: 3">{
                         Row::new()
