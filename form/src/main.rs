@@ -58,6 +58,14 @@ impl Component for MyForm {
                             })
                     }</div>
                 })
+                .with_child(html!{<span style="grid-column-start: 1; grid-column-end: 2">{"Number1"}</span>})
+                 .with_child(html!{
+                    <div style="grid-column-start: 2; grid-column-end: 3">{
+                        Field::new("number1")
+                            .number(3.0, 10.0, 1.0)
+                            .default("4")
+                    }</div>
+                })
                 .with_child(html!{<span style="grid-column-start: 1; grid-column-end: 2">{"Checkbox1"}</span>})
                 .with_child(html!{
                     <div style="grid-column-start: 2; grid-column-end: 3">{
