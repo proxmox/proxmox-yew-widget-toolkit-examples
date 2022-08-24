@@ -3,7 +3,7 @@ use anyhow::bail;
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Container, Panel, Row};
+use pwt::widget::{InputPanel, Panel, Row};
 use pwt::widget::form2::*;
 
 
@@ -19,70 +19,56 @@ impl Component for MyForm {
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
         Form::new(|form_ctx| {
-            Container::new()
+            InputPanel::new()
                 .padding(2)
                 .border(false)
-                .class("pwt-form-grid-col2")
-                .with_child(html!{<span style="grid-column-start: 1; grid-column-end: 2">{"Field1"}</span>})
-                .with_child(html!{
-                    <div style="grid-column-start: 2; grid-column-end: 3">{
-                        Field::new("field1")
-                            .required(true)
-                            .on_change({
-                                let form_ctx = form_ctx.clone();
-                                move |v| {
-                                    form_ctx.validate_field("field2");
-                                    log::info!("Field1 changed to '{v}'");
+                .with_field(
+                    "Field1",
+                    Field::new("field1")
+                        .required(true)
+                        .on_change({
+                            let form_ctx = form_ctx.clone();
+                            move |v| {
+                                form_ctx.validate_field("field2");
+                                log::info!("Field1 changed to '{v}'");
+                            }
+                        })
+                )
+                .with_field(
+                    "Field2",
+                    Field::new("field2")
+                        .required(true)
+                        .on_change(|v| {
+                            log::info!("Field2 changed to '{v}'");
+                        })
+                        .validate({
+                            let form_ctx = form_ctx.clone();
+                            move |v| {
+                                log::info!("VALIDATE Field2");
+                                let field1 = form_ctx.get_field_value("field1");
+                                if &field1 != v {
+                                    bail!("Field content is different");
                                 }
-                            })
-                    }</div>
-                })
-                .with_child(html!{<span style="grid-column-start: 1; grid-column-end: 2">{"Field2"}</span>})
-                .with_child(html!{
-                    <div style="grid-column-start: 2; grid-column-end: 3">{
-                        Field::new("field2")
-                            .required(true)
-                            .on_change(|v| {
-                                log::info!("Field2 changed to '{v}'");
-                            })
-                            .validate({
-                                let form_ctx = form_ctx.clone();
-                                move |v| {
-                                    log::info!("VALIDATE Field2");
-                                    let field1 = form_ctx.get_field_value("field1");
-                                    if &field1 != v {
-                                        bail!("Field content is different");
-                                    }
-                                    Ok(())
-                                }
-                            })
-                    }</div>
-                })
-                .with_child(html!{<span style="grid-column-start: 1; grid-column-end: 2">{"Number1"}</span>})
-                .with_child(html!{
-                    <div style="grid-column-start: 2; grid-column-end: 3">{
-                        Field::new("number1")
-                            .number(3.0, 10.0, 1.0)
-                            .default("4")
-                    }</div>
-                })
-                .with_child(html!{<span style="grid-column-start: 1; grid-column-end: 2">{"Checkbox1"}</span>})
-                .with_child(html!{
-                    <div style="grid-column-start: 2; grid-column-end: 3">{
-                        Checkbox::new("checkbox1").default(true)
-                    }</div>
-                })
-                .with_child(html!{<span style="grid-column-start: 1; grid-column-end: 2">{"Combobox1"}</span>})
-                .with_child(html!{
-                    <div style="grid-column-start: 2; grid-column-end: 3">{
-                        Combobox::new("combobox1")
-                            .submit_empty(true)
-                            //.editable(true)
-                            .with_item("Option 1")
-                            .with_item("Option 2")
-                            .with_item("Option 3")
-                    }</div>
-                })
+                                Ok(())
+                            }
+                        })
+                )
+                .with_field(
+                    "Number1",
+                    Field::new("number1")
+                        .number(3.0, 10.0, 1.0)
+                        .default("4")
+                )
+                .with_field("Checkbox1", Checkbox::new("checkbox1").default(true))
+                .with_field(
+                    "Combobox1",
+                    Combobox::new("combobox1")
+                        .submit_empty(true)
+                    //.editable(true)
+                        .with_item("Option 1")
+                        .with_item("Option 2")
+                        .with_item("Option 3")
+                )
                .with_child(html!{
                     <div style="grid-column-start: 2; grid-column-end: 3">{
                         Row::new()
