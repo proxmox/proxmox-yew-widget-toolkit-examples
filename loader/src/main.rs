@@ -5,7 +5,7 @@ use pwt::prelude::*;
 use serde_json::Value;
 
 use pwt::state::Loader;
-use pwt::widget::{Column, Button, Panel, Toolbar};
+use pwt::widget::{Column, Panel};
 
 pub enum Msg {
     DataChange,
@@ -37,7 +37,7 @@ impl Component for App {
         }
     }
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
 
         // Use loader.render to correcty show load mask and load errors
         let content = self.loader.render(|data| {
