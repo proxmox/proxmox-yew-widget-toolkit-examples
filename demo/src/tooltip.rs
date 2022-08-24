@@ -2,7 +2,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Button, Row, Tooltip};
-use pwt::widget::form::Field;
+use pwt::widget::form2::Field;
 
 #[function_component]
 pub fn TooltipDemo() -> Html {
@@ -33,7 +33,8 @@ pub fn TooltipDemo() -> Html {
                     .class("pwt-align-items-center")
                     .with_child("Number between 3 and 10: ")
                     .with_child(
-                        Field::number(3.0, 10.0, 1.0)
+                        Field::new("number1")
+                            .number(3.0, 10.0, 1.0)
                             .default("2") // invalid to show tooltip
                             .required(true)
                     )
