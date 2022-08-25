@@ -23,31 +23,27 @@ impl Component for MyForm {
                 .padding(2)
                 .border(false)
                 .with_field(
-                    "Field1",
-                    Field::new("field1")
+                    "Password",
+                    Field::new("password")
                         .required(true)
+                        .input_type("password")
                         .on_change({
                             let form_ctx = form_ctx.clone();
-                            move |v| {
-                                form_ctx.validate_field("field2");
-                                log::info!("Field1 changed to '{v}'");
-                            }
+                            move |_value| form_ctx.validate_field("confirm_password")
                         })
                 )
                 .with_field(
-                    "Field2",
-                    Field::new("field2")
+                    "Confirm Password",
+                    Field::new("confirm_password")
                         .required(true)
-                        .on_change(|v| {
-                            log::info!("Field2 changed to '{v}'");
-                        })
+                        .submit(false)
+                        .input_type("password")
                         .validate({
                             let form_ctx = form_ctx.clone();
-                            move |v| {
-                                log::info!("VALIDATE Field2");
-                                let field1 = form_ctx.get_field_value("field1");
-                                if &field1 != v {
-                                    bail!("Field content is different");
+                            move |value| {
+                                let field1 = form_ctx.get_field_value("password");
+                                if &field1 != value {
+                                    bail!("Passwords do not match!");
                                 }
                                 Ok(())
                             }
@@ -64,7 +60,7 @@ impl Component for MyForm {
                     "Combobox1",
                     Combobox::new("combobox1")
                         .submit_empty(true)
-                    //.editable(true)
+                        //.editable(true)
                         .with_item("Option 1")
                         .with_item("Option 2")
                         .with_item("Option 3")
