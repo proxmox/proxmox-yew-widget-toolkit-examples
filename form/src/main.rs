@@ -4,7 +4,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{InputPanel, Panel, Row};
-use pwt::widget::form2::*;
+use pwt::widget::form::*;
 
 
 pub struct MyForm {}
