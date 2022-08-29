@@ -60,6 +60,7 @@ impl Component for MyForm {
                     "Combobox1",
                     Combobox::new("combobox1")
                         .submit_empty(true)
+                        .placeholder("Please select something.")
                         //.editable(true)
                         .with_item("Option 1")
                         .with_item("Option 2")
