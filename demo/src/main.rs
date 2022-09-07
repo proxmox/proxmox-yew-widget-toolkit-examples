@@ -7,6 +7,9 @@ use tab_panel::TabPanelDemo;
 mod tooltip;
 pub use tooltip::TooltipDemo;
 
+mod datatable;
+pub use datatable::DataTableDemo;
+
 use yew::prelude::*;
 use yew_router::HashRouter;
 
@@ -40,6 +43,14 @@ fn MainMenu() -> Html {
                 "Buttons",
                 None::<&str>,
                 |_| { html!{<ButtonsDemo/>} },
+            )
+        )
+        .with_item(
+            MenuItem::new(
+                "datatable_panel",
+                "DataTable",
+                None::<&str>,
+                |_| { html!{<DataTableDemo/>} },
             )
         )
         .navigation_container()
