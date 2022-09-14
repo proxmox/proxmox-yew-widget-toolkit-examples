@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Button, Column, Container, TabPanel};
+use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
 #[function_component]
