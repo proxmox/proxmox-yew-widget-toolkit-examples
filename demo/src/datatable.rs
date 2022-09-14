@@ -57,7 +57,8 @@ pub fn DataTableDemo() -> Html {
 
     let table1 = DataTable::new(columns)
         .class("pwt-fit pwt-border")
-        //.cell_class("pwt-truncate pwt-p-2")
+    //.cell_class("pwt-truncate pwt-p-2")
+    //.vertical_align("middle")
         .bordered(true)
         .data(data);
 
