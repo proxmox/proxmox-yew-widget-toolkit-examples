@@ -59,6 +59,7 @@ pub fn DataTableDemo() -> Html {
         .class("pwt-fit pwt-border")
     //.cell_class("pwt-truncate pwt-p-2")
     //.vertical_align("middle")
+    //.min_row_height(100)
         .bordered(true)
         .data(data);
 
