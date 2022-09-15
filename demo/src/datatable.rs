@@ -31,7 +31,7 @@ pub fn DataTableDemo() -> Html {
     thread_local!{
         static DATA: Rc<Vec<usize>> = Rc::new({
             let mut data = Vec::new();
-            for i in 0..30 { data.push(i); }
+            for i in 0..30_000 { data.push(i); }
             data
         });
     }
