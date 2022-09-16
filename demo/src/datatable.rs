@@ -10,7 +10,7 @@ use pwt::widget::data_table2::*;
 pub fn DataTableDemo() -> Html {
 
     let header1 = DataTableColumn::new("RecordId")
-        .width(90)
+       // .width(90)
         .sorter(usize::cmp)
         .render(|n: &usize| html!{n.to_string()});
 
