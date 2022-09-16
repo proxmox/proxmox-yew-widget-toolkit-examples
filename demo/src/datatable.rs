@@ -11,6 +11,7 @@ pub fn DataTableDemo() -> Html {
 
     let header1 = DataTableColumn::new("RecordId")
         .width(80)
+        .sorter(usize::cmp)
         .render(|n: &usize| html!{n.to_string()});
 
 
