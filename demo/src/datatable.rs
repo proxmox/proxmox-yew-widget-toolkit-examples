@@ -10,7 +10,7 @@ use pwt::widget::data_table2::*;
 pub fn DataTableDemo() -> Html {
 
     let header1 = DataTableColumn::new("RecordId")
-       // .width(90)
+        .fixed(90)
         .sorter(usize::cmp)
         .render(|n: &usize| html!{n.to_string()});
 
@@ -27,6 +27,7 @@ pub fn DataTableDemo() -> Html {
         });
 
     let header3 = DataTableColumn::new("TESTHEADER3")
+        .percentage(20)
         .render(|n: &usize| html!{format!("This is record {n} (a longer line)")});
 
     thread_local!{
