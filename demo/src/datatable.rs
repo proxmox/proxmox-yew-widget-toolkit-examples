@@ -58,7 +58,8 @@ pub fn DataTableDemo() -> Html {
         header2.clone().into(),
     ]);
 
-    let selection = Selection2::new(true, |n: &usize| (*n).into())
+    let selection = Selection2::new(|n: &usize| (*n).into())
+        .multiselect(true)
         .on_select(|sel| log::info!("Current Selection: {:?}", sel));
 
     selection.select(2);
