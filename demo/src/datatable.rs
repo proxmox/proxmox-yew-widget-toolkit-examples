@@ -3,6 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use pwt::prelude::*;
 
+use pwt::props::Selection2;
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
@@ -57,6 +58,11 @@ pub fn DataTableDemo() -> Html {
         header2.clone().into(),
     ]);
 
+    let selection = Selection2::new(true, |n: &usize| (*n).into());
+
+    selection.select(2);
+    selection.select(4);
+
     let table1 = DataTable::new(columns)
         .class("pwt-fit pwt-border")
     //.cell_class("pwt-p-2 pwt-fs-4")
@@ -64,6 +70,7 @@ pub fn DataTableDemo() -> Html {
     //.min_row_height(100)
     //.header_class("pwt-scheme-primary-container pwt-fs-4")
         .bordered(true)
+        .selection(selection)
         .data(data);
 
     Column::new()
