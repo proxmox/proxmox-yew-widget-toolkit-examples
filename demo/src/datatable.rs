@@ -13,6 +13,7 @@ pub fn DataTableDemo() -> Html {
     let header1 = DataTableColumn::new("RecordId")
         .fixed(90)
         .sorter(usize::cmp)
+        .sort_order(false)
         .render(|n: &usize| html!{n.to_string()});
 
 
@@ -41,13 +42,11 @@ pub fn DataTableDemo() -> Html {
 
     let data = DATA.with(Rc::clone);
 
-    let group3 = HeaderGroup::new()
-        .content(html!{"Group3"})
+    let group3 = HeaderGroup::new("Group3")
         .with_child(header2.clone())
         .with_child(header3.clone());
 
-    let group2 = HeaderGroup::new()
-        .content(html!{"Group2"})
+    let group2 = HeaderGroup::new("Group2")
         .with_child(header1.clone())
         .with_child(group3)
         .with_child(header3.clone());
