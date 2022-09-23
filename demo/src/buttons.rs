@@ -27,6 +27,12 @@ pub fn ButtonsDemo() -> Html {
                     .pressed(pressed)
                     .class("neutral"),
             )
+            .with_child(
+                Button::new("Error")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class("error"),
+            )
             .into()
     }
 
