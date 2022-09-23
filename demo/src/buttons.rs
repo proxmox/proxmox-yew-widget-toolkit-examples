@@ -5,14 +5,28 @@ use pwt::widget::{Column, Button, Row};
 
 #[function_component]
 pub fn ButtonsDemo() -> Html {
-
-    fn render_buttons(disabled: bool) -> Html {
+    fn render_buttons(disabled: bool, pressed: bool) -> Html {
         Row::new()
             .gap(2)
-            .with_child(Button::new("Normal").disabled(disabled))
-            .with_child(Button::new("Primary").disabled(disabled).class("primary"))
-            .with_child(Button::new("Secondary").disabled(disabled).class("secondary"))
-            .with_child(Button::new("Neutral").disabled(disabled).class("neutral"))
+            .with_child(Button::new("Normal").disabled(disabled).pressed(pressed))
+            .with_child(
+                Button::new("Primary")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class("primary"),
+            )
+            .with_child(
+                Button::new("Secondary")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class("secondary"),
+            )
+            .with_child(
+                Button::new("Neutral")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class("neutral"),
+            )
             .into()
     }
 
@@ -21,9 +35,11 @@ pub fn ButtonsDemo() -> Html {
         .gap(2)
         .class("pwt-align-items-start")
         .with_child("Enabled Buttons")
-        .with_child(render_buttons(false))
+        .with_child(render_buttons(false, false))
         .with_child("Disabled Buttons")
-        .with_child(render_buttons(true))
+        .with_child(render_buttons(true, false))
+        .with_child("Pressed Buttons")
+        .with_child(render_buttons(false, true))
         .with_child("Button with Icon")
         .with_child(Button::new("Delete").icon_class("fa fa-trash-o"))
         .with_child("Round Button with Icon")
