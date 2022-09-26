@@ -59,7 +59,7 @@ pub fn DataTableDemo() -> Html {
 
     let selection = Selection2::new(|n: &usize| (*n).into())
         .multiselect(true)
-        .on_select(|sel| log::info!("Current Selection: {:?}", sel));
+        .on_select(|sel: Selection2<usize>| log::info!("Current Selection: {:?}", sel.selected_keys()));
 
     selection.select(2);
     selection.select(4);
