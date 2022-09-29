@@ -11,7 +11,10 @@
     <link data-trunk href="../../assets/font-awesome.css" rel="css"/>
     <link data-trunk href="../../assets/fonts" rel="copy-dir"/>
 
-    <link data-trunk href="../../assets/proxmox-yew-style-auto.css" rel="copy-file"/>
-
+    <style>
+      /* Avoid flickering (default background in firefox is always white)*/
+      @media (prefers-color-scheme: dark ) { html { background: #333; } }
+      @media (prefers-color-scheme: light) { html { background: #fff; } }
+    </style>
   </head>
 </html>
