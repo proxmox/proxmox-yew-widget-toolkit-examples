@@ -7,6 +7,9 @@ use tab_panel::TabPanelDemo;
 mod tooltip;
 pub use tooltip::TooltipDemo;
 
+mod menu;
+pub use menu::MenuDemo;
+
 mod datatable;
 pub use datatable::DataTableDemo;
 
@@ -53,7 +56,15 @@ fn MainMenu() -> Html {
                 |_| { html!{<DataTableDemo/>} },
             )
         )
-        .navigation_container()
+        .with_item(
+            MenuItem::new(
+                "menu_panel",
+                "Menus",
+                None::<&str>,
+                |_| { html!{<MenuDemo/>} },
+            )
+        )
+         .navigation_container()
         .into()
 }
 
