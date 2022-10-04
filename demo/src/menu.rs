@@ -20,6 +20,11 @@ pub fn MenuDemo() -> Html {
             Menu::new()
                 .with_item(MenuItem::new("Submenu1 Item1"))
                 .with_item(submenu2)
+                .with_item(<Container as Into<Html>>::into(
+                    Container::new()
+                        .padding((0, 2))
+                        .with_child(Button::new("Button2").tabindex(-1).class("pwt-menu-item-indent"))
+                ))
                 .with_item(MenuItem::new("Submenu1 Item2"))
         );
    
