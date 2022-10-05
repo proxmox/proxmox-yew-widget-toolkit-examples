@@ -6,6 +6,13 @@ use pwt::widget::{Column, Menu, MenuItem, Button, Container};
 #[function_component]
 pub fn MenuDemo() -> Html {
 
+    let submenu3 = MenuItem::new("Submenu3")
+        .menu(
+            Menu::new()
+                .with_item(MenuItem::new("Submenu3 disabled Item1").disabled(true))
+                .with_item(MenuItem::new("Submenu3 disabled Item2").disabled(true))
+        );
+
     let submenu2 = MenuItem::new("Submenu2")
         .menu(
             Menu::new()
@@ -13,7 +20,7 @@ pub fn MenuDemo() -> Html {
                 .with_item(MenuItem::new("Submenu2 Item2"))
                 .with_item(MenuItem::new("Submenu2 Item3"))
         );
-    
+
      let submenu1 = MenuItem::new("Submenu1")
         .icon_class("fa fa-coffee")
         .menu(
@@ -25,9 +32,10 @@ pub fn MenuDemo() -> Html {
                         .padding((0, 2))
                         .with_child(Button::new("Button2").tabindex(-1).class("pwt-menu-item-indent"))
                 ))
+                .with_item(submenu3)
                 .with_item(MenuItem::new("Submenu1 Item2"))
         );
-   
+
     Column::new()
         .padding(2)
         .gap(2)
