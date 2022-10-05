@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Menu, MenuItem, Button, Container};
+use pwt::widget::{Column, Menu, MenuItem, MenuButton, Button, Container};
 
 #[function_component]
 pub fn MenuDemo() -> Html {
@@ -39,6 +39,16 @@ pub fn MenuDemo() -> Html {
     Column::new()
         .padding(2)
         .gap(2)
+        .with_child("Menu Button:")
+        .with_child(
+            MenuButton::new("MyMenu").menu(
+                Menu::new()
+                    .with_item(MenuItem::new("MyMenu Item1"))
+                    .with_item(MenuItem::new("MyMenu Item2"))
+                    .with_item(submenu1.clone())
+                    .with_item(MenuItem::new("Mymenu Item3"))
+            )
+        )
         .with_child("Simple Menu:")
         .with_child(
             Menu::new()
