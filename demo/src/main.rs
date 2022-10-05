@@ -13,58 +13,68 @@ pub use menu::MenuDemo;
 mod datatable;
 pub use datatable::DataTableDemo;
 
+mod navigation;
+pub use navigation::NavigationDemo;
+
+mod fields;
+pub use fields::FieldsDemo;
+
 use yew::prelude::*;
 use yew_router::HashRouter;
 
 use pwt::prelude::*;
 
-use pwt::component::{NavigationMenu, MenuItem};
+use pwt::component::{MenuItem, NavigationMenu};
 use pwt::widget::{Panel, ThemeLoader, ThemeSelector};
 
 #[function_component]
 fn MainMenu() -> Html {
     NavigationMenu::new()
-        .with_item(
-            MenuItem::new(
-                "tooltip_panel",
-                "Tooltips",
-                None::<&str>,
-                |_| { html!{<TooltipDemo/>} },
-            )
-        )
-         .with_item(
-            MenuItem::new(
-                "tab_panel",
-                "Tab Panel",
-                None::<&str>,
-                |_| { html!{<TabPanelDemo/>} },
-            )
-        )
-       .with_item(
-            MenuItem::new(
-                "button_panel",
-                "Buttons",
-                None::<&str>,
-                |_| { html!{<ButtonsDemo/>} },
-            )
-        )
-        .with_item(
-            MenuItem::new(
-                "datatable_panel",
-                "DataTable",
-                None::<&str>,
-                |_| { html!{<DataTableDemo/>} },
-            )
-        )
-        .with_item(
-            MenuItem::new(
-                "menu_panel",
-                "Menus",
-                None::<&str>,
-                |_| { html!{<MenuDemo/>} },
-            )
-        )
-         .navigation_container()
+        .with_item(MenuItem::new(
+            "tooltip_panel",
+            "Tooltips",
+            None::<&str>,
+            |_| {
+                html! {<TooltipDemo/>}
+            },
+        ))
+        .with_item(MenuItem::new(
+            "tab_panel",
+            "Tab Panel",
+            None::<&str>,
+            |_| {
+                html! {<TabPanelDemo/>}
+            },
+        ))
+        .with_item(MenuItem::new("forms_panel", "Fields", None::<&str>, |_| {
+            html! {<FieldsDemo />}
+        }))
+        .with_item(MenuItem::new(
+            "button_panel",
+            "Buttons",
+            None::<&str>,
+            |_| {
+                html! {<ButtonsDemo/>}
+            },
+        ))
+        .with_item(MenuItem::new(
+            "datatable_panel",
+            "DataTable",
+            None::<&str>,
+            |_| {
+                html! {<DataTableDemo/>}
+            },
+        ))
+        .with_item(MenuItem::new("menu_panel", "Menus", None::<&str>, |_| {
+            html! {<MenuDemo/>}
+        }))
+        .with_item(MenuItem::new(
+            "nav_panel",
+            "Navigation",
+            None::<&str>,
+            |_| html!(<NavigationDemo/>),
+        ))
+        .navigation_container()
         .into()
 }
 
