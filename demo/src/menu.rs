@@ -21,7 +21,7 @@ pub fn MenuDemo() -> Html {
                 .with_item(MenuItem::new("Submenu2 Item3"))
         );
 
-     let submenu1 = MenuItem::new("Submenu1")
+    let submenu1 = MenuItem::new("Submenu1")
         .icon_class("fa fa-coffee")
         .menu(
             Menu::new()
