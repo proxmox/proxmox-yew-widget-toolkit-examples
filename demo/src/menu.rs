@@ -26,7 +26,7 @@ pub fn MenuDemo() -> Html {
         .menu(
             Menu::new()
                 .with_item(MenuItem::new("Submenu1 Item1"))
-                .with_item(submenu2)
+                .with_item(submenu2.clone())
                 .with_item(<Container as Into<Html>>::into(
                     Container::new()
                         .padding((0, 2))
@@ -54,6 +54,7 @@ pub fn MenuDemo() -> Html {
         .with_child(
             Menu::new_menubar()
                 .with_item(submenu1)
+                .with_item(submenu2)
                 .with_item(MenuItem::new("No Submenu with icon").icon_class("fa fa-fire-extinguisher"))
                 .with_item(MenuItem::new("MenuItem4"))
                 .with_item(MenuItem::new("MenuItem5"))
