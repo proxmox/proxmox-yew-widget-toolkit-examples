@@ -6,6 +6,12 @@ use pwt::widget::{Column, Menu, MenuItem, MenuButton, Button, Container};
 #[function_component]
 pub fn MenuDemo() -> Html {
 
+    let longmenu = MenuItem::new("Long Submenu")
+        .menu(
+            Menu::new()
+                .items((0..100).map(|i| MenuItem::new(format!("Item{i}")).into()))
+       );
+
     let submenu3 = MenuItem::new("Submenu3")
         .menu(
             Menu::new()
@@ -20,6 +26,7 @@ pub fn MenuDemo() -> Html {
                 .with_separator()
                 .with_item(MenuItem::new("Submenu2 Item2"))
                 .with_separator()
+                .with_item(longmenu.clone())
                 .with_item(MenuItem::new("Submenu2 Item3"))
         );
 
@@ -57,6 +64,8 @@ pub fn MenuDemo() -> Html {
             Menu::new_menubar()
                 .with_item(submenu1)
                 .with_item(submenu2)
+                .with_separator()
+                .with_item(longmenu)
                 .with_separator()
                 .with_item(MenuItem::new("No Submenu with icon").icon_class("fa fa-fire-extinguisher"))
                 .with_item(MenuItem::new("MenuItem4"))
