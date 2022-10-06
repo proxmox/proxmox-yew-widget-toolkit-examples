@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Menu, MenuItem, MenuButton, Button, Container, Panel, Toolbar};
+use pwt::widget::{Column, Menu, MenuItem, MenuButton, MenuCheckbox, Button, Container, Panel, Toolbar};
 
 fn panel_with_menu_button() -> Html {
 
@@ -33,13 +33,34 @@ fn panel_with_menubar() -> Html {
         .menu(
             Menu::new()
                 .items((0..50).map(|i| MenuItem::new(format!("Item{i}")).into()))
-       );
+        );
+
+    let radiogroup = MenuItem::new("RadioGroup test")
+        .menu(
+            Menu::new()
+                .with_item(MenuCheckbox::new("Value1").group("mygroup"))
+                .with_item(MenuCheckbox::new("Value2").group("mygroup"))
+                .with_item(MenuCheckbox::new("Value3").group("mygroup"))
+                .with_item(MenuCheckbox::new("Value4").group("mygroup"))
+        );
+
+    let checkboxes = MenuItem::new("CheckboxTest")
+        .menu(
+            Menu::new()
+                .with_item(radiogroup)
+                .with_item(MenuCheckbox::new("Checkbox1"))
+                .with_item(MenuCheckbox::new("Checkbox2"))
+                .with_item(MenuCheckbox::new("Checkbox3"))
+                .with_item(MenuCheckbox::new("Checkbox4"))
+                .with_item(MenuCheckbox::new("Checkbox5"))
+        );
 
     let submenu3 = MenuItem::new("Submenu3")
         .menu(
             Menu::new()
                 .with_item(MenuItem::new("Submenu3 disabled Item1").disabled(true))
                 .with_item(MenuItem::new("Submenu3 disabled Item2").disabled(true))
+                .with_item(MenuCheckbox::new("A Checkbox"))
         );
 
     let submenu2 = MenuItem::new("Submenu2")
@@ -70,6 +91,7 @@ fn panel_with_menubar() -> Html {
 
     let menubar = Menu::new_menubar()
         .with_item(submenu1)
+        .with_item(checkboxes)
         .with_item(submenu2)
         .with_separator()
         .with_item(longmenu)
