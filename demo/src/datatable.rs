@@ -23,7 +23,7 @@ pub fn DataTableDemo() -> Html {
             <>
                 <h3>{"This is a header"}</h3>
                 <p>{format!("This is record {n} with more than one line")}</p>
-                <input/>
+                <input class="pwt-input"/>
 
             </>
         });
