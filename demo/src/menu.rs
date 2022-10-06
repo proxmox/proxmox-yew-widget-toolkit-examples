@@ -17,7 +17,9 @@ pub fn MenuDemo() -> Html {
         .menu(
             Menu::new()
                 .with_item(MenuItem::new("Submenu2 Item1"))
+                .with_separator()
                 .with_item(MenuItem::new("Submenu2 Item2"))
+                .with_separator()
                 .with_item(MenuItem::new("Submenu2 Item3"))
         );
 
@@ -55,6 +57,7 @@ pub fn MenuDemo() -> Html {
             Menu::new_menubar()
                 .with_item(submenu1)
                 .with_item(submenu2)
+                .with_separator()
                 .with_item(MenuItem::new("No Submenu with icon").icon_class("fa fa-fire-extinguisher"))
                 .with_item(MenuItem::new("MenuItem4"))
                 .with_item(MenuItem::new("MenuItem5"))
