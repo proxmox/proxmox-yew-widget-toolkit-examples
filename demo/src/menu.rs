@@ -1,10 +1,33 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Menu, MenuItem, MenuButton, Button, Container};
+use pwt::widget::{Column, Menu, MenuItem, MenuButton, Button, Container, Panel, Toolbar};
 
-#[function_component]
-pub fn MenuDemo() -> Html {
+fn panel_with_menu_button() -> Html {
+
+    let toolbar = Toolbar::new()
+        .class("pwt-border-bottom")
+        .with_child(
+            MenuButton::new("MyMenu").menu(
+                Menu::new()
+                    .with_item(MenuItem::new("MyMenu Item1"))
+                    .with_item(MenuItem::new("MyMenu Item2"))
+                    .with_item(MenuItem::new("Disabled Item").icon_class("fa fa-trash-o").disabled(true))
+                    .with_item(MenuItem::new("MyMenu Item3"))
+            )
+        );
+
+    let text = "Menu buttons are useful inside toolbars.";
+
+    Panel::new()
+        .title("Menu Button Example")
+        .with_child(toolbar)
+        .with_child(html!{<div class="pwt-p-2">{text}</div>})
+        .into()
+
+}
+
+fn panel_with_menubar() -> Html {
 
     let longmenu = MenuItem::new("Long Submenu")
         .menu(
@@ -45,31 +68,33 @@ pub fn MenuDemo() -> Html {
                 .with_item(MenuItem::new("Submenu1 Item2"))
         );
 
+    let menubar = Menu::new_menubar()
+        .with_item(submenu1)
+        .with_item(submenu2)
+        .with_separator()
+        .with_item(longmenu)
+        .with_separator()
+        .with_item(MenuItem::new("No Submenu with icon").icon_class("fa fa-fire-extinguisher"))
+        .with_item(MenuItem::new("MenuItem4"))
+        .with_item(MenuItem::new("MenuItem5"));
+
+    let text = "This panel contains a menubar.";
+
+    Panel::new()
+        .title("Menubar Example")
+        .with_child(Container::new().with_child(menubar).class("pwt-border-bottom"))
+        .with_child(html!{<div class="pwt-p-2">{text}</div>})
+        .into()
+
+}
+
+#[function_component]
+pub fn MenuDemo() -> Html {
     Column::new()
+        .class("pwt-fit")
         .padding(2)
         .gap(2)
-        .with_child("Menu Button:")
-        .with_child(
-            MenuButton::new("MyMenu").menu(
-                Menu::new()
-                    .with_item(MenuItem::new("MyMenu Item1"))
-                    .with_item(MenuItem::new("MyMenu Item2"))
-                    .with_item(MenuItem::new("Disabled Item").icon_class("fa fa-trash-o").disabled(true))
-                    .with_item(submenu1.clone())
-                    .with_item(MenuItem::new("Mymenu Item3"))
-            )
-        )
-        .with_child("Simple Menubar:")
-        .with_child(
-            Menu::new_menubar()
-                .with_item(submenu1)
-                .with_item(submenu2)
-                .with_separator()
-                .with_item(longmenu)
-                .with_separator()
-                .with_item(MenuItem::new("No Submenu with icon").icon_class("fa fa-fire-extinguisher"))
-                .with_item(MenuItem::new("MenuItem4"))
-                .with_item(MenuItem::new("MenuItem5"))
-        )
+        .with_child(panel_with_menu_button())
+        .with_child(panel_with_menubar())
         .into()
 }
