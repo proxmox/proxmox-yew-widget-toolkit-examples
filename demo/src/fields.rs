@@ -1,6 +1,6 @@
 use pwt::{
     prelude::*,
-    widget::{Button, Container, InputPanel, SegmentedButton},
+    widget::{Container, InputPanel},
 };
 use yew::prelude::*;
 

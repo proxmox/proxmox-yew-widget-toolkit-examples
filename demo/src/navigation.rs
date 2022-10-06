@@ -1,9 +1,5 @@
 use pwt::component::{MenuItem, NavigationMenu};
-use pwt::prelude::*;
 use yew::prelude::*;
-
-use pwt::widget::form::Field;
-use pwt::widget::{Button, Column, Row, Tooltip};
 
 #[function_component]
 pub fn NavigationDemo() -> Html {
