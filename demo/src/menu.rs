@@ -9,7 +9,7 @@ pub fn MenuDemo() -> Html {
     let longmenu = MenuItem::new("Long Submenu")
         .menu(
             Menu::new()
-                .items((0..100).map(|i| MenuItem::new(format!("Item{i}")).into()))
+                .items((0..50).map(|i| MenuItem::new(format!("Item{i}")).into()))
        );
 
     let submenu3 = MenuItem::new("Submenu3")
