@@ -23,7 +23,7 @@ pub fn FieldsDemo() -> Html {
                     "Numberfield with limits",
                     Field::new("numberfield").number(0.0, 150.0, 2.0),
                 )
-                .with_field("Checkbox", Checkbox::new("checkbox"))
+                .with_field("Checkbox", Checkbox::new())
                 .with_field(
                     "Combobox",
                     Combobox::new("combobox")
