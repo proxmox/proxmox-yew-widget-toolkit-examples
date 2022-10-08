@@ -2,6 +2,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Menu, MenuItem, MenuButton, MenuCheckbox, Button, Container, Panel, Toolbar};
+use pwt::widget::form::Form;
 
 fn panel_with_menu_button() -> Html {
 
@@ -38,21 +39,21 @@ fn panel_with_menubar() -> Html {
     let radiogroup = MenuItem::new("RadioGroup test")
         .menu(
             Menu::new()
-                .with_item(MenuCheckbox::new("Value1").group("mygroup"))
-                .with_item(MenuCheckbox::new("Value2").group("mygroup"))
-                .with_item(MenuCheckbox::new("Value3").group("mygroup"))
-                .with_item(MenuCheckbox::new("Value4").group("mygroup"))
+                .with_item(MenuCheckbox::new("Value1").group("mygroup").name("opt1"))
+                .with_item(MenuCheckbox::new("Value2").group("mygroup").name("opt2"))
+                .with_item(MenuCheckbox::new("Value3").group("mygroup").name("opt3"))
+                .with_item(MenuCheckbox::new("Value4").group("mygroup").name("opt4"))
         );
 
     let checkboxes = MenuItem::new("CheckboxTest")
         .menu(
             Menu::new()
                 .with_item(radiogroup)
-                .with_item(MenuCheckbox::new("Checkbox1"))
-                .with_item(MenuCheckbox::new("Checkbox2"))
-                .with_item(MenuCheckbox::new("Checkbox3"))
-                .with_item(MenuCheckbox::new("Checkbox4"))
-                .with_item(MenuCheckbox::new("Checkbox5"))
+                .with_item(MenuCheckbox::new("Checkbox1").name("check1"))
+                .with_item(MenuCheckbox::new("Checkbox2").name("check2"))
+                .with_item(MenuCheckbox::new("Checkbox3").name("check3"))
+                .with_item(MenuCheckbox::new("Checkbox4").name("check4"))
+                .with_item(MenuCheckbox::new("Checkbox5").name("check5"))
         );
 
     let submenu3 = MenuItem::new("Submenu3")
@@ -100,11 +101,20 @@ fn panel_with_menubar() -> Html {
         .with_item(MenuItem::new("MenuItem4"))
         .with_item(MenuItem::new("MenuItem5"));
 
-    let text = "This panel contains a menubar.";
+    let text = "This panel contains a menubar. The menubar is inside a
+    Form which provides the context to store checkbox/radiobox
+    values.";
 
     Panel::new()
         .title("Menubar Example")
-        .with_child(Container::new().with_child(menubar).class("pwt-border-bottom"))
+        .with_child(
+             Form::new(move |_form_ctx| {
+                 Container::new()
+                     .with_child(menubar.clone())
+                     .class("pwt-border-bottom")
+                     .into()
+             })
+        )
         .with_child(html!{<div class="pwt-p-2">{text}</div>})
         .into()
 
