@@ -23,7 +23,7 @@ fn panel_with_menu_button() -> Html {
     Panel::new()
         .title("Menu Button Example")
         .with_child(toolbar)
-        .with_child(html!{<div class="pwt-p-2">{text}</div>})
+        .with_child(html!{<p class="pwt-p-2">{text}</p>})
         .into()
 
 }
@@ -115,7 +115,7 @@ fn panel_with_menubar() -> Html {
                      .into()
              })
         )
-        .with_child(html!{<div class="pwt-p-2">{text}</div>})
+        .with_child(html!{<p class="pwt-p-2">{text}</p>})
         .into()
 
 }
