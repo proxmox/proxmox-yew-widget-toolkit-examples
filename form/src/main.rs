@@ -55,7 +55,7 @@ impl Component for MyForm {
                         .number(3.0, 10.0, 1.0)
                         .default("4")
                 )
-                .with_field("Checkbox1", Checkbox::new("checkbox1").default(true))
+                .with_field("Checkbox1", Checkbox::new().name("checkbox1").default(true))
                 .with_field(
                     "Combobox1",
                     Combobox::new("combobox1")
@@ -70,9 +70,9 @@ impl Component for MyForm {
                     <div style="grid-column-start: 2; grid-column-end: 3">{
                         Row::new()
                             .gap(2)
-                            .with_child(Reset::new())
+                            .with_child(ResetButton::new())
                             .with_child(
-                                Submit::new()
+                                SubmitButton::new()
                                     .on_submit({
                                         let form_ctx = form_ctx.clone();
                                         move |_|  {
