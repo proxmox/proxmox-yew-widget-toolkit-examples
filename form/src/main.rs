@@ -61,7 +61,8 @@ impl Component for MyForm {
                 .with_field("Checkbox1", Checkbox::new().name("checkbox1").default(true))
                 .with_field(
                     "Combobox1",
-                    Combobox::new("combobox1")
+                    Combobox::new()
+                        .name("combobox1")
                         .submit_empty(true)
                         .placeholder("Please select something.")
                         //.editable(true)
