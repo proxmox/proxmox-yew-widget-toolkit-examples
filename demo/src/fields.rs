@@ -25,7 +25,7 @@ fn demo_input_panel(_form_ctx: &FormContext) -> Html {
         .with_field("Radio Group Option3", Checkbox::new().group("g1").name("opt3"))
         .with_field(
             "Combobox",
-            Combobox::new("combobox1")
+            Combobox::new()
                 .with_item("Item 1")
                 .with_item("Item 2"),
         )
