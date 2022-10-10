@@ -8,16 +8,16 @@ use pwt::widget::form::{Checkbox, Combobox, Field, Form, FormContext};
 
 fn demo_input_panel(_form_ctx: &FormContext) -> Html {
     InputPanel::new()
-        .with_field("Textfield", Field::new("textfield"))
-        .with_field("Password", Field::new("passwordfield").input_type("password"))
-        .with_field("Range field", Field::new("rangefield").input_type("range"))
+        .with_field("Textfield", Field::new())
+        .with_field("Password", Field::new().input_type("password"))
+        .with_field("Range field", Field::new().input_type("range"))
         .with_field(
             "Numberfield",
-            Field::new("numberfield1").input_type("number"),
+            Field::new().input_type("number"),
         )
         .with_field(
             "Numberfield with limits",
-            Field::new("numberfield2").number(0.0, 150.0, 2.0),
+            Field::new().number(0.0, 150.0, 2.0),
         )
         .with_field("Checkbox", Checkbox::new())
         .with_field("Radio Group Option1", Checkbox::new().group("g1").name("opt1"))

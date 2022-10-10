@@ -33,7 +33,7 @@ pub fn TooltipDemo() -> Html {
                     .class("pwt-align-items-center")
                     .with_child("Number between 3 and 10: ")
                     .with_child(
-                        Field::new("number1")
+                        Field::new()
                             .number(3.0, 10.0, 1.0)
                             .default("2") // invalid to show tooltip
                             .required(true)

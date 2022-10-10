@@ -24,7 +24,8 @@ impl Component for MyForm {
                 .border(false)
                 .with_field(
                     "Password",
-                    Field::new("password")
+                    Field::new()
+                        .name("password")
                         .required(true)
                         .input_type("password")
                         .on_change({
@@ -34,7 +35,8 @@ impl Component for MyForm {
                 )
                 .with_field(
                     "Confirm Password",
-                    Field::new("confirm_password")
+                    Field::new()
+                        .name("confirm_password")
                         .required(true)
                         .submit(false)
                         .input_type("password")
@@ -51,7 +53,8 @@ impl Component for MyForm {
                 )
                 .with_field(
                     "Number1",
-                    Field::new("number1")
+                    Field::new()
+                        .name("number1")
                         .number(3.0, 10.0, 1.0)
                         .default("4")
                 )
@@ -100,7 +103,6 @@ impl Component for App {
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
 
-        //let input_panel = InputPanel::new(form_state)
         Panel::new()
             .title("A Simple Form")
             .with_child(html!{<MyForm/>})
