@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Menu, MenuItem, MenuButton, MenuCheckbox, Button, Container, Panel, Toolbar};
+use pwt::widget::{dispatch_menu_close_event, Column, Menu, MenuItem, MenuButton, MenuCheckbox, Button, Container, Panel, Toolbar};
 use pwt::widget::form::Form;
 
 fn panel_with_menu_button() -> Html {
@@ -84,7 +84,14 @@ fn panel_with_menubar() -> Html {
                 .with_item(<Container as Into<Html>>::into(
                     Container::new()
                         .padding((0, 2))
-                        .with_child(Button::new("Button2").tabindex(-1).class("pwt-menu-item-indent"))
+                        .with_child(
+                            Button::new("Button2")
+                                .tabindex(-1)
+                                .class("pwt-menu-item-indent")
+                                .onclick(|event: MouseEvent| {
+                                    dispatch_menu_close_event(&event);
+                                })
+                        )
                 ))
                 .with_item(submenu3)
                 .with_item(MenuItem::new("Submenu1 Item2"))
