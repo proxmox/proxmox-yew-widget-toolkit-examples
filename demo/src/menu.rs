@@ -6,6 +6,13 @@ use pwt::widget::form::Form;
 
 fn panel_with_menu_button() -> Html {
 
+    let submenu1 = MenuItem::new("Submenu1")
+        .menu(
+            Menu::new()
+                .with_item(MenuItem::new("Submenu1 Item1"))
+                .with_item(MenuItem::new("Submenu1 Item2"))
+        );
+
     let toolbar = Toolbar::new()
         .class("pwt-border-bottom")
         .with_child(
@@ -14,6 +21,7 @@ fn panel_with_menu_button() -> Html {
                     .with_item(MenuItem::new("MyMenu Item1"))
                     .with_item(MenuItem::new("MyMenu Item2"))
                     .with_item(MenuItem::new("Disabled Item").icon_class("fa fa-trash-o").disabled(true))
+                    .with_item(submenu1)
                     .with_item(MenuItem::new("MyMenu Item3"))
             )
         );
