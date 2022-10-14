@@ -19,7 +19,10 @@ fn panel_with_menu_button() -> Html {
             MenuButton::new("MyMenu").menu(
                 Menu::new()
                     .with_item(MenuItem::new("MyMenu Item1"))
-                    .with_item(MenuItem::new("MyMenu Item2"))
+                    .with_item(
+                        MenuItem::new(html!{<a target="_blank" href="http://google.com">{"open google.com"}</a>})
+                            .focusable(true)
+                    )
                     .with_item(MenuItem::new("Disabled Item").icon_class("fa fa-trash-o").disabled(true))
                     .with_item(submenu1)
                     .with_item(MenuItem::new("MyMenu Item3"))
