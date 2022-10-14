@@ -1,7 +1,13 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{dispatch_menu_close_event, Column, Menu, MenuItem, MenuButton, MenuCheckbox, Button, Container, Panel, Toolbar};
+use pwt::widget::{
+    dispatch_menu_close_event,
+    Button, Container, Column,
+    Menu, MenuBar, MenuItem, MenuButton, MenuCheckbox,
+    Panel, Toolbar,
+};
+
 use pwt::widget::form::Form;
 
 fn panel_with_menu_button() -> Html {
@@ -108,7 +114,7 @@ fn panel_with_menubar() -> Html {
                 .with_item(MenuItem::new("Submenu1 Item2"))
         );
 
-    let menubar = Menu::new_menubar()
+    let menubar = MenuBar::new()
         .with_item(submenu1)
         .with_item(checkboxes)
         .with_item(submenu2)
