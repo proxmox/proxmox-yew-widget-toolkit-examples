@@ -13,6 +13,9 @@ pub use menu::MenuDemo;
 mod datatable;
 pub use datatable::DataTableDemo;
 
+mod tree;
+pub use tree::TreeDemo;
+
 mod navigation;
 pub use navigation::NavigationDemo;
 
@@ -63,6 +66,14 @@ fn MainMenu() -> Html {
             None::<&str>,
             |_| {
                 html! {<DataTableDemo/>}
+            },
+        ))
+        .with_item(MenuItem::new(
+            "tree_panel",
+            "Tree",
+            None::<&str>,
+            |_| {
+                html! {<TreeDemo/>}
             },
         ))
         .with_item(MenuItem::new("menu_panel", "Menus", None::<&str>, |_| {

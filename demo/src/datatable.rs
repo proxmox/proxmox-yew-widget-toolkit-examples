@@ -33,9 +33,9 @@ pub fn DataTableDemo() -> Html {
         .render(|n: &usize| html!{format!("This is record {n} (a longer line)")});
 
     thread_local!{
-        static DATA: Rc<Vec<usize>> = Rc::new({
+        static DATA: Rc<Vec<Rc<usize>>> = Rc::new({
             let mut data = Vec::new();
-            for i in 0..30_000 { data.push(i); }
+            for i in 0..30_000 { data.push(Rc::new(i)); }
             data
         });
     }
