@@ -1,9 +1,10 @@
 use std::rc::Rc;
 
 use yew::prelude::*;
+
 use pwt::prelude::*;
 
-use pwt::props::Selection2;
+use pwt::props::{Selection2, ExtractKeyFn};
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
@@ -57,14 +58,16 @@ pub fn DataTableDemo() -> Html {
         header2.clone().into(),
     ]);
 
-    let selection = Selection2::new(|n: &usize| (*n).into())
+    let extract_key = ExtractKeyFn::new(|n: &usize| (*n).into());
+
+    let selection = Selection2::new(extract_key.clone())
         .multiselect(true)
         .on_select(|sel: Selection2<usize>| log::info!("Current Selection: {:?}", sel.selected_keys()));
 
     selection.select(2);
     selection.select(4);
 
-    let table1 = DataTable::new(columns)
+    let table1 = DataTable::new(columns, extract_key)
         .class("pwt-fit pwt-border")
     //.cell_class("pwt-p-2 pwt-fs-4")
     //.vertical_align("middle")
