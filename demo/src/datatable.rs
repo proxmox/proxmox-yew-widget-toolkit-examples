@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::cell::RefCell;
 
 use yew::prelude::*;
 
@@ -33,15 +34,18 @@ pub fn DataTableDemo() -> Html {
         .percentage(20)
         .render(|n: &usize| html!{format!("This is record {n} (a longer line)")});
 
-    thread_local!{
-        static DATA: Rc<Vec<Rc<usize>>> = Rc::new({
-            let mut data = Vec::new();
-            for i in 0..30_000 { data.push(Rc::new(i)); }
-            data
-        });
-    }
+    let extract_key = ExtractKeyFn::new(|n: &usize| (*n).into());
+    let extract_key2 = extract_key.clone();
 
-    let data = DATA.with(Rc::clone);
+    let store = use_state(move || {
+        let mut data: Vec<Rc<usize>> = Vec::new();
+        for i in 0..30_000 { data.push(Rc::new(i)); }
+
+        let mut store = TreeFilter::new(extract_key2);
+        store.set_data_list(Rc::new(data));
+
+        Rc::new(RefCell::new(store))
+    });
 
     let group3 = HeaderGroup::new("Group3")
         .with_child(header2.clone())
@@ -58,7 +62,6 @@ pub fn DataTableDemo() -> Html {
         header2.clone().into(),
     ]);
 
-    let extract_key = ExtractKeyFn::new(|n: &usize| (*n).into());
 
     let selection = Selection2::new(extract_key.clone())
         .multiselect(true)
@@ -67,15 +70,14 @@ pub fn DataTableDemo() -> Html {
     selection.select(2);
     selection.select(4);
 
-    let table1 = DataTable::new(columns, extract_key)
+    let table1 = DataTable::new(columns, Rc::clone(&*store))
         .class("pwt-fit pwt-border")
     //.cell_class("pwt-p-2 pwt-fs-4")
     //.vertical_align("middle")
     //.min_row_height(100)
     //.header_class("pwt-scheme-primary-container pwt-fs-4")
         .bordered(true)
-        .selection(selection)
-        .data(data);
+        .selection(selection);
 
     Column::new()
         .class("pwt-fit")
