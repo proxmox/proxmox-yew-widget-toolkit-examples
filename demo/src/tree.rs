@@ -19,28 +19,28 @@ fn test0() {
         |d: &usize| Key::from(*d)
     );
 
-    
+
     store.set_data(vec![4,1,3,2]);
 
     //let second = &store.read()[1];
 
-    
+
     for item in store.read().iter() {
         log::info!("GOT ITEM {}", item);
     }
-    
+
     store.write().sort();
-    
+
     for (_cursor, node) in store.filtered_data() {
         log::info!("GOT node {}", *node.record());
     }
 
     store.write().push(5);
-    
+
     for (_cursor, node) in store.filtered_data() {
         log::info!("GOT node {}", *node.record());
     }
- 
+
 }
 
 fn test1() {
@@ -51,7 +51,7 @@ fn test1() {
 
     { // limit scope
         let mut tree = tree.write();
-    
+
         let mut root = tree.append(5);
         assert!(*root.record() == 5);
         assert!(*root.append(1).record() == 1);
@@ -60,7 +60,7 @@ fn test1() {
         // fixme: *root.record() = 6;
         // assert!(*root.record() == 6);
     }
-    
+
         //let mut root: Box<dyn DataNode<usize>> = Box::new(root);
     //*root.record() = 6;
     //assert!(*root.record() == 6);
@@ -71,7 +71,7 @@ fn create_tree_store() -> TreeStore<String> {
     let tree: TreeStore<String> = TreeStore::with_extract_key(
         |d: &String| Key::from(d.clone())
     );
-    
+
     { // limit scope
         let mut tree = tree.write();
         let mut record1 = tree.append(String::from("Record1"));
@@ -94,16 +94,26 @@ pub fn TreeDemo() -> Html {
 
     test0();
     test1();
-    
+
+    let store = use_state(|| create_tree_store());
+
     let header1 = DataTableColumn::new("Record")
         .fixed(200)
         .sorter(String::cmp)
         //.sort_order(false)
         //.render(|item: &String| html!{item.to_string()});
-        .render_node(|item: &dyn DataNode<String>| {
+        .on_cell_click({
+            let store = (*store).clone();
+            move |key| {
+                log::info!("CLICK TEST {}", key);
+                store.toggle_expanded(&key);
+            }
+        })
+        .render_node(move |item: &dyn DataNode<String>| {
             let indent: Html = (0..item.level())
                 .map(|_| html!{ <span aria-hidden="" class="pwt-ps-4"/> })
                 .collect();
+
 
             html!{<>{indent.clone()}{item.record().to_string()}</>}
         });
@@ -126,7 +136,6 @@ pub fn TreeDemo() -> Html {
         ],
     });
 
-    let store = use_state(|| create_tree_store());
 
     let columns: Rc<Vec<Header<String>>> = Rc::new(vec![
         header1.clone().into(),
