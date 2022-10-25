@@ -1,5 +1,4 @@
 use std::rc::Rc;
-use std::cell::RefCell;
 
 use yew::prelude::*;
 
@@ -38,13 +37,12 @@ pub fn DataTableDemo() -> Html {
     let extract_key2 = extract_key.clone();
 
     let store = use_state(move || {
-        let mut data: Vec<Rc<usize>> = Vec::new();
-        for i in 0..30_000 { data.push(Rc::new(i)); }
+        let mut data: Vec<usize> = Vec::new();
+        for i in 0..30_000 { data.push(i); }
 
-        let mut store = TreeFilter::new(extract_key2);
-        store.set_data_list(Rc::new(data));
-
-        Rc::new(RefCell::new(store))
+        let store = Store::with_extract_key(extract_key2);
+        store.set_data(data);
+        store
     });
 
     let group3 = HeaderGroup::new("Group3")
@@ -70,7 +68,7 @@ pub fn DataTableDemo() -> Html {
     selection.select(2);
     selection.select(4);
 
-    let table1 = DataTable::new(columns, Rc::clone(&*store))
+    let table1 = DataTable::new(columns, (*store).clone())
         .class("pwt-fit pwt-border")
     //.cell_class("pwt-p-2 pwt-fs-4")
     //.vertical_align("middle")
