@@ -8,7 +8,7 @@ use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 //use pwt::props::Selection2;
-use pwt::state::{SlabTreeStore, DataNode};
+use pwt::state::{TreeStore, DataNode};
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
@@ -45,7 +45,7 @@ fn test0() {
 
 fn test1() {
 
-    let tree: SlabTreeStore<usize> = SlabTreeStore::with_extract_key(
+    let tree: TreeStore<usize> = TreeStore::with_extract_key(
         |d: &usize| Key::from(*d)
     );
 
@@ -67,8 +67,8 @@ fn test1() {
 
 }
 
-fn create_tree_store() -> SlabTreeStore<String> {
-    let tree: SlabTreeStore<String> = SlabTreeStore::with_extract_key(
+fn create_tree_store() -> TreeStore<String> {
+    let tree: TreeStore<String> = TreeStore::with_extract_key(
         |d: &String| Key::from(d.clone())
     );
     
