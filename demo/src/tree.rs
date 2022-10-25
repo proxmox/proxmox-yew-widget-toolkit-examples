@@ -13,6 +13,7 @@ use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
 fn test0() {
+    use pwt::state::Store;
 
     let store: Store<usize> = Store::with_extract_key(
         |d: &usize| Key::from(*d)

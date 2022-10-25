@@ -5,6 +5,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::props::{Selection2, ExtractKeyFn};
+use pwt::state::Store;
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
