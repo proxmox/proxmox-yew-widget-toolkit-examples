@@ -8,7 +8,7 @@ use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 //use pwt::props::Selection2;
-use pwt::state::{TreeStore, DataNode};
+use pwt::state::{TreeStore, DataNode, use_tree_store};
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
@@ -95,7 +95,7 @@ pub fn TreeDemo() -> Html {
     test0();
     test1();
 
-    let store = use_state(|| create_tree_store());
+    let store = use_tree_store(|| create_tree_store());
 
     let header1 = DataTableColumn::new("Record")
         .fixed(200)
@@ -103,7 +103,7 @@ pub fn TreeDemo() -> Html {
         //.sort_order(false)
         //.render(|item: &String| html!{item.to_string()});
         .on_cell_click({
-            let store = (*store).clone();
+            let store = store.clone();
             move |key| {
                 log::info!("CLICK TEST {}", key);
                 store.toggle_expanded(&key);
@@ -141,7 +141,7 @@ pub fn TreeDemo() -> Html {
         header1.clone().into(),
     ]);
 
-    let table1 = DataTable::new(columns, (*store).clone())
+    let table1 = DataTable::new(columns, store.clone())
         .class("pwt-fit pwt-border")
         .bordered(true);
 
