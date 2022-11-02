@@ -52,7 +52,7 @@ fn test1() {
     { // limit scope
         let mut tree = tree.write();
 
-        let mut root = tree.append(5);
+        let mut root = tree.set_root(5);
         assert!(*root.record() == 5);
         assert!(*root.append(1).record() == 1);
         assert!(*root.append(2).record() == 2);
@@ -74,7 +74,7 @@ fn create_tree_store() -> TreeStore<String> {
 
     { // limit scope
         let mut tree = tree.write();
-        let mut record1 = tree.append(String::from("Record1"));
+        let mut record1 = tree.set_root(String::from("Record1"));
         record1.set_expanded(true);
         record1.append(String::from("Record2"));
         record1.append(String::from("Record4"));
