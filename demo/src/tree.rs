@@ -8,7 +8,7 @@ use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 //use pwt::props::Selection2;
-use pwt::state::{TreeStore, DataNode, use_tree_store};
+use pwt::state::{TreeStore, DataStore, DataNode, use_tree_store};
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
