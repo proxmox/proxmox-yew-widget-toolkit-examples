@@ -20,7 +20,7 @@ fn test0() {
     );
 
 
-    store.set_data(vec![4,1,3,2]);
+    store.write().set_data(vec![4,1,3,2]);
 
     //let second = &store.read()[1];
 

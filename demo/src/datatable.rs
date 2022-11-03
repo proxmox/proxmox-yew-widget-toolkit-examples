@@ -42,7 +42,7 @@ pub fn DataTableDemo() -> Html {
         for i in 0..30_000 { data.push(i); }
 
         let store = Store::with_extract_key(extract_key2);
-        store.set_data(data);
+        store.write().set_data(data);
         store
     });
 
