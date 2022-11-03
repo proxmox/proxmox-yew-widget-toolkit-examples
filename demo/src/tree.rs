@@ -106,7 +106,7 @@ pub fn TreeDemo() -> Html {
             let store = store.clone();
             move |key| {
                 log::info!("CLICK TEST {}", key);
-                store.toggle_expanded(&key);
+                store.write().toggle_expanded_key(&key);
             }
         })
         .render_node(move |item: &dyn DataNode<String>| {
