@@ -106,7 +106,9 @@ pub fn TreeDemo() -> Html {
             let store = store.clone();
             move |key| {
                 log::info!("CLICK TEST {}", key);
-                store.write().toggle_expanded_key(&key);
+                if let Some(mut node) = store.write().lookup_node_mut(&key) {
+                    node.set_expanded(!node.expanded());
+                }
             }
         })
         .render_node(move |item: &dyn DataNode<String>| {
