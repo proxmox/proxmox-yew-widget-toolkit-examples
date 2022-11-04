@@ -66,7 +66,7 @@ fn test1() {
     //assert!(*root.record() == 6);
 
 }
-
+/*
 fn test_serde() {
     use pwt::state::{SlabTree, SlabTreeData};
 
@@ -99,6 +99,7 @@ fn test_serde() {
     
     log::info!("TREE: {}", serde_json::to_string_pretty(d).unwrap());
 }
+ */
 
 fn create_tree_store() -> TreeStore<String> {
     let tree: TreeStore<String> = TreeStore::with_extract_key(
@@ -130,7 +131,7 @@ pub fn TreeDemo() -> Html {
         test1();
     }
     
-    test_serde();
+    //test_serde();
     
     let store = use_tree_store(|| create_tree_store());
 
