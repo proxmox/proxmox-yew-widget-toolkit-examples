@@ -67,6 +67,39 @@ fn test1() {
 
 }
 
+fn test_serde() {
+    use pwt::state::{SlabTree, SlabTreeData};
+
+    let tree_data = json!({
+        "record": "Redord1",
+        "expanded": true,
+        "children": [
+            { "record": "Redord2" },
+            {
+                "record": "Redord3",
+                "expanded": true,
+                "children": [
+                    { "record": "Redord3-1" },
+                    { "record": "Redord3-2" },
+                    { "record": "Redord3-3" },
+                ],
+            },
+            { "record": "Redord4" },
+        ],
+    });
+
+    let tree_root: SlabTreeData<String> =  serde_json::from_value(tree_data).unwrap();
+
+    let tree: TreeStore<String> = TreeStore::with_extract_key(
+        |d: &String| Key::from(d.clone())
+    );
+    tree.write().set_root_tree(tree_root);
+
+    let d: &SlabTree<String> = &*tree.read();
+    
+    log::info!("TREE: {}", serde_json::to_string_pretty(d).unwrap());
+}
+
 fn create_tree_store() -> TreeStore<String> {
     let tree: TreeStore<String> = TreeStore::with_extract_key(
         |d: &String| Key::from(d.clone())
@@ -92,9 +125,13 @@ fn create_tree_store() -> TreeStore<String> {
 #[function_component]
 pub fn TreeDemo() -> Html {
 
-    test0();
-    test1();
-
+    if false {
+        test0();
+        test1();
+    }
+    
+    test_serde();
+    
     let store = use_tree_store(|| create_tree_store());
 
     let header1 = DataTableColumn::new("Record")
@@ -120,23 +157,6 @@ pub fn TreeDemo() -> Html {
             html!{<>{indent.clone()}{item.record().to_string()}</>}
         });
 
-    let _tree = json!({
-        "record": "Redord1",
-        "expanded": true,
-        "children": [
-            { "record": "Redord2" },
-            {
-                "record": "Redord3",
-                "expanded": true,
-                "children": [
-                    { "record": "Redord3-1" },
-                    { "record": "Redord3-2" },
-                    { "record": "Redord3-3" },
-                ],
-            },
-            { "record": "Redord4" },
-        ],
-    });
 
 
     let columns: Rc<Vec<Header<String>>> = Rc::new(vec![
