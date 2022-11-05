@@ -66,9 +66,9 @@ fn test1() {
     //assert!(*root.record() == 6);
 
 }
-/*
+
 fn test_serde() {
-    use pwt::state::{SlabTree, SlabTreeData};
+    use pwt::state::{SlabTree, KeyedSlabTree};
 
     let tree_data = json!({
         "record": "Redord1",
@@ -88,18 +88,17 @@ fn test_serde() {
         ],
     });
 
-    let tree_root: SlabTreeData<String> =  serde_json::from_value(tree_data).unwrap();
+    let tree_root: SlabTree<String> = serde_json::from_value(tree_data).unwrap();
 
     let tree: TreeStore<String> = TreeStore::with_extract_key(
         |d: &String| Key::from(d.clone())
     );
     tree.write().set_root_tree(tree_root);
 
-    let d: &SlabTree<String> = &*tree.read();
-    
+    let d: &KeyedSlabTree<String> = &*tree.read();
+
     log::info!("TREE: {}", serde_json::to_string_pretty(d).unwrap());
 }
- */
 
 fn create_tree_store() -> TreeStore<String> {
     let tree: TreeStore<String> = TreeStore::with_extract_key(
@@ -122,7 +121,6 @@ fn create_tree_store() -> TreeStore<String> {
     tree
 }
 
-
 #[function_component]
 pub fn TreeDemo() -> Html {
 
@@ -130,9 +128,9 @@ pub fn TreeDemo() -> Html {
         test0();
         test1();
     }
-    
-    //test_serde();
-    
+
+    test_serde();
+
     let store = use_tree_store(|| create_tree_store());
 
     let header1 = DataTableColumn::new("Record")
