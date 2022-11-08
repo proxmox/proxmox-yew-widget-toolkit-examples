@@ -67,8 +67,8 @@ fn test1() {
 
 }
 
-fn test_serde() {
-    use pwt::state::{SlabTree, KeyedSlabTree};
+fn create_tree_store() -> TreeStore<String> {
+    use pwt::state::SlabTree;
 
     let tree_data = json!({
         "record": "Redord1",
@@ -77,7 +77,7 @@ fn test_serde() {
             { "record": "Redord2" },
             {
                 "record": "Redord3",
-                "expanded": true,
+                "expanded": false,
                 "children": [
                     { "record": "Redord3-1" },
                     { "record": "Redord3-2" },
@@ -95,38 +95,7 @@ fn test_serde() {
     );
 
     tree.write().set_root_tree(tree_root);
-
-    log::info!("TREE: {}", serde_json::to_string_pretty(&*tree.read()).unwrap());
-}
-
-fn create_tree_store() -> TreeStore<String> {
-    let tree: TreeStore<String> = TreeStore::with_extract_key(
-        |d: &String| Key::from(d.clone())
-    );
-
-    { // limit scope
-        let mut tree = tree.write();
-        let mut record1 = tree.set_root(String::from("Record1"));
-        //record1.set_expanded(true);
-        record1.append(String::from("Record2"));
-        record1.append(String::from("Record4"));
-        let mut record3 = record1.append(String::from("Record3"));
-        //record3.set_expanded(true);
-        record3.append(String::from("Redord3-1"));
-        record3.append(String::from("Redord3-3"));
-        record3.append(String::from("Redord3-2"));
-        // expand all nodes
-        record1.visit_mut(&mut |node| node.set_expanded(true));
-
-        let mut node_count = 0;
-        let mut max_level = 0;
-        record1.visit(&mut |node| {
-            node_count += 1;
-            max_level = max_level.max(node.level());
-        });
-        log::info!("Nodes: {} Levels: {}", node_count, max_level);
-    }
-
+    tree.write().root_mut().unwrap().visit_mut(&mut |node| node.set_expanded(true));
     tree
 }
 
@@ -137,8 +106,6 @@ pub fn TreeDemo() -> Html {
         test0();
         test1();
     }
-
-    test_serde();
 
     let store = use_tree_store(|| create_tree_store());
 
