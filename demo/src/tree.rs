@@ -116,9 +116,9 @@ pub fn TreeDemo() -> Html {
         //.render(|item: &String| html!{item.to_string()});
         .on_cell_click({
             let store = store.clone();
-            move |key| {
-                log::info!("CLICK TEST {}", key);
-                if let Some(mut node) = store.write().lookup_node_mut(&key) {
+            move |event: DataTableMouseEvent| {
+                log::info!("CLICK TEST {}", event.key);
+                if let Some(mut node) = store.write().lookup_node_mut(&event.key) {
                     node.set_expanded(!node.expanded());
                 }
             }
