@@ -77,7 +77,6 @@ pub fn DataTableDemo() -> Html {
         selection
     });
 
-
     let table1 = DataTable::new(columns, (*store).clone())
         .class("pwt-fit pwt-border")
     //.cell_class("pwt-p-2 pwt-fs-4")
