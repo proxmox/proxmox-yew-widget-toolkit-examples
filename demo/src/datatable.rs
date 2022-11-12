@@ -5,7 +5,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::props::ExtractKeyFn;
-use pwt::state::{Selection2, Store};
+use pwt::state::{use_selection, Selection2, Store};
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
@@ -61,13 +61,22 @@ pub fn DataTableDemo() -> Html {
         header2.clone().into(),
     ]);
 
+    let selection = use_selection(|| {
+        let selection = Selection2::new()
+            .multiselect(true)
+            .on_select(|sel: Selection2| {
+                let keys = sel.selected_keys();
+                if keys.len() > 10 {
+                    log::info!("Current Selection: {} records", keys.len());
+                } else {
+                    log::info!("Current Selection: {:?}", sel.selected_keys());
+                }
+            });
+        selection.select(2);
+        selection.select(4);
+        selection
+    });
 
-    let selection = Selection2::new()
-        .multiselect(true)
-        .on_select(|sel: Selection2| log::info!("Current Selection: {:?}", sel.selected_keys()));
-
-    selection.select(2);
-    selection.select(4);
 
     let table1 = DataTable::new(columns, (*store).clone())
         .class("pwt-fit pwt-border")
