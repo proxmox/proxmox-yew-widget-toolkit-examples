@@ -134,7 +134,7 @@ pub fn TreeDemo() -> Html {
 
 
 
-    let columns: Rc<Vec<Header<String>>> = Rc::new(vec![
+    let columns: Rc<Vec<DataTableHeader<String>>> = Rc::new(vec![
         header1.clone().into(),
     ]);
 

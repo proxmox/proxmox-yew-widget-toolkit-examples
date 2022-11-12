@@ -46,16 +46,16 @@ pub fn DataTableDemo() -> Html {
         store
     });
 
-    let group3 = HeaderGroup::new("Group3")
+    let group3 = DataTableHeaderGroup::new("Group3")
         .with_child(header2.clone())
         .with_child(header3.clone());
 
-    let group2 = HeaderGroup::new("Group2")
+    let group2 = DataTableHeaderGroup::new("Group2")
         .with_child(header1.clone())
         .with_child(group3)
         .with_child(header3.clone());
 
-    let columns: Rc<Vec<Header<usize>>> = Rc::new(vec![
+    let columns: Rc<Vec<DataTableHeader<usize>>> = Rc::new(vec![
         header1.clone().into(),
         group2.into(),
         header2.clone().into(),
