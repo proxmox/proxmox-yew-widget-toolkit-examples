@@ -117,19 +117,14 @@ pub fn TreeDemo() -> Html {
         .on_cell_click({
             let store = store.clone();
             move |event: DataTableMouseEvent| {
-                log::info!("CLICK TEST {}", event.key);
-                if let Some(mut node) = store.write().lookup_node_mut(&event.key) {
+                log::info!("CLICK TEST {}", event.record_key);
+                if let Some(mut node) = store.write().lookup_node_mut(&event.record_key) {
                     node.set_expanded(!node.expanded());
                 }
             }
         })
         .render_node(move |item: &dyn DataNode<String>| {
-            let indent: Html = (0..item.level())
-                .map(|_| html!{ <span aria-hidden="" class="pwt-ps-4"/> })
-                .collect();
-
-
-            html!{<>{indent.clone()}{item.record().to_string()}</>}
+            render_tree_node(item, |record| (None, record.to_string()))
         });
 
 
