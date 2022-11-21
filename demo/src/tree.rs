@@ -9,7 +9,7 @@ use pwt::prelude::*;
 
 //use pwt::props::Selection2;
 use pwt::state::{TreeStore, DataStore, DataNode, use_tree_store};
-use pwt::widget::{Button, Column};
+use pwt::widget::{Button, Column, Row};
 use pwt::widget::data_table2::*;
 
 fn test0() {
@@ -129,14 +129,34 @@ pub fn TreeDemo() -> Html {
 
 
     let column2 = DataTableColumn::new("Actions")
-        .fixed(100)
+        .fixed(130)
         .render(|record: &String| {
-            Button::new("b1")
-                .tabindex(-1)
-                .onclick({
-                    let record = record.clone();
-                    move |_| log::info!("Pressed B1 on '{record}'")
-                })
+            Row::new()
+                .gap(2)
+                .with_child(
+                    Button::new("B1")
+                        .tabindex(-1)
+                        .onclick({
+                            let record = record.clone();
+                            move |_| log::info!("Pressed B1 on '{record}'")
+                        })
+                )
+                .with_child(
+                    Button::new("B2")
+                        .tabindex(-1)
+                        .onclick({
+                            let record = record.clone();
+                            move |_| log::info!("Pressed B2 on '{record}'")
+                        })
+                )
+                .with_child(
+                    Button::new("B3")
+                        .tabindex(-1)
+                        .onclick({
+                            let record = record.clone();
+                            move |_| log::info!("Pressed B3 on '{record}'")
+                        })
+                )
                 .into()
         });
 
