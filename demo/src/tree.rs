@@ -9,7 +9,7 @@ use pwt::prelude::*;
 
 //use pwt::props::Selection2;
 use pwt::state::{TreeStore, DataStore, DataNode, use_tree_store};
-use pwt::widget::{Button, Column, Row};
+use pwt::widget::{ActionIcon, Button, Column, Row};
 use pwt::widget::data_table2::*;
 
 fn test0() {
@@ -128,11 +128,12 @@ pub fn TreeDemo() -> Html {
         });
 
 
-    let column2 = DataTableColumn::new("Actions")
+    let column2 = DataTableColumn::new("Buttons")
         .fixed(130)
         .render(|record: &String| {
             Row::new()
                 .gap(2)
+                .class("pwt-justify-content-between")
                 .with_child(
                     Button::new("B1")
                         .tabindex(-1)
@@ -160,10 +161,43 @@ pub fn TreeDemo() -> Html {
                 .into()
         });
 
+    let column3 = DataTableColumn::new("Actions")
+        .fixed(80)
+        .render(|record: &String| {
+            Row::new()
+                .gap(2)
+                .class("pwt-justify-content-evenly")
+                .with_child(
+                    ActionIcon::new("fa fa-bold")
+                        .aria_label("bold")
+                        .on_activate({
+                            let record = record.clone();
+                            move |_| log::info!("Pressed Icon 'bold' on '{record}'")
+                        })
+                )
+                .with_child(
+                    ActionIcon::new("fa fa-italic")
+                        .aria_label("italic")
+                        .on_activate({
+                            let record = record.clone();
+                            move |_| log::info!("Pressed Icon 'italic' on '{record}'")
+                        })
+                )
+                .with_child(
+                    ActionIcon::new("fa fa-font")
+                        .aria_label("font")
+                        .on_activate({
+                            let record = record.clone();
+                            move |_| log::info!("Pressed Icon 'font' on '{record}'")
+                        })
+                )
+                .into()
+        });
 
     let columns: Rc<Vec<DataTableHeader<String>>> = Rc::new(vec![
         header1.clone().into(),
         column2.clone().into(),
+        column3.clone().into(),
     ]);
 
     let table1 = DataTable::new(columns, store.clone())
