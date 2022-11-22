@@ -25,8 +25,8 @@ pub fn DataTableDemo() -> Html {
             <>
                 <h3>{"This is a header"}</h3>
                 <p>{format!("This is record {n} with more than one line")}</p>
+                <p><a tabindex="-1" href="/">{"This is a link"}</a></p>
                 <input tabindex="-1" class="pwt-input"/>
-
             </>
         });
 
