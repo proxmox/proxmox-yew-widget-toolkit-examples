@@ -1,7 +1,7 @@
 use pwt::{prelude::*, widget::SegmentedButton};
 use yew::prelude::*;
 
-use pwt::widget::{Button, Column, Row};
+use pwt::widget::{ActionIcon, Button, Column, Row};
 
 #[function_component]
 pub fn ButtonsDemo() -> Html {
@@ -80,6 +80,18 @@ pub fn ButtonsDemo() -> Html {
         )
         .with_child("Round Icon Button")
         .with_child(Button::new_icon("fa fa-trash-o").class("rounded"))
+
+        .with_child("Action Icons (Icon Buttons without decoration)")
+        .with_child(
+            Row::new()
+                .gap(2)
+                .with_child(ActionIcon::new("fa fa-trash-o").tabindex(0).aria_label("remove"))
+                .with_child(ActionIcon::new("fa fa-refresh").tabindex(0).aria_label("refresh"))
+                .with_child(ActionIcon::new("fa fa-italic").tabindex(0).aria_label("italic"))
+                .with_child(ActionIcon::new("fa fa-bold").tabindex(0).aria_label("bold"))
+                .with_child(ActionIcon::new("fa fa-align-justify").tabindex(0).aria_label("align-justify"))
+        )
+
         .with_child("Segmented Button")
         .with_child(render_segmented_buttons(false))
         .with_child("Segmented Button with Icon")
