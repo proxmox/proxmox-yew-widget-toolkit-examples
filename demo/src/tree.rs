@@ -109,6 +109,11 @@ pub fn TreeDemo() -> Html {
 
     let store = use_tree_store(|| create_tree_store());
 
+    let header0 = DataTableColumn::new("Row")
+        .fixed(60)
+        .render_cell(pwt::widget::data_table2::render_row_number);
+
+
     let header1 = DataTableColumn::new("Record")
         .fixed(200)
         .sorter(String::cmp)
@@ -195,6 +200,7 @@ pub fn TreeDemo() -> Html {
         });
 
     let columns: Rc<Vec<DataTableHeader<String>>> = Rc::new(vec![
+        header0.clone().into(),
         header1.clone().into(),
         column2.clone().into(),
         column3.clone().into(),
