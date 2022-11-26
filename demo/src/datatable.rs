@@ -14,6 +14,7 @@ pub fn DataTableDemo() -> Html {
 
     let header0 = DataTableColumn::new("")
         .width("2.5em")
+        .aria_label("selection indicator")
         .render_cell(pwt::widget::data_table2::render_selection_indicator);
 
     let header1 = DataTableColumn::new("RecordId")
