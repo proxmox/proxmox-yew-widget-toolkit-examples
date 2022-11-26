@@ -8,7 +8,7 @@ use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 //use pwt::props::Selection2;
-use pwt::state::{TreeStore, DataStore, DataNode, use_tree_store};
+use pwt::state::{TreeStore, DataStore, use_tree_store};
 use pwt::widget::{ActionIcon, Button, Column, Row};
 use pwt::widget::data_table2::*;
 
@@ -123,8 +123,8 @@ pub fn TreeDemo() -> Html {
                 }
             }
         })
-        .render_node(move |item: &dyn DataNode<String>| {
-            render_tree_node(item, |record| (None, record.to_string()))
+        .render_cell(move |args: &mut DataTableColumnRenderArgs<String>| {
+            render_tree_node(args, |record| (None, record.to_string()))
         });
 
 
