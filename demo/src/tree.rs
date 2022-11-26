@@ -113,7 +113,6 @@ pub fn TreeDemo() -> Html {
         .fixed(60)
         .render_cell(pwt::widget::data_table2::render_row_number);
 
-
     let header1 = DataTableColumn::new("Record")
         .fixed(200)
         .sorter(String::cmp)

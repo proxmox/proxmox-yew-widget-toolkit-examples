@@ -12,6 +12,10 @@ use pwt::widget::data_table2::*;
 #[function_component]
 pub fn DataTableDemo() -> Html {
 
+    let header0 = DataTableColumn::new("")
+        .width("2.5em")
+        .render_cell(pwt::widget::data_table2::render_selection_indicator);
+
     let header1 = DataTableColumn::new("RecordId")
         .fixed(90)
         .sorter(usize::cmp)
@@ -56,6 +60,7 @@ pub fn DataTableDemo() -> Html {
         .with_child(header3.clone());
 
     let columns: Rc<Vec<DataTableHeader<usize>>> = Rc::new(vec![
+        header0.clone().into(),
         header1.clone().into(),
         group2.into(),
         header2.clone().into(),
