@@ -78,8 +78,8 @@ pub fn DataTableDemo() -> Html {
                     log::info!("Current Selection: {:?}", sel.selected_keys());
                 }
             });
-        selection.select(2);
-        selection.select(4);
+        //selection.select(2);
+        //selection.select(4);
         selection
     });
 
