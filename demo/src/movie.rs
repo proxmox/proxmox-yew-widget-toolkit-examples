@@ -59,10 +59,8 @@ fn load_movie_list(store: &Store<Record>) {
     });
 }
 
-#[function_component]
-pub fn MovieDemo() -> Html {
-
-    let columns: Rc<Vec<DataTableHeader<Record>>> = Rc::new(vec![
+thread_local!{
+    static COLUMNS: Rc<Vec<DataTableHeader<Record>>> = Rc::new(vec![
         DataTableColumn::new("Title")
             .sorter(|r1: &Record, r2: &Record| r1.title.cmp(&r2.title))
             .render(|r: &Record| html!{r.title.clone()})
@@ -95,8 +93,13 @@ pub fn MovieDemo() -> Html {
                 html!{text}
             })
             .into(),
-
     ]);
+}
+
+#[function_component]
+pub fn MovieDemo() -> Html {
+
+    let columns = COLUMNS.with(Rc::clone);
 
     let store = use_state(move || {
         let store = Store::new();
