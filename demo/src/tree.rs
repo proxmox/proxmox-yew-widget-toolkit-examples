@@ -211,6 +211,9 @@ pub fn TreeDemo() -> Html {
 
     let table1 = DataTable::new(columns, store.clone())
         .class("pwt-fit pwt-border")
+        .row_render_callback(move |args: &mut DataTableRowRenderArgs<String>| {
+            args.set_attribute("style", "color:red;");
+        })
         .bordered(true);
 
     Column::new()
