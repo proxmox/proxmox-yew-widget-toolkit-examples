@@ -128,6 +128,10 @@ pub fn TreeDemo() -> Html {
             }
         })
         .render_cell(move |args: &mut DataTableColumnRenderArgs<String>| {
+            let is_leaf = args.node().is_leaf(); 
+            if !is_leaf {
+                args.set_attribute("colspan", "3");
+            }
             render_tree_node(args, |record| (None, record.to_string()))
         });
 
