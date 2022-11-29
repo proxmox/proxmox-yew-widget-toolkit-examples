@@ -108,7 +108,7 @@ pub fn MovieDemo() -> Html {
     });
 
     let selection = use_selection(|| {
-        let selection = Selection2::new();
+        let selection = Selection2::new().multiselect(true);
         selection
     });
 
