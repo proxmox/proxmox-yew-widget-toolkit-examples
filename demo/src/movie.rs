@@ -1,12 +1,14 @@
 use std::rc::Rc;
 
 use serde::Deserialize;
+use gloo_net::http::Request;
+
 use yew::prelude::*;
 use yew::virtual_dom::Key;
 
 use pwt::prelude::*;
 
-use pwt::props::{LoadCallback, IntoLoadCallback, ExtractPrimaryKey};
+use pwt::props::ExtractPrimaryKey;
 use pwt::state::{use_selection, Selection2, Store};
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
@@ -32,9 +34,22 @@ fn load_movie_list(store: &Store<Record>) {
     let store = store.clone();
 
     wasm_bindgen_futures::spawn_local(async move {
-        let loader: LoadCallback::<Vec<Record>> = url.into_load_callback().unwrap();
-        let res = loader.apply().await;
-        match res {
+
+        let response = match Request::get(url).send().await {
+            Ok(response) => {
+                if !response.ok() {
+                    log::error!("Load failed - {}: {}", response.status(), response.status_text());
+                    return;
+                }
+                response
+            }
+            Err(err) => {
+                log::error!("Load failed - {}", err);
+                return;
+            }
+        };
+
+        match response.json::<Vec<Record>>().await {
             Ok(data) => {
                 log::info!("Load sucessful - got {} records", data.len());
                 // Seems the dataset contains duplicate entries.
