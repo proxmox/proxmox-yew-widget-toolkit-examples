@@ -12,9 +12,9 @@ use pwt::widget::data_table2::*;
 #[function_component]
 pub fn DataTableDemo() -> Html {
 
-    let header0 = DataTableColumn::new("")
+    let header0 = DataTableColumn::new("selection indicator")
         .width("2.5em")
-        .aria_label("selection indicator")
+        .header_content(html!{})
         .render_cell(pwt::widget::data_table2::render_selection_indicator);
 
     let header1 = DataTableColumn::new("RecordId")
