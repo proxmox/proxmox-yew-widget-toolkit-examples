@@ -36,6 +36,7 @@ use pwt::widget::{Panel, ThemeLoader, ThemeSelector};
 #[function_component]
 fn MainMenu() -> Html {
     NavigationMenu::new()
+        .aria_label("Examples")
         .with_item(MenuItem::new(
             "tooltip_panel",
             "Tooltips",
@@ -104,6 +105,8 @@ fn MainMenu() -> Html {
 fn DemoApp() -> Html {
     let panel = Panel::new()
         .class("pwt-viewport")
+        .attribute("role", "banner")
+        .attribute("aria-label", "Demo")
         .title("Proxmox Yew Widget Toolkit Demo Application")
         .tool(ThemeSelector::new())
         .with_child(html!{<MainMenu/>});
