@@ -14,6 +14,7 @@ pub fn DataTableDemo() -> Html {
 
     let header0 = DataTableColumn::new("selection indicator")
         .width("2.5em")
+        .resizable(false)
         .header_content(html!{})
         .render_cell(pwt::widget::data_table2::render_selection_indicator);
 
