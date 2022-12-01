@@ -16,7 +16,9 @@ pub fn DataTableDemo() -> Html {
         .width("2.5em")
         .resizable(false)
         .show_menu(false)
-        .header_content(html!{})
+        .render_header(|args: &mut DataTableHeaderRenderArgs<usize>| {
+            html!{}
+        })
         .render_cell(pwt::widget::data_table2::render_selection_indicator);
 
     let header1 = DataTableColumn::new("RecordId")
