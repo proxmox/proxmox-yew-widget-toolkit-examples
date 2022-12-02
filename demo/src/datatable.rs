@@ -83,6 +83,7 @@ pub fn DataTableDemo() -> Html {
     let table1 = DataTable::new(columns, (*store).clone())
         .class("pwt-fit pwt-border")
         .min_row_height(110)
+        .autoselect(false)
     //.cell_class("pwt-p-2 pwt-fs-4")
     //.vertical_align("middle")
     //.min_row_height(100)
