@@ -23,7 +23,7 @@ pub fn DataTableDemo() -> Html {
                 "fa-fw",
                 match status {
                     RowSelectionStatus::Nothing => "fa-circle-o",
-                    RowSelectionStatus::Some => "fa-gear", // fixme
+                    RowSelectionStatus::Some => "fa-times-circle-o",
                     RowSelectionStatus::All => "fa-check-circle-o",
                 },
             );
