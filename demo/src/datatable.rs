@@ -12,39 +12,7 @@ use pwt::widget::data_table2::*;
 #[function_component]
 pub fn DataTableDemo() -> Html {
 
-    let header0 = DataTableColumn::new("selection indicator")
-        .width("2.5em")
-        .resizable(false)
-        .show_menu(false)
-        .render_header(|args: &mut DataTableHeaderRenderArgs<usize>| {
-            let status = args.selection_status();
-            let class = classes!(
-                "fa",
-                "fa-fw",
-                match status {
-                    RowSelectionStatus::Nothing => "fa-circle-o",
-                    RowSelectionStatus::Some => "fa-times-circle-o",
-                    RowSelectionStatus::All => "fa-check-circle-o",
-                },
-            );
-
-            let aria_checked = match status {
-                RowSelectionStatus::Nothing => "false",
-                RowSelectionStatus::Some => "mixed",
-                RowSelectionStatus::All => "true",
-            };
-
-
-            let link = args.link();
-            let onclick = Callback::from(move |_| {
-                link.send_toggle_select_all();
-            });
-
-            html!{
-                <i {class} {onclick} role="checkbox" aria-checked={aria_checked} aria-label="select all"/>
-            }
-        })
-        .render_cell(pwt::widget::data_table2::render_selection_indicator);
+    let header0 = DataTableColumn::selection_indicator();
 
     let header1 = DataTableColumn::new("RecordId")
         .fixed(90)

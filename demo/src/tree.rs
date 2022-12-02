@@ -109,9 +109,7 @@ pub fn TreeDemo() -> Html {
 
     let store = use_tree_store(|| create_tree_store());
 
-    let header0 = DataTableColumn::new("Row")
-        .fixed(60)
-        .render_cell(pwt::widget::data_table2::render_row_number);
+    let header0 = DataTableColumn::row_number();
 
     let header1 = DataTableColumn::new("Record")
         .fixed(200)
@@ -128,7 +126,7 @@ pub fn TreeDemo() -> Html {
             }
         })
         .render_cell(move |args: &mut DataTableCellRenderArgs<String>| {
-            let is_leaf = args.node().is_leaf(); 
+            let is_leaf = args.node().is_leaf();
             if !is_leaf {
                 args.set_attribute("colspan", "3");
             }
