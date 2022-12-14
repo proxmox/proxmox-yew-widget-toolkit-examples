@@ -7,7 +7,7 @@ use pwt::prelude::*;
 use pwt::props::ExtractKeyFn;
 use pwt::state::{use_selection, Selection, Store};
 use pwt::widget::Column;
-use pwt::widget::data_table2::*;
+use pwt::widget::data_table::*;
 
 #[function_component]
 pub fn DataTableDemo() -> Html {

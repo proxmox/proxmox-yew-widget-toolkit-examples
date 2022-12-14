@@ -10,7 +10,7 @@ use pwt::prelude::*;
 //use pwt::props::Selection2;
 use pwt::state::{TreeStore, DataStore, use_tree_store};
 use pwt::widget::{ActionIcon, Button, Column, Row};
-use pwt::widget::data_table2::*;
+use pwt::widget::data_table::*;
 
 fn test0() {
     use pwt::state::Store;
