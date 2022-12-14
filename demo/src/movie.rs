@@ -9,7 +9,7 @@ use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 use pwt::props::ExtractPrimaryKey;
-use pwt::state::{use_selection, Selection2, Store};
+use pwt::state::{use_selection, Selection, Store};
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
@@ -123,7 +123,7 @@ pub fn MovieDemo() -> Html {
     });
 
     let selection = use_selection(|| {
-        let selection = Selection2::new().multiselect(true);
+        let selection = Selection::new().multiselect(true);
         selection
     });
 

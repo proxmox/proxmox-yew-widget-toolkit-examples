@@ -5,7 +5,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::props::ExtractKeyFn;
-use pwt::state::{use_selection, Selection2, Store};
+use pwt::state::{use_selection, Selection, Store};
 use pwt::widget::Column;
 use pwt::widget::data_table2::*;
 
@@ -65,9 +65,9 @@ pub fn DataTableDemo() -> Html {
     ]);
 
     let selection = use_selection(|| {
-        let selection = Selection2::new()
+        let selection = Selection::new()
             .multiselect(true)
-            .on_select(|sel: Selection2| {
+            .on_select(|sel: Selection| {
                 let keys = sel.selected_keys();
                 if keys.len() > 10 {
                     log::info!("Current Selection: {} records", keys.len());
