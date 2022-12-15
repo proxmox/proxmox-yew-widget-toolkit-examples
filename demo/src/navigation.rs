@@ -33,6 +33,22 @@ pub fn NavigationDemo() -> Html {
                         )),
                 ),
         )
+        .with_item(
+            MenuItem::new(
+                "unselectable",
+                "Submenu 3 (unselectable)",
+                "fa fa-ship",
+                |_| html! { "UNSELECTEABLE"},
+            )
+            .submenu()
+            .unselectable()
+            .with_item(MenuItem::new(
+                "unselectable-1",
+                "Entry 4",
+                "fa fa-rocket",
+                |_| html! { "Entry 4" },
+            )),
+        )
         .with_item(MenuItem::new("id7", "Entry 5", "", |_| html! { "Entry 5" }))
         .navigation_container()
         .into()
