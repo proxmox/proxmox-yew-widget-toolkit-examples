@@ -13,7 +13,7 @@ use pwt::state::{use_selection, Selection, Store};
 use pwt::widget::Column;
 use pwt::widget::data_table::*;
 
-#[derive(Deserialize)]
+#[derive(Clone, PartialEq, Deserialize)]
 struct Record {
     title: String,
     year: usize,
