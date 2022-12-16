@@ -1,6 +1,8 @@
 mod counter;
-pub use counter::SevenGuisCounter;
+pub use counter::Counter;
 
+mod temperature_converter;
+pub use temperature_converter::TemperatureConverter;
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -12,6 +14,7 @@ pub fn SevenGuisDemo() -> Html {
     Column::new()
         .padding(2)
         .gap(2)
-        .with_child(html!{<SevenGuisCounter/>})
+        .with_child(html!{<Counter/>})
+        .with_child(html!{<TemperatureConverter/>})
         .into()
 }

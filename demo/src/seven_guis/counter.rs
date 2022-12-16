@@ -4,7 +4,7 @@ use yew::prelude::*;
 use pwt::widget::{ActionIcon, Button, Column, Panel, Row};
 
 #[function_component]
-pub fn SevenGuisCounter() -> Html {
+pub fn Counter() -> Html {
 
     let count = use_state(|| 0);
     let label = html!{<input readonly=true value={count.to_string()}/>};
