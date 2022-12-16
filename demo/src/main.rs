@@ -13,6 +13,9 @@ pub use menu::MenuDemo;
 mod datatable;
 pub use datatable::DataTableDemo;
 
+mod seven_guis;
+pub use seven_guis::SevenGuisDemo;
+
 mod tree;
 pub use tree::TreeDemo;
 
@@ -37,6 +40,14 @@ use pwt::widget::{Panel, ThemeLoader, ThemeSelector};
 fn MainMenu() -> Html {
     NavigationMenu::new()
         .aria_label("Examples")
+        .with_item(MenuItem::new(
+            "7guis_panel",
+            "7GUIs",
+            None::<&str>,
+            |_| {
+                html! {<SevenGuisDemo/>}
+            },
+        ))
         .with_item(MenuItem::new(
             "tooltip_panel",
             "Tooltips",
