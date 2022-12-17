@@ -3,7 +3,7 @@ use std::rc::Rc;
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::widget::{Button, Column, Panel};
+use pwt::widget::{Button, Column, Container, Panel};
 use pwt::widget::form::{Combobox, Field};
 
 thread_local!{
@@ -18,9 +18,69 @@ pub struct FlightBooker {
     enable_book: bool,
     start_date: Option<String>,
     return_date: Option<String>,
+    view_booked: Option<(String, Option<String>)>,
+}
+
+impl FlightBooker {
+
+    fn view_booking(&self, ctx: &Context<Self>, booking: &(String, Option<String>)) -> Html {
+        let msg = match booking {
+            (start_date, None) => {
+                format!("You have booked a one-way flight on {start_date}")
+            }
+            (start_date, Some(return_date)) => {
+                format!("You have booked a return flight on {start_date}, returning on {return_date}")
+            }
+        };
+        Container::new()
+            .padding(2)
+            .with_child(
+                Column::new()
+                    .gap(2)
+                    .with_child(msg)
+                    .with_child(
+                        Button::new("Continue")
+                            .onclick(ctx.link().callback(|_| Msg::Continue))
+                    )
+            )
+            .into()
+    }
+
+    fn view_form(&self, ctx: &Context<Self>) -> Html {
+        let combo = Combobox::new()
+            .default("one-way flight")
+            .items(FLIGHT_MODE.with(Rc::clone))
+            .on_change(ctx.link().callback(Msg::Mode));
+
+        let flight_date = Field::new()
+            .required(true)
+            .on_change(ctx.link().callback(Msg::StartDate))
+            .input_type("date");
+
+        let return_date = Field::new()
+            .required(true)
+            .disabled(!self.with_return_flight)
+            .on_change(ctx.link().callback(Msg::ReturnDate))
+            .input_type("date");
+
+        let book = Button::new("Book")
+            .disabled(!self.enable_book)
+            .onclick(ctx.link().callback(|_| Msg::Book));
+
+        Column::new()
+            .padding(2)
+            .gap(2)
+            .with_child(combo)
+            .with_child(flight_date)
+            .with_child(return_date)
+            .with_child(book)
+            .into()
+    }
 }
 
 pub enum Msg {
+    Book,
+    Continue,
     Mode(String),
     StartDate(String),
     ReturnDate(String),
@@ -36,6 +96,7 @@ impl Component for FlightBooker {
             start_date: None,
             return_date: None,
             enable_book: false,
+            view_booked: None,
         }
     }
 
@@ -49,6 +110,14 @@ impl Component for FlightBooker {
             }
             Msg::ReturnDate(date) => {
                 self.return_date = Some(date);
+            }
+            Msg::Continue => {
+                self.view_booked = None;
+            }
+            Msg::Book => {
+                if let Some(start_date) = &self.start_date {
+                    self.view_booked = Some((start_date.clone(), self.return_date.clone()));
+                }
             }
         }
 
@@ -83,36 +152,15 @@ impl Component for FlightBooker {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let combo = Combobox::new()
-            .default("one-way flight")
-            .items(FLIGHT_MODE.with(Rc::clone))
-            .on_change(ctx.link().callback(Msg::Mode));
-
-        let flight_date = Field::new()
-            .required(true)
-            .on_change(ctx.link().callback(Msg::StartDate))
-            .input_type("date");
-
-        let return_date = Field::new()
-            .required(true)
-            .disabled(!self.with_return_flight)
-            .on_change(ctx.link().callback(Msg::ReturnDate))
-            .input_type("date");
-
-        let book = Button::new("Book").disabled(!self.enable_book);
+        let body: Html = match &self.view_booked {
+            Some(data) => self.view_booking(ctx, data),
+            None => self.view_form(ctx),
+        };
 
         Panel::new()
             .attribute("style", "width:200px;")
             .title("Flight Booker")
-            .with_child(
-                Column::new()
-                    .padding(2)
-                    .gap(2)
-                    .with_child(combo)
-                    .with_child(flight_date)
-                    .with_child(return_date)
-                    .with_child(book)
-            )
+            .with_child(body)
             .into()
     }
 }
