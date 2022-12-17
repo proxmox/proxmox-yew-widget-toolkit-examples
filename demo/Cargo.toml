@@ -10,6 +10,7 @@ edition = "2021"
 [dependencies]
 wasm-logger = "0.2"
 log = "0.4.6"
+js-sys = "0.3"
 yew = { git = "https://github.com/yewstack/yew", features = ["csr"] }
 yew-router = { git = "https://github.com/yewstack/yew" }
 pwt = { path = "../../" }
