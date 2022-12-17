@@ -13,6 +13,7 @@ pub fn Counter() -> Html {
         .into();
 
     Panel::new()
+        .attribute("style", "width: 260px;")
         .title("Counter")
         .with_child(
             Row::new()

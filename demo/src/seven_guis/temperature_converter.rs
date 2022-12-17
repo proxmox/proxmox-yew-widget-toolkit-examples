@@ -64,6 +64,7 @@ impl Component for TemperatureConverter {
             );
 
         Panel::new()
+            .attribute("style", "width: 400px;")
             .title("Temperature Converter")
             .with_child(body)
             .into()
