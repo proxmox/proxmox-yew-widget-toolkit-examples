@@ -4,48 +4,68 @@ use yew::prelude::*;
 use pwt::widget::{Button, Column, InputPanel, Panel, Row};
 use pwt::widget::form::{Form, Field};
 
-#[function_component]
-pub fn TemperatureConverter() -> Html {
+pub struct TemperatureConverter {
+    celsius: Option<f64>,
+    fahrenheit: Option<f64>,
+}
 
-    let form = Form::new(|form_ctx| {
-        InputPanel::new()
+pub enum Msg {
+    Celsius(String),
+    Fahrenheit(String),
+}
+
+impl Component for TemperatureConverter {
+    type Message = Msg;
+    type Properties = ();
+
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {
+            celsius: None,
+            fahrenheit: None,
+        }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::Celsius(c) => {
+                self.celsius = c.parse::<f64>().ok();
+                self.fahrenheit = self.celsius.map(|c| (c*9.0/5.0) + 32.0);
+            }
+            Msg::Fahrenheit(f) => {
+                self.fahrenheit = f.parse::<f64>().ok();
+                self.celsius = self.fahrenheit.map(|f| (f - 32.0)*5.0/9.0);
+            }
+        }
+        true
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let celsius = self.celsius.map(|c| c.to_string()).unwrap_or(String::new());
+        let fahrenheit = self.fahrenheit.map(|f| f.to_string()).unwrap_or(String::new());
+
+        let body = InputPanel::new()
             .padding(2)
             .border(false)
             .with_field(
                 "Celsius",
                 Field::new()
                     .name("celsius")
+                    .value(celsius)
                     .number(-273.15, None, 1.0)
-                    .on_change({
-                        let form_ctx = form_ctx.clone();
-                        move |celsius: String| {
-                            if let Ok(celsius) = celsius.parse::<f64>() {
-                                let fh = (celsius*5.0/9.0) + 32.0;
-                                log::info!("CELSIUS {celsius} FH {fh}");
-                            }
-                        }
-                    })
+                    .on_change(ctx.link().callback(Msg::Celsius))
             )
             .with_right_field(
-                 "Fahrenheit",
-                 Field::new()
+                "Fahrenheit",
+                Field::new()
                     .name("fahrenheit")
+                    .value(fahrenheit)
                     .number(-459.67, None, 1.0)
-                    .on_change({
-                        let form_ctx = form_ctx.clone();
-                        move |fh: String| {
-                            if let Ok(fh) = fh.parse::<f64>() {
-                                let celsius = (fh - 32.0)*5.0/9.0;
-                                log::info!("FH {fh} CELSIUS {celsius}");
-                           }
-                        }
-                    })
-              )
-            .into()
-    });
+                    .on_change(ctx.link().callback(Msg::Fahrenheit))
+            );
 
-    Panel::new()
-        .title("Temperature Converter")
-        .with_child(form)
-        .into()
+        Panel::new()
+            .title("Temperature Converter")
+            .with_child(body)
+            .into()
+    }
 }
