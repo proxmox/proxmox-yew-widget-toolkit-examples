@@ -1,7 +1,7 @@
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::widget::{ActionIcon, Button, Column, Panel, Row};
+use pwt::widget::{Button, Panel, Row};
 
 #[function_component]
 pub fn Counter() -> Html {

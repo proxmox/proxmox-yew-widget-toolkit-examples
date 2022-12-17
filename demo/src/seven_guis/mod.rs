@@ -9,7 +9,7 @@ mod flight_booker;
 pub use flight_booker::FlightBooker;
 
 use pwt::prelude::*;
-use pwt::widget::{ActionIcon, Button, Column, Row};
+use pwt::widget::Column;
 
 #[function_component]
 pub fn SevenGuisDemo() -> Html {

@@ -1,8 +1,8 @@
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::widget::{Button, Column, InputPanel, Panel, Row};
-use pwt::widget::form::{Form, Field};
+use pwt::widget::{InputPanel, Panel};
+use pwt::widget::form::Field;
 
 pub struct TemperatureConverter {
     celsius: Option<f64>,
@@ -18,14 +18,14 @@ impl Component for TemperatureConverter {
     type Message = Msg;
     type Properties = ();
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             celsius: None,
             fahrenheit: None,
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Celsius(c) => {
                 self.celsius = c.parse::<f64>().ok();
