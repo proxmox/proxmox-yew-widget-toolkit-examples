@@ -49,7 +49,6 @@ impl Component for TemperatureConverter {
             .with_field(
                 "Celsius",
                 Field::new()
-                    .name("celsius")
                     .value(celsius)
                     .number(-273.15, None, 1.0)
                     .on_change(ctx.link().callback(Msg::Celsius))
@@ -57,7 +56,6 @@ impl Component for TemperatureConverter {
             .with_right_field(
                 "Fahrenheit",
                 Field::new()
-                    .name("fahrenheit")
                     .value(fahrenheit)
                     .number(-459.67, None, 1.0)
                     .on_change(ctx.link().callback(Msg::Fahrenheit))
