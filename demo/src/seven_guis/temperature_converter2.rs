@@ -30,6 +30,7 @@ impl Component for TemperatureConverter2 {
             Msg::Celsius(c) => {
                 self.celsius = c.parse::<f64>().ok();
                 self.fahrenheit = self.celsius.map(|c| (c*9.0/5.0) + 32.0);
+                log::info!("C {:?}",  self.celsius);
             }
             Msg::Fahrenheit(f) => {
                 self.fahrenheit = f.parse::<f64>().ok();
@@ -45,7 +46,7 @@ impl Component for TemperatureConverter2 {
 
         let link = ctx.link().clone();
         
-        let body = Form::new(move |form_ctx: &_| {
+        let body = Form::new().with_child(
             InputPanel::new()
                 .padding(2)
                 .border(false)
@@ -65,8 +66,7 @@ impl Component for TemperatureConverter2 {
                         .number(-459.67, None, 1.0)
                         .on_change(link.callback(Msg::Fahrenheit))
                 )
-                .into()
-        });
+        );
 
         Panel::new()
             .attribute("style", "width: 400px;")
