@@ -6,8 +6,6 @@ use pwt::state::form::FormContext;
 use pwt::widget::form2::{Field, Form};
 
 pub struct TemperatureConverter2 {
-    celsius: Option<f64>,
-    fahrenheit: Option<f64>,
     form_ctx: FormContext,
 }
 
@@ -27,11 +25,7 @@ impl Component for TemperatureConverter2 {
                 log::info!("CTX CHANGE F: {:?}", form_ctx.read().get_field_value("fahrenheit"));
             });
 
-        Self {
-            celsius: None,
-            fahrenheit: None,
-            form_ctx,
-        }
+        Self { form_ctx }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
