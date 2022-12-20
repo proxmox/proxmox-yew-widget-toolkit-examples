@@ -2,8 +2,7 @@ use pwt::prelude::*;
 use yew::prelude::*;
 
 use pwt::widget::{InputPanel, Panel, Row};
-use pwt::state::form::FormContext;
-use pwt::widget::form2::{Field, Form};
+use pwt::widget::form2::{Field, Form, FormContext};
 
 pub struct TemperatureConverter2 {
     form_ctx: FormContext,
