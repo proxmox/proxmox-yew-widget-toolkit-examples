@@ -3,7 +3,7 @@ use std::rc::Rc;
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::widget::{Button, Column, Container, Panel};
+use pwt::widget::{Button, Column, Container, Panel, Row};
 use pwt::widget::form::{Combobox, Field};
 
 thread_local!{
@@ -157,10 +157,10 @@ impl Component for FlightBooker {
             None => self.view_form(ctx),
         };
 
-        Panel::new()
-            .attribute("style", "width:200px;")
-            .title("Flight Booker")
-            .with_child(body)
-            .into()
+        Row::new().with_child(
+            Panel::new()
+                .title("Flight Booker")
+                .with_child(body)
+        ).into()
     }
 }

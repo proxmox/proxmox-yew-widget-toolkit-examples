@@ -12,15 +12,15 @@ pub fn Counter() -> Html {
         .onclick(move |_| { count.set(*count + 1); })
         .into();
 
-    Panel::new()
-        .attribute("style", "width: 260px;")
-        .title("Counter")
-        .with_child(
-            Row::new()
-                .class("pwt-align-items-center")
-                .padding(2)
-                .gap(2)
-                .children([label, button])
-        )
-        .into()
+    Row::new().with_child(
+        Panel::new()
+            .title("Counter")
+            .with_child(
+                Row::new()
+                    .class("pwt-align-items-center")
+                    .padding(2)
+                    .gap(2)
+                    .children([label, button])
+            )
+    ).into()
 }

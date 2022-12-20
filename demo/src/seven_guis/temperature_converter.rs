@@ -1,7 +1,7 @@
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::widget::{InputPanel, Panel};
+use pwt::widget::{InputPanel, Panel, Row};
 use pwt::widget::form::Field;
 
 pub struct TemperatureConverter {
@@ -61,10 +61,10 @@ impl Component for TemperatureConverter {
                     .on_change(ctx.link().callback(Msg::Fahrenheit))
             );
 
-        Panel::new()
-            .attribute("style", "width: 400px;")
-            .title("Temperature Converter (Controlled)")
-            .with_child(body)
-            .into()
+        Row::new().with_child(
+            Panel::new()
+                .title("Temperature Converter (Controlled)")
+                .with_child(body)
+        ).into()
     }
 }

@@ -1,7 +1,7 @@
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::widget::{InputPanel, Panel};
+use pwt::widget::{InputPanel, Panel, Row};
 use pwt::state::form::FormContext;
 use pwt::widget::form2::{Field, Form};
 
@@ -80,10 +80,10 @@ impl Component for TemperatureConverter2 {
                     )
             );
 
-        Panel::new()
-            .attribute("style", "width: 400px;")
-            .title("Temperature Converter (FormContext)")
-            .with_child(body)
-            .into()
+        Row::new().with_child(
+            Panel::new()
+                .title("Temperature Converter (FormContext)")
+                .with_child(body)
+        ).into()
     }
 }
