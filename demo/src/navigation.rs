@@ -1,4 +1,7 @@
-use pwt::component::{MenuItem, NavigationMenu};
+use pwt::{
+    component::{MenuItem, NavigationMenu},
+    props::WidgetBuilder,
+};
 use yew::prelude::*;
 
 #[function_component]
@@ -50,6 +53,7 @@ pub fn NavigationDemo() -> Html {
             )),
         )
         .with_item(MenuItem::new("id7", "Entry 5", "", |_| html! { "Entry 5" }))
+        .class("pwt-border-right")
         .navigation_container()
         .into()
 }

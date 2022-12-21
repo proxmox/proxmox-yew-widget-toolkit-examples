@@ -117,6 +117,7 @@ fn MainMenu() -> Html {
             None::<&str>,
             |_| html!(<DialogDemo/>),
         ))
+        .class("pwt-border-right")
         .navigation_container()
         .into()
 }
@@ -128,6 +129,7 @@ fn DemoApp() -> Html {
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
         .title("Proxmox Yew Widget Toolkit Demo Application")
+        .header_classes("pwt-border-bottom")
         .tool(ThemeSelector::new())
         .with_child(html!{<MainMenu/>});
 
