@@ -17,10 +17,9 @@ use pwt::widget::Column;
 
 #[function_component]
 pub fn SevenGuisDemo() -> Html {
-
     Column::new()
         .padding(2)
-        .gap(2)
+        .gap(3)
         .with_child(html!{<Counter/>})
         .with_child(html!{<TemperatureConverter/>})
         .with_child(html!{<TemperatureConverter2/>})
