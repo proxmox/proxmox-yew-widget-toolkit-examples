@@ -25,6 +25,9 @@ pub use movie::MovieDemo;
 mod navigation;
 pub use navigation::NavigationDemo;
 
+mod dialog;
+pub use dialog::DialogDemo;
+
 mod fields;
 pub use fields::FieldsDemo;
 
@@ -107,6 +110,12 @@ fn MainMenu() -> Html {
             "Navigation",
             None::<&str>,
             |_| html!(<NavigationDemo/>),
+        ))
+        .with_item(MenuItem::new(
+            "dialog_panel",
+            "Dialogs",
+            None::<&str>,
+            |_| html!(<DialogDemo/>),
         ))
         .navigation_container()
         .into()
