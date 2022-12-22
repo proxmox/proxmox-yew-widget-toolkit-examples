@@ -129,7 +129,7 @@ fn DemoApp() -> Html {
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
         .title("Proxmox Yew Widget Toolkit Demo Application")
-        .header_classes("pwt-border-bottom")
+        .header_class("pwt-border-bottom")
         .tool(ThemeSelector::new())
         .with_child(html!{<MainMenu/>});
 
