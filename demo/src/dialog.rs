@@ -13,7 +13,7 @@ pub fn DialogDemo() -> Html {
         let show_dialog = show_dialog.clone();
         move |_| show_dialog.set(true)
     };
-    let mut row = Row::new()
+    let mut row = Column::new()
         .padding(2)
         .gap(2)
         .with_child(Button::new("Show Dialog").onclick(onclick));
