@@ -7,7 +7,7 @@ use pwt::widget::{Button, Panel, Row};
 pub fn Counter() -> Html {
 
     let count = use_state(|| 0);
-    let label = html!{<input readonly=true value={count.to_string()}/>};
+    let label = html!{<input class="pwt-input" readonly=true value={count.to_string()}/>};
     let button = Button::new("Count")
         .onclick(move |_| { count.set(*count + 1); })
         .into();
