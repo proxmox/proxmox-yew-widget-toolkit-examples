@@ -7,3 +7,6 @@ command_arguments= ["../../scss/proxmox-yew-style-light.scss", "dist/.stage/prox
 stage="build"
 command="sassc"
 command_arguments= ["../../scss/proxmox-yew-style-dark.scss", "dist/.stage/proxmox-yew-style-dark.css"]
+
+[watch]
+watch = ["./src", "../../src", "../../scss"]
