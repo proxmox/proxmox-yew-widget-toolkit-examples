@@ -149,7 +149,7 @@ pub fn MenuDemo() -> Html {
     Column::new()
         .class("pwt-fit")
         .padding(2)
-        .gap(2)
+        .gap(3)
         .with_child(panel_with_menu_button())
         .with_child(panel_with_menubar())
         .into()
