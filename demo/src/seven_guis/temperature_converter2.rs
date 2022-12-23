@@ -62,14 +62,14 @@ impl Component for TemperatureConverter2 {
                         Field::new()
                             .name("celsius")
                             .number(-273.15, None, 1.0)
-                            .on_change(link.callback(Msg::Celsius))
-                    )
+                            .on_input(link.callback(Msg::Celsius))
+                     )
                     .with_right_field(
                         "Fahrenheit",
                         Field::new()
                             .name("fahrenheit")
                             .number(-459.67, None, 1.0)
-                            .on_change(link.callback(Msg::Fahrenheit))
+                            .on_input(link.callback(Msg::Fahrenheit))
                     )
             );
 

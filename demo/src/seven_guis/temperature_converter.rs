@@ -51,14 +51,14 @@ impl Component for TemperatureConverter {
                 Field::new()
                     .value(celsius)
                     .number(-273.15, None, 1.0)
-                    .on_change(ctx.link().callback(Msg::Celsius))
+                    .on_input(ctx.link().callback(Msg::Celsius))
             )
             .with_right_field(
                 "Fahrenheit",
                 Field::new()
                     .value(fahrenheit)
                     .number(-459.67, None, 1.0)
-                    .on_change(ctx.link().callback(Msg::Fahrenheit))
+                    .on_input(ctx.link().callback(Msg::Fahrenheit))
             );
 
         Row::new().with_child(
