@@ -2,7 +2,7 @@ use pwt::prelude::*;
 use yew::prelude::*;
 
 use pwt::widget::{InputPanel, Panel, Row};
-use pwt::widget::form::Field;
+use pwt::widget::form2::Field;
 
 pub struct TemperatureConverter {
     celsius: Option<f64>,
