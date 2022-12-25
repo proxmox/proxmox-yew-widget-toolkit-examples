@@ -1,7 +1,7 @@
-use pwt::{prelude::*, widget::SegmentedButton};
 use yew::prelude::*;
 
-use pwt::widget::{ActionIcon, Button, Column, Row};
+use pwt::prelude::*;
+use pwt::widget::{ActionIcon, Button, Column, Row, SegmentedButton};
 
 #[function_component]
 pub fn ButtonsDemo() -> Html {
