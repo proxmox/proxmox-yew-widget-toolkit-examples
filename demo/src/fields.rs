@@ -4,8 +4,7 @@ use pwt::{
 };
 use yew::prelude::*;
 
-//use pwt::widget::form::{Checkbox, Combobox, Field, Form, FormContext};
-use pwt::widget::form2::{Checkbox, Field, Form, FormContext};
+use pwt::widget::form2::{Checkbox, Field, Form};
 
 fn demo_input_panel() -> Html {
     InputPanel::new()

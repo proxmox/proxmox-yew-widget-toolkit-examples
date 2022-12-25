@@ -8,7 +8,7 @@ use pwt::widget::{
     Panel, Toolbar,
 };
 
-use pwt::widget::form::Form;
+use pwt::widget::form2::Form;
 
 fn panel_with_menu_button() -> Html {
 
@@ -56,10 +56,10 @@ fn panel_with_menubar() -> Html {
     let radiogroup = MenuItem::new("RadioGroup test")
         .menu(
             Menu::new()
-                .with_item(MenuCheckbox::new("Value1").group("mygroup").name("opt1"))
-                .with_item(MenuCheckbox::new("Value2").group("mygroup").name("opt2"))
-                .with_item(MenuCheckbox::new("Value3").group("mygroup").name("opt3"))
-                .with_item(MenuCheckbox::new("Value4").group("mygroup").name("opt4"))
+                .with_item(MenuCheckbox::radio("Value1").name("mygroup").value("opt1"))
+                .with_item(MenuCheckbox::radio("Value2").name("mygroup").value("opt2"))
+                .with_item(MenuCheckbox::radio("Value3").name("mygroup").value("opt3"))
+                .with_item(MenuCheckbox::radio("Value4").name("mygroup").value("opt4"))
         );
 
     let checkboxes = MenuItem::new("CheckboxTest")
@@ -132,12 +132,9 @@ fn panel_with_menubar() -> Html {
     Panel::new()
         .title("Menubar Example")
         .with_child(
-             Form::new(move |_form_ctx| {
-                 Container::new()
-                     .with_child(menubar.clone())
-                     .class("pwt-border-bottom")
-                     .into()
-             })
+             Form::new()
+                .with_child(menubar.clone())
+                .class("pwt-border-bottom")
         )
         .with_child(html!{<p class="pwt-p-2">{text}</p>})
         .into()
