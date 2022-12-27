@@ -34,7 +34,6 @@ impl Component for MyForm {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         let form_ctx = self.form_ctx.clone();
 
-        log::info!("test");
         let input_panel = InputPanel::new()
             .padding(2)
             .border(false)
