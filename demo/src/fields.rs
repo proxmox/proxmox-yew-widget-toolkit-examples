@@ -4,7 +4,7 @@ use pwt::{
 };
 use yew::prelude::*;
 
-use pwt::widget::form2::{Checkbox, Field, Form};
+use pwt::widget::form2::{Checkbox, Combobox, Field, Form};
 
 fn demo_input_panel() -> Html {
     InputPanel::new()
@@ -23,14 +23,13 @@ fn demo_input_panel() -> Html {
         .with_field("Radio Group Option1", Checkbox::radio().name("g1").value("opt1"))
         .with_field("Radio Group Option2", Checkbox::radio().name("g1").value("opt2").default(Some(true)))
         .with_field("Radio Group Option3", Checkbox::radio().name("g1").value("opt3"))
-    /* fixme: enable again
         .with_field(
             "Combobox",
             Combobox::new()
+                .default("Item 1")
                 .with_item("Item 1")
                 .with_item("Item 2"),
         )
-     */
         .into()
 }
 
