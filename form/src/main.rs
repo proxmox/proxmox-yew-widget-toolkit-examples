@@ -2,9 +2,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{InputPanel, Panel, Row};
-use pwt::widget::form2::{Field, Form, Checkbox, Combobox, SubmitButton, ResetButton};
-use pwt::widget::form2::context::FormContext;
-
+use pwt::widget::form2::{Field, Form, FormContext, Checkbox, Combobox, SubmitButton, ResetButton};
 
 pub struct MyForm {
     form_ctx: FormContext,
