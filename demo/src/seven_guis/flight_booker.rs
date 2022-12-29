@@ -4,7 +4,7 @@ use pwt::prelude::*;
 use yew::prelude::*;
 
 use pwt::widget::{Button, Column, Container, Panel, Row};
-use pwt::widget::form::{Combobox, Field};
+use pwt::widget::form2::{Combobox, Field};
 
 thread_local!{
     static FLIGHT_MODE: Rc<Vec<AttrValue>> = Rc::new(vec![
