@@ -4,6 +4,9 @@ use buttons::ButtonsDemo;
 mod tab_panel;
 use tab_panel::TabPanelDemo;
 
+mod toolbar;
+pub use toolbar::ToolbarDemo;
+
 mod tooltip;
 pub use tooltip::TooltipDemo;
 
@@ -49,6 +52,14 @@ fn MainMenu() -> Html {
             None::<&str>,
             |_| {
                 html! {<SevenGuisDemo/>}
+            },
+        ))
+        .with_item(MenuItem::new(
+            "toolbar_panel",
+            "Toolbar",
+            None::<&str>,
+            |_| {
+                html! {<ToolbarDemo/>}
             },
         ))
         .with_item(MenuItem::new(
