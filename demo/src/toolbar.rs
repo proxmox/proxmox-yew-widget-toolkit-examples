@@ -17,6 +17,7 @@ pub fn ToolbarDemo() -> Html {
         .class("pwt-border-bottom")
         .with_child(Button::new("Button1"))
         .with_child(Button::new("Button2"))
+        .with_child(Button::new("Button3").disabled(true))
         .with_child(Checkbox::new())
         .with_child(menu_button)
         ;
