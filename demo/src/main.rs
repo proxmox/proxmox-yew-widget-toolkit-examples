@@ -1,6 +1,9 @@
 mod buttons;
 use buttons::ButtonsDemo;
 
+mod colors;
+use colors::ColorsDemo;
+
 mod tab_panel;
 use tab_panel::TabPanelDemo;
 
@@ -127,6 +130,12 @@ fn MainMenu() -> Html {
             "Dialogs",
             None::<&str>,
             |_| html!(<DialogDemo/>),
+        ))
+        .with_item(MenuItem::new(
+            "colors_panel",
+            "Colors",
+            None::<&str>,
+            |_| html!(<ColorsDemo/>),
         ))
         .class("pwt-border-right")
         .navigation_container()
