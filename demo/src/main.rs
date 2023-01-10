@@ -137,6 +137,7 @@ fn MainMenu() -> Html {
 fn DemoApp() -> Html {
     let panel = Panel::new()
         .class("pwt-viewport")
+        .border(false)
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
         .title("Proxmox Yew Widget Toolkit Demo Application")
