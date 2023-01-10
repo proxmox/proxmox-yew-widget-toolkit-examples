@@ -39,7 +39,7 @@ use yew_router::HashRouter;
 
 use pwt::prelude::*;
 
-use pwt::component::{MenuItem, NavigationMenu};
+use pwt::widget::nav_menu::{MenuItem, NavigationMenu};
 use pwt::widget::{Panel, ThemeLoader, ThemeSelector};
 
 #[function_component]

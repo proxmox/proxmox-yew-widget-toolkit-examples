@@ -1,8 +1,7 @@
-use pwt::{
-    component::{MenuItem, NavigationMenu},
-    props::WidgetBuilder,
-};
 use yew::prelude::*;
+
+use pwt::props::WidgetBuilder;
+use pwt::widget::nav_menu::{MenuItem, NavigationMenu};
 
 #[function_component]
 pub fn NavigationDemo() -> Html {

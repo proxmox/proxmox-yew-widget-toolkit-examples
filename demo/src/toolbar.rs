@@ -1,7 +1,8 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Button, Menu, MenuButton, MenuItem, Panel, Toolbar};
+use pwt::widget::{Column, Button, Panel, Toolbar};
+use pwt::widget::menu::{Menu, MenuButton, MenuItem};
 use pwt::widget::form2::Checkbox;
 
 #[function_component]

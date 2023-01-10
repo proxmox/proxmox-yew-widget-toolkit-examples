@@ -1,13 +1,8 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{
-    dispatch_menu_close_event,
-    Button, Container, Column,
-    Menu, MenuBar, MenuItem, MenuButton, MenuCheckbox,
-    Panel, Toolbar,
-};
-
+use pwt::widget::{Button, Container, Column, Panel, Toolbar};
+use pwt::widget::menu::{dispatch_menu_close_event, Menu, MenuBar, MenuItem, MenuButton, MenuCheckbox};
 use pwt::widget::form2::Form;
 
 fn panel_with_menu_button() -> Html {
