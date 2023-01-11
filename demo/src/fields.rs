@@ -1,9 +1,5 @@
-use pwt::{
-    prelude::*,
-    widget::{Container, InputPanel},
-};
-use yew::prelude::*;
-
+use pwt::prelude::*;
+use pwt::widget::{Container, InputPanel};
 use pwt::widget::form2::{Checkbox, Combobox, Field, Form};
 
 fn demo_input_panel() -> Html {

@@ -1,8 +1,6 @@
 use std::rc::Rc;
 
 use pwt::prelude::*;
-use yew::prelude::*;
-
 use pwt::widget::{Button, Column, Container, Panel, Row};
 use pwt::widget::form2::{Combobox, Field};
 

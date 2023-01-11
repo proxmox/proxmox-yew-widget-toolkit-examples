@@ -1,6 +1,4 @@
-use yew::prelude::*;
 use pwt::prelude::*;
-
 use pwt::widget::{Column, Panel, ThemeLoader, ThemeSelector, Toolbar};
 
 pub struct App {}
@@ -32,7 +30,6 @@ impl Component for App {
 
         ThemeLoader::new(panel).into()
     }
-
 }
 
 fn main() {

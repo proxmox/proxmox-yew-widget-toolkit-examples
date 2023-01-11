@@ -12,6 +12,13 @@
     <link data-trunk href="../../assets/fonts" rel="copy-dir"/>
 
     <link data-trunk href="../../scss/proxmox-yew-style-light.scss" rel="scss"/>
+    <link data-trunk href="../../scss/proxmox-yew-style-dark.scss" rel="scss"/>
+
+    <style>
+      /* Avoid flickering (default background in firefox is always white)*/
+      @media (prefers-color-scheme: dark ) { body { background: #333; } }
+      @media (prefers-color-scheme: light) { body { background: #fff; } }
+    </style>
 
   </head>
 </html>

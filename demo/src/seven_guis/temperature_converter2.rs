@@ -1,6 +1,4 @@
 use pwt::prelude::*;
-use yew::prelude::*;
-
 use pwt::widget::{InputPanel, Panel, Row};
 use pwt::widget::form2::{Field, Form, FormContext};
 
