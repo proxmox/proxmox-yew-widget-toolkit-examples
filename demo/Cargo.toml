@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = [
   "Dietmar Maurer <dietmar@proxmox.com>",
 ]
-license = "MIT"
+license = "MIT OR Apache-2.0"
 edition = "2021"
 
 [dependencies]
