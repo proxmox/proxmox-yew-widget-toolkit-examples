@@ -22,6 +22,9 @@ pub use datatable::DataTableDemo;
 mod seven_guis;
 pub use seven_guis::SevenGuisDemo;
 
+mod resizable;
+pub use resizable::ResizableDemo;
+
 mod tree;
 pub use tree::TreeDemo;
 
@@ -136,6 +139,12 @@ fn MainMenu() -> Html {
             "Colors",
             None::<&str>,
             |_| html!(<ColorsDemo/>),
+        ))
+        .with_item(MenuItem::new(
+            "resizable_panel",
+            "Resizable",
+            None::<&str>,
+            |_| html!(<ResizableDemo/>),
         ))
         .class("pwt-border-right")
         .navigation_container()
