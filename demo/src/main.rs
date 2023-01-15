@@ -25,6 +25,9 @@ pub use seven_guis::SevenGuisDemo;
 mod resizable;
 pub use resizable::ResizableDemo;
 
+mod split_pane;
+pub use split_pane::SplitPaneDemo;
+
 mod tree;
 pub use tree::TreeDemo;
 
@@ -145,6 +148,12 @@ fn MainMenu() -> Html {
             "Resizable",
             None::<&str>,
             |_| html!(<ResizableDemo/>),
+        ))
+        .with_item(MenuItem::new(
+            "split_pane_panel",
+            "SplitPane",
+            None::<&str>,
+            |_| html!(<SplitPaneDemo/>),
         ))
         .class("pwt-border-right")
         .navigation_container()
