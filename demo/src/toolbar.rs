@@ -3,7 +3,7 @@ use pwt::prelude::*;
 
 use pwt::widget::{Column, Button, Panel, Toolbar};
 use pwt::widget::menu::{Menu, MenuButton, MenuItem};
-use pwt::widget::form2::Checkbox;
+use pwt::widget::form::Checkbox;
 
 #[function_component]
 pub fn ToolbarDemo() -> Html {

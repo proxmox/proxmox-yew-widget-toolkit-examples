@@ -2,7 +2,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Button, Row, Tooltip};
-use pwt::widget::form2::Field;
+use pwt::widget::form::Field;
 
 #[function_component]
 pub fn TooltipDemo() -> Html {

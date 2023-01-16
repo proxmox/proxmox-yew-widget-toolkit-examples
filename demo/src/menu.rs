@@ -3,7 +3,7 @@ use pwt::prelude::*;
 
 use pwt::widget::{Button, Container, Column, Panel, Toolbar};
 use pwt::widget::menu::{dispatch_menu_close_event, Menu, MenuBar, MenuItem, MenuButton, MenuCheckbox};
-use pwt::widget::form2::Form;
+use pwt::widget::form::Form;
 
 fn panel_with_menu_button() -> Html {
 

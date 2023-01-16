@@ -1,6 +1,6 @@
 use pwt::prelude::*;
 use pwt::widget::{InputPanel, Panel, Row};
-use pwt::widget::form2::{Field, Form, FormContext};
+use pwt::widget::form::{Field, Form, FormContext};
 
 pub struct TemperatureConverter2 {
     form_ctx: FormContext,
