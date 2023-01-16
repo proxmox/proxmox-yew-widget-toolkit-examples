@@ -4,40 +4,76 @@ use pwt::widget::{Pane, SplitPane};
 use super::LoremIpsum;
 
 #[function_component]
-pub fn SplitPaneDemo() -> Html {
+pub fn SplitPaneDemoNested() -> Html {
 
+    let nested = SplitPane::new()
+        .class("pwt-fit")
+        .vertical(true)
+        .with_child(html!{<div class="pwt-p-2">{"Nested Region1"}</div>})
+        .with_child(html!{<div class="pwt-p-2">{"Nested Region2"}</div>})
+        .with_child(html!{<div class="pwt-p-2">{"Nested Region3"}</div>});
+
+    SplitPane::new()
+        .class("pwt-fit")
+        .with_child(html!{<div class="pwt-p-2">{"This is Region1"}</div>})
+        .with_child(nested)
+        .with_child(html!{<div class="pwt-p-2">{"This is Region3"}</div>})
+        .into()
+}
+
+#[function_component]
+pub fn SplitPaneDemoHorizontal() -> Html {
+    SplitPane::new()
+        .class("pwt-fit")
+        .with_child(Pane::new(html!{<LoremIpsum/>}))
+        .with_child(Pane::new(html!{<LoremIpsum/>}))
+        .with_child(Pane::new(html!{<LoremIpsum/>}))
+        .into()
+}
+
+#[function_component]
+pub fn SplitPaneDemoVertical() -> Html {
     SplitPane::new()
         .class("pwt-fit")
         .vertical(true)
-        .with_child(Pane::new(html!{<LoremIpsum/>}).min_size(20))
-        .with_child(Pane::new(html!{<LoremIpsum/>}).flex(2))
-        .with_child(Pane::new(html!{<LoremIpsum/>}).flex(2).min_fraction(0.2))
+        .with_child(Pane::new(html!{<LoremIpsum/>}))
+        .with_child(Pane::new(html!{<LoremIpsum/>}))
+        .with_child(Pane::new(html!{<LoremIpsum/>}))
         .into()
 }
 
 #[function_component]
-pub fn SplitPaneDemo3() -> Html {
-
+pub fn SplitPaneDemoSizing() -> Html {
     SplitPane::new()
         .class("pwt-fit")
-        .with_child(Pane::new("Region1").fraction(0.1))
-        .with_child(Pane::new("Region2").fraction(0.4))
-        .with_child(Pane::new("Region3").fraction(0.5))
+        .with_child(
+            Pane::new(html!{<div class="pwt-p-2">{"Region1: 100 pixel"}</div>})
+                .size(100)
+        )
+        .with_child(
+            Pane::new(html!{<div class="pwt-p-2">{"Region2: 20 percent"}</div>})
+                .fraction(0.2)
+        )
+        .with_child(
+            Pane::new(html!{<div class="pwt-p-2">{"Region3: flex 1"}</div>})
+                .flex(1)
+        )
+        .with_child(
+            Pane::new(html!{<div class="pwt-p-2">{"Region4: flex 2"}</div>})
+                .flex(2)
+        )
         .into()
 }
 
 #[function_component]
-pub fn SplitPaneDemo1() -> Html {
-
+pub fn SplitPaneDemoMinMax() -> Html {
     SplitPane::new()
-        .with_child(html!{<div class="pwt-p-2">{"This is Region1"}</div>})
-        .with_child(html!{<div class="pwt-p-2">{"This is Region2 and is longer"}</div>})
+        .class("pwt-fit")
         .with_child(
-            Pane::new(html!{<div class="pwt-p-2 pwt-overflow-hidden">{"Region3"}</div>})
-                .size(900)
-                .min_fraction(0.2)
-                .max_size(45)
-       )
-        .with_child(html!{<div class="pwt-p-2">{"Region4"}</div>})
+            Pane::new(html!{<div class="pwt-p-2">{"Region1: min 100 pixel, max 80%"}</div>})
+                .max_fraction(0.8)
+                .min_size(100)
+        )
+        .with_child(html!{<div class="pwt-p-2">{"Region2"}</div>})
         .into()
 }

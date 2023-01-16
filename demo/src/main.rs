@@ -29,7 +29,7 @@ mod resizable;
 pub use resizable::ResizableDemo;
 
 mod split_pane;
-pub use split_pane::SplitPaneDemo;
+pub use split_pane::*;
 
 mod tree;
 pub use tree::TreeDemo;
@@ -152,12 +152,47 @@ fn MainMenu() -> Html {
             None::<&str>,
             |_| html!(<ResizableDemo/>),
         ))
-        .with_item(MenuItem::new(
-            "split_pane_panel",
-            "SplitPane",
-            None::<&str>,
-            |_| html!(<SplitPaneDemo/>),
-        ))
+        .with_item(
+            MenuItem::new(
+                "split_pane_panel",
+                "SplitPane",
+                None::<&str>,
+                |_| html!(<SplitPaneDemoNested/>),
+            )
+           .submenu()
+                .with_item(
+                    MenuItem::new(
+                        "split_pane_panel_horizontal",
+                        "Horizontal",
+                        None::<&str>,
+                        |_| html!(<SplitPaneDemoHorizontal/>),
+                    )
+                )
+                .with_item(
+                    MenuItem::new(
+                        "split_pane_panel_vertical",
+                        "Vertical",
+                        None::<&str>,
+                        |_| html!(<SplitPaneDemoVertical/>),
+                    )
+                )
+                .with_item(
+                    MenuItem::new(
+                        "split_pane_panel_sizing",
+                        "Default Size",
+                        None::<&str>,
+                        |_| html!(<SplitPaneDemoSizing/>),
+                    )
+                )
+                 .with_item(
+                    MenuItem::new(
+                        "split_pane_panel_min_max",
+                        "Min/Max Size",
+                        None::<&str>,
+                        |_| html!(<SplitPaneDemoMinMax/>),
+                    )
+                )
+        )
         .class("pwt-border-right")
         .navigation_container()
         .into()
