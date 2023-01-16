@@ -55,11 +55,15 @@ pub fn SplitPaneDemoSizing() -> Html {
                 .fraction(0.2)
         )
         .with_child(
-            Pane::new(html!{<div class="pwt-p-2">{"Region3: flex 1"}</div>})
+            Pane::new(html!{<div class="pwt-p-2">{"Region3: None (auto)"}</div>})
+                .size(None)
+        )
+        .with_child(
+            Pane::new(html!{<div class="pwt-p-2">{"Region4: flex 1 (default)"}</div>})
                 .flex(1)
         )
         .with_child(
-            Pane::new(html!{<div class="pwt-p-2">{"Region4: flex 2"}</div>})
+            Pane::new(html!{<div class="pwt-p-2">{"Region5: flex 2"}</div>})
                 .flex(2)
         )
         .into()
