@@ -25,9 +25,6 @@ pub use datatable::DataTableDemo;
 mod seven_guis;
 pub use seven_guis::SevenGuisDemo;
 
-mod resizable;
-pub use resizable::ResizableDemo;
-
 mod split_pane;
 pub use split_pane::*;
 
@@ -145,12 +142,6 @@ fn MainMenu() -> Html {
             "Colors",
             None::<&str>,
             |_| html!(<ColorsDemo/>),
-        ))
-        .with_item(MenuItem::new(
-            "resizable_panel",
-            "Resizable",
-            None::<&str>,
-            |_| html!(<ResizableDemo/>),
         ))
         .with_item(
             MenuItem::new(
