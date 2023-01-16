@@ -1,6 +1,7 @@
 use pwt::prelude::*;
 
 use pwt::widget::{Pane, SplitPane};
+use super::LoremIpsum;
 
 #[function_component]
 pub fn SplitPaneDemo() -> Html {
@@ -8,9 +9,9 @@ pub fn SplitPaneDemo() -> Html {
     SplitPane::new()
         .class("pwt-fit")
         .vertical(true)
-        .with_child(Pane::new("Region1").min_size(20))
-        .with_child(Pane::new("Region2").flex(2))
-        .with_child(Pane::new("Region3").flex(2).min_fraction(0.2))
+        .with_child(Pane::new(html!{<LoremIpsum/>}).min_size(20))
+        .with_child(Pane::new(html!{<LoremIpsum/>}).flex(2))
+        .with_child(Pane::new(html!{<LoremIpsum/>}).flex(2).min_fraction(0.2))
         .into()
 }
 

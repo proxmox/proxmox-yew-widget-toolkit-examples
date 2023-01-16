@@ -4,6 +4,9 @@ use buttons::ButtonsDemo;
 mod colors;
 use colors::ColorsDemo;
 
+mod lorem_ipsum;
+pub use lorem_ipsum::LoremIpsum;
+
 mod tab_panel;
 use tab_panel::TabPanelDemo;
 
