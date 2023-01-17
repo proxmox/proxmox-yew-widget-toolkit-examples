@@ -52,7 +52,7 @@ pub fn NavigationDemo() -> Html {
             )),
         )
         .with_item(MenuItem::new("id7", "Entry 5", "", |_| html! { "Entry 5" }))
-        .class("pwt-border-right")
+        .class("pwt-border-left")
         .navigation_container()
         .into()
 }
