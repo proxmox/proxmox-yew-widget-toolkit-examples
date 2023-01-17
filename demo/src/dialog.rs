@@ -5,6 +5,8 @@ use pwt::{
     widget::{AlertDialog, Button, Column, Dialog, Row},
 };
 
+use crate::LoremIpsum;
+
 #[derive(PartialEq)]
 enum ViewState {
     Main,
@@ -49,7 +51,7 @@ pub fn DialogDemo() -> Html {
                     .style("min-width: 200px;")
                     .with_child(
                         Column::new()
-                            .with_child(Row::new().padding(4).with_child(html! { {"Content"}}))
+                            .with_child(html!{<LoremIpsum/>})
                             .with_child(
                                 Row::new()
                                     .padding(2)

@@ -5,6 +5,8 @@ use pwt::widget::{Column, Button, Panel, Toolbar};
 use pwt::widget::menu::{Menu, MenuButton, MenuItem};
 use pwt::widget::form::Checkbox;
 
+use crate::LoremIpsum;
+
 #[function_component]
 pub fn ToolbarDemo() -> Html {
 
@@ -26,7 +28,7 @@ pub fn ToolbarDemo() -> Html {
     let panel = Panel::new()
         .title("A panel with a toolbar")
         .with_child(toolbar)
-        .with_child(html!{<div class="pwt-p-2"><p>{"This is the panel body."}</p></div>});
+        .with_child(html!{<LoremIpsum/>});
 
     Column::new()
         .class("pwt-fit")

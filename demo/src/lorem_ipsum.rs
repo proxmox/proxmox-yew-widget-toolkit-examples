@@ -5,6 +5,7 @@ use pwt::widget::Column;
 pub fn LoremIpsum() -> Html {
 
     Column::new()
+        .padding(2)
         .gap(2)
         .with_child(html!{<h3>{"Lorem Ipsum"}</h3>})
         .with_child(html!{<p>{r#"
