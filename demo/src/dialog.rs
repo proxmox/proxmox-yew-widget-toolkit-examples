@@ -1,4 +1,4 @@
-use yew::prelude::*;
+use pwt::prelude::*;
 
 use pwt::{
     props::{ContainerBuilder, EventSubscriber, WidgetBuilder},

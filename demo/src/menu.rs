@@ -95,7 +95,7 @@ fn panel_with_menubar() -> Html {
                 .with_item(submenu2.clone())
                 .with_item(<Container as Into<Html>>::into(
                     Container::new()
-                        .padding((0, 2))
+                        .padding_x(2)
                         .with_child(
                             Button::new("Button2")
                                 .tabindex(-1)
