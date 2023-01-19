@@ -49,7 +49,7 @@ use yew_router::HashRouter;
 use pwt::prelude::*;
 
 use pwt::widget::nav_menu::{MenuItem, NavigationMenu};
-use pwt::widget::{Panel, ThemeLoader, ThemeSelector};
+use pwt::widget::{Panel, ThemeLoader, ThemeSelector, RtlSwitcher};
 
 #[function_component]
 fn MainMenu() -> Html {
@@ -196,6 +196,8 @@ fn DemoApp() -> Html {
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
         .title("Proxmox Yew Widget Toolkit Demo Application")
+        .tool(html! {{"RTL"}})
+        .tool(RtlSwitcher::new())
         .tool(ThemeSelector::new())
         .with_child(html!{<MainMenu/>});
 
