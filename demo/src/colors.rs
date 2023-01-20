@@ -7,6 +7,8 @@ use pwt::css::ColorScheme;
 static COLOR_SCHEMES: &[ColorScheme] = &[
     ColorScheme::Neutral,
     ColorScheme::NeutralContainer,
+    ColorScheme::NeutralAlt,
+    ColorScheme::NeutralAltContainer,
     ColorScheme::Primary,
     ColorScheme::PrimaryContainer,
     ColorScheme::Secondary,
