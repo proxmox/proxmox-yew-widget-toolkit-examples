@@ -3,11 +3,16 @@ use yew::prelude::*;
 use pwt::prelude::*;
 use pwt::widget::{Button, Container, Column, Row, TabPanel, TabPanelRenderInfo};
 
-static COLOR_SCHEMES: &'static[&'static str] = &[
-    "neutral", "neutral-container",
-    "primary", "primary-container",
-    "secondary", "secondary-container",
-    "error", "error-container",
+use pwt::css::ColorScheme;
+static COLOR_SCHEMES: &[ColorScheme] = &[
+    ColorScheme::Neutral,
+    ColorScheme::NeutralContainer,
+    ColorScheme::Primary,
+    ColorScheme::PrimaryContainer,
+    ColorScheme::Secondary,
+    ColorScheme::SecondaryContainer,
+    ColorScheme::Error,
+    ColorScheme::ErrorContainer,
 ];
 
 fn color_scheme(color: &str, title: &str) -> Html {
@@ -69,20 +74,23 @@ fn box_panel(_: &TabPanelRenderInfo) -> Html {
     for scheme in COLOR_SCHEMES {
         panel.add_child(
             Container::new()
-                .class(format!("pwt-scheme-{}", scheme))
+                .class(*scheme)
                 .border(true)
                 .padding(2)
-                .with_child(format!("Color scheme '{}'", scheme))
+                .with_child(format!("Color scheme '{:?}'", scheme))
         );
 
         let mut buttons = Row::new().gap(2);
 
         for scheme in COLOR_SCHEMES {
-            buttons.add_child(Button::new(*scheme).class(*scheme));
+            buttons.add_child(
+                Button::new(format!("{:?}", scheme))
+                    .class(*scheme)
+            )
         }
         panel.add_child(
             Container::new()
-                .class(format!("pwt-scheme-{}", scheme))
+                .class(*scheme)
                 .border(true)
                 .padding(2)
                 .with_child(buttons)
