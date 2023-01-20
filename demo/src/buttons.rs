@@ -2,6 +2,7 @@ use yew::prelude::*;
 
 use pwt::prelude::*;
 use pwt::widget::{ActionIcon, Button, Column, Row, SegmentedButton};
+use pwt::css::ColorScheme;
 
 #[function_component]
 pub fn ButtonsDemo() -> Html {
@@ -13,32 +14,38 @@ pub fn ButtonsDemo() -> Html {
                 Button::new("Primary")
                     .disabled(disabled)
                     .pressed(pressed)
-                    .class("primary"),
+                    .class(ColorScheme::Primary),
             )
             .with_child(
                 Button::new("Secondary")
                     .disabled(disabled)
                     .pressed(pressed)
-                    .class("secondary"),
+                    .class(ColorScheme::Secondary),
             )
             .with_child(
                 Button::new("Neutral")
                     .disabled(disabled)
                     .pressed(pressed)
-                    .class("neutral"),
+                    .class(ColorScheme::Neutral),
             )
             .with_child(
                 Button::new("Error")
                     .disabled(disabled)
                     .pressed(pressed)
-                    .class("error"),
+                    .class(ColorScheme::Error),
             )
             .into()
     }
 
     fn render_segmented_buttons(icons: bool) -> Html {
         let mut row = Row::new().gap(2);
-        for class in &["", "primary", "secondary", "neutral", "error"] {
+        for class in &[
+            None,
+            Some(ColorScheme::Primary),
+            Some(ColorScheme::Secondary),
+            Some(ColorScheme::Neutral),
+            Some(ColorScheme::Error),
+        ] {
             let mut btn = if icons {
                 SegmentedButton::new()
                     .with_button(Button::new("First").icon_class("fa fa-paper-plane"))
@@ -51,8 +58,8 @@ pub fn ButtonsDemo() -> Html {
                     .with_button(Button::new("Third"))
             };
 
-            if *class != "" {
-                btn.add_class(*class);
+            if let Some(class) = *class {
+                btn.add_class(class);
             }
 
             row.add_child(btn)
@@ -99,9 +106,9 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Segmented Button with mixed colors")
         .with_child(
             SegmentedButton::new()
-                .class("neutral")
+                .class(ColorScheme::Neutral)
                 .with_button(Button::new("First"))
-                .with_button(Button::new("Second").class("primary"))
+                .with_button(Button::new("Second").class(ColorScheme::Primary))
                 .with_button(Button::new("Third")),
         )
         .with_child("Rounded Segmented Button")
