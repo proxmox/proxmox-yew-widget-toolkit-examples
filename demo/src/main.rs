@@ -196,9 +196,9 @@ fn DemoApp() -> Html {
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
         .title("Proxmox Yew Widget Toolkit Demo Application")
-        .tool(html! {{"RTL"}})
-        .tool(RtlSwitcher::new())
-        .tool(ThemeSelector::new())
+        .with_tool(html! {{"RTL"}})
+        .with_tool(RtlSwitcher::new())
+        .with_tool(ThemeSelector::new())
         .with_child(html!{<MainMenu/>});
 
     ThemeLoader::new(panel).into()
