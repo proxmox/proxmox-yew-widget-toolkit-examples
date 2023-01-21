@@ -6,15 +6,10 @@ use pwt::widget::{Button, Container, Column, Row, TabPanel, TabPanelRenderInfo};
 use pwt::css::ColorScheme;
 static COLOR_SCHEMES: &[ColorScheme] = &[
     ColorScheme::Neutral,
-    ColorScheme::NeutralContainer,
     ColorScheme::NeutralAlt,
-    ColorScheme::NeutralAltContainer,
     ColorScheme::Primary,
-    ColorScheme::PrimaryContainer,
     ColorScheme::Secondary,
-    ColorScheme::SecondaryContainer,
     ColorScheme::Error,
-    ColorScheme::ErrorContainer,
 ];
 
 fn color_scheme(color: &str, title: &str) -> Html {
