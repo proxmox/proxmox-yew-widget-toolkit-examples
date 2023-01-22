@@ -1,7 +1,9 @@
 use yew::prelude::*;
 
 use pwt::prelude::*;
-use pwt::widget::{Button, Container, Column, Row, TabPanel, TabPanelRenderInfo};
+use pwt::widget::{
+    Button, Container, Column, Row, Panel, TabPanel, TabPanelRenderInfo,
+};
 
 use pwt::css::ColorScheme;
 static COLOR_SCHEMES: &[ColorScheme] = &[
@@ -12,7 +14,7 @@ static COLOR_SCHEMES: &[ColorScheme] = &[
     ColorScheme::Error,
 ];
 
-fn color_scheme(color: &str, title: &str) -> Html {
+fn color_palette(color: &str, title: &str) -> Html {
     let percentage = [99, 95, 90, 80, 70, 60, 50, 40, 30, 20, 10];
     let colors: Html = percentage.iter().map(|p| {
         let class = format!(
@@ -55,10 +57,10 @@ fn color_panel(_: &TabPanelRenderInfo) -> Html {
         .padding(2)
         .gap(4)
         //.class("pwt-flex-fill")
-        .with_child(color_scheme("primary", "Primary Color"))
-        .with_child(color_scheme("secondary", "Secondary Color"))
-        .with_child(color_scheme("error", "Error Color"))
-        .with_child(color_scheme("neutral", "Neutral Color"))
+        .with_child(color_palette("primary", "Primary Color"))
+        .with_child(color_palette("secondary", "Secondary Color"))
+        .with_child(color_palette("neutral", "Neutral Color"))
+        .with_child(color_palette("error", "Error Color"))
         .into()
 }
 
@@ -69,15 +71,10 @@ fn box_panel(_: &TabPanelRenderInfo) -> Html {
         .gap(4);
 
     for scheme in COLOR_SCHEMES {
-        panel.add_child(
-            Container::new()
-                .class(*scheme)
-                .border(true)
-                .padding(2)
-                .with_child(format!("Color scheme '{:?}'", scheme))
-        );
 
-        let mut buttons = Row::new().gap(2);
+        let mut buttons = Row::new()
+            .padding(2)
+            .gap(2);
 
         for scheme in COLOR_SCHEMES {
             buttons.add_child(
@@ -85,11 +82,11 @@ fn box_panel(_: &TabPanelRenderInfo) -> Html {
                     .class(*scheme)
             )
         }
+
         panel.add_child(
-            Container::new()
+            Panel::new()
                 .class(*scheme)
-                .border(true)
-                .padding(2)
+                .title(format!("Color scheme '{:?}'", scheme))
                 .with_child(buttons)
         );
     }
