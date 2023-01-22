@@ -4,7 +4,7 @@ use pwt::widget::form::{Checkbox, Combobox, Field, Form};
 
 fn demo_input_panel() -> Html {
     InputPanel::new()
-        .with_field("Textfield", Field::new())
+        .with_field("Textfield (primary)", Field::new().class("pwt-scheme-primary"))
         .with_field("Password", Field::new().input_type("password"))
         .with_field("Range field", Field::new().input_type("range"))
         .with_field(

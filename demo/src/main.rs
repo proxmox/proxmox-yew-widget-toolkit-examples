@@ -191,7 +191,9 @@ fn MainMenu() -> Html {
 #[function_component]
 fn DemoApp() -> Html {
     let panel = Panel::new()
-        .class("pwt-viewport")
+    //.class("pwt-viewport")
+    .class("pwt-viewport pwt-scheme-primary")
+    //.class("pwt-viewport pwt-scheme-secondary")
         .border(false)
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
