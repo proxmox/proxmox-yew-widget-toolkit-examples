@@ -23,6 +23,12 @@ pub fn ButtonsDemo() -> Html {
                     .class(ColorScheme::Secondary),
             )
             .with_child(
+                Button::new("Tertiray")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class(ColorScheme::Tertiary),
+            )
+            .with_child(
                 Button::new("Neutral")
                     .disabled(disabled)
                     .pressed(pressed)

@@ -11,6 +11,7 @@ static COLOR_SCHEMES: &[ColorScheme] = &[
     ColorScheme::NeutralAlt,
     ColorScheme::Primary,
     ColorScheme::Secondary,
+    ColorScheme::Tertiary,
     ColorScheme::Error,
 ];
 
@@ -59,6 +60,7 @@ fn color_panel(_: &TabPanelRenderInfo) -> Html {
         //.class("pwt-flex-fill")
         .with_child(color_palette("primary", "Primary Color"))
         .with_child(color_palette("secondary", "Secondary Color"))
+        .with_child(color_palette("tertiary", "Tertiary Color"))
         .with_child(color_palette("neutral", "Neutral Color"))
         .with_child(color_palette("error", "Error Color"))
         .into()
