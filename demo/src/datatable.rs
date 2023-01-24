@@ -93,7 +93,7 @@ pub fn DataTableDemo() -> Html {
 
     Column::new()
         .class("pwt-fit")
-        .padding(4)
+        .padding(2)
         .gap(4)
         .with_child(table1)
         .into()
