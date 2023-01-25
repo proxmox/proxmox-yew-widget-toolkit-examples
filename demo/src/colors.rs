@@ -2,7 +2,7 @@ use yew::prelude::*;
 
 use pwt::prelude::*;
 use pwt::widget::{
-    Button, Container, Column, Row, Panel, TabPanel, TabPanelRenderInfo,
+    Button, Column, Row, Panel, TabPanel, TabPanelRenderInfo,
 };
 
 use pwt::css::ColorScheme;
@@ -62,6 +62,7 @@ fn color_panel(_: &TabPanelRenderInfo) -> Html {
         .with_child(color_palette("secondary", "Secondary Color"))
         .with_child(color_palette("tertiary", "Tertiary Color"))
         .with_child(color_palette("neutral", "Neutral Color"))
+        .with_child(color_palette("neutral-alt", "Neutral Variant Color"))
         .with_child(color_palette("error", "Error Color"))
         .into()
 }
@@ -101,7 +102,7 @@ pub fn ColorsDemo() -> Html {
     TabPanel::new()
         .class("pwt-fit")
         .title("Color Scheme preview")
-        .with_item_builder("boxes", "Boxes", None::<&str>, box_panel)
         .with_item_builder("colors", "Colors", None::<&str>, color_panel)
+        .with_item_builder("boxes", "Boxes", None::<&str>, box_panel)
         .into()
 }

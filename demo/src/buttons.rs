@@ -35,6 +35,12 @@ pub fn ButtonsDemo() -> Html {
                     .class(ColorScheme::Neutral),
             )
             .with_child(
+                Button::new("NeutralAlt")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class(ColorScheme::NeutralAlt),
+            )
+            .with_child(
                 Button::new("Error")
                     .disabled(disabled)
                     .pressed(pressed)
