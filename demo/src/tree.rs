@@ -135,7 +135,6 @@ pub fn TreeDemo() -> Html {
 
 
     let column2 = DataTableColumn::new("Buttons")
-        .fixed(130)
         .render(|record: &String| {
             Row::new()
                 .gap(2)
@@ -168,7 +167,6 @@ pub fn TreeDemo() -> Html {
         });
 
     let column3 = DataTableColumn::new("Actions")
-        .fixed(80)
         .render(|record: &String| {
             Row::new()
                 .gap(2)
