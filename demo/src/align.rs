@@ -5,14 +5,19 @@ use pwt::widget::dom::IntoHtmlElement;
 use pwt::widget::Panel;
 use pwt::{
     props::{ContainerBuilder, EventSubscriber, WidgetBuilder},
-    widget::{Button, Column, Row},
+    widget::{Button, Column, Container, Row},
 };
 
 #[function_component]
 pub fn AlignDemo() -> Html {
     let button_ref = NodeRef::default();
     let text_ref = NodeRef::default();
-    let button = Button::new("Base").node_ref(button_ref.clone());
+    let button = Container::new()
+        .class("pwt-bg-color-surface")
+        .padding(2)
+        .border(true)
+        .with_child("Base")
+        .node_ref(button_ref.clone());
 
     let top_onclick = {
         let button_ref = button_ref.clone();
@@ -75,6 +80,7 @@ pub fn AlignDemo() -> Html {
         .gap(2)
         .with_child(
             Column::new()
+                .gap(2)
                 .with_child(Button::new("Top").onclick(top_onclick))
                 .with_child(Button::new("TopEnd").onclick(top_end_onclick))
                 .with_child(Button::new("End").onclick(end_onclick))
