@@ -1,3 +1,6 @@
+mod align;
+use align::AlignDemo;
+
 mod buttons;
 use buttons::ButtonsDemo;
 
@@ -136,6 +139,12 @@ fn MainMenu() -> Html {
             "Dialogs",
             None::<&str>,
             |_| html!(<DialogDemo/>),
+        ))
+        .with_item(MenuItem::new(
+            "align_panel",
+            "Alignment",
+            None::<&str>,
+            |_| html!(<AlignDemo/>),
         ))
         .with_item(MenuItem::new(
             "colors_panel",

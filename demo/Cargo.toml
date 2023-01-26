@@ -20,6 +20,7 @@ pwt = { path = "../../" }
 wasm-bindgen = "0.2"
 gloo-history = "0.1"
 gloo-net = { version = "0.2", features= ["http"] }
+gloo-timers = "0.2"
 serde = "1.0"
 serde_json = "1.0"
 wasm-bindgen-futures = "0.4"
