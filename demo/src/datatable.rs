@@ -15,7 +15,7 @@ pub fn DataTableDemo() -> Html {
     let header0 = DataTableColumn::selection_indicator();
 
     let header1 = DataTableColumn::new("RecordId")
-        .fixed(90)
+        .width("max-content")
         .sorter(usize::cmp)
         .sort_order(false)
         .render(|n: &usize| html!{n.to_string()});

@@ -89,8 +89,8 @@ pub fn ButtonsDemo() -> Html {
         .with_child(render_buttons(true, false))
         .with_child("Pressed Buttons")
         .with_child(render_buttons(false, true))
-        .with_child("Button with Icon")
-        .with_child(Button::new("Delete").icon_class("fa fa-trash-o"))
+        .with_child("Button with Icon (raised)")
+        .with_child(Button::new("Delete").class("raised").icon_class("fa fa-trash-o"))
         .with_child("Round Button with Icon")
         .with_child(
             Button::new("Delete")
@@ -146,6 +146,14 @@ pub fn ButtonsDemo() -> Html {
                         .with_button(Button::new("Second"))
                         .with_button(Button::new("Third").class("rounded")),
                 ),
+        )
+        .with_child("Rounded Segmented Button (raised)")
+        .with_child(
+            SegmentedButton::new()
+                .class("rounded raised")
+                .with_button(Button::new("First"))
+                .with_button(Button::new("Second"))
+                .with_button(Button::new("Third")),
         )
         .into()
 }
