@@ -35,6 +35,12 @@ pub fn ButtonsDemo() -> Html {
                     .class(ColorScheme::Neutral),
             )
             .with_child(
+                Button::new("Surface")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class(ColorScheme::Surface),
+            )
+            .with_child(
                 Button::new("NeutralAlt")
                     .disabled(disabled)
                     .pressed(pressed)
@@ -55,8 +61,7 @@ pub fn ButtonsDemo() -> Html {
             None,
             Some(ColorScheme::Primary),
             Some(ColorScheme::Secondary),
-            Some(ColorScheme::Neutral),
-            Some(ColorScheme::Error),
+            Some(ColorScheme::Tertiary),
         ] {
             let mut btn = if icons {
                 SegmentedButton::new()
