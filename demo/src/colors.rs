@@ -8,6 +8,7 @@ use pwt::widget::{
 use pwt::css::ColorScheme;
 static COLOR_SCHEMES: &[ColorScheme] = &[
     ColorScheme::Neutral,
+    ColorScheme::Surface,
     ColorScheme::NeutralAlt,
     ColorScheme::Primary,
     ColorScheme::Secondary,
@@ -16,7 +17,7 @@ static COLOR_SCHEMES: &[ColorScheme] = &[
 ];
 
 fn color_palette(color: &str, title: &str) -> Html {
-    let percentage = [99, 95, 90, 80, 70, 60, 50, 40, 30, 20, 10];
+    let percentage = [99, 95, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5];
     let colors: Html = percentage.iter().map(|p| {
         let class = format!(
             "pwt-bg-color-{}-{} pwt-color-{}-{} pwt-p-2",
