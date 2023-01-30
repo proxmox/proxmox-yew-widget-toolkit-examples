@@ -103,7 +103,7 @@ pub fn ButtonsDemo() -> Html {
                 .class("rounded"),
         )
         .with_child("Round Icon Button")
-        .with_child(Button::new_icon("fa fa-trash-o").class("rounded"))
+        .with_child(Button::new_icon("fa fa-trash-o").class("circle"))
 
         .with_child("Action Icons (Icon Buttons without decoration)")
         .with_child(
