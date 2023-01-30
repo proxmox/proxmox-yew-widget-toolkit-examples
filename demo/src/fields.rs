@@ -15,9 +15,10 @@ fn demo_input_panel() -> Html {
             "Numberfield with limits",
             Field::new().number(0.0, 150.0, 2.0),
         )
-        .with_field("Checkbox", Checkbox::new().default(Some(true)))
+        .with_field("Checkbox", Checkbox::new().default(true))
+        .with_field("Switch", Checkbox::new().switch(true))
         .with_field("Radio Group Option1", Checkbox::radio().name("g1").value("opt1"))
-        .with_field("Radio Group Option2", Checkbox::radio().name("g1").value("opt2").default(Some(true)))
+        .with_field("Radio Group Option2", Checkbox::radio().name("g1").value("opt2").default(true))
         .with_field("Radio Group Option3", Checkbox::radio().name("g1").value("opt3"))
         .with_field(
             "Combobox",
