@@ -124,7 +124,7 @@ fn fonts_panel(_: &TabPanelRenderInfo) -> Html {
 pub fn ThemeDemo() -> Html {
     TabPanel::new()
         .class("pwt-fit")
-        .title("Color Scheme preview")
+        .title("Theme settings preview")
         .with_item_builder("fonts", "Fonts", None::<&str>, fonts_panel)
         .with_item_builder("colors", "Colors", None::<&str>, color_panel)
         .with_item_builder("boxes", "Boxes", None::<&str>, box_panel)
