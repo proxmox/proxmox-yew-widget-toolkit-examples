@@ -98,11 +98,34 @@ fn box_panel(_: &TabPanelRenderInfo) -> Html {
     panel.into()
 }
 
+fn fonts_panel(_: &TabPanelRenderInfo) -> Html {
+
+    let fonts = ["Display", "Headline", "Title", "Body", "Label"];
+    let sizes = ["large", "medium", "small"];
+
+    let mut panel = Column::new()
+        .padding(2)
+        .gap(1);
+
+    for font in fonts {
+        for size in sizes {
+            let class = format!("pwt-font-{}-{}", font.to_lowercase(), size);
+            panel.add_child(html!{
+                <span {class}>{format!("{} {}", font, size)}</span>
+            });
+
+        }
+    }
+
+    panel.into()
+}
+
 #[function_component]
-pub fn ColorsDemo() -> Html {
+pub fn ThemeDemo() -> Html {
     TabPanel::new()
         .class("pwt-fit")
         .title("Color Scheme preview")
+        .with_item_builder("fonts", "Fonts", None::<&str>, fonts_panel)
         .with_item_builder("colors", "Colors", None::<&str>, color_panel)
         .with_item_builder("boxes", "Boxes", None::<&str>, box_panel)
         .into()

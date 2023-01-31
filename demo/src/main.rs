@@ -4,8 +4,8 @@ use align::AlignDemo;
 mod buttons;
 use buttons::ButtonsDemo;
 
-mod colors;
-use colors::ColorsDemo;
+mod theme;
+use theme::ThemeDemo;
 
 mod lorem_ipsum;
 pub use lorem_ipsum::LoremIpsum;
@@ -147,10 +147,10 @@ fn MainMenu() -> Html {
             |_| html!(<AlignDemo/>),
         ))
         .with_item(MenuItem::new(
-            "colors_panel",
-            "Colors",
+            "theme_panel",
+            "Theme",
             None::<&str>,
-            |_| html!(<ColorsDemo/>),
+            |_| html!(<ThemeDemo/>),
         ))
         .with_item(
             MenuItem::new(
