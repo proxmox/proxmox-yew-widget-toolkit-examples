@@ -113,8 +113,8 @@ impl Component for FlightBooker {
                 self.view_booked = None;
             }
             Msg::Book => {
-                if let Some(start_date) = &self.start_date {
-                    self.view_booked = Some((start_date.clone(), self.return_date.clone()));
+                if let Some(start_date) = self.start_date.take() {
+                    self.view_booked = Some((start_date, self.return_date.take()));
                 }
             }
         }
