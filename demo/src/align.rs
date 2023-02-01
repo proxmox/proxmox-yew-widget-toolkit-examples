@@ -102,9 +102,8 @@ pub fn AlignDemo() -> Html {
         .with_child(
             Panel::new()
                 .title("Floating")
-                .with_child(html!({ "Content" }))
+                .with_child(html!(<div class="pwt-p-2">{ "Content" }</div>))
                 .node_ref(text_ref.clone())
-                .attribute("style", "width: 100px; height: 100px"),
         );
     row.into()
 }
