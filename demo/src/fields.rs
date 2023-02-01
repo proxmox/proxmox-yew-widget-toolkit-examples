@@ -3,6 +3,10 @@ use pwt::widget::{Container, InputPanel};
 use pwt::widget::form::{Checkbox, Combobox, Field, Form};
 
 fn demo_input_panel() -> Html {
+    let mut long_combo = Combobox::new();
+    for i in 0..50 {
+        long_combo.add_item(format!("Item {}", i))
+    }
     InputPanel::new()
         .with_field("Textfield (primary)", Field::new().class("pwt-scheme-primary"))
         .with_field("Password", Field::new().input_type("password"))
@@ -27,6 +31,7 @@ fn demo_input_panel() -> Html {
                 .with_item("Item 1")
                 .with_item("Item 2"),
         )
+        .with_field("Long Combobox", long_combo)
         .into()
 }
 
