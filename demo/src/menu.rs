@@ -139,7 +139,7 @@ fn panel_with_menubar() -> Html {
 #[function_component]
 pub fn MenuDemo() -> Html {
     Column::new()
-        .class("pwt-fit")
+        .class("pwt-size-fit-content")
         .padding(2)
         .gap(3)
         .with_child(panel_with_menu_button())

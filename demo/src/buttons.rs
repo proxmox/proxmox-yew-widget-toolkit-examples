@@ -87,6 +87,7 @@ pub fn ButtonsDemo() -> Html {
     Column::new()
         .padding(2)
         .gap(2)
+        .class("pwt-size-fit-content")
         .class("pwt-align-items-start")
         .with_child("Enabled Buttons")
         .with_child(render_buttons(false, false))

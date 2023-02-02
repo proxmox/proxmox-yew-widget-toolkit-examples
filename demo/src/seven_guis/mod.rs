@@ -19,6 +19,7 @@ use pwt::widget::Column;
 pub fn SevenGuisDemo() -> Html {
     Column::new()
         .padding(2)
+        .class("pwt-size-fit-content")
         .gap(3)
         .with_child(html!{<Counter/>})
         .with_child(html!{<TemperatureConverter/>})
