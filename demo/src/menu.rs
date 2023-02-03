@@ -94,12 +94,15 @@ fn panel_with_menubar() -> Html {
                 .with_item(MenuItem::new("Submenu1 Item1"))
                 .with_item(submenu2.clone())
                 .with_item(<Container as Into<Html>>::into(
+                    // Create a custom menu item
                     Container::new()
-                        .padding_x(2)
+                        .class("pwt-menu-item")
+                        // add space for icon (but do not set an icon class)
+                        .with_child(html!{<span class="pwt-menu-item-icon"/>})
+                        // add our button
                         .with_child(
                             Button::new("Button2")
                                 .tabindex(-1)
-                                .class("pwt-menu-item-indent")
                                 .onclick(|event: MouseEvent| {
                                     dispatch_menu_close_event(&event);
                                 })
