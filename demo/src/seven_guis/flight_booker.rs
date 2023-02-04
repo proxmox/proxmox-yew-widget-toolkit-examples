@@ -46,7 +46,7 @@ impl FlightBooker {
 
     fn view_form(&self, ctx: &Context<Self>) -> Html {
         let combo = Combobox::new()
-            .default("one-way flight")
+            .default(if self.with_return_flight {"return flight" } else { "one-way flight"})
             .items(FLIGHT_MODE.with(Rc::clone))
             .on_change(ctx.link().callback(Msg::Mode));
 
