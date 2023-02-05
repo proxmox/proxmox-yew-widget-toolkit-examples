@@ -89,6 +89,7 @@ fn box_panel(_: &TabPanelRenderInfo) -> Html {
 
         panel.add_child(
             Panel::new()
+                .class("pwt-size-fit-content")
                 .class(*scheme)
                 .title(format!("Color scheme '{:?}'", scheme))
                 .with_child(buttons)
