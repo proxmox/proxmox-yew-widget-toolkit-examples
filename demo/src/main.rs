@@ -4,6 +4,9 @@ use align::AlignDemo;
 mod buttons;
 use buttons::ButtonsDemo;
 
+mod canvas;
+use canvas::CanvasDemo;
+
 mod theme;
 use theme::ThemeDemo;
 
@@ -58,6 +61,14 @@ use pwt::widget::{Panel, ThemeLoader, ThemeModeSelector, ThemeNameSelector, RtlS
 fn MainMenu() -> Html {
     NavigationMenu::new()
         .aria_label("Examples")
+        .with_item(MenuItem::new(
+            "canvas_panel",
+            "Canvas",
+            None::<&str>,
+            |_| {
+                html! {<CanvasDemo/>}
+            },
+        ))
         .with_item(MenuItem::new(
             "7guis_panel",
             "7GUIs",
