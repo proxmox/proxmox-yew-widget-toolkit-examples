@@ -1,3 +1,6 @@
+mod circle_drawer;
+pub use circle_drawer::CircleDrawer;
+
 mod counter;
 pub use counter::Counter;
 
@@ -21,6 +24,7 @@ pub fn SevenGuisDemo() -> Html {
         .padding(2)
         .class("pwt-size-fit-content")
         .gap(3)
+        .with_child(html!{<CircleDrawer/>})
         .with_child(html!{<Counter/>})
         .with_child(html!{<TemperatureConverter/>})
         .with_child(html!{<TemperatureConverter2/>})
