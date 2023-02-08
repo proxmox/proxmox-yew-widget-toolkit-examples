@@ -3,7 +3,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
-use pwt::widget::canvas::{Canvas, Circle, Path, Polyline, Polygon, Rect, SvgLength};
+use pwt::widget::canvas::{Canvas, Circle, Group, Line, Path, Polyline, Polygon, Rect, SvgLength};
 
 
 fn test_canvas() -> Canvas {
@@ -54,6 +54,15 @@ fn test_canvas() -> Canvas {
                     "Q 10,60 10,30 z",
                 ))
                 .attribute("transform", "translate(400,5)")
+        )
+        .with_child(
+            Group::new()
+                .stroke("grey")
+                .stroke_width(10)
+                .attribute("transform", "translate(500,5)")
+                .attribute("stroke-linecap", "round")
+                .with_child(Line::new(10.0, 10.0, 90.0, 90.0))
+                .with_child(Line::new(90.0, 10.0, 10.0, 90.0))
         )
         /*
         .with_child({
