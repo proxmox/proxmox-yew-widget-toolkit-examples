@@ -3,7 +3,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
-use pwt::widget::canvas::{Canvas, Circle, Rect, SvgLength};
+use pwt::widget::canvas::{Canvas, Circle, Polygon, Rect, SvgLength};
 
 
 fn test_canvas() -> Canvas {
@@ -20,7 +20,7 @@ fn test_canvas() -> Canvas {
                 .stroke("currentColor")
                 .attribute("stroke-dasharray", "20 10")
                 .rx(20)
-       )
+        )
         .with_child(
             Circle::new()
                 .position(150, 50)
@@ -28,6 +28,13 @@ fn test_canvas() -> Canvas {
                 .stroke_width(5)
                 .class("pwt-fill-primary")
                 .class("pwt-stroke-secondary")
+        )
+        .with_child(
+            Polygon::new()
+                .stroke("black")
+                .class("pwt-fill-tertiary")
+                .points(&[(50.,0.), (21.,90.), (98.,35.),  (2.,35.), (79.,90.)])
+                .attribute("transform", "translate(200,5)")
         )
         /*
         .with_child({
