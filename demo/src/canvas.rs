@@ -3,7 +3,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
-use pwt::widget::canvas::{Canvas, Circle, Polygon, Rect, SvgLength};
+use pwt::widget::canvas::{Canvas, Circle, Polyline, Polygon, Rect, SvgLength};
 
 
 fn test_canvas() -> Canvas {
@@ -35,6 +35,13 @@ fn test_canvas() -> Canvas {
                 .class("pwt-fill-tertiary")
                 .points(&[(50.,0.), (21.,90.), (98.,35.),  (2.,35.), (79.,90.)])
                 .attribute("transform", "translate(200,5)")
+        )
+        .with_child(
+            Polyline::new()
+                .stroke("black")
+                .fill("none")
+                .points(&[(50.,0.), (21.,90.), (98.,35.),  (2.,35.), (79.,90.)])
+                .attribute("transform", "translate(300,5)")
         )
         /*
         .with_child({
