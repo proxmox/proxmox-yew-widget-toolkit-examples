@@ -3,7 +3,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
-use pwt::widget::canvas::{Canvas, Circle, Polyline, Polygon, Rect, SvgLength};
+use pwt::widget::canvas::{Canvas, Circle, Path, Polyline, Polygon, Rect, SvgLength};
 
 
 fn test_canvas() -> Canvas {
@@ -42,6 +42,18 @@ fn test_canvas() -> Canvas {
                 .fill("none")
                 .points(&[(50.,0.), (21.,90.), (98.,35.),  (2.,35.), (79.,90.)])
                 .attribute("transform", "translate(300,5)")
+        )
+        .with_child(
+            Path::new()
+                .fill("red")
+                .d(concat!(
+                    "M 10,30 ",
+                    "A 20,20 0,0,1 50,30 ",
+                    "A 20,20 0,0,1 90,30 ",
+                    "Q 90,60 50,90 ",
+                    "Q 10,60 10,30 z",
+                ))
+                .attribute("transform", "translate(400,5)")
         )
         /*
         .with_child({
