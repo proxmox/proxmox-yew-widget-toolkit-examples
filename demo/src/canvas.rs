@@ -3,7 +3,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
-use pwt::widget::canvas::{Canvas, Circle, SvgLength};
+use pwt::widget::canvas::{Canvas, Circle, Rect, SvgLength};
 
 
 fn test_canvas() -> Canvas {
@@ -11,13 +11,25 @@ fn test_canvas() -> Canvas {
         .class("pwt-w-100 pwt-p-0")
         .height(150.0)
         .with_child(
+            Rect::new()
+                .position(10, 10)
+                .class("pwt-fill-primary")
+                .width(80)
+                .height(80)
+                .stroke_width(5)
+                .stroke("currentColor")
+                .attribute("stroke-dasharray", "20 10")
+                .rx(20)
+       )
+        .with_child(
             Circle::new()
-                .position(SvgLength::Fraction(0.5), SvgLength::Fraction(0.5))
-                .radius(50)
-                .stroke_width(15)
+                .position(150, 50)
+                .radius(40)
+                .stroke_width(5)
                 .class("pwt-fill-primary")
                 .class("pwt-stroke-secondary")
         )
+        /*
         .with_child({
             let onclick = Callback::from(|_event: MouseEvent| {
                 log::info!("CLICKED");
@@ -28,6 +40,7 @@ fn test_canvas() -> Canvas {
                 .radius(40.0)
                 .onclick(onclick)
         })
+     */
 }
 
 #[function_component]
