@@ -3,7 +3,10 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
-use pwt::widget::canvas::{Canvas, Circle, Group, Line, Path, Polyline, Polygon, Rect, SvgLength};
+use pwt::widget::canvas::{
+    Canvas, Circle, Group, Line, Path, Polyline, Polygon, Rect, Text, TSpan,
+    SvgLength,
+};
 
 
 fn test_canvas() -> Canvas {
@@ -64,18 +67,14 @@ fn test_canvas() -> Canvas {
                 .with_child(Line::new(10.0, 10.0, 90.0, 90.0))
                 .with_child(Line::new(90.0, 10.0, 10.0, 90.0))
         )
-        /*
-        .with_child({
-            let onclick = Callback::from(|_event: MouseEvent| {
-                log::info!("CLICKED");
-            });
-
-            Circle::new()
-                .position(40.0, 50.0)
-                .radius(40.0)
-                .onclick(onclick)
-        })
-     */
+        .with_child(
+            Text::new("You are ")
+                .position(10, 120)
+                .class("pwt-font-title-large")
+                .with_child(TSpan::new("not").class("pwt-fill-error"))
+                .with_child(" a banana!")
+                .with_child(TSpan::new("This is the second line.").x(10).dy(SvgLength::Em(1.0)))
+        )
 }
 
 #[function_component]
