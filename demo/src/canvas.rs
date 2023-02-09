@@ -5,8 +5,30 @@ use pwt::prelude::*;
 use pwt::widget::{Column, Panel};
 use pwt::widget::canvas::{
     Canvas, Circle, Ellipse, Group, Hyperlink, Line, Path, Polyline, Polygon,
-    Rect, Text, TSpan, SvgLength,
+    Rect, Reference, Text, TSpan, SvgLength,
 };
+
+fn canvas_reference() -> Canvas {
+    Canvas::new()
+        .class("pwt-w-100 pwt-p-0")
+        .padding(2)
+        .with_child(
+            Polygon::new()
+                .id("star")
+                .stroke("black")
+                .points(&[(50.,0.), (21.,90.), (98.,35.),  (2.,35.), (79.,90.)])
+        )
+        .with_child(
+            Reference::new("#star")
+                .x(120)
+                .class("pwt-fill-primary")
+        )
+        .with_child(
+            Reference::new("#star")
+                .attribute("transform", "translate(240 0) rotate(45 50 50)")
+                .fill("green")
+        )
+}
 
 fn canvas_text() -> Canvas {
    Canvas::new()
@@ -112,6 +134,11 @@ pub fn CanvasDemo() -> Html {
             Panel::new()
                 .title("Canvas Text")
                 .with_child(canvas_text())
+        )
+        .with_child(
+            Panel::new()
+                .title("Use object references.")
+                .with_child(canvas_reference())
         )
         .into()
 }
