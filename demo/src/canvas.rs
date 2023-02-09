@@ -87,7 +87,7 @@ fn simple_canvas() -> Canvas {
                 .with_child(Line::new(10.0, 10.0, 90.0, 90.0))
                 .with_child(Line::new(90.0, 10.0, 10.0, 90.0))
         )
-       .with_child(
+        .with_child(
             Ellipse::new()
                 .position(650, 50)
                 .rx(40)
