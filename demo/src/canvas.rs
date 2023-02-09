@@ -4,15 +4,35 @@ use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
 use pwt::widget::canvas::{
-    Canvas, Circle, Group, Line, Path, Polyline, Polygon, Rect, Text, TSpan,
+    Canvas, Circle, Group, Hyperlink, Line, Path, Polyline, Polygon, Rect, Text, TSpan,
     SvgLength,
 };
 
+fn canvas_text() -> Canvas {
+   Canvas::new()
+        .class("pwt-w-100 pwt-p-0")
+        .padding(2)
+        .with_child(
+            Text::new("You are ")
+                .position(0, SvgLength::Em(1.0))
+                .class("pwt-font-title-large")
+                .with_child(TSpan::new("not").class("pwt-fill-error"))
+                .with_child(" a banana!")
+                .with_child(TSpan::new("This is the second line.").x(0).dy(SvgLength::Em(1.0)))
+                .with_child(
+                    TSpan::new("A link to ").x(0).dy(SvgLength::Em(1.0))
+                        .with_child(
+                            Hyperlink::new()
+                                .href("https://www.proxmox.com")
+                                .with_child(TSpan::new("www.proxmox.com"))
+                        )
+                )
+        )
+}
 
-fn test_canvas() -> Canvas {
+fn simple_canvas() -> Canvas {
     Canvas::new()
         .class("pwt-w-100 pwt-p-0")
-        .height(150.0)
         .with_child(
             Rect::new()
                 .position(10, 10)
@@ -67,14 +87,6 @@ fn test_canvas() -> Canvas {
                 .with_child(Line::new(10.0, 10.0, 90.0, 90.0))
                 .with_child(Line::new(90.0, 10.0, 10.0, 90.0))
         )
-        .with_child(
-            Text::new("You are ")
-                .position(10, 120)
-                .class("pwt-font-title-large")
-                .with_child(TSpan::new("not").class("pwt-fill-error"))
-                .with_child(" a banana!")
-                .with_child(TSpan::new("This is the second line.").x(10).dy(SvgLength::Em(1.0)))
-        )
 }
 
 #[function_component]
@@ -86,8 +98,13 @@ pub fn CanvasDemo() -> Html {
         .gap(2)
         .with_child(
             Panel::new()
-                .title("Simple Canvas")
-                .with_child(test_canvas())
+                .title("Simple canvas shapes")
+                .with_child(simple_canvas())
+        )
+        .with_child(
+            Panel::new()
+                .title("Canvas Text")
+                .with_child(canvas_text())
         )
         .into()
 }
