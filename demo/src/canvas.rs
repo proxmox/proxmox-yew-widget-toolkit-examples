@@ -4,8 +4,8 @@ use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
 use pwt::widget::canvas::{
-    Canvas, Circle, Group, Hyperlink, Line, Path, Polyline, Polygon, Rect, Text, TSpan,
-    SvgLength,
+    Canvas, Circle, Ellipse, Group, Hyperlink, Line, Path, Polyline, Polygon,
+    Rect, Text, TSpan, SvgLength,
 };
 
 fn canvas_text() -> Canvas {
@@ -87,6 +87,13 @@ fn simple_canvas() -> Canvas {
                 .with_child(Line::new(10.0, 10.0, 90.0, 90.0))
                 .with_child(Line::new(90.0, 10.0, 10.0, 90.0))
         )
+       .with_child(
+            Ellipse::new()
+                .position(650, 50)
+                .rx(40)
+                .ry(30)
+                .class("pwt-fill-primary")
+       )
 }
 
 #[function_component]
