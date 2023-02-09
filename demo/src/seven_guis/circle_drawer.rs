@@ -66,7 +66,7 @@ impl CircleDrawer {
             canvas.add_child(
                 Circle::new()
                     .position(circle.x, circle.y)
-                    .radius(circle.r)
+                    .r(circle.r)
                     .stroke("black")
                     .stroke_width(2)
                     .fill(if self.selected == i { "grey" } else { "white" })
@@ -86,7 +86,7 @@ impl CircleDrawer {
         canvas
     }
     
-    fn create_toolbar(&self, ctx: &Context<Self>) -> Toolbar {
+    fn create_toolbar(&self, _ctx: &Context<Self>) -> Toolbar {
         Toolbar::new()
             .class("pwt-bg-color-surface")
             .with_flex_spacer()

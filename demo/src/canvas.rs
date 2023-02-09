@@ -69,7 +69,7 @@ fn simple_canvas() -> Canvas {
         .with_child(
             Circle::new()
                 .position(150, 50)
-                .radius(40)
+                .r(40)
                 .stroke_width(5)
                 .class("pwt-fill-primary")
                 .class("pwt-stroke-secondary")
