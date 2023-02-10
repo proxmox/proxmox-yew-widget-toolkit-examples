@@ -1,5 +1,6 @@
 use indexmap::IndexMap;
 
+use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 use pwt::widget::{Button, Container, Dialog, Panel, Toolbar};
@@ -79,6 +80,7 @@ impl CircleDrawer {
         for (id, circle) in map {
             canvas.add_child(
                 Circle::new()
+                    .key(Key::from(circle.id.to_string()))
                     .position(circle.x, circle.y)
                     .r(circle.r)
                     .stroke("black")
