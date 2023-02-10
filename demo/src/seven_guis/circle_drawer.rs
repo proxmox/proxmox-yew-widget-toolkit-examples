@@ -6,8 +6,6 @@ use pwt::widget::{Button, Container, Dialog, Panel, Toolbar};
 use pwt::widget::canvas::{Canvas, Circle};
 use pwt::widget::form::Field;
 
-// TODO: implement Undo/Redo functionality
-
 pub enum Msg {
     Undo,
     Redo,
@@ -18,20 +16,17 @@ pub enum Msg {
     CloseDialog,
 }
 
+#[derive(Clone)]
 struct CircleState {
+    id: usize,
     x: i32,
     y: i32,
     r: usize,
 }
 
-enum Action {
-    Create(usize, i32, i32, usize), /* (id, x , y, radius) */
-    Radius(usize, usize), /* (id, new-radius */
-}
-
 pub struct CircleDrawer {
-    undo: Vec<Action>,
-    redo: Vec<Action>,
+    undo: Vec<CircleState>,
+    redo: Vec<CircleState>,
     selected: usize,
     show_resize_dialog: bool,
     unique_id_counter: usize,
@@ -41,25 +36,9 @@ impl CircleDrawer {
 
     fn create_resize_dialog(&self, ctx: &Context<Self>) -> Dialog {
 
-        let mut circle: Option<CircleState> = None;
-        for action in self.undo.iter() {
-            match action {
-                Action::Create(id, x, y, r) if *id == self.selected => {
-                    circle = Some(CircleState { x: *x, y: *y, r: *r});
-                }
-                Action::Radius(id, r) if *id == self.selected => {
-                    let old = circle.unwrap();
-                    circle = Some(CircleState { x: old.x, y: old.y, r: *r});
-                }
-                _ => {}
-            }
-
-        }
-
-        let circle = match circle {
-            None => panic!("unable toö find circle {} - internal error", self.selected),
-            Some(circle) => circle,
-        };
+        let circle = self.undo.iter().rev()
+            .find(|circle| circle.id == self.selected)
+            .unwrap();
 
         Dialog::new(format!(
             "Adjust diameter of circle at ({}, {})",
@@ -91,20 +70,13 @@ impl CircleDrawer {
                 Msg::CreateCircle(e.offset_x(), e.offset_y())
             }));
 
+        // use latest state, but keep drawing order
         let mut map = IndexMap::new();
-        for action in &self.undo {
-            match action {
-                Action::Create(id, x, y, r) => {
-                    map.insert(id, CircleState { x: *x, y: *y, r: *r });
-                }
-                Action::Radius(id, r) => {
-                    map.get_mut(id).unwrap().r = *r;
-                }
-            }
+        for circle in &self.undo {
+            map.insert(circle.id, circle);
         }
 
         for (id, circle) in map {
-            let id = *id;
             canvas.add_child(
                 Circle::new()
                     .position(circle.x, circle.y)
@@ -186,15 +158,20 @@ impl Component for CircleDrawer {
                 let id = self.unique_id_counter;
                 self.unique_id_counter += 1;
 
-                self.undo.push(Action::Create(id, x, y, random_radius()))
+                self.undo.push(CircleState { id, x, y, r: random_radius()})
             }
             Msg::ChangeRadius(new_radius) => {
                 match self.undo.last_mut() {
-                    Some(Action::Radius(id, r)) if *id == self.selected => {
+                    Some(CircleState { id, r, .. }) if *id == self.selected => {
                         *r = new_radius;
                     }
                     _ => {
-                        self.undo.push(Action::Radius(self.selected, new_radius));
+                        let mut circle = self.undo.iter().rev()
+                            .find(|circle| circle.id == self.selected)
+                            .unwrap()
+                            .clone();
+                        circle.r = new_radius;
+                        self.undo.push(circle);
                     }
                 }
             }
