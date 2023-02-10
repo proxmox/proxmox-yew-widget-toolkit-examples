@@ -1,3 +1,5 @@
+use indexmap::IndexMap;
+
 use pwt::prelude::*;
 
 use pwt::widget::{Button, Container, Dialog, Panel, Toolbar};
@@ -7,6 +9,8 @@ use pwt::widget::form::Field;
 // TODO: implement Undo/Redo functionality
 
 pub enum Msg {
+    Undo,
+    Redo,
     CreateCircle(i32, i32),
     CircleClick(usize),
     ChangeRadius(usize),
@@ -20,18 +24,43 @@ struct CircleState {
     r: usize,
 }
 
+enum Action {
+    Create(usize, i32, i32, usize), /* (id, x , y, radius) */
+    Radius(usize, usize), /* (id, new-radius */
+}
+
 pub struct CircleDrawer {
-    circles: Vec<CircleState>,
+    undo: Vec<Action>,
+    redo: Vec<Action>,
     selected: usize,
     show_resize_dialog: bool,
+    unique_id_counter: usize,
 }
 
 impl CircleDrawer {
 
     fn create_resize_dialog(&self, ctx: &Context<Self>) -> Dialog {
 
-        let circle = &self.circles[self.selected];
-        
+        let mut circle: Option<CircleState> = None;
+        for action in self.undo.iter() {
+            match action {
+                Action::Create(id, x, y, r) if *id == self.selected => {
+                    circle = Some(CircleState { x: *x, y: *y, r: *r});
+                }
+                Action::Radius(id, r) if *id == self.selected => {
+                    let old = circle.unwrap();
+                    circle = Some(CircleState { x: old.x, y: old.y, r: *r});
+                }
+                _ => {}
+            }
+
+        }
+
+        let circle = match circle {
+            None => panic!("unable toö find circle {} - internal error", self.selected),
+            Some(circle) => circle,
+        };
+
         Dialog::new(format!(
             "Adjust diameter of circle at ({}, {})",
             circle.x,
@@ -45,10 +74,10 @@ impl CircleDrawer {
                     .value(format!("{}", circle.r))
                     .on_change(ctx.link().callback(|v: String| {
                         Msg::ChangeRadius(v.parse::<f32>().unwrap() as usize)
-                    }))   
+                    }))
             )
     }
-    
+
     fn create_canvas(&self, ctx: &Context<Self>) -> Canvas {
         let mut canvas = Canvas::new()
             .class("pwt-w-100")
@@ -62,39 +91,56 @@ impl CircleDrawer {
                 Msg::CreateCircle(e.offset_x(), e.offset_y())
             }));
 
-        for (i, circle) in self.circles.iter().enumerate() {
+        let mut map = IndexMap::new();
+        for action in &self.undo {
+            match action {
+                Action::Create(id, x, y, r) => {
+                    map.insert(id, CircleState { x: *x, y: *y, r: *r });
+                }
+                Action::Radius(id, r) => {
+                    map.get_mut(id).unwrap().r = *r;
+                }
+            }
+        }
+
+        for (id, circle) in map {
+            let id = *id;
             canvas.add_child(
                 Circle::new()
                     .position(circle.x, circle.y)
                     .r(circle.r)
                     .stroke("black")
                     .stroke_width(2)
-                    .fill(if self.selected == i { "grey" } else { "white" })
+                    .fill(if self.selected == id { "grey" } else { "white" })
                     .onclick(Callback::from(move |e: MouseEvent| {
                         e.stop_propagation();
                     }))
                     .oncontextmenu(ctx.link().callback(move |e: MouseEvent| {
                         e.prevent_default();
-                        Msg::CircleClick(i)
+                        Msg::CircleClick(id)
                     }))
                     .onmouseover(ctx.link().callback(move |_| {
-                        Msg::Select(i)
+                        Msg::Select(id)
                     }))
             );
         }
 
         canvas
     }
-    
-    fn create_toolbar(&self, _ctx: &Context<Self>) -> Toolbar {
+
+    fn create_toolbar(&self, ctx: &Context<Self>) -> Toolbar {
         Toolbar::new()
             .class("pwt-bg-color-surface")
             .with_flex_spacer()
             .with_child(
                 Button::new("Undo")
+                    .disabled(self.undo.is_empty())
+                    .onclick(ctx.link().callback(|_| Msg::Undo))
             )
             .with_child(
                 Button::new("Redo")
+                    .disabled(self.redo.is_empty())
+                    .onclick(ctx.link().callback(|_| Msg::Redo))
             )
             .with_flex_spacer()
     }
@@ -106,16 +152,28 @@ impl Component for CircleDrawer {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            circles: Vec::new(),
+            undo: Vec::new(),
+            redo: Vec::new(),
             selected: 0,
             show_resize_dialog: false,
+            unique_id_counter: 0,
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::Undo => {
+                if let Some(action) = self.undo.pop() {
+                    self.redo.push(action);
+                }
+            }
+            Msg::Redo => {
+                if let Some(action) = self.redo.pop() {
+                    self.undo.push(action);
+                }
+            }
             Msg::CloseDialog => {
-                self.show_resize_dialog = false; 
+                self.show_resize_dialog = false;
             }
             Msg::Select(index) => {
                 self.selected = index;
@@ -125,15 +183,20 @@ impl Component for CircleDrawer {
                 self.show_resize_dialog = true;
             }
             Msg::CreateCircle(x, y) => {
-                log::info!("CC {x} {y}");
-                
-                self.circles.push(CircleState {
-                    x, y, r: random_radius(),
-                })
+                let id = self.unique_id_counter;
+                self.unique_id_counter += 1;
+
+                self.undo.push(Action::Create(id, x, y, random_radius()))
             }
-            Msg::ChangeRadius(r) => {
-                let circle = &mut self.circles[self.selected];
-                circle.r = r;
+            Msg::ChangeRadius(new_radius) => {
+                match self.undo.last_mut() {
+                    Some(Action::Radius(id, r)) if *id == self.selected => {
+                        *r = new_radius;
+                    }
+                    _ => {
+                        self.undo.push(Action::Radius(self.selected, new_radius));
+                    }
+                }
             }
         }
         true
@@ -143,7 +206,7 @@ impl Component for CircleDrawer {
 
         let dialog = self.show_resize_dialog
             .then(|| self.create_resize_dialog(ctx));
-        
+
         Panel::new()
             .title("Circle Drawer")
             .with_child(self.create_toolbar(ctx))
@@ -158,10 +221,10 @@ impl Component for CircleDrawer {
             .into()
     }
 }
-   
+
 fn random_radius() -> usize {
     use std::cell::RefCell;
-    
+
     thread_local!{
         static SEED: RefCell<usize> = RefCell::new(13456374);
     }
