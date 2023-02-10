@@ -8,6 +8,33 @@ use pwt::widget::canvas::{
     Rect, Reference, Text, TSpan, SvgLength,
 };
 
+fn canvas_test() -> Column {
+
+    /* TODO
+    let child =  Polygon::new()
+        .fill("black")
+        .points(&[(60.,30.), (90.,90.),  (30.,90.)]);
+     */
+
+    let child = html!{
+        <svg><polygon points="60,30 90,90 30,90" fill="green">
+            <animateTransform
+	    attributeName="transform"
+	    attributeType="XML"
+	    type="rotate"
+	    from="0 60 70"
+	    to="360 60 70"
+	    dur="5s"
+	    repeatCount="indefinite" />
+        </polygon></svg>
+    };
+
+    Column::new()
+        .class("pwt-w-100 pwt-p-0")
+        .padding(2)
+        .with_child(child)
+}
+
 fn canvas_reference() -> Canvas {
     Canvas::new()
         .class("pwt-w-100 pwt-p-0")
@@ -115,7 +142,7 @@ fn simple_canvas() -> Canvas {
                 .rx(40)
                 .ry(30)
                 .class("pwt-fill-primary")
-       )
+        )
 }
 
 #[function_component]
@@ -139,6 +166,11 @@ pub fn CanvasDemo() -> Html {
             Panel::new()
                 .title("Use object references.")
                 .with_child(canvas_reference())
+        )
+        .with_child(
+            Panel::new()
+                .title("SVG animateTransform (not working)")
+                .with_child(canvas_test())
         )
         .into()
 }
