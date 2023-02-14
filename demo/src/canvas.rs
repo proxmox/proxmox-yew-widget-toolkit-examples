@@ -4,35 +4,45 @@ use pwt::prelude::*;
 
 use pwt::widget::{Column, Panel};
 use pwt::widget::canvas::{
-    Canvas, Circle, Ellipse, Group, Hyperlink, Line, Path, Polyline, Polygon,
-    Rect, Reference, Text, TSpan, SvgLength,
+    Animate, AnimateTransform, Canvas, Circle, Ellipse, Group, Hyperlink, Line,
+    Path, Polyline, Polygon, Rect, Reference, Text, TSpan, SvgLength,
 };
 
-fn canvas_test() -> Column {
+fn canvas_animation() -> Canvas {
 
-    /* TODO
-    let child =  Polygon::new()
-        .fill("black")
-        .points(&[(60.,30.), (90.,90.),  (30.,90.)]);
-     */
-
-    let child = html!{
-        <svg><polygon points="60,30 90,90 30,90" fill="green">
-            <animateTransform
-	    attributeName="transform"
-	    attributeType="XML"
-	    type="rotate"
-	    from="0 60 70"
-	    to="360 60 70"
-	    dur="5s"
-	    repeatCount="indefinite" />
-        </polygon></svg>
-    };
-
-    Column::new()
+    Canvas::new()
         .class("pwt-w-100 pwt-p-0")
         .padding(2)
-        .with_child(child)
+        .with_child(
+            Polygon::new()
+                .fill("green")
+                .points(&[(60.,30.), (90.,90.),  (30.,90.)])
+                .animate(
+                    AnimateTransform::rotate()
+	                .attribute("from", "0 60 70")
+	                .attribute("to", "360 60 70")
+	                .attribute("dur", "5s")
+                        .repeat_count(f32::INFINITY)
+                )
+                .animate(
+                    AnimateTransform::scale()
+                        .attribute("values", "1 1; 2 1; 1 1;")
+	                .attribute("dur", "5s")
+                        .additive(true)
+                        .repeat_count(f32::INFINITY)
+                )
+        )
+        .with_child(
+            Circle::new()
+                .position(200, 50)
+                .r(10)
+                .animate(
+                    Animate::new("r")
+                        .attribute("values", "10; 50; 10;")
+                        .attribute("dur", "2s")
+                        .repeat_count(f32::INFINITY)
+                )
+        )
 }
 
 fn canvas_reference() -> Canvas {
@@ -169,8 +179,8 @@ pub fn CanvasDemo() -> Html {
         )
         .with_child(
             Panel::new()
-                .title("SVG animateTransform (not working)")
-                .with_child(canvas_test())
+                .title("SVG animation")
+                .with_child(canvas_animation())
         )
         .into()
 }
