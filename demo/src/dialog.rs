@@ -41,12 +41,15 @@ pub fn DialogDemo() -> Html {
         ViewState::Main => { /* do nothing */ }
         ViewState::ShowAlert => {
             row.add_child(
-                AlertDialog::new("This is an alert!").on_close(close_callback)
+                AlertDialog::new("This is an alert!")
+                    .on_close(close_callback)
+                    .draggable(true)
             );
         }
         ViewState::ShowDialog => {
             row.add_child(
                 Dialog::new("Example Dialog")
+                    .draggable(true)
                     .on_close(close_callback)
                     .style("min-width: 200px;")
                     .with_child(
