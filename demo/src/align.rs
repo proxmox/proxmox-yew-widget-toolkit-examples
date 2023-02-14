@@ -19,51 +19,29 @@ pub fn AlignDemo() -> Html {
         .with_child("Base")
         .node_ref(button_ref.clone());
 
-    let top_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::Top)
-    };
-    let top_end_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::TopEnd)
-    };
-    let end_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::End)
-    };
-    let bottom_end_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::BottomEnd)
-    };
-    let bottom_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::Bottom)
-    };
-    let bottom_start_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::BottomStart)
-    };
-    let start_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::Start)
-    };
-    let top_start_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::TopStart)
-    };
-    let center_onclick = {
-        let button_ref = button_ref.clone();
-        let text_ref = text_ref.clone();
-        move |_| align(button_ref.clone(), text_ref.clone(), Point::Center)
-    };
+    let button_points = vec![
+        ("Top", Point::Top),
+        ("TopEnd", Point::TopEnd),
+        ("End", Point::End),
+        ("BottomEnd", Point::BottomEnd),
+        ("Bottom", Point::Bottom),
+        ("BottomStart", Point::BottomStart),
+        ("Start", Point::Start),
+        ("TopStart", Point::TopStart),
+        ("Center", Point::Center),
+    ];
+
+    let mut column = Column::new().gap(2);
+
+    for (text, point) in button_points {
+        let handler = {
+            let button_ref = button_ref.clone();
+            let text_ref = text_ref.clone();
+            move |_| align(button_ref.clone(), text_ref.clone(), point)
+        };
+
+        column.add_child(Button::new(text).onclick(handler));
+    }
 
     {
         let button_ref = button_ref.clone();
@@ -78,19 +56,7 @@ pub fn AlignDemo() -> Html {
         .class("pwt-fit")
         .padding(2)
         .gap(2)
-        .with_child(
-            Column::new()
-                .gap(2)
-                .with_child(Button::new("Top").onclick(top_onclick))
-                .with_child(Button::new("TopEnd").onclick(top_end_onclick))
-                .with_child(Button::new("End").onclick(end_onclick))
-                .with_child(Button::new("BottomEnd").onclick(bottom_end_onclick))
-                .with_child(Button::new("Bottom").onclick(bottom_onclick))
-                .with_child(Button::new("BottomStart").onclick(bottom_start_onclick))
-                .with_child(Button::new("Start").onclick(start_onclick))
-                .with_child(Button::new("TopStart").onclick(top_start_onclick))
-                .with_child(Button::new("Center").onclick(center_onclick)),
-        )
+        .with_child(column)
         .with_flex_spacer()
         .with_child(
             Column::new()
@@ -103,7 +69,7 @@ pub fn AlignDemo() -> Html {
             Panel::new()
                 .title("Floating")
                 .with_child(html!(<div class="pwt-p-2">{ "Content" }</div>))
-                .node_ref(text_ref.clone())
+                .node_ref(text_ref.clone()),
         );
     row.into()
 }
