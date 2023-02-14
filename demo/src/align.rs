@@ -1,6 +1,6 @@
 use pwt::prelude::*;
 
-use pwt::widget::align::{align_to, AlignOptions, GrowDirection, Point};
+use pwt::widget::align::{align_to, align_to_xy, AlignOptions, GrowDirection, Point};
 use pwt::widget::dom::IntoHtmlElement;
 use pwt::widget::Panel;
 use pwt::{
@@ -50,6 +50,25 @@ pub fn AlignDemo() -> Html {
             align(button_ref.clone(), text_ref.clone(), Point::Center);
         })
         .forget();
+    }
+
+    {
+        let text_ref = text_ref.clone();
+        column.add_child(Button::new("To 0,0").onclick(move |_| {
+            let _ = align_to_xy(text_ref.clone(), (0.0, 0.0), Point::TopStart);
+        }));
+    }
+    {
+        let text_ref = text_ref.clone();
+        column.add_child(Button::new("To 500,500").onclick(move |_| {
+            let _ = align_to_xy(text_ref.clone(), (500.0, 500.0), Point::TopStart);
+        }));
+    }
+    {
+        let text_ref = text_ref.clone();
+        column.add_child(Button::new("To -20,-20").onclick(move |_| {
+            let _ = align_to_xy(text_ref.clone(), (-20.0, -20.0), Point::TopStart);
+        }));
     }
 
     let row = Row::new()
