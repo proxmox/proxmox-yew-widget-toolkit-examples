@@ -13,6 +13,9 @@ use theme::ThemeDemo;
 mod lorem_ipsum;
 pub use lorem_ipsum::LoremIpsum;
 
+mod miscellaneous;
+use miscellaneous::MiscellaneousDemo;
+
 mod tab_panel;
 use tab_panel::TabPanelDemo;
 
@@ -127,6 +130,14 @@ fn MainMenu() -> Html {
             |_| {
                 html! {<TreeDemo/>}
             },
+        ))
+        .with_item(MenuItem::new(
+            "miscellaneous_panel",
+            "Miscellaneous",
+            None::<&str>,
+            |_| {
+                html! {<MiscellaneousDemo/>}
+            }
         ))
         .with_item(MenuItem::new(
             "movies_panel",
