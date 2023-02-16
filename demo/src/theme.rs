@@ -14,6 +14,7 @@ static COLOR_SCHEMES: &[ColorScheme] = &[
     ColorScheme::Secondary,
     ColorScheme::Tertiary,
     ColorScheme::Error,
+    ColorScheme::Warning,
 ];
 
 fn color_palette(color: &str, title: &str) -> Html {
@@ -65,6 +66,7 @@ fn color_panel(_: &TabPanelRenderInfo) -> Html {
         .with_child(color_palette("neutral", "Neutral Color"))
         .with_child(color_palette("neutral-alt", "Neutral Variant Color"))
         .with_child(color_palette("error", "Error Color"))
+        .with_child(color_palette("warning", "Warning Color"))
         .into()
 }
 
