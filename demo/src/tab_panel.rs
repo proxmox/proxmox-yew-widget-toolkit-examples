@@ -22,7 +22,7 @@ pub fn TabPanelDemo() -> Html {
         .with_item(
             "tab1",
             "Tab 1",
-            None::<&str>,
+            "fa fa-hdd-o",
             render_tab("This is Tab 1"),
         )
        .with_item(
@@ -34,7 +34,7 @@ pub fn TabPanelDemo() -> Html {
         .with_item(
             "tab3",
             "Tab 3",
-            None::<&str>,
+            "fa fa-th-large",
             render_tab("This is Tab 3"),
         )
         .navigation_container()
