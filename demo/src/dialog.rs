@@ -11,6 +11,7 @@ use crate::LoremIpsum;
 enum ViewState {
     Main,
     ShowDialog,
+    ShowResizableDialog,
     ShowAlert,
 }
 
@@ -32,6 +33,10 @@ pub fn DialogDemo() -> Html {
         .with_child(Button::new("Show Dialog").onclick({
             let view_state = view_state.clone();
             move |_| view_state.set(ViewState::ShowDialog)
+        }))
+        .with_child(Button::new("Show resizable Dialog").onclick({
+            let view_state = view_state.clone();
+            move |_| view_state.set(ViewState::ShowResizableDialog)
         }))
         .with_child(Button::new("Show Alert").onclick({
             let view_state = view_state.clone();
@@ -65,6 +70,31 @@ pub fn DialogDemo() -> Html {
                                     move |_| view_state.set(ViewState::Main)
                                 })),
                         ),
+                    ),
+            );
+        }
+        ViewState::ShowResizableDialog => {
+            row.add_child(
+                Dialog::new("Example Resizable Dialog")
+                    .draggable(true)
+                    .resizable(true)
+                    .on_close(close_callback)
+                    .style("min-width: 200px; min-height: 50px;")
+                    .with_child(
+                        Column::new()
+                            .class("pwt-fit")
+                            .with_child(html! {<LoremIpsum/>})
+                            .with_child(
+                                Row::new()
+                                    .padding(2)
+                                    .gap(2)
+                                    .with_flex_spacer()
+                                    .class("pwt-bg-color-neutral-container-alt")
+                                    .with_child(Button::new("OK").onclick({
+                                        let view_state = view_state.clone();
+                                        move |_| view_state.set(ViewState::Main)
+                                    })),
+                            ),
                     ),
             );
         }
