@@ -18,12 +18,13 @@ enum ViewState {
 pub fn DialogDemo() -> Html {
     let view_state = use_state(|| ViewState::Main);
 
-    let close_callback = use_callback({
-        let view_state = view_state.clone();
-        move |(), ()| {
-            view_state.set(ViewState::Main)
-        }
-    }, ());
+    let close_callback = use_callback(
+        {
+            let view_state = view_state.clone();
+            move |(), ()| view_state.set(ViewState::Main)
+        },
+        (),
+    );
 
     let mut row = Column::new()
         .padding(2)
@@ -37,13 +38,13 @@ pub fn DialogDemo() -> Html {
             move |_| view_state.set(ViewState::ShowAlert)
         }));
 
-    match *view_state  {
+    match *view_state {
         ViewState::Main => { /* do nothing */ }
         ViewState::ShowAlert => {
             row.add_child(
                 AlertDialog::new("This is an alert!")
                     .on_close(close_callback)
-                    .draggable(true)
+                    .draggable(true),
             );
         }
         ViewState::ShowDialog => {
@@ -53,21 +54,17 @@ pub fn DialogDemo() -> Html {
                     .on_close(close_callback)
                     .style("min-width: 200px;")
                     .with_child(
-                        Column::new()
-                            .with_child(html!{<LoremIpsum/>})
-                            .with_child(
-                                Row::new()
-                                    .padding(2)
-                                    .gap(2)
-                                    .with_flex_spacer()
-                                    .class("pwt-bg-color-neutral-container-alt")
-                                    .with_child(
-                                        Button::new("OK").onclick({
-                                            let view_state = view_state.clone();
-                                            move |_| view_state.set(ViewState::Main)
-                                        })
-                                    ),
-                            ),
+                        Column::new().with_child(html! {<LoremIpsum/>}).with_child(
+                            Row::new()
+                                .padding(2)
+                                .gap(2)
+                                .with_flex_spacer()
+                                .class("pwt-bg-color-neutral-container-alt")
+                                .with_child(Button::new("OK").onclick({
+                                    let view_state = view_state.clone();
+                                    move |_| view_state.set(ViewState::Main)
+                                })),
+                        ),
                     ),
             );
         }
