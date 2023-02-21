@@ -14,29 +14,21 @@ pub fn TabPanelDemo() -> Html {
             .into()
     }
 
-    TabPanel::new()
+    let mut panel = TabPanel::new()
         .class("pwt-fit")
         .title("This is a simple Tab Panel")
         .tool(Button::new("?").class("circle").disabled(true))
-        .tool(Button::new("!").class("circle").disabled(false))
-        .with_item(
-            "tab1",
-            "Tab 1",
+        .tool(Button::new("!").class("circle").disabled(false));
+
+    for i in 0..6 {
+        panel.add_item(
+            format!("tab{i}"),
+            format!("Tab {i}"),
             "fa fa-hdd-o",
-            render_tab("This is Tab 1"),
-        )
-       .with_item(
-            "tab2",
-            "Tab 2",
-            None::<&str>,
-           render_tab("This is Tab 2"),
-        )
-        .with_item(
-            "tab3",
-            "Tab 3",
-            "fa fa-th-large",
-            render_tab("This is Tab 3"),
-        )
-        .navigation_container()
+            render_tab(&format!("This is Tab {i}")),
+        );
+    }
+
+    panel.navigation_container()
         .into()
 }
