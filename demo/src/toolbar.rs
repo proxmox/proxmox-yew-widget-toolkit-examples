@@ -17,6 +17,7 @@ pub fn ToolbarDemo() -> Html {
     );
 
     let toolbar = Toolbar::new()
+        .class("pwt-border-bottom")
         .with_child(Button::new("Button1"))
         .with_child(Button::new("Button2"))
         .with_child(Button::new("Button3").disabled(true))
@@ -30,14 +31,11 @@ pub fn ToolbarDemo() -> Html {
 
     let panel = Panel::new()
         .title("A panel with a toolbar")
-        .with_child(
-            BarScroll::new(toolbar)
-                .class("pwt-border-bottom")
-        )
+        .with_child(toolbar)
         .with_child(html!{<LoremIpsum/>});
 
     Column::new()
-        .class("pwt-size-fit-content")
+        .class("pwt-fit")
         .padding(2)
         .with_child(panel)
         .into()
