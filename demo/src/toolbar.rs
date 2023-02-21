@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{BarScroll, Column, Button, Panel, Toolbar};
+use pwt::widget::{Column, Button, Panel, Toolbar};
 use pwt::widget::menu::{Menu, MenuButton, MenuItem};
 use pwt::widget::form::Checkbox;
 
