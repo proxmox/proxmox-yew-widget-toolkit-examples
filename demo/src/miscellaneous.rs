@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
 use pwt::prelude::*;
-use pwt::widget::{Button, Column, Meter, MiniScroll, Panel, Progress, Row};
+use pwt::widget::{Button, Column, Meter, MiniScroll, Panel, Progress, Row, MiniScrollMode};
 
 fn mini_scoll_demo1() -> Html {
 
@@ -15,11 +15,28 @@ fn mini_scoll_demo1() -> Html {
 
 
     Panel::new()
-        .attribute("style", "width:300px;")
-        .title("MimiScroll mode 'simple'")
+        .title("MiniScroll mode 'MiniScrollMode::Native' (default)")
         .with_child(MiniScroll::new(content))
         .into()
 }
+
+fn mini_scoll_demo2() -> Html {
+
+    let mut content = Row::new()
+        .padding(2)
+        .gap(2);
+
+    for i in 0..10 {
+        content.add_child(Button::new(format!("Button {i}")));
+    }
+
+
+    Panel::new()
+        .title("MiniScroll mode 'MiniScrollMode::Arrow'")
+        .with_child(MiniScroll::new(content).scroll_mode(MiniScrollMode::Arrow))
+        .into()
+}
+
 #[function_component]
 pub fn MiscellaneousDemo() -> Html {
 
@@ -43,5 +60,6 @@ pub fn MiscellaneousDemo() -> Html {
         .with_child(meter.clone().value(420.0))
         .with_child(meter.clone().value(460.0))
         .with_child(mini_scoll_demo1())
+        .with_child(mini_scoll_demo2())
         .into()
 }

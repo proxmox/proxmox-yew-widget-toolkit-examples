@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Button, Container, TabPanel, MiniScroll, MiniScrollMode};
+use pwt::widget::{Button, Container, TabPanel, MiniScrollMode};
 
 
 #[function_component]
