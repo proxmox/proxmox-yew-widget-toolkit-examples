@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Button, Panel, Toolbar};
+use pwt::widget::{Column, Button, MiniScroll, Panel, Toolbar};
 use pwt::widget::menu::{Menu, MenuButton, MenuItem};
 use pwt::widget::form::Checkbox;
 
@@ -31,11 +31,11 @@ pub fn ToolbarDemo() -> Html {
 
     let panel = Panel::new()
         .title("A panel with a toolbar")
-        .with_child(toolbar)
+        .with_child(MiniScroll::new(toolbar))
         .with_child(html!{<LoremIpsum/>});
 
     Column::new()
-        .class("pwt-fit")
+        .class("pwt-size-fit-content")
         .padding(2)
         .with_child(panel)
         .into()

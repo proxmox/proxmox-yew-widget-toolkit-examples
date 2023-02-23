@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Button, Container, TabPanel};
+use pwt::widget::{Button, Container, TabPanel, MiniScroll, MiniScrollMode};
 
 
 #[function_component]
@@ -15,7 +15,9 @@ pub fn TabPanelDemo() -> Html {
     }
 
     let mut panel = TabPanel::new()
+        //.class("pwt-size-fit-content")
         .class("pwt-fit")
+        .scroll_mode(MiniScrollMode::Arrow)
         .title("This is a simple Tab Panel")
         .tool(Button::new("?").class("circle").disabled(true))
         .tool(Button::new("!").class("circle").disabled(false));
