@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Button, MiniScroll, Panel, Toolbar};
+use pwt::widget::{Column, Button, MiniScroll, Panel, Toolbar, MiniScrollMode};
 use pwt::widget::menu::{Menu, MenuButton, MenuItem};
 use pwt::widget::form::Checkbox;
 
@@ -17,6 +17,7 @@ pub fn ToolbarDemo() -> Html {
     );
 
     let toolbar = Toolbar::new()
+        .scroll_mode(MiniScrollMode::Native)
         .class("pwt-border-bottom")
         .with_child(Button::new("Button1"))
         .with_child(Button::new("Button2"))
@@ -31,7 +32,7 @@ pub fn ToolbarDemo() -> Html {
 
     let panel = Panel::new()
         .title("A panel with a toolbar")
-        .with_child(MiniScroll::new(toolbar))
+        .with_child(toolbar)
         .with_child(html!{<LoremIpsum/>});
 
     Column::new()
