@@ -17,7 +17,7 @@ pub fn TabPanelDemo() -> Html {
     let mut panel = TabPanel::new()
         //.class("pwt-size-fit-content")
         .class("pwt-fit")
-        .scroll_mode(MiniScrollMode::Arrow)
+        .scroll_mode(MiniScrollMode::Native)
         .title("This is a simple Tab Panel")
         .tool(Button::new("?").class("circle").disabled(true))
         .tool(Button::new("!").class("circle").disabled(false));
