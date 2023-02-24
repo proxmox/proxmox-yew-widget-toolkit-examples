@@ -7,6 +7,9 @@ use buttons::ButtonsDemo;
 mod canvas;
 use canvas::CanvasDemo;
 
+mod gestures;
+pub use gestures::GestureDetectorDemo;
+
 mod theme;
 use theme::ThemeDemo;
 
@@ -64,6 +67,14 @@ use pwt::widget::{Panel, ThemeLoader, ThemeModeSelector, ThemeNameSelector, RtlS
 fn MainMenu() -> Html {
     NavigationMenu::new()
         .aria_label("Examples")
+        .with_item(MenuItem::new(
+            "gesture_panel",
+            "Gestures",
+            None::<&str>,
+            |_| {
+                html! {<GestureDetectorDemo/>}
+            },
+        ))
         .with_item(MenuItem::new(
             "canvas_panel",
             "Canvas",
