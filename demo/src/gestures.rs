@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use pwt::prelude::*;
-use pwt::widget::{Column, GestureDetector, GestureDragEvent, Panel};
+use pwt::widget::{Column, GestureDetector, GestureDragEvent, GestureSwipeEvent, Panel};
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct GestureDetectorDemoProps {}
@@ -52,6 +52,12 @@ impl Component for GestureDetectorDemo {
                     "DRAG UPDATE {} {}",
                     event.offset_x(),
                     event.offset_y(),
+                ))
+            }))
+            .on_swipe(ctx.link().callback(|event: GestureSwipeEvent| {
+                Msg::Log(format!(
+                    "SWIPE direction {}",
+                    event.direction,
                 ))
             }))
             .on_tap(ctx.link().callback(|_| Msg::Log("TAP".into())))
