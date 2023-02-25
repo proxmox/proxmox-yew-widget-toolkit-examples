@@ -53,7 +53,7 @@ impl Component for GestureDetectorDemo {
                     .with_child(
                         GestureDetector::new()
                             .on_tap(ctx.link().callback(|_| Msg::Log("TAP".into())))
-                            .on_long_tap(ctx.link().callback(|_| Msg::Log("LONG TAP".into()))),
+                            .on_long_press(ctx.link().callback(|_| Msg::Log("LONG PRESS".into()))),
                     ),
             )
             .with_child(log_panel)
