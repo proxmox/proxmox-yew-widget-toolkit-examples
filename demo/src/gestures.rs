@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use pwt::prelude::*;
-use pwt::widget::{Column, GestureDetector, Panel};
+use pwt::widget::{Column, GestureDetector, GestureDragEvent, Panel};
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct GestureDetectorDemoProps {}
@@ -44,17 +44,26 @@ impl Component for GestureDetectorDemo {
                 .collect::<Html>()
         });
 
+        let detector = GestureDetector::new()
+            .on_drag_start(ctx.link().callback(|_| Msg::Log(format!("DRAG START"))))
+            .on_drag_end(ctx.link().callback(|_| Msg::Log(format!("DRAG END"))))
+            .on_drag_update(ctx.link().callback(|event: GestureDragEvent| {
+                Msg::Log(format!(
+                    "DRAG UPDATE {} {}",
+                    event.offset_x(),
+                    event.offset_y(),
+                ))
+            }))
+            .on_tap(ctx.link().callback(|_| Msg::Log("TAP".into())))
+            .on_long_press(ctx.link().callback(|_| Msg::Log("LONG PRESS".into())));
+
         Column::new()
             .class("pwt-fit")
             .with_child(
                 Panel::new()
                     .class("pwt-flex-fill")
                     .title("Gesture Detector")
-                    .with_child(
-                        GestureDetector::new()
-                            .on_tap(ctx.link().callback(|_| Msg::Log("TAP".into())))
-                            .on_long_press(ctx.link().callback(|_| Msg::Log("LONG PRESS".into()))),
-                    ),
+                    .with_child(detector),
             )
             .with_child(log_panel)
             .into()
