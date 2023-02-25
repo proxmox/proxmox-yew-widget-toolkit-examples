@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use pwt::prelude::*;
-use pwt::widget::{Column, GestureDetector, GestureDragEvent, GestureSwipeEvent, Panel};
+use pwt::widget::{Button, Column, GestureDetector, GestureDragEvent, GestureSwipeEvent, Panel};
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct GestureDetectorDemoProps {}
@@ -44,7 +44,14 @@ impl Component for GestureDetectorDemo {
                 .collect::<Html>()
         });
 
-        let detector = GestureDetector::new()
+        let content = Button::new("Button inside GestureDetector")
+            .onclick(ctx.link().callback(|_| Msg::Log("BUTTON CLICK".into())))
+            .onpointerdown(|event: PointerEvent| {
+                // disable gesture detector on button (enable onclick)
+                event.stop_propagation();
+            });
+
+        let detector = GestureDetector::new(content)
             .on_drag_start(ctx.link().callback(|_| Msg::Log(format!("DRAG START"))))
             .on_drag_end(ctx.link().callback(|_| Msg::Log(format!("DRAG END"))))
             .on_drag_update(ctx.link().callback(|event: GestureDragEvent| {
