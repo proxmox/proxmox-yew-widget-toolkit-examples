@@ -45,11 +45,7 @@ impl Component for GestureDetectorDemo {
         });
 
         let content = Button::new("Button inside GestureDetector")
-            .onclick(ctx.link().callback(|_| Msg::Log("BUTTON CLICK".into())))
-            .onpointerdown(|event: PointerEvent| {
-                // disable gesture detector on button (enable onclick)
-                event.stop_propagation();
-            });
+            .onclick(ctx.link().callback(|_| Msg::Log("BUTTON CLICK".into())));
 
         let detector = GestureDetector::new(content)
             .on_drag_start(ctx.link().callback(|_| Msg::Log(format!("DRAG START"))))
