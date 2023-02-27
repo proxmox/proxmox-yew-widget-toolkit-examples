@@ -1,7 +1,10 @@
 use std::collections::VecDeque;
 
 use pwt::prelude::*;
-use pwt::widget::{Button, Column, GestureDetector, GestureDragEvent, GestureSwipeEvent, Panel};
+use pwt::widget::{
+    Button, Column, Container, Slidable, GestureDetector,
+    GestureDragEvent, GestureSwipeEvent, Row, Panel,
+};
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct GestureDetectorDemoProps {}
@@ -44,8 +47,13 @@ impl Component for GestureDetectorDemo {
                 .collect::<Html>()
         });
 
-        let content = Button::new("Button inside GestureDetector")
-            .onclick(ctx.link().callback(|_| Msg::Log("BUTTON CLICK".into())));
+        let content = Container::new()
+            .class("pwt-fit")
+            .attribute("style", "touch-action:none;")
+            .with_child(
+                Button::new("Button inside GestureDetector")
+                    .onclick(ctx.link().callback(|_| Msg::Log("BUTTON CLICK".into())))
+            );
 
         let detector = GestureDetector::new(content)
             .on_drag_start(ctx.link().callback(|_| Msg::Log(format!("DRAG START"))))
@@ -58,16 +66,21 @@ impl Component for GestureDetectorDemo {
                 ))
             }))
             .on_swipe(ctx.link().callback(|event: GestureSwipeEvent| {
-                Msg::Log(format!(
-                    "SWIPE direction {}",
-                    event.direction,
-                ))
+                Msg::Log(format!("SWIPE direction {}", event.direction,))
             }))
             .on_tap(ctx.link().callback(|_| Msg::Log("TAP".into())))
             .on_long_press(ctx.link().callback(|_| Msg::Log("LONG PRESS".into())));
 
+        let slidable = Slidable::new(
+            Container::new()
+                .padding(4)
+                .with_child("TESTDISMITETSTETSTESTEST")
+        )
+        .attribute("style", "width:300px;background:red;");
+
         Column::new()
             .class("pwt-fit")
+            .with_child(Row::new().with_child(slidable))
             .with_child(
                 Panel::new()
                     .class("pwt-flex-fill")
