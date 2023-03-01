@@ -75,8 +75,10 @@ impl Component for GestureDetectorDemo {
             Container::new()
                 .padding(4)
                 .with_child("TESTDISMITETSTETSTESTEST")
-        )
-        .attribute("style", "width:300px;background:red;");
+         )
+        .attribute("style", "width:300px;background:red;")
+        .on_dismiss(|_| { /* just enable dismiss */ });
+
 
         Column::new()
             .class("pwt-fit")
