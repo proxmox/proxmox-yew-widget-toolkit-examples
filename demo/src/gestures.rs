@@ -61,8 +61,8 @@ impl Component for GestureDetectorDemo {
             .on_drag_update(ctx.link().callback(|event: GestureDragEvent| {
                 Msg::Log(format!(
                     "DRAG UPDATE {} {}",
-                    event.offset_x(),
-                    event.offset_y(),
+                    event.x(),
+                    event.y(),
                 ))
             }))
             .on_swipe(ctx.link().callback(|event: GestureSwipeEvent| {
