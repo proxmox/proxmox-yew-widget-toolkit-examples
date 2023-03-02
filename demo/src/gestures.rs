@@ -74,9 +74,9 @@ impl Component for GestureDetectorDemo {
         let slidable = Slidable::new(
             Container::new()
                 .padding(4)
-                .with_child("TESTDISMITETSTETSTESTEST")
+                .with_child("Slide to left or right to dismiss")
          )
-        .attribute("style", "width:300px;background:red;")
+        .class("pwt-w-100")
         .on_dismiss(|_| { /* just enable dismiss */ });
 
 
