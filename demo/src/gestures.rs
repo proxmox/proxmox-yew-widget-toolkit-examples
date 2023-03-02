@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use pwt::prelude::*;
 use pwt::widget::{
     Button, Column, Container, Slidable, GestureDetector,
-    GestureDragEvent, GestureSwipeEvent, Row, Panel,
+    GestureDragEvent, GestureSwipeEvent, Row, Panel, SlidableAction,
 };
 
 #[derive(Properties, Clone, PartialEq)]
@@ -84,8 +84,8 @@ impl Component for GestureDetectorDemo {
                 .padding(4)
                 .with_child("Slide to reveal buttons")
          )
-         .left_actions(Button::new("Left"))
-         .right_actions(Button::new("Right"))
+         .left_actions(SlidableAction::new("Bookmark").icon_class("fa fa-star-o"))
+         .right_actions(SlidableAction::new("Delete").icon_class("fa fa-trash"))
         .class("pwt-w-100");
 
 
