@@ -71,18 +71,28 @@ impl Component for GestureDetectorDemo {
             .on_tap(ctx.link().callback(|_| Msg::Log("TAP".into())))
             .on_long_press(ctx.link().callback(|_| Msg::Log("LONG PRESS".into())));
 
-        let slidable = Slidable::new(
+        let slidable1 = Slidable::new(
+                Container::new()
+                    .padding(4)
+                    .with_child("Slide to left or right to dismiss")
+             )
+            .class("pwt-w-100")
+            .on_dismiss(|_| { /* just enable dismiss */ });
+
+        let slidable2 = Slidable::new(
             Container::new()
                 .padding(4)
-                .with_child("Slide to left or right to dismiss")
+                .with_child("Slide to reveal buttons")
          )
-        .class("pwt-w-100")
-        .on_dismiss(|_| { /* just enable dismiss */ });
+         .left_actions(Button::new("Left"))
+         .right_actions(Button::new("Right"))
+        .class("pwt-w-100");
 
 
         Column::new()
             .class("pwt-fit")
-            .with_child(Row::new().with_child(slidable))
+            .with_child(Row::new().with_child(slidable1))
+            .with_child(Row::new().with_child(slidable2))
             .with_child(
                 Panel::new()
                     .class("pwt-flex-fill")
