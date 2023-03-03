@@ -1,10 +1,11 @@
 use std::collections::VecDeque;
 
 use pwt::prelude::*;
-use pwt::widget::{
-    Button, Column, Container, GestureDetector, GestureDragEvent, GestureSwipeEvent, Panel, Row,
-    Slidable, SlidableAction, SlidableActionMouseEvent,
+use pwt::touch::{
+    GestureDetector, GestureDragEvent, GestureSwipeEvent, Slidable, SlidableAction,
+    SlidableActionMouseEvent,
 };
+use pwt::widget::{Button, Column, Container, Panel, Row};
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct GestureDetectorDemoProps {}
@@ -93,7 +94,6 @@ impl Component for GestureDetectorDemo {
                 .on_click(|event: SlidableActionMouseEvent| {
                     event.dismiss(true);
                 }),
-
         )
         .class("pwt-w-100");
 

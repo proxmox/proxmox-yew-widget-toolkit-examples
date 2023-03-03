@@ -1,7 +1,8 @@
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::widget::{Button, Column, PageView, Panel, Toolbar};
+use pwt::touch::PageView;
+use pwt::widget::{Button, Column, Panel, Toolbar};
 
 pub enum Msg {
     Page0,
