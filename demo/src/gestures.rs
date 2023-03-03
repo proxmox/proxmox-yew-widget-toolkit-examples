@@ -2,8 +2,8 @@ use std::collections::VecDeque;
 
 use pwt::prelude::*;
 use pwt::widget::{
-    Button, Column, Container, Slidable, GestureDetector,
-    GestureDragEvent, GestureSwipeEvent, Row, Panel, SlidableAction,
+    Button, Column, Container, GestureDetector, GestureDragEvent, GestureSwipeEvent, Panel, Row,
+    Slidable, SlidableAction, SlidableActionMouseEvent,
 };
 
 #[derive(Properties, Clone, PartialEq)]
@@ -52,18 +52,14 @@ impl Component for GestureDetectorDemo {
             .attribute("style", "touch-action:none;")
             .with_child(
                 Button::new("Button inside GestureDetector")
-                    .onclick(ctx.link().callback(|_| Msg::Log("BUTTON CLICK".into())))
+                    .onclick(ctx.link().callback(|_| Msg::Log("BUTTON CLICK".into()))),
             );
 
         let detector = GestureDetector::new(content)
             .on_drag_start(ctx.link().callback(|_| Msg::Log(format!("DRAG START"))))
             .on_drag_end(ctx.link().callback(|_| Msg::Log(format!("DRAG END"))))
             .on_drag_update(ctx.link().callback(|event: GestureDragEvent| {
-                Msg::Log(format!(
-                    "DRAG UPDATE {} {}",
-                    event.x(),
-                    event.y(),
-                ))
+                Msg::Log(format!("DRAG UPDATE {} {}", event.x(), event.y(),))
             }))
             .on_swipe(ctx.link().callback(|event: GestureSwipeEvent| {
                 Msg::Log(format!("SWIPE direction {}", event.direction,))
@@ -72,22 +68,34 @@ impl Component for GestureDetectorDemo {
             .on_long_press(ctx.link().callback(|_| Msg::Log("LONG PRESS".into())));
 
         let slidable1 = Slidable::new(
-                Container::new()
-                    .padding(4)
-                    .with_child("Slide to left or right to dismiss")
-             )
-            .class("pwt-w-100")
-            .on_dismiss(|_| { /* just enable dismiss */ });
+            Container::new()
+                .padding(4)
+                .with_child("Slide to left or right to dismiss"),
+        )
+        .class("pwt-w-100")
+        .on_dismiss(|_| { /* just enable dismiss */ });
 
         let slidable2 = Slidable::new(
             Container::new()
                 .padding(4)
-                .with_child("Slide to reveal buttons")
-         )
-         .left_actions(SlidableAction::new("Bookmark").icon_class("fa fa-star-o"))
-         .right_actions(SlidableAction::new("Delete").icon_class("fa fa-trash"))
-        .class("pwt-w-100");
+                .with_child("Slide to reveal buttons"),
+        )
+        .left_actions(
+            SlidableAction::new("Bookmark")
+                .icon_class("fa fa-star-o")
+                .on_click(|event: SlidableActionMouseEvent| {
+                    event.keep_open(true);
+                }),
+        )
+        .right_actions(
+            SlidableAction::new("Delete")
+                .icon_class("fa fa-trash")
+                .on_click(|event: SlidableActionMouseEvent| {
+                    event.dismiss(true);
+                }),
 
+        )
+        .class("pwt-w-100");
 
         Column::new()
             .class("pwt-fit")
