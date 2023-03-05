@@ -1,11 +1,11 @@
 [[hooks]]
 stage="build"
-command="sassc"
+command="sass"
 command_arguments= ["../../www/scss/proxmox-yew-style-light.scss", "dist/.stage/proxmox-yew-style-light.css"]
 
 [[hooks]]
 stage="build"
-command="sassc"
+command="sass"
 command_arguments= ["../../www/scss/proxmox-yew-style-dark.scss", "dist/.stage/proxmox-yew-style-dark.css"]
 
 [watch]
