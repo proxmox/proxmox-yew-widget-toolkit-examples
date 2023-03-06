@@ -50,7 +50,7 @@ impl Component for App {
         Panel::new()
             .margin(4)
             .title("This panel loads data form the server.")
-            .tool(self.loader.reload_button()) // add a reload button
+            .with_tool(self.loader.reload_button()) // add a reload button
             .with_child(content) // display data
             .into()
     }
