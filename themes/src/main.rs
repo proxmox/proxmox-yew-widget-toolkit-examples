@@ -1,5 +1,5 @@
 use pwt::prelude::*;
-use pwt::widget::{Column, Panel, ThemeLoader, ThemeSelector, Toolbar};
+use pwt::widget::{Column, Panel, ThemeLoader, ThemeModeSelector, Toolbar};
 
 pub struct App {}
 
@@ -14,14 +14,14 @@ impl Component for App {
     fn view(&self, _ctx: &Context<Self>) -> Html {
 
         let toolbar = Toolbar::new()
-            .border((false, false, true, false))
+            .border_bottom(true)
             .with_flex_spacer()
-            .with_child(ThemeSelector::new());
+            .with_child(ThemeModeSelector::new());
 
         let content = Column::new()
             .padding(2)
             .with_child("Please press the theme selector button to change the theme.");
- 
+
         let panel = Panel::new()
             .margin(4)
             .title("A simple Panel")
