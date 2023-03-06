@@ -43,7 +43,7 @@ impl Component for App {
     fn view(&self, ctx: &Context<Self>) -> Html {
 
         let toolbar = Toolbar::new()
-            .border((false, false, true, false))
+            .border_bottom(true)
             .with_child(
                 Button::new("Increment")
                     .onclick(ctx.link().callback(|_| Msg::Increment))
