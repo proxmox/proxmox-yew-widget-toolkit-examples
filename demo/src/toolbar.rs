@@ -27,6 +27,7 @@ pub fn ToolbarDemo() -> Html {
         .with_child(Button::new("Button5"))
         .with_child(Button::new("Button6"))
         .with_child(Button::new("Button7"))
+        .with_flex_spacer()
         .with_child(menu_button)
         ;
 
