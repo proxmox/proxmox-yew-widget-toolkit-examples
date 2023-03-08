@@ -48,6 +48,7 @@ pub fn MiscellaneousDemo() -> Html {
         .optimum(200.0);
 
     Column::new()
+        .class("pwt-fit")
         .padding(2)
         .gap(2)
         .with_child("Progress indicator (ongoing progress)")

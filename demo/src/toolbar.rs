@@ -37,7 +37,7 @@ pub fn ToolbarDemo() -> Html {
         .with_child(html!{<LoremIpsum/>});
 
     Column::new()
-        .class("pwt-size-fit-content")
+        .class("pwt-fit")
         .padding(2)
         .with_child(panel)
         .into()
