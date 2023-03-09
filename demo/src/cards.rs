@@ -3,7 +3,7 @@ use pwt::widget::{Card, Column};
 
 fn card_with_text(text: &str) -> Card {
     Card::new()
-        .class("pwt-d-flex pwt-justify-content-center pwt-align-items-center")
+        .class("pwt-d-flex pwt-justify-content-center pwt-align-items-center pwt-p-4")
         .with_child(text)
 }
 
@@ -18,8 +18,9 @@ pub fn CardsDemo() -> Html {
 
     for i in 0..6 {
         column.add_child(
-            card_with_text(&format!("Elevantionm level {i}"))
+            card_with_text(&format!("Elevantion level {i}, Interactive"))
                 .class(format!("pwt-elevation{i}"))
+                .class("pwt-interactive")
         )
     }
 
