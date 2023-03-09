@@ -59,7 +59,11 @@ pub fn DialogDemo() -> Html {
                     .on_close(close_callback)
                     .style("min-width: 200px;")
                     .with_child(
-                        Column::new().with_child(html! {<LoremIpsum/>}).with_child(
+                        Column::new()
+                            .class("pwt-fit")
+                            .with_child(html! {
+                                <div class="pwt-overflow-auto"><LoremIpsum/></div>
+                            }).with_child(
                             Row::new()
                                 .padding(2)
                                 .gap(2)
@@ -83,7 +87,9 @@ pub fn DialogDemo() -> Html {
                     .with_child(
                         Column::new()
                             .class("pwt-fit")
-                            .with_child(html! {<LoremIpsum/>})
+                            .with_child(html!{
+                                <div class="pwt-overflow-auto"><LoremIpsum/></div>
+                            })
                             .with_child(
                                 Row::new()
                                     .padding(2)
