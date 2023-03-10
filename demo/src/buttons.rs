@@ -17,16 +17,34 @@ pub fn ButtonsDemo() -> Html {
                     .class(ColorScheme::Primary),
             )
             .with_child(
+                Button::new("PrimaryContainer")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class(ColorScheme::PrimaryContainer),
+            )
+            .with_child(
                 Button::new("Secondary")
                     .disabled(disabled)
                     .pressed(pressed)
                     .class(ColorScheme::Secondary),
             )
             .with_child(
+                Button::new("SecondaryContainer")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class(ColorScheme::SecondaryContainer),
+            )
+            .with_child(
                 Button::new("Tertiray")
                     .disabled(disabled)
                     .pressed(pressed)
                     .class(ColorScheme::Tertiary),
+            )
+            .with_child(
+                Button::new("TertirayContainer")
+                    .disabled(disabled)
+                    .pressed(pressed)
+                    .class(ColorScheme::TertiaryContainer),
             )
             .with_child(
                 Button::new("Neutral")
