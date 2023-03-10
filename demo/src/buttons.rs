@@ -95,8 +95,8 @@ pub fn ButtonsDemo() -> Html {
         .with_child(render_buttons(true, false))
         .with_child("Pressed Buttons")
         .with_child(render_buttons(false, true))
-        .with_child("Button with Icon (raised)")
-        .with_child(Button::new("Delete").class("raised").icon_class("fa fa-trash-o"))
+        .with_child("Button with Icon (elevated)")
+        .with_child(Button::new("Delete").class("pwt-elevated").icon_class("fa fa-trash-o"))
         .with_child("Round Button with Icon")
         .with_child(
             Button::new("Delete")
