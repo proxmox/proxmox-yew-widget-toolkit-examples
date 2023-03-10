@@ -153,10 +153,10 @@ pub fn ButtonsDemo() -> Html {
                         .with_button(Button::new("Third").class("rounded")),
                 ),
         )
-        .with_child("Rounded Segmented Button (raised)")
+        .with_child("Rounded Segmented Button (elevated)")
         .with_child(
             SegmentedButton::new()
-                .class("rounded raised")
+                .class("rounded pwt-elevated")
                 .with_button(Button::new("First"))
                 .with_button(Button::new("Second"))
                 .with_button(Button::new("Third")),
