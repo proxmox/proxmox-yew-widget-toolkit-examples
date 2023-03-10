@@ -108,11 +108,13 @@ impl CircleDrawer {
             .with_flex_spacer()
             .with_child(
                 Button::new("Undo")
+                    .class("pwt-scheme-neutral-alt")
                     .disabled(self.undo.is_empty())
                     .onclick(ctx.link().callback(|_| Msg::Undo))
             )
             .with_child(
                 Button::new("Redo")
+                    .class("pwt-scheme-neutral-alt")
                     .disabled(self.redo.is_empty())
                     .onclick(ctx.link().callback(|_| Msg::Redo))
             )
