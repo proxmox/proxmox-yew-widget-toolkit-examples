@@ -41,12 +41,15 @@ impl Component for GestureDetectorDemo {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let log_panel = Panel::new().title("Gesture detection log").with_child({
-            self.logs
-                .iter()
-                .map(|t| html! {<div>{t}</div>})
-                .collect::<Html>()
-        });
+        let log_panel = Panel::new()
+            .border(false)
+            .title("Gesture detection log")
+            .with_child({
+                self.logs
+                    .iter()
+                    .map(|t| html! {<div>{t}</div>})
+                    .collect::<Html>()
+            });
 
         let content = Container::new()
             .class("pwt-fit")
@@ -104,6 +107,7 @@ impl Component for GestureDetectorDemo {
             .with_child(
                 Panel::new()
                     .class("pwt-flex-fill")
+                    .border(false)
                     .title("Gesture Detector")
                     .with_child(detector),
             )
