@@ -107,6 +107,16 @@ pub fn ButtonsDemo() -> Html {
         .gap(2)
         .class("pwt-size-fit-content")
         .class("pwt-align-items-start")
+        .with_child("Button Types")
+        .with_child(
+            Row::new().gap(2)
+            .with_child(Button::new("Filled").class(ColorScheme::Primary))
+            .with_child(Button::new("Elevated").class("pwt-elevated"))
+            .with_child(Button::new("Outline")
+                .class(ColorScheme::Primary)
+                .class("pwt-button-outline")
+            )
+        )
         .with_child("Enabled Buttons")
         .with_child(render_buttons(false, false))
         .with_child("Disabled Buttons")
@@ -114,7 +124,18 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Pressed Buttons")
         .with_child(render_buttons(false, true))
         .with_child("Button with Icon (elevated)")
-        .with_child(Button::new("Delete").class("pwt-elevated").icon_class("fa fa-trash-o"))
+        .with_child(
+            Row::new().gap(2)
+            .with_child(
+                Button::new("Delete").class("pwt-elevated")
+                    .icon_class("fa fa-trash-o")
+            )
+            .with_child(
+                Button::new("Delete").class("pwt-elevated")
+                    .disabled(true)
+                    .icon_class("fa fa-trash-o")
+            )
+        )
         .with_child("Round Button with Icon")
         .with_child(
             Button::new("Delete")
