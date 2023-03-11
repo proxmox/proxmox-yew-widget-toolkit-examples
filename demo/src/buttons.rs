@@ -111,7 +111,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child(
             Row::new().gap(2)
             .with_child(Button::new("Filled").class(ColorScheme::Primary))
-            .with_child(Button::new("Elevated").class("pwt-elevated"))
+            .with_child(Button::new("Elevated").class("pwt-button-elevated"))
             .with_child(Button::new("Outline")
                 .class(ColorScheme::Primary)
                 .class("pwt-button-outline")
@@ -127,11 +127,11 @@ pub fn ButtonsDemo() -> Html {
         .with_child(
             Row::new().gap(2)
             .with_child(
-                Button::new("Delete").class("pwt-elevated")
+                Button::new("Delete").class("pwt-button-elevated")
                     .icon_class("fa fa-trash-o")
             )
             .with_child(
-                Button::new("Delete").class("pwt-elevated")
+                Button::new("Delete").class("pwt-button-elevated")
                     .disabled(true)
                     .icon_class("fa fa-trash-o")
             )
@@ -195,7 +195,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Rounded Segmented Button (elevated)")
         .with_child(
             SegmentedButton::new()
-                .class("rounded pwt-elevated")
+                .class("rounded pwt-button-elevated")
                 .with_button(Button::new("First"))
                 .with_button(Button::new("Second"))
                 .with_button(Button::new("Third")),
