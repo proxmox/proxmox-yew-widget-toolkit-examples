@@ -1,6 +1,6 @@
 use pwt::prelude::*;
-use pwt::widget::{Card, Column, Row};
-use pwt::touch::Fab;
+use pwt::widget::{Card, Column, Row, Fa};
+use pwt::touch::{Fab, FabMenu, FabMenuDirection};
 
 fn card_with_text(text: &str) -> Card {
     Card::new()
@@ -21,6 +21,12 @@ pub fn CardsDemo() -> Html {
                 .class("pwt-align-items-center")
                 .with_child(Fab::new("fa fa-pencil"))
                 .with_child(Fab::new("fa fa-pencil").small(true).class("pwt-scheme-primary-container"))
+                .with_child(
+                    FabMenu::new()
+                        .direction(FabMenuDirection::Right)
+                        .with_child(Fab::new("fa fa-pencil"))
+                        .with_child(Fab::new("fa fa-trash"))
+                )
         )
         .with_child(card_with_text("Default Card"));
 
