@@ -23,10 +23,10 @@ pub fn CardsDemo() -> Html {
                 .with_child(Fab::new("fa fa-pencil").small(true).class("pwt-scheme-primary-container"))
                 .with_child(
                     FabMenu::new()
-                        .direction(FabMenuDirection::Right)
+                        .direction(FabMenuDirection::Down)
                         .align(FabMenuAlign::Start)
-                        .with_child(Fab::new("fa fa-pencil"))
-                        .with_child(Fab::new("fa fa-trash"))
+                        .with_child(Fab::new("fa fa-pencil").text("Edit"))
+                        .with_child(Fab::new("fa fa-trash").text("Delete"))
                 )
         )
         .with_child(card_with_text("Default Card"));
