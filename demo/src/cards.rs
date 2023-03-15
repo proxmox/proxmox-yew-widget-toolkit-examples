@@ -23,6 +23,7 @@ pub fn CardsDemo() -> Html {
                 .with_child(Fab::new("fa fa-pencil").small(true).class("pwt-scheme-primary-container"))
                 .with_child(
                     FabMenu::new()
+                        .main_button_class("pwt-scheme-primary")
                         .direction(FabMenuDirection::Down)
                         .align(FabMenuAlign::Start)
                         .with_child(Fab::new("fa fa-pencil").text("Edit"))
