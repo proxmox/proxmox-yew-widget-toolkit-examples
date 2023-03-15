@@ -19,8 +19,9 @@ pub fn CardsDemo() -> Html {
             Row::new()
                 .gap(4)
                 .class("pwt-align-items-center")
+                .with_child(Fab::new("fa fa-pencil").large())
                 .with_child(Fab::new("fa fa-pencil"))
-                .with_child(Fab::new("fa fa-pencil").small(true).class("pwt-scheme-primary-container"))
+                .with_child(Fab::new("fa fa-pencil").small().class("pwt-scheme-primary-container"))
                 .with_child(
                     FabMenu::new()
                         .main_button_class("pwt-scheme-primary")
