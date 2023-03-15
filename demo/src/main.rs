@@ -268,5 +268,7 @@ fn RoutedApp() -> Html {
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
+
+    pwt::state::set_default_theme_name("Proxmox");
     yew::Renderer::<RoutedApp>::new().render();
 }
