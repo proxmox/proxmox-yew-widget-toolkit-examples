@@ -38,8 +38,14 @@ pub fn CardsDemo() -> Html {
             card_with_text(&format!("Elevantion level {i}, Interactive"))
                 .class(format!("pwt-elevation{i}"))
                 .class("pwt-interactive")
+                //.class("pwt-scheme-primary-container")
+                //.class("pwt-card-outline")
         )
     }
 
-    column.into()
+    column
+        .with_child(card_with_text("Filled Card").class("pwt-interactive").class("pwt-scheme-primary-container"))
+        .with_child(card_with_text("Outline Card").class("pwt-interactive").class("pwt-card-outline"))
+        .with_child(card_with_text("Rectangular Card").class("pwt-interactive").class("pwt-shape-none"))
+        .into()
 }

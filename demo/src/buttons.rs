@@ -2,6 +2,7 @@ use yew::prelude::*;
 
 use pwt::prelude::*;
 use pwt::widget::{ActionIcon, Button, Column, Row, SegmentedButton};
+use pwt::touch::Fab;
 use pwt::css::ColorScheme;
 
 #[function_component]
@@ -110,6 +111,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Button Types")
         .with_child(
             Row::new().gap(2)
+            .with_child(Fab::new("fa fa-trash").small().text("FAB"))
             .with_child(Button::new("Filled").class(ColorScheme::Primary))
             .with_child(Button::new("Tonal").class(ColorScheme::PrimaryContainer))
             .with_child(Button::new("Elevated").class("pwt-button-elevated"))
