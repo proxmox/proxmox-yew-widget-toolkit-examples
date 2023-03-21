@@ -46,6 +46,7 @@ pub fn CardsDemo() -> Html {
     column
         .with_child(card_with_text("Filled Card").class("pwt-interactive").class("pwt-scheme-primary-container"))
         .with_child(card_with_text("Outline Card").class("pwt-interactive").class("pwt-card-outline"))
+        .with_child(card_with_text("Flat Card").class("pwt-card-flat").class("pwt-interactive"))
         .with_child(card_with_text("Rectangular Card").class("pwt-interactive").class("pwt-shape-none"))
         .into()
 }
