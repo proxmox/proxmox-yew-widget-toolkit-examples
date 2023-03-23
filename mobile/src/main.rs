@@ -2,7 +2,7 @@ use pwt::prelude::*;
 use yew::prelude::*;
 
 use pwt::touch::PageView;
-use pwt::widget::{Button, Column, Panel, Toolbar};
+use pwt::widget::{Button, Column, Panel, Row, Toolbar};
 
 pub enum Msg {
     Page0,
@@ -14,6 +14,44 @@ pub struct App {
     page: usize,
 }
 
+impl App {
+
+    fn banner(&self, text: &str) -> Row {
+        Row::new()
+            .attribute("role", "banner")
+            .attribute("aria-label", "PWT Mobile Demo")
+            .class("pwt-navbar")
+            .class("pwt-justify-content-space-between pwt-align-items-center")
+            .class("pwt-border-bottom")
+            .class("pwt-shadow1")
+            .padding(4)
+            .margin_bottom(2)
+            .with_child(html!{
+                <span class="pwt-ps-1 pwt-font-headline-small">{text}</span>
+            })
+            //.with_flex_spacer()
+            //.with_child(button_group)
+    }
+
+    fn page0(&self, ctx: &Context<Self>) -> Html {
+        let content = Button::new("VIEW PAGE1").onclick(ctx.link().callback(|_| Msg::Page1));
+
+        Column::new()
+            .with_child(self.banner("Page0"))
+            .with_child(content)
+            .into()
+    }
+
+    fn page1(&self, ctx: &Context<Self>) -> Html {
+        let content = Button::new("VIEW PAGE0").onclick(ctx.link().callback(|_| Msg::Page0));
+
+        Column::new()
+            .with_child(self.banner("Page1"))
+            .with_child(content)
+            .into()
+    }
+
+}
 impl Component for App {
     type Message = Msg;
     type Properties = ();
@@ -38,8 +76,8 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let page0 = Button::new("VIEW PAGE1").onclick(ctx.link().callback(|_| Msg::Page1));
-        let page1 = Button::new("VIEW PAGE0").onclick(ctx.link().callback(|_| Msg::Page0));
+        let page0 = self.page0(ctx);
+        let page1 = self.page1(ctx);
 
         PageView::new()
             .view_page(self.page)
