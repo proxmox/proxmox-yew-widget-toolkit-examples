@@ -38,6 +38,7 @@ impl App {
 
         Column::new()
             .with_child(self.banner("Page0"))
+            .with_child(html!{<p class="pwt-p-2">{"You can also SWIPE LEFT to view Page 1."}</p>})
             .with_child(content)
             .into()
     }
@@ -47,6 +48,7 @@ impl App {
 
         Column::new()
             .with_child(self.banner("Page1"))
+            .with_child(html!{<p class="pwt-p-2">{"You can also SWIPE RIGHT to view Page 0."}</p>})
             .with_child(content)
             .into()
     }
