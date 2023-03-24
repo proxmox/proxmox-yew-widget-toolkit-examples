@@ -1,17 +1,19 @@
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::touch::PageView;
+use pwt::touch::{NavigationBar, NavigationBarItem, PageView};
 use pwt::widget::{Button, Column, Panel, Row, Toolbar};
 
 pub enum Msg {
     Page0,
     Page1,
     PageChange(usize),
+    NavigationBarSelect(usize),
 }
 
 pub struct App {
     page: usize,
+    active_item: usize,
 }
 
 impl App {
@@ -24,7 +26,7 @@ impl App {
             .class("pwt-justify-content-space-between pwt-align-items-center")
             .class("pwt-border-bottom")
             .class("pwt-shadow1")
-            .padding(4)
+            .padding(2)
             .margin_bottom(2)
             .with_child(html!{
                 <span class="pwt-ps-1 pwt-font-headline-small">{text}</span>
@@ -59,7 +61,7 @@ impl Component for App {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self { page: 0 }
+        Self { page: 0, active_item: 0, }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -72,6 +74,9 @@ impl Component for App {
             }
             Msg::PageChange(page) => {
                 self.page = page;
+            },
+            Msg::NavigationBarSelect(active_item) => {
+                self.active_item = active_item;
             }
         }
         true
@@ -87,11 +92,30 @@ impl Component for App {
             .with_child(page0)
             .with_child(page1);
 
+        let items = vec![
+            NavigationBarItem::new()
+                .icon_class("fa fa-trash-o")
+                .active_icon_class("fa fa-trash")
+                .label("Delete"),
+            NavigationBarItem::new()
+                .icon_class("fa fa-gear")
+                .label("Settings"),
+            NavigationBarItem::new()
+                .icon_class("fa fa-user-o")
+                .active_icon_class("fa fa-user")
+                .label("Users"),
+        ];
+
+        let navigation_bar = NavigationBar::new(items)
+            .active_item(self.active_item)
+            .on_select(ctx.link().callback(Msg::NavigationBarSelect));
+
         Column::new()
             .class("pwt-viewport")
             .with_child(html!{
                 <div class="pwt-flex-fill">{page_view}</div>
             })
+            .with_child(navigation_bar)
             .into()
 
     }
