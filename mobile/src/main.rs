@@ -81,10 +81,19 @@ impl Component for App {
         let page0 = self.page0(ctx);
         let page1 = self.page1(ctx);
 
-        PageView::new()
+        let page_view = PageView::new()
             .view_page(self.page)
             .on_page_change(ctx.link().callback(Msg::PageChange))
-            .with_child(page0).with_child(page1).into()
+            .with_child(page0)
+            .with_child(page1);
+
+        Column::new()
+            .class("pwt-viewport")
+            .with_child(html!{
+                <div class="pwt-flex-fill">{page_view}</div>
+            })
+            .into()
+
     }
 }
 
