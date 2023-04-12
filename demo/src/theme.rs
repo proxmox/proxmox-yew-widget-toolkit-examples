@@ -2,7 +2,7 @@ use yew::prelude::*;
 
 use pwt::prelude::*;
 use pwt::widget::{
-    Button, Column, Row, Panel, TabPanel, TabPanelRenderInfo,
+    Button, Column, Row, Panel, TabPanel, SelectionViewRenderInfo,
 };
 
 use pwt::css::ColorScheme;
@@ -54,7 +54,7 @@ fn color_palette(color: &str, title: &str) -> Html {
     }
 }
 
-fn color_panel(_: &TabPanelRenderInfo) -> Html {
+fn color_panel(_: &SelectionViewRenderInfo) -> Html {
 
     Column::new()
         .padding(2)
@@ -70,7 +70,7 @@ fn color_panel(_: &TabPanelRenderInfo) -> Html {
         .into()
 }
 
-fn box_panel(_: &TabPanelRenderInfo) -> Html {
+fn box_panel(_: &SelectionViewRenderInfo) -> Html {
 
     let mut panel = Column::new()
         .padding(2)
@@ -101,7 +101,7 @@ fn box_panel(_: &TabPanelRenderInfo) -> Html {
     panel.into()
 }
 
-fn fonts_panel(_: &TabPanelRenderInfo) -> Html {
+fn fonts_panel(_: &SelectionViewRenderInfo) -> Html {
 
     let fonts = ["Display", "Headline", "Title", "Body", "Label"];
     let sizes = ["large", "medium", "small"];
