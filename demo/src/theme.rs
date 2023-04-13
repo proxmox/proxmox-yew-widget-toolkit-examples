@@ -2,7 +2,7 @@ use yew::prelude::*;
 
 use pwt::prelude::*;
 use pwt::widget::{
-    Button, Column, Row, Panel, TabPanel, SelectionViewRenderInfo,
+    Button, Column, Row, Panel, TabBarItem, TabPanel, SelectionViewRenderInfo,
 };
 
 use pwt::css::ColorScheme;
@@ -128,8 +128,8 @@ pub fn ThemeDemo() -> Html {
     TabPanel::new()
         .class("pwt-fit")
         .title("Theme settings preview")
-        .with_item_builder("fonts", "Fonts", None::<&str>, fonts_panel)
-        .with_item_builder("colors", "Colors", None::<&str>, color_panel)
-        .with_item_builder("boxes", "Boxes", None::<&str>, box_panel)
+        .with_item_builder(TabBarItem::new().label("Fonts"), fonts_panel)
+        .with_item_builder(TabBarItem::new().label("Colors"), color_panel)
+        .with_item_builder(TabBarItem::new().label("Boxes"), box_panel)
         .into()
 }

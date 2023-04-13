@@ -1,7 +1,9 @@
 use yew::prelude::*;
+use yew::virtual_dom::Key;
+
 use pwt::prelude::*;
 
-use pwt::widget::{Button, Container, TabPanel, MiniScrollMode};
+use pwt::widget::{Button, Container, TabBarItem, TabPanel, MiniScrollMode};
 
 
 #[function_component]
@@ -24,9 +26,10 @@ pub fn TabPanelDemo() -> Html {
 
     for i in 0..6 {
         panel.add_item(
-            format!("tab{i}"),
-            format!("Tab {i}"),
-            "fa fa-hdd-o",
+            TabBarItem::new()
+                .key(Key::from(format!("tab{i}")))
+                .label(format!("Tab {i}"))
+                .icon_class("fa fa-hdd-o"),
             render_tab(&format!("This is Tab {i}")),
         );
     }
