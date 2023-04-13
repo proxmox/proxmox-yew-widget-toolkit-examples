@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yew::virtual_dom::Key;
 
 use pwt::prelude::*;
 
@@ -27,7 +26,7 @@ pub fn TabPanelDemo() -> Html {
     for i in 0..6 {
         panel.add_item(
             TabBarItem::new()
-                .key(Key::from(format!("tab{i}")))
+                .key(format!("tab{i}"))
                 .label(format!("Tab {i}"))
                 .icon_class("fa fa-hdd-o"),
             render_tab(&format!("This is Tab {i}")),
