@@ -63,14 +63,14 @@ use yew_router::HashRouter;
 
 use pwt::prelude::*;
 
-use pwt::widget::nav_menu::{MenuItem, NavigationMenu};
+use pwt::widget::nav_menu::{NavMenuItem, NavMenu};
 use pwt::widget::{Panel, ThemeLoader, ThemeModeSelector, ThemeNameSelector, RtlSwitcher};
 
 #[function_component]
 fn MainMenu() -> Html {
-    NavigationMenu::new()
+    NavMenu::new()
         .aria_label("Examples")
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "cards_panel",
             "Cards",
             None::<&str>,
@@ -78,7 +78,7 @@ fn MainMenu() -> Html {
                 html! {<CardsDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "gesture_panel",
             "Gestures",
             None::<&str>,
@@ -86,7 +86,7 @@ fn MainMenu() -> Html {
                 html! {<GestureDetectorDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "canvas_panel",
             "Canvas",
             None::<&str>,
@@ -94,7 +94,7 @@ fn MainMenu() -> Html {
                 html! {<CanvasDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "7guis_panel",
             "7GUIs",
             None::<&str>,
@@ -102,7 +102,7 @@ fn MainMenu() -> Html {
                 html! {<SevenGuisDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "toolbar_panel",
             "Toolbar",
             None::<&str>,
@@ -110,7 +110,7 @@ fn MainMenu() -> Html {
                 html! {<ToolbarDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "tooltip_panel",
             "Tooltips",
             None::<&str>,
@@ -118,7 +118,7 @@ fn MainMenu() -> Html {
                 html! {<TooltipDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "tab_panel",
             "Tab Panel",
             None::<&str>,
@@ -126,10 +126,10 @@ fn MainMenu() -> Html {
                 html! {<TabPanelDemo/>}
             },
         ))
-        .with_item(MenuItem::new("forms_panel", "Fields", None::<&str>, |_| {
+        .with_item(NavMenuItem::new("forms_panel", "Fields", None::<&str>, |_| {
             html! {<FieldsDemo />}
         }))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "button_panel",
             "Buttons",
             None::<&str>,
@@ -137,7 +137,7 @@ fn MainMenu() -> Html {
                 html! {<ButtonsDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "datatable_panel",
             "DataTable",
             None::<&str>,
@@ -145,7 +145,7 @@ fn MainMenu() -> Html {
                 html! {<DataTableDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "tree_panel",
             "Tree",
             None::<&str>,
@@ -153,7 +153,7 @@ fn MainMenu() -> Html {
                 html! {<TreeDemo/>}
             },
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "miscellaneous_panel",
             "Miscellaneous",
             None::<&str>,
@@ -161,7 +161,7 @@ fn MainMenu() -> Html {
                 html! {<MiscellaneousDemo/>}
             }
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "movies_panel",
             "Movies",
             None::<&str>,
@@ -169,35 +169,35 @@ fn MainMenu() -> Html {
                 html! {<MovieDemo/>}
             },
         ))
-        .with_item(MenuItem::new("menu_panel", "Menus", None::<&str>, |_| {
+        .with_item(NavMenuItem::new("menu_panel", "Menus", None::<&str>, |_| {
             html! {<MenuDemo/>}
         }))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "nav_panel",
             "Navigation",
             None::<&str>,
             |_| html!(<NavigationDemo/>),
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "dialog_panel",
             "Dialogs",
             None::<&str>,
             |_| html!(<DialogDemo/>),
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "align_panel",
             "Alignment",
             None::<&str>,
             |_| html!(<AlignDemo/>),
         ))
-        .with_item(MenuItem::new(
+        .with_item(NavMenuItem::new(
             "theme_panel",
             "Theme",
             None::<&str>,
             |_| html!(<ThemeDemo/>),
         ))
         .with_item(
-            MenuItem::new(
+            NavMenuItem::new(
                 "split_pane_panel",
                 "SplitPane",
                 None::<&str>,
@@ -205,7 +205,7 @@ fn MainMenu() -> Html {
             )
            .submenu()
                 .with_item(
-                    MenuItem::new(
+                    NavMenuItem::new(
                         "split_pane_panel_horizontal",
                         "Horizontal",
                         None::<&str>,
@@ -213,7 +213,7 @@ fn MainMenu() -> Html {
                     )
                 )
                 .with_item(
-                    MenuItem::new(
+                    NavMenuItem::new(
                         "split_pane_panel_vertical",
                         "Vertical",
                         None::<&str>,
@@ -221,7 +221,7 @@ fn MainMenu() -> Html {
                     )
                 )
                 .with_item(
-                    MenuItem::new(
+                    NavMenuItem::new(
                         "split_pane_panel_sizing",
                         "Default Size",
                         None::<&str>,
@@ -229,7 +229,7 @@ fn MainMenu() -> Html {
                     )
                 )
                  .with_item(
-                    MenuItem::new(
+                    NavMenuItem::new(
                         "split_pane_panel_min_max",
                         "Min/Max Size",
                         None::<&str>,
