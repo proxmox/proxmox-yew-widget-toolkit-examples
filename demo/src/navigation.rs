@@ -71,6 +71,7 @@ pub fn NavigationDemo() -> Html {
     let selection = use_selection(|| Selection::new());
 
     let drawer = NavigationDrawer::new(menu)
+        .header(html!{<div class="pwt-p-2 pwt-font-size-title-large">{"Menu Header"}</div>})
         .selection(selection.clone())
         .class("pwt-border-left")
         .on_select({
