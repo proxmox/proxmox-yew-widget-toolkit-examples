@@ -79,9 +79,7 @@ pub fn NavigationDemo() -> Html {
             move |key: Option<Key>| {
                 content.set(html!{<p>{format!("Selected key is {:?}", key)}</p>});
             }
-        })
-        .navigation_container();
-
+        });
 
     let content1 = Column::new()
         .padding(2)
