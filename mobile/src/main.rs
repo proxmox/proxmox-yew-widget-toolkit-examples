@@ -1,7 +1,8 @@
 use pwt::prelude::*;
 use yew::prelude::*;
 
-use pwt::touch::{NavigationBar, NavigationBarItem, PageView};
+use pwt::widget::TabBarItem;
+use pwt::touch::{NavigationBar, PageView};
 use pwt::widget::{Button, Column, Panel, Row, Toolbar};
 
 pub enum Msg {
@@ -93,14 +94,14 @@ impl Component for App {
             .with_child(page1);
 
         let items = vec![
-            NavigationBarItem::new()
+            TabBarItem::new()
                 .icon_class("fa fa-trash-o")
                 .active_icon_class("fa fa-trash")
                 .label("Delete"),
-            NavigationBarItem::new()
+            TabBarItem::new()
                 .icon_class("fa fa-gear")
                 .label("Settings"),
-            NavigationBarItem::new()
+            TabBarItem::new()
                 .icon_class("fa fa-user-o")
                 .active_icon_class("fa fa-user")
                 .label("Users"),
