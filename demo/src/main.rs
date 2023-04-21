@@ -63,33 +63,33 @@ use yew_router::HashRouter;
 
 use pwt::prelude::*;
 use pwt::state::{use_selection, NavigationContainer, Selection};
-use pwt::widget::nav::{NavMenu, NavMenuItem, NavigationDrawer};
+use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{
     Pane, Panel, RtlSwitcher, SelectionView, SelectionViewRenderInfo, SplitPane, ThemeLoader,
     ThemeModeSelector, ThemeNameSelector,
 };
 
 fn register_view(
-    menu: &mut NavMenu,
+    menu: &mut Menu,
     view: &mut SelectionView,
     text: &'static str,
     id: &'static str,
     renderer: impl 'static + Fn(&SelectionViewRenderInfo) -> Html,
 ) {
     view.add_builder(id.clone(), renderer);
-    menu.add_item(NavMenuItem::new(text).key(id));
+    menu.add_item(MenuItem::new(text).key(id));
 }
 
 fn register_submenu(
-    menu: &mut NavMenu,
+    menu: &mut Menu,
     view: &mut SelectionView,
     text: &'static str,
     id: &'static str,
     renderer: impl 'static + Fn(&SelectionViewRenderInfo) -> Html,
-    submenu: NavMenu,
+    submenu: Menu,
 ) {
     view.add_builder(id.clone(), renderer);
-    menu.add_item(NavMenuItem::new(text).key(id).submenu(submenu));
+    menu.add_item(MenuItem::new(text).key(id).submenu(submenu));
 }
 
 #[function_component]
@@ -100,7 +100,7 @@ fn MainMenu() -> Html {
         .selection(selection.clone())
         .class("pwt-fit");
 
-    let mut menu = NavMenu::new();
+    let mut menu = Menu::new();
 
     register_view(
         &mut menu,
@@ -246,7 +246,7 @@ fn MainMenu() -> Html {
         |_| html! {<ThemeDemo/>},
     );
 
-    let mut submenu = NavMenu::new();
+    let mut submenu = Menu::new();
 
     register_view(
         &mut submenu,

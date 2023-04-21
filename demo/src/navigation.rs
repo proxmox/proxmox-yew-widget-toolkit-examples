@@ -6,42 +6,42 @@ use pwt::prelude::*;
 use pwt::state::use_selection;
 
 use pwt::widget::{Column, Container, Pane, SplitPane, SelectionView, SelectionViewRenderInfo};
-use pwt::widget::nav::{NavMenu, NavMenuItem, NavigationDrawer};
+use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 
 #[function_component]
 pub fn NavigationDemo() -> Html {
 
     let content = use_state(|| html!{});
 
-    let menu = NavMenu::new()
+    let menu = Menu::new()
        .with_item(
-            NavMenuItem::new("Entry 1")
+            MenuItem::new("Entry 1")
                 .key("id1")
                 .icon_class("fa fa-paper-plane")
         )
         .with_item(
-            NavMenuItem::new("Submenu 1")
+            MenuItem::new("Submenu 1")
                 .key("id2")
                 .icon_class("fa fa-car")
                 .submenu(
-                    NavMenu::new()
+                    Menu::new()
                         .with_item(
-                            NavMenuItem::new("Entry 2")
+                            MenuItem::new("Entry 2")
                                 .key("id3")
                                 .icon_class("fa fa-motorcycle")
                         )
                         .with_item(
-                            NavMenuItem::new("Entry 3")
+                            MenuItem::new("Entry 3")
                                 .key("id4")
                                 .icon_class("fa fa-bicycle")
                         )
                         .with_item(
-                            NavMenuItem::new("Submenu 2")
+                            MenuItem::new("Submenu 2")
                                 .key("id5")
                                 .icon_class("fa fa-ship")
                                 .submenu(
-                                    NavMenu::new().with_item(
-                                        NavMenuItem::new("Entry 4")
+                                    Menu::new().with_item(
+                                        MenuItem::new("Entry 4")
                                             .key("id6")
                                             .icon_class("fa fa-rocket")
                                     ),
@@ -50,21 +50,21 @@ pub fn NavigationDemo() -> Html {
                 ),
         )
         .with_item(
-            NavMenuItem::new("Submenu 3 (unselectable)")
+            MenuItem::new("Submenu 3 (unselectable)")
                 .key("unselectable")
                 .selectable(false)
                 .icon_class("fa fa-ship")
                 .submenu(
-                    NavMenu::new()
+                    Menu::new()
                         .with_item(
-                            NavMenuItem::new("Entry 5")
+                            MenuItem::new("Entry 5")
                                 .key("id7")
                                 .icon_class("fa fa-rocket")
                         ),
                 ),
         )
         .with_item(
-            NavMenuItem::new("Entry 6")
+            MenuItem::new("Entry 6")
                 .key("id8")
         );
 
