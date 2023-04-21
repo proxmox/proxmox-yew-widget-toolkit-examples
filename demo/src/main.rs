@@ -70,13 +70,26 @@ use pwt::widget::{
 };
 
 fn register_view(
+    menu: &mut NavMenu,
     view: &mut SelectionView,
     text: &'static str,
     id: &'static str,
     renderer: impl 'static + Fn(&SelectionViewRenderInfo) -> Html,
-) -> NavMenuItem {
+) {
     view.add_builder(id.clone(), renderer);
-    NavMenuItem::new(text).key(id)
+    menu.add_item(NavMenuItem::new(text).key(id));
+}
+
+fn register_submenu(
+    menu: &mut NavMenu,
+    view: &mut SelectionView,
+    text: &'static str,
+    id: &'static str,
+    renderer: impl 'static + Fn(&SelectionViewRenderInfo) -> Html,
+    submenu: NavMenu,
+) {
+    view.add_builder(id.clone(), renderer);
+    menu.add_item(NavMenuItem::new(text).key(id).submenu(submenu));
 }
 
 #[function_component]
@@ -87,150 +100,194 @@ fn MainMenu() -> Html {
         .selection(selection.clone())
         .class("pwt-fit");
 
-    let menu = NavMenu::new()
-        .with_item(register_view(
-            &mut content,
-            "Cards",
-            "cards_panel",
-            |_| html! {<CardsDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Gestures",
-            "gesture_panel",
-            |_| html! {<GestureDetectorDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Canvas",
-            "canvas_panel",
-            |_| html! {<CanvasDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "7GUIs",
-            "7guis_panel",
-            |_| html! {<SevenGuisDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Toolbar",
-            "toolbar_panel",
-            |_| html! {<ToolbarDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Tooltips",
-            "tooltip_panel",
-            |_| html! {<TooltipDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Tab Panel",
-            "tab_panel",
-            |_| html! {<TabPanelDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Fields",
-            "forms_panel",
-            |_| html! {<FieldsDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Buttons",
-            "button_panel",
-            |_| html! {<ButtonsDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "DataTable",
-            "datatable_panel",
-            |_| html! {<DataTableDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Tree",
-            "tree_panel",
-            |_| html! {<TreeDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Miscellaneous",
-            "miscellaneous_panel",
-            |_| html! {<MiscellaneousDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Movies",
-            "movies_panel",
-            |_| html! {<MovieDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Menus",
-            "menu_panel",
-            |_| html! {<MenuDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Navigation",
-            "nav_panel",
-            |_| html! {<NavigationDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Dialogs",
-            "dialog_panel",
-            |_| html! {<DialogDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Alignment",
-            "align_panel",
-            |_| html! {<AlignDemo/>},
-        ))
-        .with_item(register_view(
-            &mut content,
-            "Theme",
-            "theme_panel",
-            |_| html! {<ThemeDemo/>},
-        ))
-        .with_item(
-            register_view(
-                &mut content,
-                "SplitPane",
-                "split_pane_panel",
-                |_| html! {<SplitPaneDemoNested/>},
-            )
-            .submenu(
-                NavMenu::new()
-                    .with_item(register_view(
-                        &mut content,
-                        "Horizontal",
-                        "split_pane_panel_horizontal",
-                        |_| html! {<SplitPaneDemoHorizontal/>},
-                    ))
-                    .with_item(register_view(
-                        &mut content,
-                        "Vertical",
-                        "split_pane_panel_vertical",
-                        |_| html! {<SplitPaneDemoVertical/>},
-                    ))
-                    .with_item(register_view(
-                        &mut content,
-                        "Default Size",
-                        "split_pane_panel_sizing",
-                        |_| html! {<SplitPaneDemoSizing/>},
-                    ))
-                    .with_item(register_view(
-                        &mut content,
-                        "Min/Max Size",
-                        "split_pane_panel_min_max",
-                        |_| html! {<SplitPaneDemoMinMax/>},
-                    )),
-            ),
-        );
+    let mut menu = NavMenu::new();
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Cards",
+        "cards_panel",
+        |_| html! {<CardsDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Gestures",
+        "gesture_panel",
+        |_| html! {<GestureDetectorDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Canvas",
+        "canvas_panel",
+        |_| html! {<CanvasDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "7GUIs",
+        "7guis_panel",
+        |_| html! {<SevenGuisDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Toolbar",
+        "toolbar_panel",
+        |_| html! {<ToolbarDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Tooltips",
+        "tooltip_panel",
+        |_| html! {<TooltipDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Tab Panel",
+        "tab_panel",
+        |_| html! {<TabPanelDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Fields",
+        "forms_panel",
+        |_| html! {<FieldsDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Buttons",
+        "button_panel",
+        |_| html! {<ButtonsDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "DataTable",
+        "datatable_panel",
+        |_| html! {<DataTableDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Tree",
+        "tree_panel",
+        |_| html! {<TreeDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Miscellaneous",
+        "miscellaneous_panel",
+        |_| html! {<MiscellaneousDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Movies",
+        "movies_panel",
+        |_| html! {<MovieDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Menus",
+        "menu_panel",
+        |_| html! {<MenuDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Navigation",
+        "nav_panel",
+        |_| html! {<NavigationDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Dialogs",
+        "dialog_panel",
+        |_| html! {<DialogDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Alignment",
+        "align_panel",
+        |_| html! {<AlignDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Theme",
+        "theme_panel",
+        |_| html! {<ThemeDemo/>},
+    );
+
+    let mut submenu = NavMenu::new();
+
+    register_view(
+        &mut submenu,
+        &mut content,
+        "Horizontal",
+        "split_pane_panel_horizontal",
+        |_| html! {<SplitPaneDemoHorizontal/>},
+    );
+
+    register_view(
+        &mut submenu,
+        &mut content,
+        "Vertical",
+        "split_pane_panel_vertical",
+        |_| html! {<SplitPaneDemoVertical/>},
+    );
+
+    register_view(
+        &mut submenu,
+        &mut content,
+        "Default Size",
+        "split_pane_panel_sizing",
+        |_| html! {<SplitPaneDemoSizing/>},
+    );
+
+    register_view(
+        &mut submenu,
+        &mut content,
+        "Min/Max Size",
+        "split_pane_panel_min_max",
+        |_| html! {<SplitPaneDemoMinMax/>},
+    );
+
+    register_submenu(
+        &mut menu,
+        &mut content,
+        "SplitPane",
+        "split_pane_panel",
+        |_| html! {<SplitPaneDemoNested/>},
+        submenu,
+    );
 
     let drawer = NavigationDrawer::new(menu)
         .selection(selection)
