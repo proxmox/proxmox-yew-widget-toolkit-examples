@@ -291,7 +291,7 @@ fn MainMenu() -> Html {
 
     let drawer = NavigationDrawer::new(menu)
         .selection(selection)
-        // fixme: .aria_label("Examples")
+        .aria_label("Examples")
         .class("pwt-border-left")
         .router(true);
 
