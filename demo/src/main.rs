@@ -8,7 +8,7 @@ mod canvas;
 use canvas::CanvasDemo;
 
 mod cards;
-pub  use cards::CardsDemo;
+pub use cards::CardsDemo;
 
 mod gestures;
 pub use gestures::GestureDetectorDemo;
@@ -62,192 +62,199 @@ use yew::prelude::*;
 use yew_router::HashRouter;
 
 use pwt::prelude::*;
+use pwt::state::{use_selection, NavigationContainer, Selection};
+use pwt::widget::nav::{NavMenu, NavMenuItem, NavigationDrawer};
+use pwt::widget::{
+    Pane, Panel, RtlSwitcher, SelectionView, SelectionViewRenderInfo, SplitPane, ThemeLoader,
+    ThemeModeSelector, ThemeNameSelector,
+};
 
-use pwt::widget::nav_menu::{NavMenuItem, NavMenu};
-use pwt::widget::{Panel, ThemeLoader, ThemeModeSelector, ThemeNameSelector, RtlSwitcher};
+fn register_view(
+    view: &mut SelectionView,
+    text: &'static str,
+    id: &'static str,
+    renderer: impl 'static + Fn(&SelectionViewRenderInfo) -> Html,
+) -> NavMenuItem {
+    view.add_builder(id.clone(), renderer);
+    NavMenuItem::new(text).key(id)
+}
 
 #[function_component]
 fn MainMenu() -> Html {
-    NavMenu::new()
-        .aria_label("Examples")
-        .with_item(NavMenuItem::new(
-            "cards_panel",
+    let selection = use_selection(|| Selection::new());
+
+    let mut content = SelectionView::new()
+        .selection(selection.clone())
+        .class("pwt-fit");
+
+    let menu = NavMenu::new()
+        .with_item(register_view(
+            &mut content,
             "Cards",
-            None::<&str>,
-            |_| {
-                html! {<CardsDemo/>}
-            },
+            "cards_panel",
+            |_| html! {<CardsDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "gesture_panel",
+        .with_item(register_view(
+            &mut content,
             "Gestures",
-            None::<&str>,
-            |_| {
-                html! {<GestureDetectorDemo/>}
-            },
+            "gesture_panel",
+            |_| html! {<GestureDetectorDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "canvas_panel",
+        .with_item(register_view(
+            &mut content,
             "Canvas",
-            None::<&str>,
-            |_| {
-                html! {<CanvasDemo/>}
-            },
+            "canvas_panel",
+            |_| html! {<CanvasDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "7guis_panel",
+        .with_item(register_view(
+            &mut content,
             "7GUIs",
-            None::<&str>,
-            |_| {
-                html! {<SevenGuisDemo/>}
-            },
+            "7guis_panel",
+            |_| html! {<SevenGuisDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "toolbar_panel",
+        .with_item(register_view(
+            &mut content,
             "Toolbar",
-            None::<&str>,
-            |_| {
-                html! {<ToolbarDemo/>}
-            },
+            "toolbar_panel",
+            |_| html! {<ToolbarDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "tooltip_panel",
+        .with_item(register_view(
+            &mut content,
             "Tooltips",
-            None::<&str>,
-            |_| {
-                html! {<TooltipDemo/>}
-            },
+            "tooltip_panel",
+            |_| html! {<TooltipDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "tab_panel",
+        .with_item(register_view(
+            &mut content,
             "Tab Panel",
-            None::<&str>,
-            |_| {
-                html! {<TabPanelDemo/>}
-            },
+            "tab_panel",
+            |_| html! {<TabPanelDemo/>},
         ))
-        .with_item(NavMenuItem::new("forms_panel", "Fields", None::<&str>, |_| {
-            html! {<FieldsDemo />}
-        }))
-        .with_item(NavMenuItem::new(
-            "button_panel",
+        .with_item(register_view(
+            &mut content,
+            "Fields",
+            "forms_panel",
+            |_| html! {<FieldsDemo/>},
+        ))
+        .with_item(register_view(
+            &mut content,
             "Buttons",
-            None::<&str>,
-            |_| {
-                html! {<ButtonsDemo/>}
-            },
+            "button_panel",
+            |_| html! {<ButtonsDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "datatable_panel",
+        .with_item(register_view(
+            &mut content,
             "DataTable",
-            None::<&str>,
-            |_| {
-                html! {<DataTableDemo/>}
-            },
+            "datatable_panel",
+            |_| html! {<DataTableDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "tree_panel",
+        .with_item(register_view(
+            &mut content,
             "Tree",
-            None::<&str>,
-            |_| {
-                html! {<TreeDemo/>}
-            },
+            "tree_panel",
+            |_| html! {<TreeDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "miscellaneous_panel",
+        .with_item(register_view(
+            &mut content,
             "Miscellaneous",
-            None::<&str>,
-            |_| {
-                html! {<MiscellaneousDemo/>}
-            }
+            "miscellaneous_panel",
+            |_| html! {<MiscellaneousDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "movies_panel",
+        .with_item(register_view(
+            &mut content,
             "Movies",
-            None::<&str>,
-            |_| {
-                html! {<MovieDemo/>}
-            },
+            "movies_panel",
+            |_| html! {<MovieDemo/>},
         ))
-        .with_item(NavMenuItem::new("menu_panel", "Menus", None::<&str>, |_| {
-            html! {<MenuDemo/>}
-        }))
-        .with_item(NavMenuItem::new(
-            "nav_panel",
+        .with_item(register_view(
+            &mut content,
+            "Menus",
+            "menu_panel",
+            |_| html! {<MenuDemo/>},
+        ))
+        .with_item(register_view(
+            &mut content,
             "Navigation",
-            None::<&str>,
-            |_| html!(<NavigationDemo/>),
+            "nav_panel",
+            |_| html! {<NavigationDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "dialog_panel",
+        .with_item(register_view(
+            &mut content,
             "Dialogs",
-            None::<&str>,
-            |_| html!(<DialogDemo/>),
+            "dialog_panel",
+            |_| html! {<DialogDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "align_panel",
+        .with_item(register_view(
+            &mut content,
             "Alignment",
-            None::<&str>,
-            |_| html!(<AlignDemo/>),
+            "align_panel",
+            |_| html! {<AlignDemo/>},
         ))
-        .with_item(NavMenuItem::new(
-            "theme_panel",
+        .with_item(register_view(
+            &mut content,
             "Theme",
-            None::<&str>,
-            |_| html!(<ThemeDemo/>),
+            "theme_panel",
+            |_| html! {<ThemeDemo/>},
         ))
         .with_item(
-            NavMenuItem::new(
-                "split_pane_panel",
+            register_view(
+                &mut content,
                 "SplitPane",
-                None::<&str>,
-                |_| html!(<SplitPaneDemoNested/>),
+                "split_pane_panel",
+                |_| html! {<SplitPaneDemoNested/>},
             )
-           .submenu()
-                .with_item(
-                    NavMenuItem::new(
-                        "split_pane_panel_horizontal",
+            .submenu(
+                NavMenu::new()
+                    .with_item(register_view(
+                        &mut content,
                         "Horizontal",
-                        None::<&str>,
-                        |_| html!(<SplitPaneDemoHorizontal/>),
-                    )
-                )
-                .with_item(
-                    NavMenuItem::new(
-                        "split_pane_panel_vertical",
+                        "split_pane_panel_horizontal",
+                        |_| html! {<SplitPaneDemoHorizontal/>},
+                    ))
+                    .with_item(register_view(
+                        &mut content,
                         "Vertical",
-                        None::<&str>,
-                        |_| html!(<SplitPaneDemoVertical/>),
-                    )
-                )
-                .with_item(
-                    NavMenuItem::new(
-                        "split_pane_panel_sizing",
+                        "split_pane_panel_vertical",
+                        |_| html! {<SplitPaneDemoVertical/>},
+                    ))
+                    .with_item(register_view(
+                        &mut content,
                         "Default Size",
-                        None::<&str>,
-                        |_| html!(<SplitPaneDemoSizing/>),
-                    )
-                )
-                 .with_item(
-                    NavMenuItem::new(
-                        "split_pane_panel_min_max",
+                        "split_pane_panel_sizing",
+                        |_| html! {<SplitPaneDemoSizing/>},
+                    ))
+                    .with_item(register_view(
+                        &mut content,
                         "Min/Max Size",
-                        None::<&str>,
-                        |_| html!(<SplitPaneDemoMinMax/>),
-                    )
-                )
+                        "split_pane_panel_min_max",
+                        |_| html! {<SplitPaneDemoMinMax/>},
+                    )),
+            ),
+        );
+
+    let drawer = NavigationDrawer::new(menu)
+        .selection(selection)
+        // fixme: .aria_label("Examples")
+        .class("pwt-border-left")
+        .router(true);
+
+    NavigationContainer::new()
+        .with_child(
+            SplitPane::new()
+                .class("pwt-fit")
+                .with_child(Pane::new(drawer).size(None))
+                .with_child(Pane::new(content).flex(1)),
         )
-        .navigation_container()
         .into()
 }
 
 #[function_component]
 fn DemoApp() -> Html {
     let panel = Panel::new()
-    //.class("pwt-viewport")
-    .class("pwt-viewport pwt-scheme-primary")
-    //    .class("pwt-viewport pwt-scheme-neutral-alt")
-    //.class("pwt-viewport pwt-scheme-secondary")
+        //.class("pwt-viewport")
+        .class("pwt-viewport pwt-scheme-primary")
+        //.class("pwt-viewport pwt-scheme-neutral-alt")
+        //.class("pwt-viewport pwt-scheme-secondary")
         .border(false)
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
@@ -256,14 +263,14 @@ fn DemoApp() -> Html {
         .with_tool(RtlSwitcher::new())
         .with_tool(ThemeNameSelector::new())
         .with_tool(ThemeModeSelector::new())
-        .with_child(html!{<MainMenu/>});
+        .with_child(html! {<MainMenu/>});
 
     ThemeLoader::new(panel).into()
 }
 
 #[function_component]
 fn RoutedApp() -> Html {
-    html!{ <HashRouter><DemoApp/></HashRouter> }
+    html! { <HashRouter><DemoApp/></HashRouter> }
 }
 
 fn main() {
