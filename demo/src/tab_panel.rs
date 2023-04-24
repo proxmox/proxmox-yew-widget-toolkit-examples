@@ -2,6 +2,7 @@ use yew::prelude::*;
 
 use pwt::prelude::*;
 
+use pwt::state::NavigationContainer;
 use pwt::widget::{Button, Container, TabBarItem, TabPanel, MiniScrollMode};
 
 
@@ -18,6 +19,7 @@ pub fn TabPanelDemo() -> Html {
     let mut panel = TabPanel::new()
         //.class("pwt-size-fit-content")
         .class("pwt-fit")
+        .router(true)
         .scroll_mode(MiniScrollMode::Native)
         .title("This is a simple Tab Panel")
         .tool(Button::new("?").class("circle").disabled(true))
@@ -33,6 +35,7 @@ pub fn TabPanelDemo() -> Html {
         );
     }
 
-    panel.navigation_container()
+    NavigationContainer::new()
+        .with_child(panel)
         .into()
 }
