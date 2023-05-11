@@ -1,24 +1,26 @@
 use pwt::prelude::*;
+use pwt::state::NavigationContainer;
 use yew::prelude::*;
 
-use pwt::widget::TabBarItem;
 use pwt::touch::{NavigationBar, PageView};
+use pwt::widget::TabBarItem;
 use pwt::widget::{Button, Column, Panel, Row, Toolbar};
+use yew::virtual_dom::Key;
+use yew_router::HashRouter;
 
 pub enum Msg {
     Page0,
     Page1,
     PageChange(usize),
-    NavigationBarSelect(usize),
+    NavigationBarSelect(Option<Key>),
 }
 
 pub struct App {
     page: usize,
-    active_item: usize,
+    active_item: Option<Key>,
 }
 
 impl App {
-
     fn banner(&self, text: &str) -> Row {
         Row::new()
             .attribute("role", "banner")
@@ -29,11 +31,11 @@ impl App {
             .class("pwt-shadow1")
             .padding(2)
             .margin_bottom(2)
-            .with_child(html!{
+            .with_child(html! {
                 <span class="pwt-ps-1 pwt-font-headline-small">{text}</span>
             })
-            //.with_flex_spacer()
-            //.with_child(button_group)
+        //.with_flex_spacer()
+        //.with_child(button_group)
     }
 
     fn page0(&self, ctx: &Context<Self>) -> Html {
@@ -41,7 +43,7 @@ impl App {
 
         Column::new()
             .with_child(self.banner("Page0"))
-            .with_child(html!{<p class="pwt-p-2">{"You can also SWIPE LEFT to view Page 1."}</p>})
+            .with_child(html! {<p class="pwt-p-2">{"You can also SWIPE LEFT to view Page 1."}</p>})
             .with_child(content)
             .into()
     }
@@ -51,18 +53,20 @@ impl App {
 
         Column::new()
             .with_child(self.banner("Page1"))
-            .with_child(html!{<p class="pwt-p-2">{"You can also SWIPE RIGHT to view Page 0."}</p>})
+            .with_child(html! {<p class="pwt-p-2">{"You can also SWIPE RIGHT to view Page 0."}</p>})
             .with_child(content)
             .into()
     }
-
 }
 impl Component for App {
     type Message = Msg;
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self { page: 0, active_item: 0, }
+        Self {
+            page: 0,
+            active_item: None,
+        }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -75,7 +79,7 @@ impl Component for App {
             }
             Msg::PageChange(page) => {
                 self.page = page;
-            },
+            }
             Msg::NavigationBarSelect(active_item) => {
                 self.active_item = active_item;
             }
@@ -95,34 +99,44 @@ impl Component for App {
 
         let items = vec![
             TabBarItem::new()
+                .key("delete")
                 .icon_class("fa fa-trash-o")
                 .active_icon_class("fa fa-trash")
                 .label("Delete"),
             TabBarItem::new()
+                .key("settings")
                 .icon_class("fa fa-gear")
                 .label("Settings"),
             TabBarItem::new()
+                .key("users")
                 .icon_class("fa fa-user-o")
                 .active_icon_class("fa fa-user")
                 .label("Users"),
         ];
 
         let navigation_bar = NavigationBar::new(items)
-            .active_item(self.active_item)
+            .router(true)
             .on_select(ctx.link().callback(Msg::NavigationBarSelect));
 
-        Column::new()
-            .class("pwt-viewport")
-            .with_child(html!{
-                <div class="pwt-flex-fill">{page_view}</div>
-            })
-            .with_child(navigation_bar)
+        NavigationContainer::new()
+            .with_child(
+                Column::new()
+                    .class("pwt-viewport")
+                    .with_child(html! {
+                        <div class="pwt-flex-fill">{page_view}</div>
+                    })
+                    .with_child(navigation_bar),
+            )
             .into()
-
     }
+}
+
+#[function_component]
+fn RoutedApp() -> Html {
+    html! { <HashRouter><App/></HashRouter> }
 }
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::Renderer::<App>::new().render();
+    yew::Renderer::<RoutedApp>::new().render();
 }
