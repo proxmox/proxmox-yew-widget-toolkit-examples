@@ -52,6 +52,9 @@ pub use movie::MovieDemo;
 mod navigation;
 pub use navigation::NavigationDemo;
 
+mod navigation_rail;
+pub use navigation_rail::NavigationRailDemo;
+
 mod dialog;
 pub use dialog::DialogDemo;
 
@@ -220,6 +223,14 @@ fn MainMenu() -> Html {
         "Navigation",
         "nav_panel",
         |_| html! {<NavigationDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Navigation Rail",
+        "nav_rail_panel",
+        |_| html! {<NavigationRailDemo/>},
     );
 
     register_view(
