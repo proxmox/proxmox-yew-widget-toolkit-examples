@@ -57,9 +57,9 @@ fn color_palette(color: &str, title: &str) -> Html {
 fn color_panel(_: &SelectionViewRenderInfo) -> Html {
 
     Column::new()
+        .class("pwt-flex-fill")
         .padding(2)
         .gap(4)
-        //.class("pwt-flex-fill")
         .with_child(color_palette("primary", "Primary Color"))
         .with_child(color_palette("secondary", "Secondary Color"))
         .with_child(color_palette("tertiary", "Tertiary Color"))
@@ -107,6 +107,7 @@ fn fonts_panel(_: &SelectionViewRenderInfo) -> Html {
     let sizes = ["large", "medium", "small"];
 
     let mut panel = Column::new()
+        .class("pwt-flex-fill")
         .padding(2)
         .gap(1);
 
