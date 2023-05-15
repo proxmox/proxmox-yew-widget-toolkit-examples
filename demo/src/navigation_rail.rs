@@ -1,6 +1,8 @@
+use pwt::css::JustifyContent;
 use pwt::prelude::*;
-use pwt::touch::NavigationRail;
+use pwt::touch::{NavigationRail, Fab};
 use pwt::widget::{Row, TabBarItem};
+
 #[function_component]
 pub fn NavigationRailDemo() -> Html {
     let rail = NavigationRail::new(vec![
@@ -18,7 +20,10 @@ pub fn NavigationRailDemo() -> Html {
             .icon_class("fa fa-user-o")
             .active_icon_class("fa fa-user")
             .label("Users"),
-    ]);
+    ])
+    .leading(Fab::new("fa fa-pencil"))
+    .group_alignment(JustifyContent::Center)
+    ;
 
     Row::new().class("pwt-fit").with_child(rail).into()
 }
