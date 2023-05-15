@@ -49,8 +49,8 @@ pub use tree::TreeDemo;
 mod movie;
 pub use movie::MovieDemo;
 
-mod navigation;
-pub use navigation::NavigationDemo;
+mod navigation_drawer;
+pub use navigation_drawer::NavigationDrawerDemo;
 
 mod navigation_rail;
 pub use navigation_rail::NavigationRailDemo;
@@ -220,9 +220,9 @@ fn MainMenu() -> Html {
     register_view(
         &mut menu,
         &mut content,
-        "Navigation",
-        "nav_panel",
-        |_| html! {<NavigationDemo/>},
+        "Navigation Drawer",
+        "nav_drawer_panel",
+        |_| html! {<NavigationDrawerDemo/>},
     );
 
     register_view(

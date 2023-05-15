@@ -9,7 +9,7 @@ use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{Column, Container, Pane, SelectionView, SelectionViewRenderInfo, SplitPane};
 
 #[function_component]
-pub fn NavigationDemo() -> Html {
+pub fn NavigationDrawerDemo() -> Html {
     let content = use_state(|| html! {});
 
     let menu = Menu::new()
