@@ -54,6 +54,7 @@ impl Component for GestureDetectorDemo {
         let content = Container::new()
             .class("pwt-fit")
             .attribute("style", "touch-action:none;")
+            .padding(4)
             .with_child(
                 Button::new("Button inside GestureDetector")
                     .onclick(ctx.link().callback(|_| Msg::Log("BUTTON CLICK".into()))),
