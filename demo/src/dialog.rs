@@ -69,7 +69,7 @@ pub fn DialogDemo() -> Html {
                                 .gap(2)
                                 .with_flex_spacer()
                                 .class("pwt-bg-color-neutral-container-alt")
-                                .with_child(Button::new("OK").onclick({
+                                .with_child(Button::new("OK").autofocus(true).onclick({
                                     let view_state = view_state.clone();
                                     move |_| view_state.set(ViewState::Main)
                                 })),
@@ -96,7 +96,7 @@ pub fn DialogDemo() -> Html {
                                     .gap(2)
                                     .with_flex_spacer()
                                     .class("pwt-bg-color-neutral-container-alt")
-                                    .with_child(Button::new("OK").onclick({
+                                    .with_child(Button::new("OK").autofocus(true).onclick({
                                         let view_state = view_state.clone();
                                         move |_| view_state.set(ViewState::Main)
                                     })),
