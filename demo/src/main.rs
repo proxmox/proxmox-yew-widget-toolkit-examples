@@ -55,6 +55,9 @@ pub use navigation_drawer::NavigationDrawerDemo;
 mod navigation_rail;
 pub use navigation_rail::NavigationRailDemo;
 
+mod navigation_bar;
+pub use navigation_bar::NavigationBarDemo;
+
 mod dialog;
 pub use dialog::DialogDemo;
 
@@ -231,6 +234,14 @@ fn MainMenu() -> Html {
         "Navigation Rail",
         "nav_rail_panel",
         |_| html! {<NavigationRailDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Navigation Bar",
+        "nav_bar_panel",
+        |_| html! {<NavigationBarDemo/>},
     );
 
     register_view(

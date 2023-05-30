@@ -1,16 +1,17 @@
 use pwt::css::JustifyContent;
 use pwt::prelude::*;
-use pwt::touch::{NavigationRail, Fab};
+use pwt::touch::{Fab, NavigationRail};
 use pwt::widget::{Row, TabBarItem};
+use pwt::state::NavigationContainer;
 
 #[function_component]
 pub fn NavigationRailDemo() -> Html {
     let rail = NavigationRail::new(vec![
         TabBarItem::new()
             .key("delete")
-            .icon_class("fa fa-trash-o")
-            .active_icon_class("fa fa-trash")
-            .label("Delete"),
+            .icon_class("fa fa-envelope-o")
+            .active_icon_class("fa fa-envelope")
+            .label("Mail"),
         TabBarItem::new()
             .key("settings")
             .icon_class("fa fa-gear")
@@ -21,9 +22,11 @@ pub fn NavigationRailDemo() -> Html {
             .active_icon_class("fa fa-user")
             .label("Users"),
     ])
+    .router(true)
     .leading(Fab::new("fa fa-pencil"))
-    .group_alignment(JustifyContent::Center)
-    ;
+    .group_alignment(JustifyContent::Center);
 
-    Row::new().class("pwt-fit").with_child(rail).into()
+    NavigationContainer::new()
+        .with_child(Row::new().class("pwt-fit").with_child(rail))
+        .into()
 }
