@@ -1,6 +1,5 @@
 use pwt::prelude::*;
-use pwt::widget::{Card, Column, Row};
-use pwt::touch::{Fab, FabMenu, FabMenuAlign, FabMenuDirection};
+use pwt::widget::{Card, Column};
 
 fn card_with_text(text: &str) -> Card {
     Card::new()
