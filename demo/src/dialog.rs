@@ -90,6 +90,7 @@ pub fn DialogDemo() -> Html {
                             .with_child(html!{
                                 <div class="pwt-overflow-auto"><LoremIpsum/></div>
                             })
+                            .with_flex_spacer()
                             .with_child(
                                 Row::new()
                                     .padding(2)
