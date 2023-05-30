@@ -15,22 +15,6 @@ pub fn CardsDemo() -> Html {
         .class("pwt-fit")
         .padding(2)
         .gap(4)
-        .with_child(
-            Row::new()
-                .gap(4)
-                .class("pwt-align-items-center")
-                .with_child(Fab::new("fa fa-pencil").large())
-                .with_child(Fab::new("fa fa-pencil"))
-                .with_child(Fab::new("fa fa-pencil").small().class("pwt-scheme-primary-container"))
-                .with_child(
-                    FabMenu::new()
-                        .main_button_class("pwt-scheme-primary")
-                        .direction(FabMenuDirection::Down)
-                        .align(FabMenuAlign::Start)
-                        .with_child(Fab::new("fa fa-pencil").text("Edit"))
-                        .with_child(Fab::new("fa fa-trash").text("Delete"))
-                )
-        )
         .with_child(card_with_text("Default Card"));
 
     for i in 0..6 {

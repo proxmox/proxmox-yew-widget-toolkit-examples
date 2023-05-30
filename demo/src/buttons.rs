@@ -1,9 +1,9 @@
 use yew::prelude::*;
 
-use pwt::prelude::*;
-use pwt::widget::{ActionIcon, Button, Column, Row, SegmentedButton};
-use pwt::touch::Fab;
 use pwt::css::ColorScheme;
+use pwt::prelude::*;
+use pwt::touch::{Fab, FabMenu, FabMenuDirection, FabMenuAlign};
+use pwt::widget::{ActionIcon, Button, Column, Row, SegmentedButton};
 
 #[function_component]
 pub fn ButtonsDemo() -> Html {
@@ -108,18 +108,41 @@ pub fn ButtonsDemo() -> Html {
         .gap(2)
         .class("pwt-size-fit-content")
         .class("pwt-align-items-start")
+        .with_child("Favorite Action Buttons (FAB) types.")
+        .with_child(
+            Row::new()
+                .gap(4)
+                .class("pwt-align-items-center")
+                .with_child(Fab::new("fa fa-pencil").large())
+                .with_child(Fab::new("fa fa-pencil"))
+                .with_child(
+                    Fab::new("fa fa-pencil")
+                        .small()
+                        .class("pwt-scheme-primary-container"),
+                )
+                .with_child(
+                    FabMenu::new()
+                        .main_button_class("pwt-scheme-primary")
+                        .direction(FabMenuDirection::Down)
+                        .align(FabMenuAlign::Start)
+                        .with_child(Fab::new("fa fa-pencil").text("Edit"))
+                        .with_child(Fab::new("fa fa-trash").text("Delete")),
+                ),
+        )
         .with_child("Button Types")
         .with_child(
-            Row::new().gap(2)
-            .with_child(Fab::new("fa fa-trash").small().text("FAB"))
-            .with_child(Button::new("Filled").class(ColorScheme::Primary))
-            .with_child(Button::new("Tonal").class(ColorScheme::PrimaryContainer))
-            .with_child(Button::new("Elevated").class("pwt-button-elevated"))
-            .with_child(Button::new("Outline")
-                .class(ColorScheme::Tertiary)
-                .class("pwt-button-outline")
-            )
-            .with_child(Button::new("Text").class("pwt-button-text"))
+            Row::new()
+                .gap(2)
+                .with_child(Fab::new("fa fa-trash").small().text("FAB"))
+                .with_child(Button::new("Filled").class(ColorScheme::Primary))
+                .with_child(Button::new("Tonal").class(ColorScheme::PrimaryContainer))
+                .with_child(Button::new("Elevated").class("pwt-button-elevated"))
+                .with_child(
+                    Button::new("Outline")
+                        .class(ColorScheme::Tertiary)
+                        .class("pwt-button-outline"),
+                )
+                .with_child(Button::new("Text").class("pwt-button-text")),
         )
         .with_child("Enabled Filled Buttons")
         .with_child(render_buttons(false, false))
@@ -129,16 +152,19 @@ pub fn ButtonsDemo() -> Html {
         .with_child(render_buttons(false, true))
         .with_child("Button with Icon (elevated)")
         .with_child(
-            Row::new().gap(2)
-            .with_child(
-                Button::new("Delete").class("pwt-button-elevated")
-                    .icon_class("fa fa-trash-o")
-            )
-            .with_child(
-                Button::new("Delete").class("pwt-button-elevated")
-                    .disabled(true)
-                    .icon_class("fa fa-trash-o")
-            )
+            Row::new()
+                .gap(2)
+                .with_child(
+                    Button::new("Delete")
+                        .class("pwt-button-elevated")
+                        .icon_class("fa fa-trash-o"),
+                )
+                .with_child(
+                    Button::new("Delete")
+                        .class("pwt-button-elevated")
+                        .disabled(true)
+                        .icon_class("fa fa-trash-o"),
+                ),
         )
         .with_child("Round Button with Icon")
         .with_child(
@@ -148,18 +174,32 @@ pub fn ButtonsDemo() -> Html {
         )
         .with_child("Round Icon Button")
         .with_child(Button::new_icon("fa fa-trash-o").class("circle"))
-
         .with_child("Action Icons (Icon Buttons without decoration)")
         .with_child(
             Row::new()
                 .gap(2)
-                .with_child(ActionIcon::new("fa fa-trash-o").tabindex(0).aria_label("remove"))
-                .with_child(ActionIcon::new("fa fa-refresh").tabindex(0).aria_label("refresh"))
-                .with_child(ActionIcon::new("fa fa-italic").tabindex(0).aria_label("italic"))
+                .with_child(
+                    ActionIcon::new("fa fa-trash-o")
+                        .tabindex(0)
+                        .aria_label("remove"),
+                )
+                .with_child(
+                    ActionIcon::new("fa fa-refresh")
+                        .tabindex(0)
+                        .aria_label("refresh"),
+                )
+                .with_child(
+                    ActionIcon::new("fa fa-italic")
+                        .tabindex(0)
+                        .aria_label("italic"),
+                )
                 .with_child(ActionIcon::new("fa fa-bold").tabindex(0).aria_label("bold"))
-                .with_child(ActionIcon::new("fa fa-align-justify").tabindex(0).aria_label("align-justify"))
+                .with_child(
+                    ActionIcon::new("fa fa-align-justify")
+                        .tabindex(0)
+                        .aria_label("align-justify"),
+                ),
         )
-
         .with_child("Segmented Button")
         .with_child(render_segmented_buttons(false))
         .with_child("Segmented Button with Icon")
