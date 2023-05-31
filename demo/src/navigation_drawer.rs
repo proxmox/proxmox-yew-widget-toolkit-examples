@@ -3,7 +3,7 @@ use yew::prelude::*;
 use yew::virtual_dom::Key;
 
 use pwt::prelude::*;
-use pwt::css::Fit;
+use pwt::css::{Fit, Flex};
 
 use pwt::state::{use_selection, NavigationContainer};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
@@ -108,7 +108,7 @@ pub fn NavigationDrawerDemo() -> Html {
     NavigationContainer::new()
         .with_child(
             SplitPane::new()
-                .class("pwt-fit")
+                .class(Flex::Fill)
                 .with_child(Pane::new(drawer).size(None))
                 .with_child(Pane::new(content1).flex(1))
                 .with_child(Pane::new(content2).flex(1)),

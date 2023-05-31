@@ -1,3 +1,4 @@
+use pwt::css::Flex;
 use pwt::prelude::*;
 use pwt::touch::NavigationBar;
 use pwt::widget::{Column, TabBarItem};
@@ -26,7 +27,7 @@ pub fn NavigationBarDemo() -> Html {
     NavigationContainer::new()
         .with_child(
             Column::new()
-                .class("pwt-fit")
+                .class(Flex::Fill)
                 .with_flex_spacer()
                 .with_child(rail),
         )

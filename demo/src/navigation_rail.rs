@@ -1,4 +1,4 @@
-use pwt::css::JustifyContent;
+use pwt::css::{JustifyContent, Flex};
 use pwt::prelude::*;
 use pwt::touch::{Fab, NavigationRail};
 use pwt::widget::{Row, TabBarItem};
@@ -27,6 +27,11 @@ pub fn NavigationRailDemo() -> Html {
     .group_alignment(JustifyContent::Center);
 
     NavigationContainer::new()
-        .with_child(Row::new().class("pwt-fit").with_child(rail))
+        .with_child(
+            Row::new()
+                .class(Flex::Fill)
+                .border_start(true)
+                .with_child(rail)
+            )
         .into()
 }

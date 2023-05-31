@@ -72,7 +72,7 @@ pub fn SplitPaneDemoSizing() -> Html {
 #[function_component]
 pub fn SplitPaneDemoMinMax() -> Html {
     SplitPane::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
         .with_child(
             Pane::new(html!{<div class="pwt-p-2">{"Region1: min 100 pixel, max 80%"}</div>})
                 .max_fraction(0.8)
