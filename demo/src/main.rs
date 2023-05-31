@@ -68,7 +68,7 @@ use yew::prelude::*;
 use yew_router::HashRouter;
 
 use pwt::prelude::*;
-use pwt::css::Fit;
+use pwt::css::*;
 
 use pwt::state::{use_selection, NavigationContainer, Selection};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
@@ -106,7 +106,7 @@ fn MainMenu() -> Html {
 
     let mut content = SelectionView::new()
         .selection(selection.clone())
-        .class("pwt-fit");
+        .class(Fit);
 
     let mut menu = Menu::new();
 
@@ -322,7 +322,7 @@ fn MainMenu() -> Html {
     NavigationContainer::new()
         .with_child(
             SplitPane::new()
-                .class("pwt-fit")
+                .class(Fit)
                 .with_child(Pane::new(drawer).size(None))
                 .with_child(Pane::new(content).flex(1)),
         )
@@ -332,10 +332,10 @@ fn MainMenu() -> Html {
 #[function_component]
 fn DemoApp() -> Html {
     let panel = Panel::new()
-        //.class("pwt-viewport")
-        .class("pwt-viewport pwt-scheme-primary")
-        //.class("pwt-viewport pwt-scheme-neutral-alt")
-        //.class("pwt-viewport pwt-scheme-secondary")
+        .class(Viewport)
+        .class(ColorScheme::Primary)
+        //.class(ColorScheme::NeutralAlt)
+        //.class(ColorScheme::Secondary)
         .border(false)
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
