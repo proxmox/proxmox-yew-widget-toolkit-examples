@@ -316,13 +316,14 @@ fn MainMenu() -> Html {
     let drawer = NavigationDrawer::new(menu)
         .selection(selection)
         .aria_label("Examples")
-        .class(Fit)
+        //.class(Fit)
         .router(true);
 
     NavigationContainer::new()
         .with_child(
             SplitPane::new()
-                .class(Fit)
+                .class(Flex::Fill)
+                .class(Overflow::Auto)
                 .with_child(Pane::new(drawer).size(None))
                 .with_child(Pane::new(content).flex(1)),
         )

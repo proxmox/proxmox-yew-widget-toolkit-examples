@@ -1,3 +1,4 @@
+use pwt::css::Flex;
 use pwt::prelude::*;
 
 use pwt::widget::{Pane, SplitPane};
@@ -7,14 +8,13 @@ use super::LoremIpsum;
 pub fn SplitPaneDemoNested() -> Html {
 
     let nested = SplitPane::new()
-        .class("pwt-fit")
         .vertical(true)
         .with_child(html!{<div class="pwt-p-2">{"Nested Region1"}</div>})
         .with_child(html!{<div class="pwt-p-2">{"Nested Region2"}</div>})
         .with_child(html!{<div class="pwt-p-2">{"Nested Region3"}</div>});
 
     SplitPane::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
         .with_child(html!{<div class="pwt-p-2">{"This is Region1"}</div>})
         .with_child(nested)
         .with_child(html!{<div class="pwt-p-2">{"This is Region3"}</div>})
@@ -24,7 +24,7 @@ pub fn SplitPaneDemoNested() -> Html {
 #[function_component]
 pub fn SplitPaneDemoHorizontal() -> Html {
     SplitPane::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
         .with_child(Pane::new(html!{<LoremIpsum/>}))
         .with_child(Pane::new(html!{<LoremIpsum/>}))
         .with_child(Pane::new(html!{<LoremIpsum/>}))
@@ -34,7 +34,7 @@ pub fn SplitPaneDemoHorizontal() -> Html {
 #[function_component]
 pub fn SplitPaneDemoVertical() -> Html {
     SplitPane::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
         .vertical(true)
         .with_child(Pane::new(html!{<LoremIpsum/>}))
         .with_child(Pane::new(html!{<LoremIpsum/>}))
@@ -45,7 +45,7 @@ pub fn SplitPaneDemoVertical() -> Html {
 #[function_component]
 pub fn SplitPaneDemoSizing() -> Html {
     SplitPane::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
         .with_child(
             Pane::new(html!{<div class="pwt-p-2">{"Region1: 100 pixel"}</div>})
                 .size(100)
