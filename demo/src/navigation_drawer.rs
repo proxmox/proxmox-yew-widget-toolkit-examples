@@ -3,6 +3,7 @@ use yew::prelude::*;
 use yew::virtual_dom::Key;
 
 use pwt::prelude::*;
+use pwt::css::Fit;
 
 use pwt::state::{use_selection, NavigationContainer};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
@@ -69,7 +70,8 @@ pub fn NavigationDrawerDemo() -> Html {
         .router(true)
         .header(html! {<div class="pwt-p-2 pwt-font-size-title-large">{"Menu Header"}</div>})
         .selection(selection.clone())
-        .class("pwt-border-left")
+        .class(Fit)
+        .border_start(true)
         .on_select({
             let content = content.clone();
             move |key: Option<Key>| {

@@ -68,6 +68,8 @@ use yew::prelude::*;
 use yew_router::HashRouter;
 
 use pwt::prelude::*;
+use pwt::css::Fit;
+
 use pwt::state::{use_selection, NavigationContainer, Selection};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{
@@ -314,7 +316,8 @@ fn MainMenu() -> Html {
     let drawer = NavigationDrawer::new(menu)
         .selection(selection)
         .aria_label("Examples")
-        .class("pwt-border-left")
+        .class(Fit)
+        .padding(4)
         .router(true);
 
     NavigationContainer::new()
