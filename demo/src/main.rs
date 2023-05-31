@@ -317,7 +317,6 @@ fn MainMenu() -> Html {
         .selection(selection)
         .aria_label("Examples")
         .class(Fit)
-        .padding(4)
         .router(true);
 
     NavigationContainer::new()
