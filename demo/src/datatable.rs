@@ -1,12 +1,12 @@
 use std::rc::Rc;
 
+use pwt::css::{Flex, Overflow};
 use yew::prelude::*;
 
 use pwt::prelude::*;
 
 use pwt::props::ExtractKeyFn;
 use pwt::state::{use_selection, Selection, Store};
-use pwt::widget::Column;
 use pwt::widget::data_table::*;
 
 #[function_component]
@@ -80,8 +80,11 @@ pub fn DataTableDemo() -> Html {
         selection
     });
 
-    let table1 = DataTable::new(columns, (*store).clone())
-        .class("pwt-fit pwt-border")
+    DataTable::new(columns, (*store).clone())
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
+        .margin(2)
+        .border(true)
         .min_row_height(110)
         .autoselect(false)
     //.cell_class("pwt-p-2 pwt-fs-4")
@@ -89,12 +92,6 @@ pub fn DataTableDemo() -> Html {
     //.min_row_height(100)
     //.header_class("pwt-scheme-primary-container pwt-fs-4")
         .bordered(true)
-        .selection(selection);
-
-    Column::new()
-        .class("pwt-fit")
-        .padding(2)
-        .gap(4)
-        .with_child(table1)
+        .selection(selection)
         .into()
 }

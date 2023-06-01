@@ -1,3 +1,4 @@
+use pwt::css::{Flex, Overflow};
 use yew::prelude::*;
 use pwt::prelude::*;
 
@@ -37,7 +38,8 @@ pub fn ToolbarDemo() -> Html {
         .with_child(html!{<LoremIpsum/>});
 
     Column::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .padding(2)
         .with_child(panel)
         .into()

@@ -1,3 +1,4 @@
+use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 use pwt::widget::{Card, Column};
 
@@ -11,7 +12,8 @@ fn card_with_text(text: &str) -> Card {
 pub fn CardsDemo() -> Html {
 
     let mut column = Column::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .padding(2)
         .gap(4)
         .with_child(card_with_text("Default Card"));

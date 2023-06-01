@@ -1,3 +1,4 @@
+use pwt::css::{Flex, Overflow};
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -53,7 +54,8 @@ pub fn MiscellaneousDemo() -> Html {
         .optimum(200.0);
 
     Column::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .padding(2)
         .gap(2)
         .with_child("Progress indicator (ongoing progress)")

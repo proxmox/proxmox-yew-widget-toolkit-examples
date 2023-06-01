@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use pwt::css::{Flex, Overflow};
 use serde_json::json;
 
 use yew::prelude::*;
@@ -9,7 +10,7 @@ use pwt::prelude::*;
 
 //use pwt::props::Selection2;
 use pwt::state::{TreeStore, DataStore, use_tree_store};
-use pwt::widget::{ActionIcon, Button, Column, Row};
+use pwt::widget::{ActionIcon, Button, Row};
 use pwt::widget::data_table::*;
 
 fn test0() {
@@ -205,17 +206,14 @@ pub fn TreeDemo() -> Html {
         column3.clone().into(),
     ]);
 
-    let table1 = DataTable::new(columns, store.clone())
-        .class("pwt-fit pwt-border")
+    DataTable::new(columns, store.clone())
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
+        .margin(2)
+        .border(true)
         .row_render_callback(move |args: &mut DataTableRowRenderArgs<String>| {
             args.set_attribute("style", "color:red;");
         })
-        .bordered(true);
-
-    Column::new()
-        .class("pwt-fit")
-        .padding(2)
-        .gap(4)
-        .with_child(table1)
+        .bordered(true)
         .into()
 }

@@ -1,3 +1,4 @@
+use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
 use pwt::{
@@ -60,7 +61,8 @@ pub fn DialogDemo() -> Html {
                     .style("min-width: 200px;")
                     .with_child(
                         Column::new()
-                            .class("pwt-fit")
+                            .class(Flex::Fill)
+                            .class(Overflow::Auto)
                             .with_child(html! {
                                 <div class="pwt-overflow-auto"><LoremIpsum/></div>
                             }).with_child(
@@ -86,7 +88,8 @@ pub fn DialogDemo() -> Html {
                     .style("min-width: 200px; min-height: 50px;")
                     .with_child(
                         Column::new()
-                            .class("pwt-fit")
+                            .class(Flex::Fill)
+                            .class(Overflow::Auto)
                             .with_child(html!{
                                 <div class="pwt-overflow-auto"><LoremIpsum/></div>
                             })

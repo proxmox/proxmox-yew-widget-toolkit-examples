@@ -1,3 +1,4 @@
+use pwt::css::{Flex, Overflow};
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -17,8 +18,8 @@ pub fn TabPanelDemo() -> Html {
     }
 
     let mut panel = TabPanel::new()
-        //.class("pwt-size-fit-content")
-        .class("pwt-fit")
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .router(true)
         .scroll_mode(MiniScrollMode::Native)
         .title("This is a simple Tab Panel")

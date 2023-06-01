@@ -1,3 +1,4 @@
+use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
 use pwt::widget::align::{align_to, align_to_xy, AlignOptions, GrowDirection, Point};
@@ -71,8 +72,9 @@ pub fn AlignDemo() -> Html {
         }));
     }
 
-    let row = Row::new()
-        .class("pwt-fit")
+    Row::new()
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .padding(2)
         .gap(2)
         .with_child(column)
@@ -89,8 +91,8 @@ pub fn AlignDemo() -> Html {
                 .title("Floating")
                 .with_child(html!(<div class="pwt-p-2">{ "Content" }</div>))
                 .node_ref(text_ref.clone()),
-        );
-    row.into()
+        )
+        .into()
 }
 
 fn align(base: NodeRef, target: NodeRef, side: Point) {

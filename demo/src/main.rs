@@ -315,9 +315,9 @@ fn MainMenu() -> Html {
     );
 
     let drawer = NavigationDrawer::new(menu)
+        .class(Overflow::Auto)
         .selection(selection)
         .aria_label("Examples")
-        //.class(Fit)
         .router(true);
 
     NavigationContainer::new()

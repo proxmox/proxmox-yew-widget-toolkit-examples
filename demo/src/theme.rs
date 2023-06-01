@@ -5,7 +5,7 @@ use pwt::widget::{
     Button, Column, Row, Panel, TabBarItem, TabPanel, SelectionViewRenderInfo,
 };
 
-use pwt::css::ColorScheme;
+use pwt::css::{ColorScheme, Flex, Overflow};
 static COLOR_SCHEMES: &[ColorScheme] = &[
     ColorScheme::Neutral,
     ColorScheme::Surface,
@@ -57,7 +57,8 @@ fn color_palette(color: &str, title: &str) -> Html {
 fn color_panel(_: &SelectionViewRenderInfo) -> Html {
 
     Column::new()
-        .class("pwt-flex-fill")
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .padding(2)
         .gap(4)
         .with_child(color_palette("primary", "Primary Color"))
@@ -73,6 +74,8 @@ fn color_panel(_: &SelectionViewRenderInfo) -> Html {
 fn box_panel(_: &SelectionViewRenderInfo) -> Html {
 
     let mut panel = Column::new()
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .padding(2)
         .gap(4);
 
@@ -107,7 +110,8 @@ fn fonts_panel(_: &SelectionViewRenderInfo) -> Html {
     let sizes = ["large", "medium", "small"];
 
     let mut panel = Column::new()
-        .class("pwt-flex-fill")
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .padding(2)
         .gap(1);
 
@@ -127,7 +131,8 @@ fn fonts_panel(_: &SelectionViewRenderInfo) -> Html {
 #[function_component]
 pub fn ThemeDemo() -> Html {
     TabPanel::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .title("Theme settings preview")
         .with_item_builder(TabBarItem::new().label("Fonts"), fonts_panel)
         .with_item_builder(TabBarItem::new().label("Colors"), color_panel)

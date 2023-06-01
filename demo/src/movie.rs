@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use pwt::css::{Flex, Overflow};
 use serde::Deserialize;
 use gloo_net::http::Request;
 
@@ -10,7 +11,6 @@ use pwt::prelude::*;
 
 use pwt::props::ExtractPrimaryKey;
 use pwt::state::{use_selection, Selection, Store};
-use pwt::widget::Column;
 use pwt::widget::data_table::*;
 
 #[derive(Clone, PartialEq, Deserialize)]
@@ -127,15 +127,12 @@ pub fn MovieDemo() -> Html {
         selection
     });
 
-    let table = DataTable::new(columns, (*store).clone())
-        .class("pwt-fit pwt-border")
+    DataTable::new(columns, (*store).clone())
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
+        .margin(2)
+        .border(true)
         .bordered(true)
-        .selection(selection);
-
-    Column::new()
-        .class("pwt-fit")
-        .padding(2)
-        .gap(4)
-        .with_child(table)
+        .selection(selection)
         .into()
 }

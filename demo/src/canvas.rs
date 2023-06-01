@@ -1,3 +1,4 @@
+use pwt::css::{Flex, Overflow};
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -11,7 +12,6 @@ use pwt::widget::canvas::{
 fn canvas_animation() -> Canvas {
 
     Canvas::new()
-        .class("pwt-w-100 pwt-p-0")
         .padding(2)
         .with_child(
             Polygon::new()
@@ -47,7 +47,6 @@ fn canvas_animation() -> Canvas {
 
 fn canvas_reference() -> Canvas {
     Canvas::new()
-        .class("pwt-w-100 pwt-p-0")
         .padding(2)
         .with_child(
             Polygon::new()
@@ -69,7 +68,6 @@ fn canvas_reference() -> Canvas {
 
 fn canvas_text() -> Canvas {
    Canvas::new()
-        .class("pwt-w-100 pwt-p-0")
         .padding(2)
         .with_child(
             Text::new("You are ")
@@ -91,7 +89,6 @@ fn canvas_text() -> Canvas {
 
 fn simple_canvas() -> Canvas {
     Canvas::new()
-        .class("pwt-w-100 pwt-p-0")
         .with_child(
             Rect::new()
                 .position(10, 10)
@@ -159,7 +156,8 @@ fn simple_canvas() -> Canvas {
 pub fn CanvasDemo() -> Html {
 
     Column::new()
-        .class("pwt-fit")
+        .class(Flex::Fill)
+        .class(Overflow::Auto)
         .padding(2)
         .gap(2)
         .with_child(
