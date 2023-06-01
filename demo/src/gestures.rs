@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 
+use pwt::css::Flex;
 use pwt::prelude::*;
 use pwt::touch::{
     GestureDetector, GestureDragEvent, GestureSwipeEvent, Slidable, SlidableAction,
@@ -44,15 +45,16 @@ impl Component for GestureDetectorDemo {
         let log_panel = Panel::new()
             .border(false)
             .title("Gesture detection log")
-            .with_child({
+            .with_child(
+                Container::new().tag("pre").padding(2).with_child({
                 self.logs
                     .iter()
-                    .map(|t| html! {<div>{t}</div>})
+                    .map(|t| html! {format!("{t}\n")})
                     .collect::<Html>()
-            });
+            }));
 
         let content = Container::new()
-            .class("pwt-fit")
+            .class(Flex::Fill)
             .attribute("style", "touch-action:none;")
             .padding(4)
             .with_child(
@@ -102,7 +104,7 @@ impl Component for GestureDetectorDemo {
         .class("pwt-w-100");
 
         Column::new()
-            .class("pwt-fit")
+            .class(Flex::Fill)
             .with_child(Row::new().with_child(slidable1))
             .with_child(Row::new().with_child(slidable2))
             .with_child(

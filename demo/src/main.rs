@@ -106,7 +106,8 @@ fn MainMenu() -> Html {
 
     let mut content = SelectionView::new()
         .selection(selection.clone())
-        .class(Fit);
+        .class(Flex::Fill)
+        .class(Overflow::Auto);
 
     let mut menu = Menu::new();
 
