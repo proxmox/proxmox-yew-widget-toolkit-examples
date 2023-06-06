@@ -348,7 +348,8 @@ fn DemoApp() -> Html {
         .with_tool(ThemeModeSelector::new())
         .with_child(html! {<MainMenu/>});
 
-    ThemeLoader::new(panel).into()
+    static THEMES: &'static [&'static str] = &["Material", "Proxmox"];
+    ThemeLoader::new(THEMES, panel).into()
 }
 
 #[function_component]
