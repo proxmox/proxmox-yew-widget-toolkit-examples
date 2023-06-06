@@ -3,7 +3,7 @@ use yew::prelude::*;
 use yew::virtual_dom::Key;
 
 use pwt::prelude::*;
-use pwt::css::Flex;
+use pwt::css::{Flex, Overflow};
 
 use pwt::state::{use_selection, NavigationContainer};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
@@ -67,6 +67,7 @@ pub fn NavigationDrawerDemo() -> Html {
     let selection = use_selection(|| Selection::new());
 
     let drawer = NavigationDrawer::new(menu)
+        .class(Overflow::Auto) // allow to shrink
         .router(true)
         .header(html! {<div class="pwt-p-2 pwt-font-size-title-large">{"Menu Header"}</div>})
         .selection(selection.clone())
