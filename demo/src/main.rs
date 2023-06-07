@@ -348,8 +348,7 @@ fn DemoApp() -> Html {
         .with_tool(ThemeModeSelector::new())
         .with_child(html! {<MainMenu/>});
 
-    static THEMES: &'static [&'static str] = &["Material", "Proxmox"];
-    ThemeLoader::new(THEMES, panel).into()
+    ThemeLoader::new(panel).into()
 }
 
 #[function_component]
@@ -360,6 +359,8 @@ fn RoutedApp() -> Html {
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
-    pwt::state::set_default_theme_name("Proxmox");
+    static THEMES: &'static [&'static str] = &["Material", "Proxmox"];
+    pwt::state::set_available_themes(THEMES);
+
     yew::Renderer::<RoutedApp>::new().render();
 }
