@@ -1,6 +1,7 @@
 use yew::prelude::*;
 
 use pwt::prelude::*;
+use pwt::state::NavigationContainer;
 use pwt::widget::{
     Button, Column, Row, Panel, TabBarItem, TabPanel, SelectionViewRenderInfo,
 };
@@ -130,12 +131,16 @@ fn fonts_panel(_: &SelectionViewRenderInfo) -> Html {
 
 #[function_component]
 pub fn ThemeDemo() -> Html {
-    TabPanel::new()
+    let panel = TabPanel::new()
+        .router(true)
         .class(Flex::Fill)
         .class(Overflow::Auto)
         .title("Theme settings preview")
-        .with_item_builder(TabBarItem::new().label("Fonts"), fonts_panel)
-        .with_item_builder(TabBarItem::new().label("Colors"), color_panel)
-        .with_item_builder(TabBarItem::new().label("Boxes"), box_panel)
+        .with_item_builder(TabBarItem::new().key("fonts").label("Fonts"), fonts_panel)
+        .with_item_builder(TabBarItem::new().key("colors").label("Colors"), color_panel)
+        .with_item_builder(TabBarItem::new().key("boxes").label("Boxes"), box_panel);
+
+    NavigationContainer::new()
+        .with_child(panel)
         .into()
 }
