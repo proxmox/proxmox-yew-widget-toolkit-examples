@@ -18,5 +18,15 @@ stage="build"
 command="sass"
 command_arguments= ["../../www/scss/material-yew-style-dark.scss", "dist/.stage/material-yew-style-dark.css"]
 
+[[hooks]]
+stage="build"
+command="sass"
+command_arguments= ["../../www/scss/desktop-yew-style-light.scss", "dist/.stage/desktop-yew-style-light.css"]
+
+[[hooks]]
+stage="build"
+command="sass"
+command_arguments= ["../../www/scss/desktop-yew-style-dark.scss", "dist/.stage/desktop-yew-style-dark.css"]
+
 [watch]
 watch = ["./src", "../../src", "../../www"]
