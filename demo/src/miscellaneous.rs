@@ -1,4 +1,5 @@
 use pwt::css::{Flex, Overflow};
+use pwt::touch::SnackBar;
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -70,5 +71,10 @@ pub fn MiscellaneousDemo() -> Html {
         .with_child(mini_scoll_demo1())
         .with_child(mini_scoll_demo2())
         .with_child(load_mask_demo())
+        .with_child(
+            SnackBar::new()
+                .action_label("Retry")
+                .message("This is a SnackBar.")
+        )
         .into()
 }
