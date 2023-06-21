@@ -50,7 +50,7 @@ impl App {
         self.snackbar_counter += 1;
         self.snackbar_controller.show_snackbar(
             SnackBar::new()
-                .message(format!("This is snackmar message #{}", self.snackbar_counter))
+                .message(format!("This is snackbar message #{}", self.snackbar_counter))
                 .action_label("Press me")
                 .show_close_icon(true)
         );
