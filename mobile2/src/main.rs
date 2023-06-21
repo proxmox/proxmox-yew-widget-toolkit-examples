@@ -1,15 +1,9 @@
 use pwt::prelude::*;
-use pwt::state::NavigationContainer;
-//use pwt::web_sys_ext::content_rect;
 use pwt::widget::nav::{Menu, MenuItem};
 use pwt::widget::nav::NavigationDrawer;
-use yew::prelude::*;
 
-use pwt::touch::{ApplicationBar, Fab, NavigationBar, PageView, Scaffold, ScaffoldController, SnackBar, SnackBarController, SnackBarManager};
+use pwt::touch::{ApplicationBar, Fab, NavigationBar, Scaffold, ScaffoldController, SnackBar, SnackBarController, SnackBarContextExt, MaterialApp};
 use pwt::widget::{ActionIcon, Container, TabBarItem};
-use pwt::widget::{Button, Column, Panel, Row, Toolbar};
-use yew::virtual_dom::Key;
-use yew_router::HashRouter;
 
 pub enum Msg {}
 
@@ -61,7 +55,7 @@ impl Component for App {
     type Message = Msg;
     type Properties = ();
 
-    fn create(_ctx: &Context<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         let scaffold_controller = ScaffoldController::new();
         let snackbar_controller = SnackBarController::new();
 
@@ -77,7 +71,7 @@ impl Component for App {
         me
     }
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         let page0 = Container::new()
             .attribute("style", "background: red;")
             .class("pwt-flex-fill pwt-overflow-auto")
@@ -91,7 +85,7 @@ impl Component for App {
                     .on_activate({
                         let controller = self.snackbar_controller.clone();
                         move |_| {
-                            controller.show_snackbar(SnackBar::new().message("You pressed the bell button."));
+                            controller.show_snackbar(SnackBar::new().message("You pressed the notification button."));
                         }
                     })
                     .into(),
@@ -127,21 +121,6 @@ impl Component for App {
 
         let navigation_bar = NavigationBar::new(items).router(true);
 
-        //.on_select(ctx.link().callback(Msg::NavigationBarSelect));
-
-        /*
-        NavigationContainer::new()
-            .with_child(
-                Column::new()
-                    .class("pwt-viewport")
-                    .with_child(html! {
-                        <div class="pwt-flex-fill">{page_view}</div>
-                    })
-                    .with_child(navigation_bar),
-            )
-            .into()
-        */
-
         let fab = Fab::new("fa fa-pencil").large();
 
         let scaffold = Scaffold::new()
@@ -152,21 +131,14 @@ impl Component for App {
             .favorite_action_button(fab)
             .drawer(self.create_drawer());
 
-        Container::new()
-            .with_child(scaffold)
-            .with_child(
-                SnackBarManager::new().controller(self.snackbar_controller.clone())
-            )
+        MaterialApp::new()
+            .snackbar_controller(self.snackbar_controller.clone())
+            .home(scaffold)
             .into()
     }
 }
 
-#[function_component]
-fn RoutedApp() -> Html {
-    html! { <HashRouter><App/></HashRouter> }
-}
-
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::Renderer::<RoutedApp>::new().render();
+    yew::Renderer::<App>::new().render();
 }
