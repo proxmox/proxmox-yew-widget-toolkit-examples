@@ -55,7 +55,7 @@ impl Component for App {
     type Message = Msg;
     type Properties = ();
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         let scaffold_controller = ScaffoldController::new();
         let snackbar_controller = SnackBarController::new();
 
@@ -73,7 +73,7 @@ impl Component for App {
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
         let page0 = Container::new()
-            .attribute("style", "background: red;")
+            //.attribute("style", "background: red;")
             .class("pwt-flex-fill pwt-overflow-auto")
             .with_child("PAGE0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
@@ -133,6 +133,7 @@ impl Component for App {
 
         MaterialApp::new()
             .snackbar_controller(self.snackbar_controller.clone())
+            .snackbar_bottom_offset(220)
             .home(scaffold)
             .into()
     }
