@@ -52,6 +52,7 @@ impl App {
             SnackBar::new()
                 .message(format!("This is snackmar message #{}", self.snackbar_counter))
                 .action_label("Press me")
+                .show_close_icon(true)
         );
     }
 }
