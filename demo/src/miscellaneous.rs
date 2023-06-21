@@ -73,7 +73,7 @@ pub fn MiscellaneousDemo() -> Html {
         .with_child(load_mask_demo())
         .with_child(
             SnackBar::new()
-                .action_label("Retry")
+                .action_label("Okay, got it")
                 .message("This is a SnackBar.")
         )
         .into()

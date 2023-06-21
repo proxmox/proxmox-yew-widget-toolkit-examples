@@ -1,10 +1,11 @@
 use pwt::prelude::*;
 use pwt::state::NavigationContainer;
+//use pwt::web_sys_ext::content_rect;
 use pwt::widget::nav::{Menu, MenuItem};
 use pwt::widget::nav::NavigationDrawer;
 use yew::prelude::*;
 
-use pwt::touch::{ApplicationBar, Fab, NavigationBar, PageView, Scaffold, ScaffoldController};
+use pwt::touch::{ApplicationBar, Fab, NavigationBar, PageView, Scaffold, ScaffoldController, SnackBar, SnackBarController, SnackBarManager};
 use pwt::widget::{ActionIcon, Container, TabBarItem};
 use pwt::widget::{Button, Column, Panel, Row, Toolbar};
 use yew::virtual_dom::Key;
@@ -14,6 +15,9 @@ pub enum Msg {}
 
 pub struct App {
     scaffold_controller: ScaffoldController,
+    snackbar_controller: SnackBarController,
+
+    snackbar_counter: usize,
 }
 
 impl App {
@@ -41,6 +45,15 @@ impl App {
 
         drawer.into()
     }
+
+    fn add_snackbar(&mut self) {
+        self.snackbar_counter += 1;
+        self.snackbar_controller.show_snackbar(
+            SnackBar::new()
+                .message(format!("This is snackmar message #{}", self.snackbar_counter))
+                .action_label("Press me")
+        );
+    }
 }
 
 impl Component for App {
@@ -49,10 +62,18 @@ impl Component for App {
 
     fn create(_ctx: &Context<Self>) -> Self {
         let scaffold_controller = ScaffoldController::new();
+        let snackbar_controller = SnackBarController::new();
 
-        Self {
+        let mut me = Self {
             scaffold_controller,
-        }
+            snackbar_controller,
+            snackbar_counter: 0,
+        };
+
+        me.add_snackbar();
+        me.add_snackbar();
+
+        me
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
@@ -65,7 +86,14 @@ impl Component for App {
             .leading(ActionIcon::new("fa fa-lg fa-arrow-left"))
             .title("APP BARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
             .actions(vec![
-                ActionIcon::new("fa fa-lg fa-bell").into(),
+                ActionIcon::new("fa fa-lg fa-bell")
+                    .on_activate({
+                        let controller = self.snackbar_controller.clone();
+                        move |_| {
+                            controller.show_snackbar(SnackBar::new().message("You pressed the bell button."));
+                        }
+                    })
+                    .into(),
                 ActionIcon::new("fa fa-lg fa-refresh").into(),
                 ActionIcon::new("fa fa-lg fa-bars")
                     .on_activate({
@@ -115,13 +143,19 @@ impl Component for App {
 
         let fab = Fab::new("fa fa-pencil").large();
 
-        Scaffold::new()
+        let scaffold = Scaffold::new()
             .controller(self.scaffold_controller.clone())
             .application_bar(app_bar)
             .body(page0)
             .navigation_bar(navigation_bar)
             .favorite_action_button(fab)
-            .drawer(self.create_drawer())
+            .drawer(self.create_drawer());
+
+        Container::new()
+            .with_child(scaffold)
+            .with_child(
+                SnackBarManager::new().controller(self.snackbar_controller.clone())
+            )
             .into()
     }
 }
