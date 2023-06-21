@@ -1,5 +1,5 @@
 use pwt::css::{Flex, Overflow};
-use pwt::touch::SnackBar;
+use pwt::touch::{SnackBar, SnackBarController, SnackBarManager};
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -54,6 +54,16 @@ pub fn MiscellaneousDemo() -> Html {
         .high(450.0)
         .optimum(200.0);
 
+    let snackbar_controller = use_state(|| {
+        let controller = SnackBarController::new();
+        controller.show_snackbar(
+            SnackBar::new()
+                .action_label("Okay, got it")
+                .message("This is a SnackBar."),
+        );
+        controller
+    });
+
     Column::new()
         .class(Flex::Fill)
         .class(Overflow::Auto)
@@ -71,10 +81,16 @@ pub fn MiscellaneousDemo() -> Html {
         .with_child(mini_scoll_demo1())
         .with_child(mini_scoll_demo2())
         .with_child(load_mask_demo())
-        .with_child(
-            SnackBar::new()
-                .action_label("Okay, got it")
-                .message("This is a SnackBar.")
-        )
+        .with_child(Button::new("Show Snackbar").onclick({
+            let controller = (*snackbar_controller).clone();
+            move |_| {
+                controller.show_snackbar(
+                    SnackBar::new()
+                        .message("You pressed the show snackbar button.")
+                        .duration(2000),
+                );
+            }
+        }))
+        .with_child(SnackBarManager::new().controller((*snackbar_controller).clone()))
         .into()
 }
