@@ -1,8 +1,8 @@
-use pwt::prelude::*;
+use pwt::touch::prelude::*;
 use pwt::widget::nav::{Menu, MenuItem};
 use pwt::widget::nav::NavigationDrawer;
 
-use pwt::touch::{ApplicationBar, Fab, NavigationBar, Scaffold, ScaffoldController, SnackBar, SnackBarController, SnackBarContextExt, MaterialApp};
+use pwt::touch::{ApplicationBar, Fab, NavigationBar, Scaffold, ScaffoldController, SnackBar, SnackBarController, MaterialApp};
 use pwt::widget::{ActionIcon, Container, TabBarItem};
 
 pub enum Msg {}
