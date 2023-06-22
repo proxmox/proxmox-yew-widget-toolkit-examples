@@ -117,7 +117,7 @@ fn Home() -> Html {
                         .with_child(html! {<h6>{"This is the home page"}</h6>})
                         .with_child(html! {<hr/>})
                         .with_child(
-                            html! {<p>{"The body of this card only contains nothing usefull."}</p>},
+                            html! {<p>{"The body of this card contains nothing usefull."}</p>},
                         ),
                 )
                 .with_child(Button::new("Show dismissive snackbar message").onclick({
@@ -161,7 +161,7 @@ fn Settings() -> Html {
 #[function_component]
 fn Favorite() -> Html {
     Scaffold::new()
-        .application_bar(ApplicationBar::new().title("Favborite"))
+        .application_bar(ApplicationBar::new().title("Favorite"))
         .body(Card::new().margin(2).with_child("Favorite"))
         .navigation_bar(navigation_bar())
         .into()
