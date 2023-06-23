@@ -3,8 +3,8 @@ use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{Button, Column};
 
 use pwt::touch::{
-    ApplicationBar, Fab, MaterialApp, NavigationBar, Scaffold, ScaffoldController, SnackBar,
-    SnackBarController,
+    ApplicationBar, Fab, MaterialApp, NavigationBar, PageController, Scaffold, ScaffoldController,
+    SnackBar, SnackBarController,
 };
 use pwt::widget::{ActionIcon, Card, TabBarItem};
 
@@ -87,6 +87,8 @@ fn create_drawer() -> NavigationDrawer {
 #[function_component]
 fn Home() -> Html {
     let snackbar_controller: Option<SnackBarController> = use_context();
+    let page_controller: Option<PageController> = use_context();
+
     let scaffold_controller = use_state(|| ScaffoldController::new());
 
     let open_drawer_button = ActionIcon::new("fa fa-lg fa-bars").on_activate({
@@ -143,7 +145,15 @@ fn Home() -> Html {
                             }
                         }
                     }),
-                ),
+                )
+                .with_child(Button::new("Push a test page to the page stack").onclick({
+                    let page_controller = page_controller.clone();
+                    move |_| {
+                        if let Some(controller) = &page_controller {
+                            controller.push_page(html! {<TestPage1/>});
+                        }
+                    }
+                })),
         )
         .navigation_bar(navigation_bar())
         .into()
@@ -175,6 +185,38 @@ fn Profile() -> Html {
         .navigation_bar(navigation_bar())
         .into()
 }
+
+#[function_component]
+fn TestPage1() -> Html {
+    let page_controller: Option<PageController> = use_context();
+
+    Scaffold::new()
+        .application_bar(ApplicationBar::new().title("Test page one"))
+        .body(
+            Column::new()
+                .padding(2)
+                .gap(2)
+                .with_child(Card::new().with_child("Test page one."))
+                .with_child(Button::new("Push a test page to the page stack").onclick({
+                    let page_controller = page_controller.clone();
+                    move |_| {
+                        if let Some(controller) = &page_controller {
+                            controller.push_page(html! {<TestPage2/>});
+                        }
+                    }
+                })),
+        )
+        .into()
+}
+
+#[function_component]
+fn TestPage2() -> Html {
+    Scaffold::new()
+        .application_bar(ApplicationBar::new().title("Test page two"))
+        .body(Card::new().margin(2).with_child("Test page two."))
+        .into()
+}
+
 
 #[function_component]
 fn NotFound() -> Html {
