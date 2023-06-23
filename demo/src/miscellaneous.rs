@@ -45,6 +45,19 @@ fn load_mask_demo() -> Html {
         .into()
 }
 
+fn load_with_progress_demo() -> Html {
+    Panel::new()
+        .title("Use progress bar as bottom border")
+        .with_child(Progress::new())
+        .with_child(html! {
+            <div class="pwt-p-2" style="min-height:50px;">
+                    {"You can use the progess indicator like an additional border."}
+                </div>
+        })
+        .into()
+}
+
+
 #[function_component]
 pub fn MiscellaneousDemo() -> Html {
     let meter = Meter::new()
@@ -73,6 +86,7 @@ pub fn MiscellaneousDemo() -> Html {
         .with_child(Progress::new())
         .with_child("Progress indicator (value)")
         .with_child(Progress::new().max(60.0).value(50.0))
+        .with_child( load_with_progress_demo())
         .with_child("Meter (min 200, max 500, low 350, height 450, optimum 200)")
         .with_child(meter.clone().value(220.0))
         .with_child(meter.clone().value(320.0))
