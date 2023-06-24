@@ -27,13 +27,16 @@ enum Route {
     NotFound,
 }
 
-fn switch(routes: Route) -> Html {
-    match routes {
-        Route::Home | Route::HomeAlias => html! {<Home/>},
-        Route::Settings => html! {<Settings/>},
-        Route::Favorite => html! {<Favorite/>},
-        Route::Profile => html! {<Profile/>},
-        Route::NotFound => html! {<NotFound/>},
+fn switch(route: &Route) -> Vec<Html> {
+    match route {
+        Route::Home | Route::HomeAlias => vec![html! {<Home/>}],
+        Route::Settings => vec![html! {<Settings/>}],
+        Route::Favorite => vec![html! {<Favorite/>}],
+        Route::Profile => vec![
+            html! {<Home/>},
+            html! {<Profile/>},
+        ],
+        Route::NotFound => vec![html! {<NotFound/>}],
     }
 }
 
@@ -234,9 +237,8 @@ fn NotFound() -> Html {
 }
 #[function_component]
 fn App() -> Html {
-    MaterialApp::new()
+    MaterialApp::<Route>::new(switch)
         .snackbar_bottom_offset(220)
-        .home(html! {<Switch<Route> render={switch}/>})
         .into()
 }
 
