@@ -32,10 +32,7 @@ fn switch(route: &Route) -> Vec<Html> {
         Route::Home | Route::HomeAlias => vec![html! {<Home/>}],
         Route::Settings => vec![html! {<Settings/>}],
         Route::Favorite => vec![html! {<Favorite/>}],
-        Route::Profile => vec![
-            html! {<Home/>},
-            html! {<Profile/>},
-        ],
+        Route::Profile => vec![html! {<Home/>}, html! {<Profile/>}],
         Route::NotFound => vec![html! {<NotFound/>}],
     }
 }
@@ -189,12 +186,29 @@ fn Profile() -> Html {
         .into()
 }
 
+fn create_back_button(page_controller: Option<PageController>) -> ActionIcon {
+    ActionIcon::new("fa fa-lg fa-arrow-left").on_activate({
+        let page_controller = page_controller.clone();
+        move |_| {
+            if let Some(page_controller) = &page_controller {
+                page_controller.last_page();
+            }
+        }
+    })
+}
+
 #[function_component]
 fn TestPage1() -> Html {
     let page_controller: Option<PageController> = use_context();
 
+    let back_button = create_back_button(page_controller.clone());
+
     Scaffold::new()
-        .application_bar(ApplicationBar::new().title("Test page one"))
+        .application_bar(
+            ApplicationBar::new()
+                .title("Test page one")
+                .leading(back_button),
+        )
         .body(
             Column::new()
                 .padding(2)
@@ -214,12 +228,18 @@ fn TestPage1() -> Html {
 
 #[function_component]
 fn TestPage2() -> Html {
+    let page_controller: Option<PageController> = use_context();
+    let back_button = create_back_button(page_controller.clone());
+
     Scaffold::new()
-        .application_bar(ApplicationBar::new().title("Test page two"))
+        .application_bar(
+            ApplicationBar::new()
+                .title("Test page two")
+                .leading(back_button),
+        )
         .body(Card::new().margin(2).with_child("Test page two."))
         .into()
 }
-
 
 #[function_component]
 fn NotFound() -> Html {
