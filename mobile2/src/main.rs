@@ -1,6 +1,6 @@
 use pwt::touch::prelude::*;
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
-use pwt::widget::{Button, Column};
+use pwt::widget::{Button, Column, Row, ThemeModeSelector};
 
 use pwt::touch::{
     ApplicationBar, Fab, MaterialApp, NavigationBar, PageController, Scaffold, ScaffoldController,
@@ -79,9 +79,14 @@ fn create_drawer() -> NavigationDrawer {
                 .icon_class("fa fa-paper-plane"),
         );
 
+    let header = Row::new()
+        .class("pwt-align-items-center")
+        .with_child(html! {<div class="pwt-p-2 pwt-font-size-title-large">{"Menu Header"}</div>})
+        .with_child(ThemeModeSelector::new());
+
     NavigationDrawer::new(menu)
         .class("pwt-flex-fill")
-        .header(html! {<div class="pwt-p-2 pwt-font-size-title-large">{"Menu Header"}</div>})
+        .header(header)
 }
 
 #[function_component]
