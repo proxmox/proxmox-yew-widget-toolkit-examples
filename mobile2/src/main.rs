@@ -161,8 +161,7 @@ fn Home() -> Html {
 
 #[function_component]
 fn Settings() -> Html {
-    Scaffold::new()
-        .application_bar(ApplicationBar::new().title("Settings"))
+    Scaffold::with_title("Settings")
         .body(Card::new().margin(2).with_child("Settings"))
         .navigation_bar(navigation_bar())
         .into()
@@ -170,8 +169,7 @@ fn Settings() -> Html {
 
 #[function_component]
 fn Favorite() -> Html {
-    Scaffold::new()
-        .application_bar(ApplicationBar::new().title("Favorite"))
+    Scaffold::with_title("Favorite")
         .body(Card::new().margin(2).with_child("Favorite"))
         .navigation_bar(navigation_bar())
         .into()
@@ -179,8 +177,7 @@ fn Favorite() -> Html {
 
 #[function_component]
 fn Profile() -> Html {
-    Scaffold::new()
-        .application_bar(ApplicationBar::new().title("Profile"))
+    Scaffold::with_title("Profile")
         .body(Card::new().margin(2).with_child("Profile"))
         .navigation_bar(navigation_bar())
         .into()
