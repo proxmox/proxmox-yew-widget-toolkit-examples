@@ -61,7 +61,7 @@ fn navigation_bar() -> NavigationBar {
     NavigationBar::new(items).router(true)
 }
 
-fn create_drawer(navigator: Navigator) -> NavigationDrawer {
+fn create_drawer(page_controller: PageController, navigator: Navigator) -> NavigationDrawer {
     let menu = Menu::new()
         .with_item(
             MenuItem::new("Home")
@@ -78,7 +78,11 @@ fn create_drawer(navigator: Navigator) -> NavigationDrawer {
                 .icon_class("fa fa-paper-plane")
                 .on_activate({
                     let navigator = navigator.clone();
-                    move |_| navigator.push(&Route::Profile)
+                    let page_controller = page_controller.clone();
+                    move |_| {
+                        navigator.push(&Route::Profile);
+                        page_controller.close_side_dialog();
+                    }
                 }),
         )
         .with_item(
@@ -108,7 +112,7 @@ fn Home() -> Html {
         let navigator = navigator.clone();
         move |_| {
             log::info!("OPENDRAWER0");
-            page_controller.show_drawer(create_drawer(navigator.clone()));
+            page_controller.show_drawer(create_drawer(page_controller.clone(), navigator.clone()));
         }
     });
 
