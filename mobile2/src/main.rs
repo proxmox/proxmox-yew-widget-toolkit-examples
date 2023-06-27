@@ -78,17 +78,21 @@ fn create_drawer(page_controller: PageController, navigator: Navigator) -> Navig
                 .icon_class("fa fa-paper-plane")
                 .on_activate({
                     let navigator = navigator.clone();
-                    let page_controller = page_controller.clone();
                     move |_| {
                         navigator.push(&Route::Profile);
-                        page_controller.close_side_dialog();
                     }
                 }),
         )
         .with_item(
-            MenuItem::new("Entry 3")
+            MenuItem::new("Close Drawer")
                 .key("id3")
-                .icon_class("fa fa-paper-plane"),
+                .icon_class("fa fa-paper-plane")
+                .on_activate({
+                    let page_controller = page_controller.clone();
+                    move |_| {
+                        page_controller.close_side_dialog();
+                    }
+                }),
         );
 
     let header = Row::new()
