@@ -3,8 +3,8 @@ use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{Button, Column, Row, ThemeModeSelector};
 
 use pwt::touch::{
-    ApplicationBar, Fab, MaterialApp, NavigationBar, PageController, Scaffold,
-    SnackBar, SnackBarController,
+    ApplicationBar, Fab, MaterialApp, NavigationBar, PageController, Scaffold, SnackBar,
+    SnackBarController,
 };
 use pwt::widget::{ActionIcon, Card, TabBarItem};
 
@@ -99,7 +99,7 @@ fn create_drawer(navigator: Navigator) -> NavigationDrawer {
 
 #[function_component]
 fn Home() -> Html {
-    let snackbar_controller: Option<SnackBarController> = use_context();
+    let snackbar_controller: SnackBarController = use_context().unwrap();
     let page_controller: PageController = use_context().unwrap();
     let navigator = use_navigator().unwrap();
 
@@ -136,24 +136,20 @@ fn Home() -> Html {
                 .with_child(Button::new("Show dismissive snackbar message").onclick({
                     let snackbar_controller = snackbar_controller.clone();
                     move |_| {
-                        if let Some(controller) = &snackbar_controller {
-                            controller.show_snackbar(
-                                SnackBar::new().message("This is a test message (dismissive)"),
-                            );
-                        }
+                        snackbar_controller.show_snackbar(
+                            SnackBar::new().message("This is a test message (dismissive)"),
+                        );
                     }
                 }))
                 .with_child(
                     Button::new("Show non-dismissive snackbar message").onclick({
                         let snackbar_controller = snackbar_controller.clone();
                         move |_| {
-                            if let Some(controller) = &snackbar_controller {
-                                controller.show_snackbar(
-                                    SnackBar::new()
-                                        .message("This is a test message (non-dismissive)")
-                                        .action_label("Okay, got it"),
-                                );
-                            }
+                            snackbar_controller.show_snackbar(
+                                SnackBar::new()
+                                    .message("This is a test message (non-dismissive)")
+                                    .action_label("Okay, got it"),
+                            );
                         }
                     }),
                 )
