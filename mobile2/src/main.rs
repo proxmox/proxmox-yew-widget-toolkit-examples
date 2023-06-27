@@ -3,7 +3,7 @@ use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{Button, Column, Row, ThemeModeSelector};
 
 use pwt::touch::{
-    ApplicationBar, Fab, MaterialApp, NavigationBar, PageController, Scaffold, ScaffoldController,
+    ApplicationBar, Fab, MaterialApp, NavigationBar, PageController, Scaffold,
     SnackBar, SnackBarController,
 };
 use pwt::widget::{ActionIcon, Card, TabBarItem};
@@ -61,17 +61,25 @@ fn navigation_bar() -> NavigationBar {
     NavigationBar::new(items).router(true)
 }
 
-fn create_drawer() -> NavigationDrawer {
+fn create_drawer(navigator: Navigator) -> NavigationDrawer {
     let menu = Menu::new()
         .with_item(
-            MenuItem::new("Entry 1")
+            MenuItem::new("Home")
                 .key("id1")
-                .icon_class("fa fa-paper-plane"),
+                .icon_class("fa fa-paper-plane")
+                .on_activate({
+                    let navigator = navigator.clone();
+                    move |_| navigator.push(&Route::Home)
+                }),
         )
         .with_item(
-            MenuItem::new("Entry 2")
+            MenuItem::new("Profile")
                 .key("id2")
-                .icon_class("fa fa-paper-plane"),
+                .icon_class("fa fa-paper-plane")
+                .on_activate({
+                    let navigator = navigator.clone();
+                    move |_| navigator.push(&Route::Profile)
+                }),
         )
         .with_item(
             MenuItem::new("Entry 3")
@@ -92,29 +100,27 @@ fn create_drawer() -> NavigationDrawer {
 #[function_component]
 fn Home() -> Html {
     let snackbar_controller: Option<SnackBarController> = use_context();
-    let page_controller: Option<PageController> = use_context();
-
-    let scaffold_controller = use_state(|| ScaffoldController::new());
+    let page_controller: PageController = use_context().unwrap();
+    let navigator = use_navigator().unwrap();
 
     let open_drawer_button = ActionIcon::new("fa fa-lg fa-bars").on_activate({
-        let scaffold_controller = (*scaffold_controller).clone();
+        let page_controller = page_controller.clone();
+        let navigator = navigator.clone();
         move |_| {
             log::info!("OPENDRAWER0");
-            scaffold_controller.toggle_drawer();
+            page_controller.show_drawer(create_drawer(navigator.clone()));
         }
     });
 
     let fab = Fab::new("fa fa-pencil");
 
     Scaffold::new()
-        .controller((*scaffold_controller).clone())
         .application_bar(
             ApplicationBar::new()
                 .leading(open_drawer_button)
                 .title("Home"),
         )
         .favorite_action_button(fab)
-        .drawer(create_drawer())
         .body(
             Column::new()
                 .padding(2)
@@ -154,9 +160,7 @@ fn Home() -> Html {
                 .with_child(Button::new("Push a test page to the page stack").onclick({
                     let page_controller = page_controller.clone();
                     move |_| {
-                        if let Some(controller) = &page_controller {
-                            controller.push_page(html! {<TestPage1/>});
-                        }
+                        page_controller.push_page(html! {<TestPage1/>});
                     }
                 })),
         )
