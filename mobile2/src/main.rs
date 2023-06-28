@@ -14,23 +14,57 @@ use yew_router::prelude::*;
 enum Route {
     #[at("/")]
     Home,
+
     #[at("/_")]
     HomeAlias,
+
     #[at("/settings")]
     Settings,
+
+    #[at("/settings/*")]
+    SubSettings,
+
     #[at("/favorite")]
     Favorite,
+
     #[at("/profile")]
     Profile,
+
     #[not_found]
     #[at("/404")]
     NotFound,
 }
+#[derive(Debug, Clone, Copy, PartialEq, Routable)]
+enum SubSettings {
+    #[at("/settings/network")]
+    Network,
+
+    #[at("/settings/account")]
+    Account,
+
+    #[not_found]
+    #[at("/settings/404")]
+    NotFound,
+}
+
+fn switch_subsettings(route: SubSettings) -> Html {
+    match route {
+        SubSettings::Account => html! {<AccountSettings/>},
+        SubSettings::Network => html! {<NetworkSettings/>},
+        SubSettings::NotFound => html! {<NotFound/>},
+    }
+}
 
 fn switch(route: &Route) -> Vec<Html> {
+    log::info!("SWITCH TO {:?}", route);
     match route {
         Route::Home | Route::HomeAlias => vec![html! {<Home/>}],
         Route::Settings => vec![html! {<Settings/>}],
+        Route::SubSettings => vec![
+            html! {<Settings/>},
+            // fixme: we cannot use Switch here, because that render NotFound during page stack transitions
+            html! { <Switch<SubSettings> render={switch_subsettings} />},
+        ],
         Route::Favorite => vec![html! {<Favorite/>}],
         Route::Profile => vec![html! {<Home/>}, html! {<Profile/>}],
         Route::NotFound => vec![html! {<NotFound/>}],
@@ -174,8 +208,48 @@ fn Home() -> Html {
 
 #[function_component]
 fn Settings() -> Html {
+    fn list_tile(titel: &str, body: &str) -> Card {
+        Card::new()
+            .class("pwt-interactive")
+            .class("pwt-shape-none")
+            .class("pwt-card-flat")
+            .class("pwt-scheme-neutral")
+            .class("pwt-border-bottom")
+            .with_child(html! {
+                <>
+                    <h6>{titel}</h6>
+                    <p>{body}</p>
+                </>
+            })
+    }
+
+    let navigator = use_navigator().unwrap();
+
+    let body = Column::new()
+        .with_child(
+            Card::new()
+                .class("pwt-shape-none")
+                .with_child(html! {<h6>{"Settings"}</h6>}),
+        )
+        .with_child(
+            list_tile(
+                "Account",
+                "Opens a new page to configure the account settings.",
+            )
+            .onclick({
+                let navigator = navigator.clone();
+                move |_| navigator.push(&SubSettings::Account)
+            }),
+        )
+        .with_child(
+            list_tile("Network", "Opens a new page to configure the network.").onclick({
+                let navigator = navigator.clone();
+                move |_| navigator.push(&SubSettings::Network)
+            }),
+        );
+
     Scaffold::with_title("Settings")
-        .body(Card::new().margin(2).with_child("Settings"))
+        .body(body)
         .navigation_bar(navigation_bar())
         .into()
 }
@@ -200,11 +274,7 @@ fn Profile() -> Html {
 fn TestPage1() -> Html {
     let page_controller: Option<PageController> = use_context();
 
-    Scaffold::new()
-        .application_bar(
-            ApplicationBar::new()
-                .title("Test page one")
-        )
+    Scaffold::with_title("Test page one")
         .body(
             Column::new()
                 .padding(2)
@@ -224,12 +294,23 @@ fn TestPage1() -> Html {
 
 #[function_component]
 fn TestPage2() -> Html {
-    Scaffold::new()
-        .application_bar(
-            ApplicationBar::new()
-                .title("Test page two")
-        )
+    Scaffold::with_title("Test page two")
         .body(Card::new().margin(2).with_child("Test page two."))
+        .into()
+}
+
+
+#[function_component]
+fn AccountSettings() -> Html {
+    Scaffold::with_title("Account settings")
+        .body(Card::new().margin(2).with_child("Account Settings"))
+        .into()
+}
+
+#[function_component]
+fn NetworkSettings() -> Html {
+    Scaffold::with_title("Network settings")
+        .body(Card::new().margin(2).with_child("Network Settings"))
         .into()
 }
 
