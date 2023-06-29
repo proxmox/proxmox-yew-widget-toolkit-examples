@@ -16,6 +16,9 @@ use settings::{Settings, SubSettings};
 mod navigation_bar;
 pub use navigation_bar::navigation_bar;
 
+mod drawer;
+pub use drawer::create_drawer;
+
 #[derive(Debug, Clone, Copy, PartialEq, Routable)]
 enum Route {
     #[at("/")]
@@ -58,50 +61,6 @@ fn switch(path: &str) -> Vec<Html> {
     }
 }
 
-
-fn create_drawer(page_controller: PageController, navigator: Navigator) -> NavigationDrawer {
-    let menu = Menu::new()
-        .with_item(
-            MenuItem::new("Home")
-                .key("id1")
-                .icon_class("fa fa-paper-plane")
-                .on_activate({
-                    let navigator = navigator.clone();
-                    move |_| navigator.push(&Route::Home)
-                }),
-        )
-        .with_item(
-            MenuItem::new("Profile")
-                .key("id2")
-                .icon_class("fa fa-paper-plane")
-                .on_activate({
-                    let navigator = navigator.clone();
-                    move |_| {
-                        navigator.push(&Route::Profile);
-                    }
-                }),
-        )
-        .with_item(
-            MenuItem::new("Close Drawer")
-                .key("id3")
-                .icon_class("fa fa-paper-plane")
-                .on_activate({
-                    let page_controller = page_controller.clone();
-                    move |_| {
-                        page_controller.close_side_dialog();
-                    }
-                }),
-        );
-
-    let header = Row::new()
-        .class("pwt-align-items-center")
-        .with_child(html! {<div class="pwt-p-2 pwt-font-size-title-large">{"Menu Header"}</div>})
-        .with_child(ThemeModeSelector::new());
-
-    NavigationDrawer::new(menu)
-        .class("pwt-flex-fill")
-        .header(header)
-}
 
 #[function_component]
 fn Home() -> Html {
