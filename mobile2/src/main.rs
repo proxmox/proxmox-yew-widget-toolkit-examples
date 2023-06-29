@@ -3,12 +3,18 @@ use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{Button, Column, Row, ThemeModeSelector};
 
 use pwt::touch::{
-    ApplicationBar, Fab, MaterialApp, NavigationBar, PageController, Scaffold, SnackBar,
+    ApplicationBar, Fab, MaterialApp, PageController, Scaffold, SnackBar,
     SnackBarController,
 };
-use pwt::widget::{ActionIcon, Card, TabBarItem};
+use pwt::widget::{ActionIcon, Card};
 
 use yew_router::prelude::*;
+
+mod settings;
+use settings::{Settings, SubSettings};
+
+mod navigation_bar;
+pub use navigation_bar::navigation_bar;
 
 #[derive(Debug, Clone, Copy, PartialEq, Routable)]
 enum Route {
@@ -34,26 +40,6 @@ enum Route {
     #[at("/404")]
     NotFound,
 }
-#[derive(Debug, Clone, Copy, PartialEq, Routable)]
-enum SubSettings {
-    #[at("/settings/network")]
-    Network,
-
-    #[at("/settings/account")]
-    Account,
-
-    #[not_found]
-    #[at("/settings/404")]
-    NotFound,
-}
-
-fn switch_subsettings(route: SubSettings) -> Html {
-    match route {
-        SubSettings::Account => html! {<AccountSettings/>},
-        SubSettings::Network => html! {<NetworkSettings/>},
-        SubSettings::NotFound => html! {<NotFound/>},
-    }
-}
 
 fn switch(path: &str) -> Vec<Html> {
     let route = Route::recognize(&path).unwrap_or_default();
@@ -64,37 +50,14 @@ fn switch(path: &str) -> Vec<Html> {
             html! {<Settings/>},
             // fixme: we cannot use Switch here, because that render NotFound during page stack transitions
             // html! { <Switch<SubSettings> render={switch_subsettings} />},
-            switch_subsettings(SubSettings::recognize(&path).unwrap_or_default()),
+            SubSettings::switch(SubSettings::recognize(&path).unwrap_or_default()),
         ],
         Route::Favorite => vec![html! {<Favorite/>}],
-        Route::Profile => vec![html! {<Home/>}, html! {<Profile/>}],
+        Route::Profile => vec![html! {<Profile/>}],
         Route::NotFound => vec![html! {<NotFound/>}],
     }
 }
 
-fn navigation_bar() -> NavigationBar {
-    let items = vec![
-        TabBarItem::new()
-            .key("")
-            .icon_class("fa fa-home")
-            .label("Home"),
-        TabBarItem::new()
-            .key("settings")
-            .icon_class("fa fa-gear")
-            .label("Settings"),
-        TabBarItem::new()
-            .key("favorite")
-            .icon_class("fa fa-star")
-            .label("Favorite"),
-        TabBarItem::new()
-            .key("profile")
-            .icon_class("fa fa-user-o")
-            .active_icon_class("fa fa-user")
-            .label("Profile"),
-    ];
-
-    NavigationBar::new(items).router(true)
-}
 
 fn create_drawer(page_controller: PageController, navigator: Navigator) -> NavigationDrawer {
     let menu = Menu::new()
@@ -207,53 +170,6 @@ fn Home() -> Html {
         .into()
 }
 
-#[function_component]
-fn Settings() -> Html {
-    fn list_tile(titel: &str, body: &str) -> Card {
-        Card::new()
-            .class("pwt-interactive")
-            .class("pwt-shape-none")
-            .class("pwt-card-flat")
-            .class("pwt-scheme-neutral")
-            .class("pwt-border-bottom")
-            .with_child(html! {
-                <>
-                    <h6>{titel}</h6>
-                    <p>{body}</p>
-                </>
-            })
-    }
-
-    let navigator = use_navigator().unwrap();
-
-    let body = Column::new()
-        .with_child(
-            Card::new()
-                .class("pwt-shape-none")
-                .with_child(html! {<h6>{"Settings"}</h6>}),
-        )
-        .with_child(
-            list_tile(
-                "Account",
-                "Opens a new page to configure the account settings.",
-            )
-            .onclick({
-                let navigator = navigator.clone();
-                move |_| navigator.push(&SubSettings::Account)
-            }),
-        )
-        .with_child(
-            list_tile("Network", "Opens a new page to configure the network.").onclick({
-                let navigator = navigator.clone();
-                move |_| navigator.push(&SubSettings::Network)
-            }),
-        );
-
-    Scaffold::with_title("Settings")
-        .body(body)
-        .navigation_bar(navigation_bar())
-        .into()
-}
 
 #[function_component]
 fn Favorite() -> Html {
@@ -302,21 +218,7 @@ fn TestPage2() -> Html {
 
 
 #[function_component]
-fn AccountSettings() -> Html {
-    Scaffold::with_title("Account settings")
-        .body(Card::new().margin(2).with_child("Account Settings"))
-        .into()
-}
-
-#[function_component]
-fn NetworkSettings() -> Html {
-    Scaffold::with_title("Network settings")
-        .body(Card::new().margin(2).with_child("Network Settings"))
-        .into()
-}
-
-#[function_component]
-fn NotFound() -> Html {
+pub fn NotFound() -> Html {
     Scaffold::new()
         .application_bar(ApplicationBar::new().title("Page not found!"))
         .body(html! {
@@ -329,6 +231,7 @@ fn NotFound() -> Html {
         //.navigation_bar(navigation_bar())
         .into()
 }
+
 #[function_component]
 fn App() -> Html {
     MaterialApp::new(switch)
