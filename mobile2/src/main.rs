@@ -325,7 +325,7 @@ fn NotFound() -> Html {
                 }<Link<Route> to={Route::Home}>{"here"}</Link<Route>></p>
             </div>
         })
-        .navigation_bar(navigation_bar())
+        //.navigation_bar(navigation_bar())
         .into()
 }
 #[function_component]
