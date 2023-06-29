@@ -55,15 +55,16 @@ fn switch_subsettings(route: SubSettings) -> Html {
     }
 }
 
-fn switch(route: &Route) -> Vec<Html> {
-    log::info!("SWITCH TO {:?}", route);
+fn switch(path: &str) -> Vec<Html> {
+    let route = Route::recognize(&path).unwrap_or_default();
     match route {
         Route::Home | Route::HomeAlias => vec![html! {<Home/>}],
         Route::Settings => vec![html! {<Settings/>}],
         Route::SubSettings => vec![
             html! {<Settings/>},
             // fixme: we cannot use Switch here, because that render NotFound during page stack transitions
-            html! { <Switch<SubSettings> render={switch_subsettings} />},
+            // html! { <Switch<SubSettings> render={switch_subsettings} />},
+            switch_subsettings(SubSettings::recognize(&path).unwrap_or_default()),
         ],
         Route::Favorite => vec![html! {<Favorite/>}],
         Route::Profile => vec![html! {<Home/>}, html! {<Profile/>}],
@@ -330,7 +331,7 @@ fn NotFound() -> Html {
 }
 #[function_component]
 fn App() -> Html {
-    MaterialApp::<Route>::new(switch)
+    MaterialApp::new(switch)
         .snackbar_bottom_offset(220)
         .into()
 }
