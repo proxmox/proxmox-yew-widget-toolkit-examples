@@ -72,7 +72,6 @@ fn Home() -> Html {
         let page_controller = page_controller.clone();
         let navigator = navigator.clone();
         move |_| {
-            log::info!("OPENDRAWER0");
             page_controller.show_drawer(create_drawer(page_controller.clone(), navigator.clone()));
         }
     });
