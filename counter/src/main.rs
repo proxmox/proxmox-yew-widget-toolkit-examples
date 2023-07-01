@@ -1,5 +1,3 @@
-use gloo_console as console;
-use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{Column, Button, Panel, Toolbar};
@@ -26,15 +24,15 @@ impl Component for App {
         match msg {
             Msg::Increment => {
                 self.value += 1;
-                console::log!("plus one");
+                log::info!("plus one");
             }
             Msg::Decrement => {
                 self.value -= 1;
-                console::log!("minus one");
+                log::info!("minus one");
             }
             Msg::Reset => {
                 self.value = 0;
-                console::log!("reset to zero");
+                log::info!("reset to zero");
             }
         }
         true
@@ -74,5 +72,6 @@ impl Component for App {
 }
 
 fn main() {
+    wasm_logger::init(wasm_logger::Config::default());
     yew::Renderer::<App>::new().render();
 }
