@@ -133,6 +133,7 @@ pub fn MovieDemo() -> Html {
         .margin(2)
         .border(true)
         .bordered(true)
+        .hover(true)
         .selection(selection)
         .into()
 }

@@ -114,11 +114,11 @@ pub fn ButtonsDemo() -> Html {
                 .gap(4)
                 .class("pwt-align-items-center")
                 .with_child(Fab::new("fa fa-pencil").large())
-                .with_child(Fab::new("fa fa-pencil"))
+                .with_child(Fab::new("fa fa-pencil").class("pwt-scheme-secondary"))
                 .with_child(
                     Fab::new("fa fa-pencil")
                         .small()
-                        .class("pwt-scheme-primary-container"),
+                        .class("pwt-scheme-tertiary"),
                 )
                 .with_child(
                     FabMenu::new()
