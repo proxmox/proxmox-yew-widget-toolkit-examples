@@ -36,13 +36,13 @@ pub fn ButtonsDemo() -> Html {
                     .class(ColorScheme::SecondaryContainer),
             )
             .with_child(
-                Button::new("Tertiray")
+                Button::new("Tertiary")
                     .disabled(disabled)
                     .pressed(pressed)
                     .class(ColorScheme::Tertiary),
             )
             .with_child(
-                Button::new("TertirayContainer")
+                Button::new("TertiaryContainer")
                     .disabled(disabled)
                     .pressed(pressed)
                     .class(ColorScheme::TertiaryContainer),
