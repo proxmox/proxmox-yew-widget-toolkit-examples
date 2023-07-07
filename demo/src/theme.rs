@@ -4,6 +4,7 @@ use pwt::prelude::*;
 use pwt::state::NavigationContainer;
 use pwt::widget::{
     Button, Column, Row, Panel, TabBarItem, TabPanel, SelectionViewRenderInfo,
+    ThemeDensitySelector,
 };
 
 use pwt::css::{ColorScheme, Flex, Overflow};
@@ -78,7 +79,8 @@ fn box_panel(_: &SelectionViewRenderInfo) -> Html {
         .class(Flex::Fill)
         .class(Overflow::Auto)
         .padding(2)
-        .gap(4);
+        .gap(4)
+        .with_child(ThemeDensitySelector::new());
 
     for scheme in COLOR_SCHEMES {
 
