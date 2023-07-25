@@ -360,7 +360,7 @@ fn RoutedApp() -> Html {
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
-    static THEMES: &'static [&'static str] = &["Dynamic", "Desktop", "Material", "Proxmox"];
+    static THEMES: &'static [&'static str] = &["Proxmox", "Desktop", "Material"];
     pwt::state::set_available_themes(THEMES);
 
     yew::Renderer::<RoutedApp>::new().render();

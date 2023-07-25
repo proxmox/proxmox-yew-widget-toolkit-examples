@@ -1,16 +1,6 @@
 [[hooks]]
 stage="build"
 command="sass"
-command_arguments= ["../../www/scss/dynamic-yew-style-light.scss", "dist/.stage/dynamic-yew-style-light.css"]
-
-[[hooks]]
-stage="build"
-command="sass"
-command_arguments= ["../../www/scss/dynamic-yew-style-dark.scss", "dist/.stage/dynamic-yew-style-dark.css"]
-
-[[hooks]]
-stage="build"
-command="sass"
 command_arguments= ["../../www/scss/proxmox-yew-style-light.scss", "dist/.stage/proxmox-yew-style-light.css"]
 
 [[hooks]]
