@@ -110,7 +110,7 @@ fn box_panel(_: &SelectionViewRenderInfo) -> Html {
 fn fonts_panel(_: &SelectionViewRenderInfo) -> Html {
 
     let fonts = ["Display", "Headline", "Title", "Body", "Label"];
-    let sizes = ["large", "medium", "small"];
+    let sizes = ["Large", "Medium", "Small"];
 
     let mut panel = Column::new()
         .class(Flex::Fill)
@@ -120,7 +120,7 @@ fn fonts_panel(_: &SelectionViewRenderInfo) -> Html {
 
     for font in fonts {
         for size in sizes {
-            let class = format!("pwt-font-{}-{}", font.to_lowercase(), size);
+            let class = format!("pwt-font-{}-{}", font.to_lowercase(), size.to_lowercase());
             panel.add_child(html!{
                 <span {class}>{format!("{} {}", font, size)}</span>
             });
