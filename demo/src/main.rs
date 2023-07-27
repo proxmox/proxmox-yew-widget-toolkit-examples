@@ -58,6 +58,9 @@ pub use navigation_rail::NavigationRailDemo;
 mod navigation_bar;
 pub use navigation_bar::NavigationBarDemo;
 
+mod application_bar;
+pub use application_bar::ApplicationBarDemo;
+
 mod dialog;
 pub use dialog::DialogDemo;
 
@@ -245,6 +248,14 @@ fn MainMenu() -> Html {
         "Navigation Bar",
         "nav_bar_panel",
         |_| html! {<NavigationBarDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Application Bar",
+        "app_bar_panel",
+        |_| html! {<ApplicationBarDemo/>},
     );
 
     register_view(
