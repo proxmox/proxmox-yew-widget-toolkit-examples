@@ -316,7 +316,6 @@ fn MainMenu() -> Html {
 
     let drawer = NavigationDrawer::new(menu)
         .class(Overflow::Auto)
-        .class("pwt-accent-tertiary")
         .selection(selection)
         .aria_label("Examples")
         .router(true);
