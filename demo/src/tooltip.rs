@@ -12,25 +12,23 @@ pub fn TooltipDemo() -> Html {
         .with_child("Button with tooltip")
         .with_child(
             Tooltip::new(Button::new("TooltipButton"))
-                .tip(html!{"This button has a tooltip"})
+                .tip("This button has a tooltip")
         )
         .with_child(
             Tooltip::new("Anything may have a tooltip, i.e this text.")
                 .class("pwt-mt-4")
-                .tip(html!{"Simple text with a tooltip."})
+                .tip("Simple text with a tooltip.")
         )
         .with_child(html!{<div/>})
         .with_child(
             Tooltip::new("Tooltips may have rich html content.")
                 .class("pwt-mt-4")
-                .rich_tip({
-                    let html: Html = Column::new()
+                .rich_tip(
+                    Column::new()
                         .with_child(html!{<h6>{"Rich Tooltip"}</h6>})
                         .with_child(html!{<p>{"Rich Tooltips may contain arbitrary html content. It is possible to add interactive elements."}</p>})
                         .with_child(Row::new().with_child(Button::new("Action").class("pwt-mt-2 pwt-button-text")))
-                        .into();
-                    html
-                })
+                )
         )
         .with_child(html!{<div class="pwt-mt-4">{"Inputs use tooltips to display validation results:"}</div>})
         .with_child(html!{
