@@ -4,6 +4,8 @@ use pwt::prelude::*;
 use pwt::widget::{Column, Button, Row, Tooltip};
 use pwt::widget::form::Field;
 
+use crate::LoremIpsum;
+
 #[function_component]
 pub fn TooltipDemo() -> Html {
 
@@ -17,14 +19,21 @@ pub fn TooltipDemo() -> Html {
                 .tip(html!{"This button has a tooltip"})
                 .with_child(Button::new("TooltipButton"))
         )
-        .with_child("Anything may have a tooltip,")
         .with_child(
             Tooltip::new()
+                .class("pwt-mt-4")
                 .tip(html!{"Simple text with a tooltip."})
-                .with_child("i.e this text.")
+                .with_child("Anything may have a tooltip, i.e this text.")
 
         )
-        .with_child("Inputs use tooltips to display validation results:")
+        .with_child(html!{<div/>})
+        .with_child(
+            Tooltip::new()
+                .class("pwt-mt-4")
+                .tip(html!{<div style="max-width:600px;"><LoremIpsum/></div>})
+                .with_child("Tooltips may have rich html content.")
+        )
+        .with_child(html!{<div class="pwt-mt-4">{"Inputs use tooltips to display validation results:"}</div>})
         .with_child(html!{
             <form novalidate={true}> // disable broser validation popup
             {
