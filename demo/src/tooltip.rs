@@ -1,5 +1,4 @@
 use pwt::prelude::*;
-use yew::prelude::*;
 
 use pwt::widget::form::Field;
 use pwt::widget::{Button, Column, Row, Tooltip};
@@ -12,20 +11,17 @@ pub fn TooltipDemo() -> Html {
         .class("pwt-align-items-start")
         .with_child("Button with tooltip")
         .with_child(
-            Tooltip::new()
+            Tooltip::new(Button::new("TooltipButton"))
                 .tip(html!{"This button has a tooltip"})
-                .with_child(Button::new("TooltipButton"))
         )
         .with_child(
-            Tooltip::new()
+            Tooltip::new("Anything may have a tooltip, i.e this text.")
                 .class("pwt-mt-4")
                 .tip(html!{"Simple text with a tooltip."})
-                .with_child("Anything may have a tooltip, i.e this text.")
-
         )
         .with_child(html!{<div/>})
         .with_child(
-            Tooltip::new()
+            Tooltip::new("Tooltips may have rich html content.")
                 .class("pwt-mt-4")
                 .rich_tip({
                     let html: Html = Column::new()
@@ -35,7 +31,6 @@ pub fn TooltipDemo() -> Html {
                         .into();
                     html
                 })
-                .with_child("Tooltips may have rich html content.")
         )
         .with_child(html!{<div class="pwt-mt-4">{"Inputs use tooltips to display validation results:"}</div>})
         .with_child(html!{
