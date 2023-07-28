@@ -1,14 +1,11 @@
-use yew::prelude::*;
 use pwt::prelude::*;
+use yew::prelude::*;
 
-use pwt::widget::{Column, Button, Row, Tooltip};
 use pwt::widget::form::Field;
-
-use crate::LoremIpsum;
+use pwt::widget::{Button, Column, Row, Tooltip};
 
 #[function_component]
 pub fn TooltipDemo() -> Html {
-
     Column::new()
         .padding(2)
         .gap(2)
@@ -30,7 +27,14 @@ pub fn TooltipDemo() -> Html {
         .with_child(
             Tooltip::new()
                 .class("pwt-mt-4")
-                .tip(html!{<div style="max-width:600px;"><LoremIpsum/></div>})
+                .rich_tip({
+                    let html: Html = Column::new()
+                        .with_child(html!{<h6>{"Rich Tooltip"}</h6>})
+                        .with_child(html!{<p>{"Rich Tooltips may contain arbitrary html content. It is possible to add interactive elements."}</p>})
+                        .with_child(Row::new().with_child(Button::new("Action").class("pwt-mt-2 pwt-button-text")))
+                        .into();
+                    html
+                })
                 .with_child("Tooltips may have rich html content.")
         )
         .with_child(html!{<div class="pwt-mt-4">{"Inputs use tooltips to display validation results:"}</div>})
