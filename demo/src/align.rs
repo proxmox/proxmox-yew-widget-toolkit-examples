@@ -48,6 +48,10 @@ pub fn AlignDemo() -> Html {
         let button_ref = button_ref.clone();
         let text_ref = text_ref.clone();
         gloo_timers::callback::Timeout::new(100, move || {
+            if let Some(el) = text_ref.clone().into_html_element() {
+                // ignore errors
+                let _ = el.style().set_property("display", "");
+            }
             align(button_ref.clone(), text_ref.clone(), Point::Center);
         })
         .forget();
@@ -89,6 +93,7 @@ pub fn AlignDemo() -> Html {
         .with_child(
             Panel::new()
                 .title("Floating")
+                .attribute("style", "display:none")
                 .with_child(html!(<div class="pwt-p-2">{ "Content" }</div>))
                 .node_ref(text_ref.clone()),
         )
