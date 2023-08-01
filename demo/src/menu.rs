@@ -73,7 +73,7 @@ fn panel_with_menubar() -> Html {
             Menu::new()
                 .with_item(MenuItem::new("Submenu3 disabled Item1").disabled(true))
                 .with_item(MenuItem::new("Submenu3 disabled Item2").disabled(true))
-                .with_item(MenuCheckbox::new("A Checkbox"))
+                .with_item(MenuCheckbox::new("A Checkbox").name("submenu3-checkbox"))
         );
 
     let submenu2 = MenuItem::new("Submenu2")
