@@ -104,6 +104,7 @@ fn panel_with_menubar() -> Html {
     );
 
     let menubar = MenuBar::new()
+        .class("pwt-flex-fill")
         .with_item(submenu1)
         .with_item(checkboxes)
         .with_item(submenu2)
