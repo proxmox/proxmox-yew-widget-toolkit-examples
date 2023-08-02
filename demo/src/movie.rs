@@ -11,7 +11,7 @@ use pwt::prelude::*;
 
 use pwt::props::ExtractPrimaryKey;
 use pwt::state::{use_selection, Selection, Store};
-use pwt::widget::data_table::*;
+use pwt::widget::{data_table::*, Mask};
 
 #[derive(Clone, PartialEq, Deserialize)]
 struct Record {
@@ -127,13 +127,18 @@ pub fn MovieDemo() -> Html {
         selection
     });
 
-    DataTable::new(columns, (*store).clone())
-        .class(Flex::Fill)
-        .class(Overflow::Auto)
-        .margin(2)
-        .border(true)
-        .bordered(true)
-        .hover(true)
-        .selection(selection)
-        .into()
+    Mask::new(
+        DataTable::new(columns, (*store).clone())
+            .class(Flex::Fill)
+            .class(Overflow::Auto)
+            .border(true)
+            .bordered(true)
+            .hover(true)
+            .selection(selection),
+    )
+    .class(Flex::Fill)
+    .class(Overflow::Auto)
+    .margin(2)
+    .visible(store.data_len() < 1)
+    .into()
 }
