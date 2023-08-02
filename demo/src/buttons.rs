@@ -2,7 +2,7 @@ use yew::prelude::*;
 
 use pwt::css::ColorScheme;
 use pwt::prelude::*;
-use pwt::touch::{Fab, FabMenu, FabMenuDirection, FabMenuAlign};
+use pwt::touch::{Fab, FabMenu, FabMenuAlign, FabMenuDirection};
 use pwt::widget::{ActionIcon, Button, Column, Row, SegmentedButton};
 
 #[function_component]
@@ -236,13 +236,33 @@ pub fn ButtonsDemo() -> Html {
                         .with_button(Button::new("Third").class("rounded")),
                 ),
         )
-        .with_child("Rounded Segmented Button (elevated)")
+        .with_child("Elevated Segmented Button")
         .with_child(
-            SegmentedButton::new()
-                .class("rounded pwt-button-elevated")
-                .with_button(Button::new("First"))
-                .with_button(Button::new("Second"))
-                .with_button(Button::new("Third")),
+            Row::new()
+                .gap(2)
+                .with_child(
+                    SegmentedButton::new()
+                        .class(ColorScheme::Primary)
+                        .class("pwt-button-elevated")
+                        .with_button(Button::new("First"))
+                        .with_button(Button::new("Second"))
+                        .with_button(Button::new("Third")),
+                )
+                .with_child(
+                    SegmentedButton::new()
+                        .class(ColorScheme::Secondary)
+                        .class("rounded pwt-button-elevated")
+                        .with_button(Button::new("First"))
+                        .with_button(Button::new("Second"))
+                        .with_button(Button::new("Third")),
+                )
+                .with_child(
+                    SegmentedButton::new()
+                        .class("pwt-button-elevated")
+                        .with_button(Button::new("First").class(ColorScheme::Tertiary))
+                        .with_button(Button::new("Second"))
+                        .with_button(Button::new("Third").class("rounded")),
+                ),
         )
         .into()
 }
