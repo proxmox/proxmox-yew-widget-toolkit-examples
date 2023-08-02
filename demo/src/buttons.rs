@@ -264,5 +264,33 @@ pub fn ButtonsDemo() -> Html {
                         .with_button(Button::new("Third").class("rounded")),
                 ),
         )
+        .with_child("Outlined Segmented Button")
+        .with_child(
+            Row::new()
+                .gap(2)
+                .with_child(
+                    SegmentedButton::new()
+                        .class("pwt-button-outline")
+                        .class(ColorScheme::Primary)
+                        .with_button(Button::new("First"))
+                        .with_button(Button::new("Second"))
+                        .with_button(Button::new("Third")),
+                )
+                .with_child(
+                    SegmentedButton::new()
+                        .class(ColorScheme::Secondary)
+                        .class("rounded pwt-button-outline")
+                        .with_button(Button::new("First"))
+                        .with_button(Button::new("Second"))
+                        .with_button(Button::new("Third")),
+                )
+                .with_child(
+                    SegmentedButton::new()
+                        .class("pwt-button-outline")
+                        .with_button(Button::new("First").class(ColorScheme::Tertiary))
+                        .with_button(Button::new("Second"))
+                        .with_button(Button::new("Third").class("rounded")),
+                ),
+        )
         .into()
 }
