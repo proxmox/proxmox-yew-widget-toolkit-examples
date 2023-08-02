@@ -1,5 +1,4 @@
 use pwt::prelude::*;
-use yew::prelude::*;
 
 use pwt::widget::form::Form;
 use pwt::widget::menu::{
