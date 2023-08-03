@@ -8,7 +8,7 @@ use pwt::{
     widget::{
         data_table::{DataTable, DataTableColumn, DataTableHeader},
         form::Combobox,
-        ActionIcon, Button, Column, Row,
+        ActionIcon, Button, Column, Panel, Row,
     },
 };
 use serde::Deserialize;
@@ -52,7 +52,6 @@ impl Component for WidgetColumnGrid {
             Rc::new(vec![
                 DataTableColumn::new("Select")
                     .render(move |rec: &Record| {
-                        log::info!("REMDERME");
                         let mut list: Vec<AttrValue> =
                             vec!["Foo".into(), "Bar".into(), "Baz".into()];
                         list.retain(|entry| {
@@ -69,7 +68,6 @@ impl Component for WidgetColumnGrid {
                         let link = link.clone();
                         let key = rec.id;
 
-                        log::debug!("list for {} is: {:?}", rec.id, list);
                         if list.is_empty() {
                             "No elements left".into()
                         } else {
@@ -105,11 +103,13 @@ impl Component for WidgetColumnGrid {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::New => {
-                self.store.write().push(Record {
-                    id: self.next_id,
-                    selection: "".to_owned(),
-                });
-                self.next_id += 1;
+                if self.store.read().len() < 3 {
+                    self.store.write().push(Record {
+                        id: self.next_id,
+                        selection: "".to_owned(),
+                    });
+                    self.next_id += 1;
+                }
             }
             Msg::Update(id, selection) => {
                 let mut list = self.store.write();
@@ -133,26 +133,29 @@ impl Component for WidgetColumnGrid {
             }
         };
 
-        Column::new()
-            .gap(2)
+        Panel::new()
+            .title("Dynamic Selection Grid")
             .with_child(
-                Row::new()
+                Column::new()
+                    .gap(2)
                     .with_child(
-                        DataTable::new(Rc::clone(&self.columns), self.store.clone())
-                            .border(true)
-                            .striped(false)
-                            .class(Flex::Fill),
+                        Row::new()
+                            .with_child(
+                                DataTable::new(Rc::clone(&self.columns), self.store.clone())
+                                    .striped(false)
+                                    .class(Flex::Fill),
+                            )
+                            .attribute("style", "height: 200px;"),
                     )
-                    .attribute("style", "height: 400px;"),
-            )
-            .with_child(
-                Row::new().with_child(
-                    Button::new("")
-                        .class(ColorScheme::Primary)
-                        .icon_class("fa fa-plus")
-                        .disabled(self.store.read().len() >= 3)
-                        .onclick(on_add),
-                ),
+                    .with_child(
+                        Row::new().margin(1).with_child(
+                            Button::new("")
+                                .class(ColorScheme::Primary)
+                                .icon_class("fa fa-plus")
+                                .disabled(self.store.read().len() >= 3)
+                                .onclick(on_add),
+                        ),
+                    ),
             )
             .into()
     }
