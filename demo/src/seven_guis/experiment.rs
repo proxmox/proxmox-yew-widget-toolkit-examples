@@ -52,6 +52,7 @@ impl Component for WidgetColumnGrid {
             Rc::new(vec![
                 DataTableColumn::new("Select")
                     .render(move |rec: &Record| {
+                        log::info!("REMDERME");
                         let mut list: Vec<AttrValue> =
                             vec!["Foo".into(), "Bar".into(), "Baz".into()];
                         list.retain(|entry| {
