@@ -18,16 +18,20 @@ pub use flight_booker::FlightBooker;
 use pwt::prelude::*;
 use pwt::widget::Column;
 
+mod experiment;
+use experiment::WidgetColumnGrid;
+
 #[function_component]
 pub fn SevenGuisDemo() -> Html {
     Column::new()
         .padding(2)
         .class("pwt-size-fit-content")
         .gap(3)
-        .with_child(html!{<CircleDrawer/>})
-        .with_child(html!{<Counter/>})
-        .with_child(html!{<TemperatureConverter/>})
-        .with_child(html!{<TemperatureConverter2/>})
-        .with_child(html!{<FlightBooker/>})
+        .with_child(html! {<CircleDrawer/>})
+        .with_child(html! {<Counter/>})
+        .with_child(html! {<TemperatureConverter/>})
+        .with_child(html! {<TemperatureConverter2/>})
+        .with_child(html! {<FlightBooker/>})
+        .with_child(html! {<WidgetColumnGrid/>})
         .into()
 }
