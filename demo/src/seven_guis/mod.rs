@@ -18,9 +18,6 @@ pub use flight_booker::FlightBooker;
 use pwt::prelude::*;
 use pwt::widget::Column;
 
-mod experiment;
-use experiment::WidgetColumnGrid;
-
 #[function_component]
 pub fn SevenGuisDemo() -> Html {
     Column::new()
@@ -32,6 +29,5 @@ pub fn SevenGuisDemo() -> Html {
         .with_child(html! {<TemperatureConverter/>})
         .with_child(html! {<TemperatureConverter2/>})
         .with_child(html! {<FlightBooker/>})
-        .with_child(html! {<WidgetColumnGrid/>})
         .into()
 }

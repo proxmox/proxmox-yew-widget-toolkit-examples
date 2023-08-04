@@ -67,6 +67,9 @@ pub use dialog::DialogDemo;
 mod fields;
 pub use fields::FieldsDemo;
 
+mod examples;
+pub use examples::ExampleWidgets;
+
 use yew::prelude::*;
 use yew_router::HashRouter;
 
@@ -323,6 +326,14 @@ fn MainMenu() -> Html {
         "split_pane_panel",
         |_| html! {<SplitPaneDemoNested/>},
         submenu,
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Example Widgets",
+        "example_widgets",
+        |_| html! {<ExampleWidgets/>},
     );
 
     let drawer = NavigationDrawer::new(menu)
