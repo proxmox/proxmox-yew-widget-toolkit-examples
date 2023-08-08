@@ -26,7 +26,8 @@ pub fn TabPanelDemo() -> Html {
             TabBarItem::new()
                 .key(format!("tab{i}"))
                 .label(format!("Tab {i}"))
-                .icon_class("fa fa-hdd-o"),
+                .icon_class("fa fa-hdd-o")
+                .disabled(i == 4),
             render_tab(&format!("This is Tab {i}")),
         );
     }
