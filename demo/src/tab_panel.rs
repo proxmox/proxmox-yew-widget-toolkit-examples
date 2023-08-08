@@ -4,17 +4,12 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::state::NavigationContainer;
-use pwt::widget::{Button, Container, TabBarItem, TabPanel, MiniScrollMode};
-
+use pwt::widget::{Button, Container, MiniScrollMode, TabBarItem, TabPanel};
 
 #[function_component]
 pub fn TabPanelDemo() -> Html {
-
     fn render_tab(text: &str) -> Html {
-        Container::new()
-            .padding(2)
-            .with_child(text)
-            .into()
+        Container::new().padding(2).with_child(text).into()
     }
 
     let mut panel = TabPanel::new()
@@ -36,7 +31,5 @@ pub fn TabPanelDemo() -> Html {
         );
     }
 
-    NavigationContainer::new()
-        .with_child(panel)
-        .into()
+    NavigationContainer::new().with_child(panel).into()
 }
