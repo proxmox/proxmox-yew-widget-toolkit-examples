@@ -96,6 +96,7 @@ impl Component for PwtWizard {
         let page_num = self.page + 1;
         let mut tab_panel = TabPanel::new()
             .class(Flex::Fill)
+            .tab_bar_style(pwt::widget::TabBarStyle::MaterialPrimary)
             .selection(self.selection.clone());
 
         let mut next_is_disabled = false;
