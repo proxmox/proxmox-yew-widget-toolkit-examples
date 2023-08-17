@@ -11,7 +11,7 @@ use crate::LoremIpsum;
 #[function_component]
 pub fn ToolbarDemo() -> Html {
 
-    let menu_button = MenuButton::new("MyMenu").menu(
+    let menu_button = MenuButton::new("MyMenu").show_arrow(true).menu(
         Menu::new()
             .with_item(MenuItem::new("Item1"))
             .with_item(MenuItem::new("Item2"))

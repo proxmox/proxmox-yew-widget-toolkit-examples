@@ -14,7 +14,7 @@ fn panel_with_menu_button() -> Html {
     );
 
     let toolbar = Toolbar::new().class("pwt-border-bottom").with_child(
-        MenuButton::new("MyMenu").menu(
+        MenuButton::new("MyMenu").show_arrow(true).menu(
             Menu::new()
                 .with_item(MenuItem::new("MyMenu Item1"))
                 .with_item(
