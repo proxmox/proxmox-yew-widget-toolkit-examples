@@ -21,4 +21,5 @@ Extract gettext messages with:
 ```
 xgettext -d demo src/*.rs -o demo.pot
 msgmerge -U demo.po demo.pot
+msgfmt demo.po -o demo.mo
 ```

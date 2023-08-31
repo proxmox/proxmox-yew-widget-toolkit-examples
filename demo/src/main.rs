@@ -37,6 +37,9 @@ pub use menu::MenuDemo;
 mod datatable;
 pub use datatable::DataTableDemo;
 
+mod i18n;
+pub use i18n::I18NDemo;
+
 mod seven_guis;
 pub use seven_guis::SevenGuisDemo;
 
@@ -147,6 +150,14 @@ fn MainMenu() -> Html {
         "7GUIs",
         "7guis_panel",
         |_| html! {<SevenGuisDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Internationalization",
+        "i18n_panel",
+        |_| html! {<I18NDemo/>},
     );
 
     register_view(
