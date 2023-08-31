@@ -375,6 +375,11 @@ fn DemoApp() -> Html {
 
 #[function_component]
 fn RoutedApp() -> Html {
+
+    pwt::use_catalog("demo.mo");
+
+    log::info!("{}", gettext("This is a test!"));
+
     html! { <HashRouter><DemoApp/></HashRouter> }
 }
 

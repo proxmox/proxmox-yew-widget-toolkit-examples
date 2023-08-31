@@ -1,0 +1,24 @@
+# Proxmox Yew Widget Toolkit Demo Translatzions
+# Copyright (C) 2023 Dietmar Maurer
+# This file is distributed under the same license as the Proxmox Yew
+# Widget Toolkit package.
+# FIRST AUTHOR <dietmar@proxmox.com>, 2023.
+
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Proxmox Yew Widget Toolkit Demo\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-08-31 11:50+0200\n"
+"PO-Revision-Date: 2023-08-31 11:50+0200\n"
+"Last-Translator: Dietmar Maurer <dietmar@proxmox.com>\n"
+"Language-Team: German <dietmar@proxmox.com>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/main.rs:387
+msgid "This is a test!"
+msgstr "Dies ist ein ÄÖÜ test!"
