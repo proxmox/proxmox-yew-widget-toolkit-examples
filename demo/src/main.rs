@@ -407,10 +407,10 @@ fn main() {
     let theme = pwt::state::Theme::load();
     let prefer_dark_mode = pwt::widget::dom::get_system_prefer_dark_mode();
     let href = theme.get_css_filename(prefer_dark_mode, "");
-    pwt::widget::dom::preload_fetch(&href);
+    pwt::widget::dom::preload_style(&href);
 
     // Preload gettext catalog
-    pwt::widget::dom::preload_link("demo.mo", "fetch");
+    pwt::widget::dom::preload_fetch("demo.mo");
 
     yew::Renderer::<RoutedApp>::new().render();
 }
