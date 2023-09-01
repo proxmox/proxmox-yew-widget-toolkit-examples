@@ -387,9 +387,13 @@ fn DemoApp() -> Html {
 #[function_component]
 fn RoutedApp() -> Html {
 
-    pwt::use_catalog("demo.mo");
+    let loaded = pwt::use_catalog("demo.mo");
 
-    html! { <HashRouter><DemoApp/></HashRouter> }
+    if loaded {
+        html! { <HashRouter><DemoApp/></HashRouter> }
+    } else {
+        html!{}
+    }
 }
 
 fn main() {
