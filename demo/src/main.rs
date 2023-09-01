@@ -388,10 +388,10 @@ fn DemoApp() -> Html {
 fn RoutedApp() -> Html {
 
     let loaded = pwt::use_catalog("demo.mo");
-
     if loaded {
         html! { <HashRouter><DemoApp/></HashRouter> }
     } else {
+        // Note: clear page state completly to force a redraw of the whole page
         html!{}
     }
 }
