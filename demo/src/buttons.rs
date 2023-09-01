@@ -9,6 +9,7 @@ use pwt::widget::{ActionIcon, Button, Column, Row, SegmentedButton};
 pub fn ButtonsDemo() -> Html {
     fn render_buttons(disabled: bool, pressed: bool) -> Html {
         Row::new()
+            .class("pwt-align-items-center")
             .gap(2)
             .with_child(Button::new("Normal").disabled(disabled).pressed(pressed))
             .with_child(
@@ -75,7 +76,7 @@ pub fn ButtonsDemo() -> Html {
     }
 
     fn render_segmented_buttons(icons: bool) -> Html {
-        let mut row = Row::new().gap(2);
+        let mut row = Row::new().gap(2).class("pwt-align-items-center");
         for class in &[
             None,
             Some(ColorScheme::Primary),
@@ -132,6 +133,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Button Types")
         .with_child(
             Row::new()
+                .class("pwt-align-items-center")
                 .gap(2)
                 .with_child(Fab::new("fa fa-trash").small().text("FAB"))
                 .with_child(Button::new("Filled").class(ColorScheme::Primary))
@@ -153,6 +155,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Button with Icon (elevated)")
         .with_child(
             Row::new()
+                .class("pwt-align-items-center")
                 .gap(2)
                 .with_child(
                     Button::new("Delete")
@@ -178,6 +181,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child(
             Row::new()
                 .gap(2)
+                .class("pwt-align-items-center")
                 .with_child(
                     ActionIcon::new("fa fa-trash-o")
                         .tabindex(0)
@@ -215,6 +219,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Rounded Segmented Button")
         .with_child(
             Row::new()
+                .class("pwt-align-items-center")
                 .gap(2)
                 .with_child(
                     SegmentedButton::new()
@@ -239,6 +244,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Elevated Segmented Button")
         .with_child(
             Row::new()
+                .class("pwt-align-items-center")
                 .gap(2)
                 .with_child(
                     SegmentedButton::new()
@@ -267,6 +273,7 @@ pub fn ButtonsDemo() -> Html {
         .with_child("Outlined Segmented Button")
         .with_child(
             Row::new()
+                .class("pwt-align-items-center")
                 .gap(2)
                 .with_child(
                     SegmentedButton::new()
