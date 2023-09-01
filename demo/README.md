@@ -23,3 +23,13 @@ xgettext -d demo src/*.rs -o demo.pot
 msgmerge -U demo.po demo.pot
 msgfmt demo.po -o demo.mo
 ```
+
+or better:
+
+1.) Install cargo xtr expension
+
+  cargo install xtr
+
+and extract messages using xtr:
+
+  xtr src/main.rs -o demo.pot

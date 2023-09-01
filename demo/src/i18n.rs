@@ -5,12 +5,15 @@ use pwt::replace_param1;
 
 #[function_component]
 pub fn I18NDemo() -> Html {
+
+    log::info!("{}", tr!("This is a test!"));
+
     Panel::new()
         .class("pwt-flex-fit")
         .border(false)
-        .title(gettext("Internationalization with gettext"))
+        .title(tr!("Internationalization with gettext"))
         .with_child(html!{
-            <div>{replace_param1(gettext("You have {0} new messages"), "5")}</div>
+            <div>{replace_param1(tr!("You have {0} new messages"), "5")}</div>
         })
         .into()
 }
