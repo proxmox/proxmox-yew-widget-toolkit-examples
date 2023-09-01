@@ -387,6 +387,7 @@ fn DemoApp() -> Html {
 #[function_component]
 fn RoutedApp() -> Html {
 
+
     let loaded = pwt::use_catalog("demo.mo");
     if loaded {
         html! { <HashRouter><DemoApp/></HashRouter> }
@@ -401,6 +402,15 @@ fn main() {
 
     static THEMES: &'static [&'static str] = &["Proxmox", "Desktop", "Material"];
     pwt::state::set_available_themes(THEMES);
+
+    // Preload Theme CSS
+    let theme = pwt::state::Theme::load();
+    let prefer_dark_mode = pwt::widget::dom::get_system_prefer_dark_mode();
+    let href = theme.get_css_filename(prefer_dark_mode, "");
+    pwt::widget::dom::preload_fetch(&href);
+
+    // Preload gettext catalog
+    pwt::widget::dom::preload_link("demo.mo", "fetch");
 
     yew::Renderer::<RoutedApp>::new().render();
 }
