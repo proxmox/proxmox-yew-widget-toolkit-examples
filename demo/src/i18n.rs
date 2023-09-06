@@ -1,19 +1,33 @@
 use pwt::prelude::*;
-use pwt::widget::Panel;
+use pwt::widget::{Button, Container, Panel};
 
-use pwt::replace_param1;
+use pwt::ngettext;
 
 #[function_component]
 pub fn I18NDemo() -> Html {
 
     log::info!("{}", tr!("This is a test!"));
+    let state = use_state(|| 0);
+
+    let button_callback = {
+        let state = state.clone();
+        Callback::from(move |_| state.set(*state + 1))
+    };
 
     Panel::new()
         .class("pwt-flex-fit")
         .border(false)
         .title(tr!("Internationalization with gettext"))
+        .with_child(
+            Container::new()
+                .margin(2)
+                .with_child(
+                    Button::new(tr!("Add Message"))
+                        .onclick(button_callback),
+                ),
+        )
         .with_child(html!{
-            <div class="pwt-m-2">{replace_param1(tr!("You have {0} new messages"), "5")}</div>
+            <div class="pwt-m-2">{ngettext!("You have one new message", "You have {n} new messages", *state)}</div>
         })
         .into()
 }
