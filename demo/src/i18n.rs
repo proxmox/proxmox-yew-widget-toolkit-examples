@@ -6,6 +6,7 @@ use pwt::ngettext;
 #[function_component]
 pub fn I18NDemo() -> Html {
 
+    // TRANSLATORS: This is a comment
     log::info!("{}", tr!("This is a test!"));
     let state = use_state(|| 0);
 
@@ -17,7 +18,7 @@ pub fn I18NDemo() -> Html {
     Panel::new()
         .class("pwt-flex-fit")
         .border(false)
-        .title(tr!("Internationalization with gettext"))
+        .title(pgettext!("This is a panel title", "Internationalization with gettext"))
         .with_child(
             Container::new()
                 .margin(2)
@@ -28,6 +29,9 @@ pub fn I18NDemo() -> Html {
         )
         .with_child(html!{
             <div class="pwt-m-2">{ngettext!("You have one new message", "You have {n} new messages", *state)}</div>
+        })
+        .with_child(html!{
+            <div class="pwt-m-2">{tr!("Static number: {}", "5")}</div>
         })
         .into()
 }
