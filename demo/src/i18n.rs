@@ -13,7 +13,7 @@ pub fn I18NDemo() -> Html {
         .border(false)
         .title(tr!("Internationalization with gettext"))
         .with_child(html!{
-            <div>{replace_param1(tr!("You have {0} new messages"), "5")}</div>
+            <div class="pwt-m-2">{replace_param1(tr!("You have {0} new messages"), "5")}</div>
         })
         .into()
 }
