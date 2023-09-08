@@ -2,7 +2,7 @@ use yew::prelude::*;
 use pwt::prelude::*;
 
 use pwt::widget::{InputPanel, Panel, Row};
-use pwt::widget::form::{Boolean, Field, Form, FormContext, Checkbox, Combobox, SubmitButton, ResetButton};
+use pwt::widget::form::{Boolean, Field, Form, FormContext, Checkbox, Combobox, Number, SubmitButton, ResetButton};
 
 pub struct MyForm {
     form_ctx: FormContext,
@@ -56,6 +56,18 @@ impl Component for MyForm {
                     .name("number1")
                     .number(3.0, 10.0, 1.0)
                     .default("4")
+            )
+            .with_field(
+                "Number2 (f64)",
+                Number::<f64>::new().name("number2")
+            )
+            .with_field(
+                "Number3 (u64)",
+                Number::<u64>::new().name("number3")
+            )
+            .with_field(
+                "Number4 (i8)",
+                Number::<i8>::new().name("number4")
             )
             .with_field("Checkbox1", Checkbox::new().name("checkbox1").default(true))
             .with_field("Checkbox2", Checkbox::new().name("checkbox2").switch(true).default(true))
