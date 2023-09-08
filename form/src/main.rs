@@ -1,3 +1,5 @@
+use serde_json::Value;
+
 use yew::prelude::*;
 use pwt::prelude::*;
 
@@ -6,15 +8,21 @@ use pwt::widget::form::{Boolean, Field, Form, FormContext, Checkbox, Combobox, N
 
 pub struct MyForm {
     form_ctx: FormContext,
+    data: Option<Value>,
+}
+
+pub enum Msg {
+    ShowData(Value),
 }
 
 impl Component for MyForm {
-    type Message = ();
+    type Message = Msg;
     type Properties = ();
 
-    fn create(_ctx: &Context<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
+        let link = ctx.link().clone();
         let form_ctx = FormContext::new()
-            .on_change(|form_ctx: FormContext| {
+            .on_change(move |form_ctx: FormContext| {
                 let pw = form_ctx.read().get_field_text("password");
                 let confirm = form_ctx.read().get_field_text("confirm_password");
                 if !confirm.is_empty() {
@@ -25,11 +33,21 @@ impl Component for MyForm {
                     };
                     form_ctx.write().set_field_valid("confirm_password", valid);
                 }
+                let data = form_ctx.get_submit_data();
+                link.send_message(Msg::ShowData(data));
             });
-        Self { form_ctx }
+        Self { form_ctx , data: None }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::ShowData(data) => {
+                self.data = Some(data);
+                true
+            }
+        }
+    }
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let form_ctx = self.form_ctx.clone();
 
         let input_panel = InputPanel::new()
@@ -103,34 +121,27 @@ impl Component for MyForm {
             });
 
 
-        Form::new()
+        let form = Form::new()
             .form_context(form_ctx)
-            .with_child(input_panel)
-            .into()
-    }
-}
+            .with_child(input_panel);
 
-pub struct App {}
-
-impl Component for App {
-    type Message = ();
-    type Properties = ();
-
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self { }
-    }
-
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+        let data_view = self.data.clone().map(|data| {
+            let text = serde_json::to_string_pretty(&data).unwrap();
+            Panel::new()
+                .title("Submit Data")
+                .with_child(html!{<div class="pwt-p-2" style="white-space: pre;">{text}</div>})
+        });
 
         Panel::new()
             .title("A Simple Form")
-            .with_child(html!{<MyForm/>})
+            .with_child(form)
+            .with_optional_child(data_view)
             .into()
     }
-
 }
+
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::Renderer::<App>::new().render();
+    yew::Renderer::<MyForm>::new().render();
 }
