@@ -9,7 +9,7 @@ use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 //use pwt::props::Selection2;
-use pwt::state::{TreeStore, DataStore, use_tree_store};
+use pwt::state::{TreeStore, use_tree_store};
 use pwt::widget::{ActionIcon, Button, Row};
 use pwt::widget::data_table::*;
 
