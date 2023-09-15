@@ -80,7 +80,6 @@ impl Component for PwtWizard {
                 } else {
                     self.pages_valid.insert(page);
                 }
-                log::info!("set: {:?}", self.pages_valid);
             }
             Msg::SelectionChange(selection) => {
                 if let Some(key) = selection.selected_key() {
