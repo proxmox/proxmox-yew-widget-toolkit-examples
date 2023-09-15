@@ -2,8 +2,8 @@ use pwt::state::Selection;
 use yew::prelude::*;
 use yew::virtual_dom::Key;
 
-use pwt::prelude::*;
 use pwt::css::{Flex, Overflow};
+use pwt::prelude::*;
 
 use pwt::state::{use_selection, NavigationContainer};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
@@ -49,6 +49,8 @@ pub fn NavigationDrawerDemo() -> Html {
                         ),
                 ),
         )
+        .with_spacer()
+        .with_section_header("Section")
         .with_item(
             MenuItem::new("Submenu 3 (unselectable)")
                 .key("unselectable")
