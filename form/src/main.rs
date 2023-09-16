@@ -1,10 +1,12 @@
 use serde_json::Value;
 
-use yew::prelude::*;
 use pwt::prelude::*;
 
+use pwt::widget::form::{
+    Boolean, Checkbox, Combobox, Field, Form, FormContext, Number, ResetButton, SubmitButton,
+    Tristate, TristateBoolean,
+};
 use pwt::widget::{InputPanel, Panel, Row};
-use pwt::widget::form::{Boolean, Field, Form, FormContext, Checkbox, Combobox, Number, SubmitButton, ResetButton};
 
 pub struct MyForm {
     form_ctx: FormContext,
@@ -21,25 +23,27 @@ impl Component for MyForm {
 
     fn create(ctx: &Context<Self>) -> Self {
         let link = ctx.link().clone();
-        let form_ctx = FormContext::new()
-            .on_change(move |form_ctx: FormContext| {
-                let pw = form_ctx.read().get_field_text("password");
-                let confirm = form_ctx.read().get_field_text("confirm_password");
-                if !confirm.is_empty() {
-                    let valid = if pw == confirm {
-                        Ok(())
-                    } else {
-                        Err(String::from("Passwords do not match!"))
-                    };
-                    form_ctx.write().set_field_valid("confirm_password", valid);
-                }
-                let data = form_ctx.get_submit_data();
-                link.send_message(Msg::ShowData(data));
-            });
-        Self { form_ctx , data: None }
+        let form_ctx = FormContext::new().on_change(move |form_ctx: FormContext| {
+            let pw = form_ctx.read().get_field_text("password");
+            let confirm = form_ctx.read().get_field_text("confirm_password");
+            if !confirm.is_empty() {
+                let valid = if pw == confirm {
+                    Ok(())
+                } else {
+                    Err(String::from("Passwords do not match!"))
+                };
+                form_ctx.write().set_field_valid("confirm_password", valid);
+            }
+            let data = form_ctx.get_submit_data();
+            link.send_message(Msg::ShowData(data));
+        });
+        Self {
+            form_ctx,
+            data: None,
+        }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::ShowData(data) => {
                 self.data = Some(data);
@@ -47,7 +51,8 @@ impl Component for MyForm {
             }
         }
     }
-    fn view(&self, ctx: &Context<Self>) -> Html {
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         let form_ctx = self.form_ctx.clone();
 
         let input_panel = InputPanel::new()
@@ -58,7 +63,7 @@ impl Component for MyForm {
                 Field::new()
                     .name("password")
                     .required(true)
-                    .input_type("password")
+                    .input_type("password"),
             )
             .with_field(
                 "Confirm Password",
@@ -66,43 +71,47 @@ impl Component for MyForm {
                     .name("confirm_password")
                     .required(true)
                     .submit(false)
-                    .input_type("password")
+                    .input_type("password"),
             )
             .with_field(
                 "Number1",
                 Field::new()
                     .name("number1")
                     .number(3.0, 10.0, 1.0)
-                    .default("4")
+                    .default("4"),
             )
-            .with_field(
-                "Number2 (f64)",
-                Number::<f64>::new().name("number2")
-            )
-            .with_field(
-                "Number3 (u64)",
-                Number::<u64>::new().name("number3")
-            )
-            .with_field(
-                "Number4 (i8)",
-                Number::<i8>::new().name("number4")
-            )
+            .with_field("Number2 (f64)", Number::<f64>::new().name("number2"))
+            .with_field("Number3 (u64)", Number::<u64>::new().name("number3"))
+            .with_field("Number4 (i8)", Number::<i8>::new().name("number4"))
             .with_field("Checkbox1", Checkbox::new().name("checkbox1").default(true))
-            .with_field("Checkbox2", Checkbox::new().name("checkbox2").switch(true).default(true))
+            .with_field(
+                "Checkbox2",
+                Checkbox::new().name("checkbox2").switch(true).default(true),
+            )
             .with_field("Boolean1", Boolean::new().name("boolean1").default(true))
-            .with_field("Boolean2", Boolean::new().name("boolean2").switch(true).default(true))
+            .with_field(
+                "Boolean2",
+                Boolean::new().name("boolean2").switch(true).default(true),
+            )
+            .with_field(
+                "TristateBoolean",
+                TristateBoolean::new()
+                    .name("tristate1")
+                    .submit_empty(true)
+                    .default(Tristate::Yes),
+            )
             .with_field(
                 "Combobox1",
                 Combobox::new()
                     .name("combobox1")
                     .submit_empty(true)
                     .placeholder("Please select something.")
-                //.editable(true)
+                    //.editable(true)
                     .with_item("Option 1")
                     .with_item("Option 2")
-                    .with_item("Option 3")
+                    .with_item("Option 3"),
             )
-            .with_child(html!{
+            .with_child(html! {
                 <div style="grid-column-start: 2; grid-column-end: 3">{
                     Row::new()
                         .gap(2)
@@ -120,16 +129,13 @@ impl Component for MyForm {
                 }</div>
             });
 
-
-        let form = Form::new()
-            .form_context(form_ctx)
-            .with_child(input_panel);
+        let form = Form::new().form_context(form_ctx).with_child(input_panel);
 
         let data_view = self.data.clone().map(|data| {
             let text = serde_json::to_string_pretty(&data).unwrap();
             Panel::new()
                 .title("Submit Data")
-                .with_child(html!{<div class="pwt-p-2" style="white-space: pre;">{text}</div>})
+                .with_child(html! {<div class="pwt-p-2" style="white-space: pre;">{text}</div>})
         });
 
         Panel::new()
@@ -139,7 +145,6 @@ impl Component for MyForm {
             .into()
     }
 }
-
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
