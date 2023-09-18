@@ -2,7 +2,7 @@ use std::{collections::HashSet, rc::Rc};
 
 use pwt::{
     css::{ColorScheme, Flex, Overflow},
-    props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, WidgetBuilder},
+    props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, FieldBuilder, WidgetBuilder},
     state::Selection,
     widget::{form::Field, Button, Column, Dialog, InputPanel, Row, TabBarItem, TabPanel},
 };
@@ -124,12 +124,14 @@ impl Component for PwtWizard {
                 InputPanel::new()
                     .class(Flex::Fill)
                     .padding(2)
-                    .with_custom_child(html! {{text}})
+                    .with_custom_child(html! {<div key={"warning-text"}>{text}</div>})
                     .with_field(
                         "Required Field",
-                        Field::new().on_change(move |value| {
-                            link.send_message(Msg::TextChange(i, value));
-                        }),
+                        Field::new()
+                            .name(format!("field{i}"))
+                            .on_change(move |value| {
+                                link.send_message(Msg::TextChange(i, value));
+                            }),
                     ),
             );
         }
