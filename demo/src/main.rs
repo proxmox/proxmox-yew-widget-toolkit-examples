@@ -14,7 +14,6 @@ mod gestures;
 pub use gestures::GestureDetectorDemo;
 
 mod theme;
-use pwt::widget::CatalogLoader;
 use theme::ThemeDemo;
 
 mod lorem_ipsum;
@@ -80,10 +79,10 @@ use yew_router::HashRouter;
 use pwt::prelude::*;
 use pwt::css::*;
 
-use pwt::state::{use_selection, NavigationContainer, Selection};
+use pwt::state::{use_selection, LanguageInfo, NavigationContainer, Selection};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{
-    Pane, Panel, RtlSwitcher, SelectionView, SelectionViewRenderInfo, SplitPane, ThemeLoader,
+    CatalogLoader, Pane, Panel, RtlSwitcher, SelectionView, SelectionViewRenderInfo, SplitPane, ThemeLoader,
     ThemeModeSelector, ThemeNameSelector,
 };
 
@@ -398,6 +397,12 @@ fn main() {
 
     static THEMES: &'static [&'static str] = &["Proxmox", "Desktop", "Material"];
     pwt::state::set_available_themes(THEMES);
+
+    pwt::state::set_available_languages(vec![
+        LanguageInfo::new("ar", "العربية", gettext_noop("Arabic")),
+        LanguageInfo::new("de", "Deutsch", gettext_noop("German")),
+        LanguageInfo::new("en", "English", gettext_noop("English")),
+    ]);
 
     yew::Renderer::<RoutedApp>::new().render();
 }
