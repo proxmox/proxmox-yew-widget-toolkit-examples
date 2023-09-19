@@ -1,5 +1,7 @@
+use std::rc::Rc;
+
 use pwt::prelude::*;
-use pwt::widget::{Button, Container, Panel};
+use pwt::widget::{Button, Container, Panel, LanguageSelector};
 
 use pwt::ngettext;
 
@@ -15,10 +17,15 @@ pub fn I18NDemo() -> Html {
         Callback::from(move |_| state.set(*state + 1))
     };
 
+    let languages = use_state(|| {
+        Rc::new(vec![String::from("en"), String::from("de")])
+    });
+
     Panel::new()
         .class("pwt-flex-fit")
         .border(false)
         .title(pgettext!("This is a panel title", "Internationalization with gettext"))
+        .with_tool(LanguageSelector::new((*languages).clone()))
         .with_child(
             Container::new()
                 .margin(2)

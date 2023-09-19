@@ -19,9 +19,9 @@ trunk serve --release
 Extract gettext messages with:
 
 ```
-xgettext -d demo src/*.rs -o demo.pot
-msgmerge -U demo.po demo.pot
-msgfmt demo.po -o demo.mo
+xgettext -d catalog src/*.rs -o catalog.pot
+msgmerge -U catalog-de.po catalog.pot
+msgfmt catalog-de.po -o catalog-de.mo
 ```
 
 or better:
@@ -32,4 +32,4 @@ or better:
 
 and extract messages using xtr:
 
-  xtr src/main.rs -o demo.pot
+  xtr src/main.rs -o catalog.pot

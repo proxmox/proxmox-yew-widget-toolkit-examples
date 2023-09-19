@@ -14,6 +14,7 @@ mod gestures;
 pub use gestures::GestureDetectorDemo;
 
 mod theme;
+use pwt::widget::CatalogLoader;
 use theme::ThemeDemo;
 
 mod lorem_ipsum;
@@ -366,7 +367,7 @@ fn MainMenu() -> Html {
 
 #[function_component]
 fn DemoApp() -> Html {
-    let panel = Panel::new()
+    Panel::new()
         .class(Viewport)
         .class(ColorScheme::Primary)
         //.class(ColorScheme::NeutralAlt)
@@ -379,20 +380,17 @@ fn DemoApp() -> Html {
         .with_tool(RtlSwitcher::new())
         .with_tool(ThemeNameSelector::new())
         .with_tool(ThemeModeSelector::new())
-        .with_child(html! {<MainMenu/>});
-
-    ThemeLoader::new(panel).into()
+        .with_child(html! {<MainMenu/>})
+        .into()
 }
 
 #[function_component]
 fn RoutedApp() -> Html {
-    let loaded = pwt::use_catalog("demo.mo");
-    if loaded {
-        html! { <HashRouter><DemoApp/></HashRouter> }
-    } else {
-        // Note: clear page state completly to force a redraw of the whole page
-        html!{}
-    }
+    let body = html!{<DemoApp/>};
+    let body =  ThemeLoader::new(body);
+    let body =  CatalogLoader::new(body);
+
+    html! { <HashRouter>{body}</HashRouter> }
 }
 
 fn main() {
