@@ -399,7 +399,6 @@ fn main() {
     pwt::state::set_available_themes(THEMES);
 
     pwt::state::set_available_languages(vec![
-        LanguageInfo::new("ar", "العربية", gettext_noop("Arabic")),
         LanguageInfo::new("de", "Deutsch", gettext_noop("German")),
         LanguageInfo::new("en", "English", gettext_noop("English")),
     ]);
