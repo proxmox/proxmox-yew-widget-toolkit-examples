@@ -109,21 +109,13 @@ pub fn TreeDemo() -> Html {
         .sorter(String::cmp)
         //.sort_order(false)
         //.render(|item: &String| html!{item.to_string()});
-        .on_cell_click({
-            let store = store.clone();
-            move |event: &mut DataTableMouseEvent| {
-                log::info!("CLICK TEST {}", event.record_key);
-                if let Some(mut node) = store.write().lookup_node_mut(&event.record_key) {
-                    node.set_expanded(!node.expanded());
-                }
-            }
-        })
+        .tree_column(Some(store.clone()))
         .render_cell(move |args: &mut DataTableCellRenderArgs<String>| {
             let is_leaf = args.is_leaf();
             if !is_leaf {
                 args.set_attribute("colspan", "3");
             }
-            render_tree_node(args, |record| (None, record.to_string()))
+            html! {args.record()}
         });
 
     let column2 = DataTableColumn::new("Buttons").render(|record: &String| {
