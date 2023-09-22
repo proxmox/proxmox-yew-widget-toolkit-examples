@@ -1,6 +1,8 @@
 use std::rc::Rc;
 
 use pwt::css::{Flex, Overflow};
+use pwt::props::ExtractPrimaryKey;
+use serde::Deserialize;
 use serde_json::json;
 
 use yew::prelude::*;
@@ -60,30 +62,161 @@ fn test1() {
     //assert!(*root.record() == 6);
 }
 
-fn create_tree_store() -> TreeStore<String> {
+#[derive(Deserialize, PartialEq, PartialOrd, Clone)]
+#[serde(rename_all = "kebab-case")]
+enum PveType {
+    Root,
+    Node,
+    Ct,
+    Vm,
+}
+
+#[derive(Deserialize, PartialEq, PartialOrd, Clone)]
+#[serde(rename_all = "kebab-case")]
+enum PveStatus {
+    Online,
+    Offline,
+    Running,
+    Stopped,
+}
+
+#[derive(Deserialize, PartialEq, Clone, PartialOrd)]
+struct PveTreeEntry {
+    id: String,
+    text: String,
+    #[serde(alias = "iconCls")]
+    icon_class: Option<String>,
+    #[serde(alias = "type")]
+    node_type: PveType,
+    status: Option<PveStatus>,
+}
+
+impl ExtractPrimaryKey for PveTreeEntry {
+    fn extract_key(&self) -> Key {
+        Key::from(self.id.clone())
+    }
+}
+
+impl PveTreeEntry {
+    fn icon(&self) -> &'static str {
+        match self.node_type {
+            PveType::Root => "fa-server",
+            PveType::Node => "fa-building",
+            PveType::Ct => "fa-cube",
+            PveType::Vm => "fa-desktop",
+        }
+    }
+
+    fn style(&self) -> &'static str {
+        match self.status {
+            Some(PveStatus::Online) => "",
+            Some(PveStatus::Offline) => "color: #FF6C59;",
+            Some(PveStatus::Running) => "color: #21BF4B;",
+            Some(PveStatus::Stopped) => "",
+            None => "",
+        }
+    }
+}
+
+fn create_tree_store() -> TreeStore<PveTreeEntry> {
     use pwt::state::SlabTree;
 
     let tree_data = json!({
-        "record": "Redord1",
+        "record": {
+            "id": "root",
+            "text": "Datacenter",
+            "type": "root",
+        },
         "expanded": true,
-        "children": [
-            { "record": "Redord2" },
-            {
-                "record": "Redord3",
-                "expanded": false,
-                "children": [
-                    { "record": "Redord3-1" },
-                    { "record": "Redord3-2" },
-                    { "record": "Redord3-3" },
-                ],
+
+        "children": [{
+            "record":  {
+                "id": "nodes/pve-node-1",
+                "text": "pve-node-1",
+                "status": "online",
+                "type": "node"
             },
-            { "record": "Redord4" },
-        ],
+
+            "expanded": true,
+
+            "children": [{
+                "record":  {
+                    "id": "vms/1000",
+                    "text": "VM 1000",
+                    "status": "running",
+                    "type": "vm"
+                },
+            },
+            {
+                "record":  {
+                    "id": "ct/500",
+                    "text": "CT 500",
+                    "status": "stopped",
+                    "type": "ct"
+                },
+            },
+            {
+                "record":  {
+                    "id": "vms/100",
+                    "text": "VM 100",
+                    "status": "stopped",
+                    "type": "vm"
+                },
+            }],
+        },
+        {
+            "record":  {
+                "id": "nodes/pve-node-2",
+                "text": "pve-node-2",
+                "status": "online",
+                "type": "node"
+            },
+
+            "expanded": true,
+
+            "children": [{
+                "record":  {
+                    "id": "vms/102",
+                    "text": "VM 102",
+                    "status": "stopped",
+                    "type": "vm"
+                },
+            },
+            {
+                "record":  {
+                    "id": "ct/103",
+                    "text": "CT 103",
+                    "status": "running",
+                    "type": "ct"
+                },
+            },
+            {
+                "record":  {
+                    "id": "ct/104",
+                    "text": "CT 100",
+                    "status": "running",
+                    "type": "ct"
+                },
+            }],
+        },{
+            "record": {
+                "id": "nodes/pve-node-3",
+                "text": "pve-node-3",
+                "status": "offline",
+                "type": "node"
+            }
+        }]
     });
 
-    let tree_root: SlabTree<String> = serde_json::from_value(tree_data).unwrap();
+    let tree_root: SlabTree<PveTreeEntry> = match serde_json::from_value(tree_data) {
+        Ok(root) => root,
+        Err(err) => {
+            log::error!("error during deserialize: {err}");
+            return TreeStore::new();
+        }
+    };
 
-    let tree: TreeStore<String> = TreeStore::with_extract_key(|d: &String| Key::from(d.clone()));
+    let tree: TreeStore<PveTreeEntry> = TreeStore::new();
 
     tree.write().set_root_tree(tree_root);
     tree.write()
@@ -106,69 +239,83 @@ pub fn TreeDemo() -> Html {
 
     let header1 = DataTableColumn::new("Record")
         .fixed(200)
-        .sorter(String::cmp)
         //.sort_order(false)
         //.render(|item: &String| html!{item.to_string()});
         .tree_column(Some(store.clone()))
-        .render_cell(move |args: &mut DataTableCellRenderArgs<String>| {
-            let is_leaf = args.is_leaf();
-            if !is_leaf {
-                args.set_attribute("colspan", "3");
+        .render_cell(move |args: &mut DataTableCellRenderArgs<PveTreeEntry>| {
+            match args.record().node_type {
+                PveType::Root | PveType::Node => {
+                    args.set_attribute("colspan", "3");
+                }
+                _ => {}
             }
-            html! {args.record()}
+            let class = classes!(args.record().icon(), "fa", "fa-fw", "pwt-pe-2");
+            let style = args.record().style();
+            html! {<><i {class} {style} /> {args.record().text.to_string()}</>}
         });
 
-    let column2 = DataTableColumn::new("Buttons").render(|record: &String| {
+    let column2 = DataTableColumn::new("Buttons").render(|record: &PveTreeEntry| {
+        let running = record.status == Some(PveStatus::Running);
         Row::new()
             .gap(2)
             .class("pwt-justify-content-between")
-            .with_child(Button::new("B1").tabindex(-1).onclick({
-                let record = record.clone();
-                move |_| log::info!("Pressed B1 on '{record}'")
-            }))
-            .with_child(Button::new("B2").tabindex(-1).onclick({
-                let record = record.clone();
-                move |_| log::info!("Pressed B2 on '{record}'")
-            }))
-            .with_child(Button::new("B3").tabindex(-1).onclick({
-                let record = record.clone();
-                move |_| log::info!("Pressed B3 on '{record}'")
-            }))
+            .with_child(
+                Button::new("Start")
+                    .icon_class("fa fa-play")
+                    .disabled(running)
+                    .tabindex(-1)
+                    .onclick({
+                        let record = record.clone();
+                        move |_| log::info!("Pressed Start on '{}'", record.text)
+                    }),
+            )
+            .with_child(
+                Button::new("Stop")
+                    .icon_class("fa fa-stop")
+                    .disabled(!running)
+                    .tabindex(-1)
+                    .onclick({
+                        let record = record.clone();
+                        move |_| log::info!("Pressed Stop on '{}'", record.text)
+                    }),
+            )
+            .with_child(
+                Button::new("Shutdown")
+                    .icon_class("fa fa-power-off")
+                    .disabled(!running)
+                    .tabindex(-1)
+                    .onclick({
+                        let record = record.clone();
+                        move |_| log::info!("Pressed Shutdown on '{}'", record.text)
+                    }),
+            )
             .into()
     });
 
-    let column3 = DataTableColumn::new("Actions").render(|record: &String| {
+    let column3 = DataTableColumn::new("Actions").render(|record: &PveTreeEntry| {
         Row::new()
             .gap(2)
             .class("pwt-justify-content-evenly")
             .with_child(
-                ActionIcon::new("fa fa-bold")
-                    .aria_label("bold")
+                ActionIcon::new("fa fa-history")
+                    .aria_label("snapshot")
                     .on_activate({
                         let record = record.clone();
-                        move |_| log::info!("Pressed Icon 'bold' on '{record}'")
+                        move |_| log::info!("Pressed Icon 'snapshot' on '{}'", record.text)
                     }),
             )
             .with_child(
-                ActionIcon::new("fa fa-italic")
-                    .aria_label("italic")
+                ActionIcon::new("fa fa-terminal")
+                    .aria_label("console")
                     .on_activate({
                         let record = record.clone();
-                        move |_| log::info!("Pressed Icon 'italic' on '{record}'")
-                    }),
-            )
-            .with_child(
-                ActionIcon::new("fa fa-font")
-                    .aria_label("font")
-                    .on_activate({
-                        let record = record.clone();
-                        move |_| log::info!("Pressed Icon 'font' on '{record}'")
+                        move |_| log::info!("Pressed Icon 'console' on '{}'", record.text)
                     }),
             )
             .into()
     });
 
-    let columns: Rc<Vec<DataTableHeader<String>>> = Rc::new(vec![
+    let columns: Rc<Vec<DataTableHeader<PveTreeEntry>>> = Rc::new(vec![
         header0.clone().into(),
         header1.clone().into(),
         column2.clone().into(),
@@ -180,9 +327,6 @@ pub fn TreeDemo() -> Html {
         .class(Overflow::Auto)
         .margin(2)
         .border(true)
-        .row_render_callback(move |args: &mut DataTableRowRenderArgs<String>| {
-            args.set_attribute("style", "color:red;");
-        })
         .bordered(true)
         .into()
 }
