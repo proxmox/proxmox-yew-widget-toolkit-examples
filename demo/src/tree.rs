@@ -9,22 +9,18 @@ use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 //use pwt::props::Selection2;
-use pwt::state::{TreeStore, use_tree_store};
-use pwt::widget::{ActionIcon, Button, Row};
+use pwt::state::{use_tree_store, TreeStore};
 use pwt::widget::data_table::*;
+use pwt::widget::{ActionIcon, Button, Row};
 
 fn test0() {
     use pwt::state::Store;
 
-    let store: Store<usize> = Store::with_extract_key(
-        |d: &usize| Key::from(*d)
-    );
+    let store: Store<usize> = Store::with_extract_key(|d: &usize| Key::from(*d));
 
-
-    store.write().set_data(vec![4,1,3,2]);
+    store.write().set_data(vec![4, 1, 3, 2]);
 
     //let second = &store.read()[1];
-
 
     for item in store.read().iter() {
         log::info!("GOT ITEM {}", item);
@@ -41,16 +37,13 @@ fn test0() {
     for (_cursor, node) in store.filtered_data() {
         log::info!("GOT node {}", *node.record());
     }
-
 }
 
 fn test1() {
+    let tree: TreeStore<usize> = TreeStore::with_extract_key(|d: &usize| Key::from(*d));
 
-    let tree: TreeStore<usize> = TreeStore::with_extract_key(
-        |d: &usize| Key::from(*d)
-    );
-
-    { // limit scope
+    {
+        // limit scope
         let mut tree = tree.write();
 
         let mut root = tree.set_root(5);
@@ -62,10 +55,9 @@ fn test1() {
         // assert!(*root.record() == 6);
     }
 
-        //let mut root: Box<dyn DataNode<usize>> = Box::new(root);
+    //let mut root: Box<dyn DataNode<usize>> = Box::new(root);
     //*root.record() = 6;
     //assert!(*root.record() == 6);
-
 }
 
 fn create_tree_store() -> TreeStore<String> {
@@ -91,18 +83,18 @@ fn create_tree_store() -> TreeStore<String> {
 
     let tree_root: SlabTree<String> = serde_json::from_value(tree_data).unwrap();
 
-    let tree: TreeStore<String> = TreeStore::with_extract_key(
-        |d: &String| Key::from(d.clone())
-    );
+    let tree: TreeStore<String> = TreeStore::with_extract_key(|d: &String| Key::from(d.clone()));
 
     tree.write().set_root_tree(tree_root);
-    tree.write().root_mut().unwrap().visit_mut(&mut |node| node.set_expanded(true));
+    tree.write()
+        .root_mut()
+        .unwrap()
+        .visit_mut(&mut |node| node.set_expanded(true));
     tree
 }
 
 #[function_component]
 pub fn TreeDemo() -> Html {
-
     if false {
         test0();
         test1();
@@ -134,70 +126,55 @@ pub fn TreeDemo() -> Html {
             render_tree_node(args, |record| (None, record.to_string()))
         });
 
+    let column2 = DataTableColumn::new("Buttons").render(|record: &String| {
+        Row::new()
+            .gap(2)
+            .class("pwt-justify-content-between")
+            .with_child(Button::new("B1").tabindex(-1).onclick({
+                let record = record.clone();
+                move |_| log::info!("Pressed B1 on '{record}'")
+            }))
+            .with_child(Button::new("B2").tabindex(-1).onclick({
+                let record = record.clone();
+                move |_| log::info!("Pressed B2 on '{record}'")
+            }))
+            .with_child(Button::new("B3").tabindex(-1).onclick({
+                let record = record.clone();
+                move |_| log::info!("Pressed B3 on '{record}'")
+            }))
+            .into()
+    });
 
-    let column2 = DataTableColumn::new("Buttons")
-        .render(|record: &String| {
-            Row::new()
-                .gap(2)
-                .class("pwt-justify-content-between")
-                .with_child(
-                    Button::new("B1")
-                        .tabindex(-1)
-                        .onclick({
-                            let record = record.clone();
-                            move |_| log::info!("Pressed B1 on '{record}'")
-                        })
-                )
-                .with_child(
-                    Button::new("B2")
-                        .tabindex(-1)
-                        .onclick({
-                            let record = record.clone();
-                            move |_| log::info!("Pressed B2 on '{record}'")
-                        })
-                )
-                .with_child(
-                    Button::new("B3")
-                        .tabindex(-1)
-                        .onclick({
-                            let record = record.clone();
-                            move |_| log::info!("Pressed B3 on '{record}'")
-                        })
-                )
-                .into()
-        });
-
-    let column3 = DataTableColumn::new("Actions")
-        .render(|record: &String| {
-            Row::new()
-                .gap(2)
-                .class("pwt-justify-content-evenly")
-                .with_child(
-                    ActionIcon::new("fa fa-bold")
-                        .aria_label("bold")
-                        .on_activate({
-                            let record = record.clone();
-                            move |_| log::info!("Pressed Icon 'bold' on '{record}'")
-                        })
-                )
-                .with_child(
-                    ActionIcon::new("fa fa-italic")
-                        .aria_label("italic")
-                        .on_activate({
-                            let record = record.clone();
-                            move |_| log::info!("Pressed Icon 'italic' on '{record}'")
-                        })
-                )
-                .with_child(
-                    ActionIcon::new("fa fa-font")
-                        .aria_label("font")
-                        .on_activate({
-                            let record = record.clone();
-                            move |_| log::info!("Pressed Icon 'font' on '{record}'")
-                        })
-                )
-                .into()
-        });
+    let column3 = DataTableColumn::new("Actions").render(|record: &String| {
+        Row::new()
+            .gap(2)
+            .class("pwt-justify-content-evenly")
+            .with_child(
+                ActionIcon::new("fa fa-bold")
+                    .aria_label("bold")
+                    .on_activate({
+                        let record = record.clone();
+                        move |_| log::info!("Pressed Icon 'bold' on '{record}'")
+                    }),
+            )
+            .with_child(
+                ActionIcon::new("fa fa-italic")
+                    .aria_label("italic")
+                    .on_activate({
+                        let record = record.clone();
+                        move |_| log::info!("Pressed Icon 'italic' on '{record}'")
+                    }),
+            )
+            .with_child(
+                ActionIcon::new("fa fa-font")
+                    .aria_label("font")
+                    .on_activate({
+                        let record = record.clone();
+                        move |_| log::info!("Pressed Icon 'font' on '{record}'")
+                    }),
+            )
+            .into()
+    });
 
     let columns: Rc<Vec<DataTableHeader<String>>> = Rc::new(vec![
         header0.clone().into(),
