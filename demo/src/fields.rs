@@ -1,5 +1,5 @@
 use pwt::prelude::*;
-use pwt::widget::form::{Checkbox, Combobox, Field, Form, Tristate, TristateBoolean};
+use pwt::widget::form::{Checkbox, Combobox, Field, Form, TextArea, Tristate, TristateBoolean};
 use pwt::widget::{Container, InputPanel};
 
 fn demo_input_panel() -> Html {
@@ -27,7 +27,10 @@ fn demo_input_panel() -> Html {
             Checkbox::new().disabled(true).default(true),
         )
         .with_field("Switch", Checkbox::new().switch(true))
-        .with_field("TristateBoolean", TristateBoolean::new().default(Tristate::Yes))
+        .with_field(
+            "TristateBoolean",
+            TristateBoolean::new().default(Tristate::Yes),
+        )
         .with_field(
             "Radio Group Option1",
             Checkbox::radio().name("g1").value("opt1"),
@@ -48,6 +51,10 @@ fn demo_input_panel() -> Html {
                 .with_item("Item 2"),
         )
         .with_field("Long Combobox", long_combo)
+        .with_field(
+            "TextArea",
+            TextArea::new().placeholder("Type some text here.")
+        )
         .into()
 }
 
