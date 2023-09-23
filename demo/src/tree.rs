@@ -241,7 +241,7 @@ pub fn TreeDemo() -> Html {
         .fixed(200)
         //.sort_order(false)
         //.render(|item: &String| html!{item.to_string()});
-        .tree_column(Some(store.clone()))
+        .tree_column(store.clone())
         .render_cell(move |args: &mut DataTableCellRenderArgs<PveTreeEntry>| {
             match args.record().node_type {
                 PveType::Root | PveType::Node => {
