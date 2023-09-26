@@ -134,6 +134,7 @@ impl Component for WidgetColumnGrid {
         };
 
         Panel::new()
+            .border(true)
             .title("Dynamic Selection Grid")
             .with_child(
                 Column::new()

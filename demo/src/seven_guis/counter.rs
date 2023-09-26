@@ -12,6 +12,7 @@ pub fn Counter() -> Html {
 
     Row::new().with_child(
         Panel::new()
+            .border(true)
             .title("Counter")
             .with_child(
                 Row::new()

@@ -157,6 +157,7 @@ impl Component for FlightBooker {
 
         Row::new().with_child(
             Panel::new()
+                .border(true)
                 .title("Flight Booker")
                 .with_child(body)
         ).into()

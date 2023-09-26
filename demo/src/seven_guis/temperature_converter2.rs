@@ -73,6 +73,7 @@ impl Component for TemperatureConverter2 {
 
         Row::new().with_child(
             Panel::new()
+                .border(true)
                 .title("Temperature Converter (FormContext)")
                 .with_child(body)
         ).into()

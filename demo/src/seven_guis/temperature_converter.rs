@@ -61,6 +61,7 @@ impl Component for TemperatureConverter {
 
         Row::new().with_child(
             Panel::new()
+                .border(true)
                 .title("Temperature Converter (Controlled)")
                 .with_child(body)
         ).into()

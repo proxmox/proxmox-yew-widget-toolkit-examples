@@ -36,6 +36,7 @@ fn panel_with_menu_button() -> Html {
     let text = "Menu buttons are useful inside toolbars.";
 
     Panel::new()
+        .border(true)
         .title("Menu Button Example")
         .with_child(toolbar)
         .with_child(html! {<p class="pwt-p-2">{text}</p>})
@@ -116,6 +117,7 @@ fn panel_with_menubar() -> Html {
     values.";
 
     Panel::new()
+        .border(true)
         .title("Menubar Example")
         .with_child(
             Form::new()

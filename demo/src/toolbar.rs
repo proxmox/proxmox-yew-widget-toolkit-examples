@@ -40,7 +40,6 @@ pub fn ToolbarDemo() -> Html {
     Column::new()
         .class(Flex::Fill)
         .class(Overflow::Auto)
-        .padding(2)
         .with_child(panel)
         .into()
 }

@@ -1,8 +1,7 @@
-use pwt::{
-    css::ColorScheme,
-    props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, WidgetBuilder},
-    widget::{Button, Panel, Row},
-};
+use pwt::prelude::*;
+use pwt::css::ColorScheme;
+use pwt::widget::{Button, Panel, Row};
+
 use web_sys::Element;
 use yew::{AttrValue, Component, DragEvent, TargetCast};
 
@@ -165,6 +164,7 @@ impl Component for DragDropList {
         }
 
         Panel::new()
+            .border(true)
             .title("Drag and Drop Items")
             .with_child(row)
             .into()

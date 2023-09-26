@@ -13,6 +13,7 @@ fn mini_scoll_demo1() -> Html {
     }
 
     Panel::new()
+        .border(true)
         .title("MiniScroll mode 'MiniScrollMode::Native' (default)")
         .with_child(MiniScroll::new(content))
         .into()
@@ -26,6 +27,7 @@ fn mini_scoll_demo2() -> Html {
     }
 
     Panel::new()
+        .border(true)
         .title("MiniScroll mode 'MiniScrollMode::Arrow'")
         .with_child(MiniScroll::new(content).scroll_mode(MiniScrollMode::Arrow))
         .into()
@@ -33,6 +35,7 @@ fn mini_scoll_demo2() -> Html {
 
 fn load_mask_demo() -> Html {
     Panel::new()
+        .border(true)
         .title("Load Mask")
         .with_child(
             Mask::new(html! {
@@ -47,6 +50,7 @@ fn load_mask_demo() -> Html {
 
 fn load_with_progress_demo() -> Html {
     Panel::new()
+        .border(true)
         .title("Use progress bar as bottom border")
         .with_child(Progress::new())
         .with_child(html! {

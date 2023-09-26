@@ -97,6 +97,7 @@ fn box_panel(_: &SelectionViewRenderInfo) -> Html {
 
         panel.add_child(
             Panel::new()
+                .border(true)
                 .class("pwt-size-fit-content")
                 .class(*scheme)
                 .title(format!("Color scheme '{:?}'", scheme))

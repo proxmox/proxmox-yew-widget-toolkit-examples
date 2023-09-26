@@ -92,6 +92,7 @@ pub fn AlignDemo() -> Html {
         .with_flex_spacer()
         .with_child(
             Panel::new()
+                .border(true)
                 .title("Floating")
                 .attribute("style", "display:none")
                 .with_child(html!(<div class="pwt-p-2">{ "Content" }</div>))

@@ -189,6 +189,7 @@ impl Component for CircleDrawer {
             .then(|| self.create_resize_dialog(ctx));
 
         Panel::new()
+            .border(true)
             .title("Circle Drawer")
             .with_child(self.create_toolbar(ctx))
             .with_child(
