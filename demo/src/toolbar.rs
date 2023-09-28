@@ -1,20 +1,21 @@
+use gloo_timers::callback::Timeout;
 use pwt::css::{Flex, Overflow};
-use yew::prelude::*;
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Button, Panel, Toolbar, MiniScrollMode};
-use pwt::widget::menu::{Menu, MenuButton, MenuItem};
 use pwt::widget::form::Checkbox;
+use pwt::widget::menu::{Menu, MenuButton, MenuItem};
+use pwt::widget::{Button, Column, MiniScrollMode, Panel, Toolbar};
 
 use crate::LoremIpsum;
 
 #[function_component]
 pub fn ToolbarDemo() -> Html {
+    let reload = use_state(|| false);
 
     let menu_button = MenuButton::new("MyMenu").show_arrow(true).menu(
         Menu::new()
             .with_item(MenuItem::new("Item1"))
-            .with_item(MenuItem::new("Item2"))
+            .with_item(MenuItem::new("Item2")),
     );
 
     let toolbar = Toolbar::new()
@@ -29,13 +30,23 @@ pub fn ToolbarDemo() -> Html {
         .with_child(Button::new("Button6"))
         .with_child(Button::new("Button7"))
         .with_flex_spacer()
-        .with_child(menu_button)
-        ;
+        .with_child(Button::refresh(*reload).onclick({
+            let reload = reload.clone();
+            move |_| {
+                reload.set(true);
+                let reload = reload.clone();
+                Timeout::new(1000, move || {
+                    reload.set(false);
+                })
+                .forget();
+            }
+        }))
+        .with_child(menu_button);
 
     let panel = Panel::new()
         .title("A panel with a toolbar")
         .with_child(toolbar)
-        .with_child(html!{<LoremIpsum/>});
+        .with_child(html! {<LoremIpsum/>});
 
     Column::new()
         .class(Flex::Fill)
