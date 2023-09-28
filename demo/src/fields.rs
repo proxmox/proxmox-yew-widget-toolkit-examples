@@ -13,6 +13,10 @@ fn demo_input_panel() -> Html {
             "Textfield (primary)",
             Field::new().class("pwt-scheme-primary"),
         )
+        .with_field(
+            "Textfield (with placeholder)",
+            Field::new().placeholder("Default"),
+        )
         .with_field("Password", Field::new().input_type("password"))
         .with_field("Range field", Field::new().input_type("range"))
         .with_field("Numberfield", Field::new().input_type("number"))
