@@ -14,8 +14,10 @@ fn demo_input_panel() -> Html {
             Field::new().class("pwt-scheme-primary"),
         )
         .with_field(
-            "Textfield (with placeholder)",
-            Field::new().placeholder("Default"),
+            "Textfield (with placeholder and icon)",
+            Field::new()
+                .with_icon("fa fa-search", true)
+                .placeholder("Search"),
         )
         .with_field("Password", Field::new().input_type("password"))
         .with_field("Range field", Field::new().input_type("range"))
@@ -54,10 +56,18 @@ fn demo_input_panel() -> Html {
                 .with_item("Item 1")
                 .with_item("Item 2"),
         )
+        .with_field(
+            "Combobox (with icon)",
+            Combobox::new()
+                .placeholder("Select a user")
+                .with_icon("fa fa-user", false)
+                .with_item("Admin")
+                .with_item("User"),
+        )
         .with_field("Long Combobox", long_combo)
         .with_field(
             "TextArea",
-            TextArea::new().placeholder("Type some text here.")
+            TextArea::new().placeholder("Type some text here."),
         )
         .into()
 }
