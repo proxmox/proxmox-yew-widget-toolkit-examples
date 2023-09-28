@@ -12,7 +12,7 @@ use pwt::prelude::*;
 
 //use pwt::props::Selection2;
 use pwt::state::{use_tree_store, TreeStore};
-use pwt::widget::data_table::*;
+use pwt::widget::{data_table::*, Tooltip};
 use pwt::widget::{ActionIcon, Button, Row};
 
 fn test0() {
@@ -297,20 +297,26 @@ pub fn TreeDemo() -> Html {
             .gap(2)
             .class("pwt-justify-content-evenly")
             .with_child(
-                ActionIcon::new("fa fa-history")
-                    .aria_label("snapshot")
-                    .on_activate({
-                        let record = record.clone();
-                        move |_| log::info!("Pressed Icon 'snapshot' on '{}'", record.text)
-                    }),
+                Tooltip::new(
+                    ActionIcon::new("fa fa-history")
+                        .aria_label("snapshot")
+                        .on_activate({
+                            let record = record.clone();
+                            move |_| log::info!("Pressed Icon 'snapshot' on '{}'", record.text)
+                        }),
+                )
+                .tip(tr!("Snapshot")),
             )
             .with_child(
-                ActionIcon::new("fa fa-terminal")
-                    .aria_label("console")
-                    .on_activate({
-                        let record = record.clone();
-                        move |_| log::info!("Pressed Icon 'console' on '{}'", record.text)
-                    }),
+                Tooltip::new(
+                    ActionIcon::new("fa fa-terminal")
+                        .aria_label("console")
+                        .on_activate({
+                            let record = record.clone();
+                            move |_| log::info!("Pressed Icon 'console' on '{}'", record.text)
+                        }),
+                )
+                .tip(tr!("Console")),
             )
             .into()
     });
@@ -327,6 +333,8 @@ pub fn TreeDemo() -> Html {
         .class(Overflow::Auto)
         .margin(2)
         .border(true)
-        .bordered(true)
+        .bordered(false)
+        .borderless(true)
+        .hover(true)
         .into()
 }
