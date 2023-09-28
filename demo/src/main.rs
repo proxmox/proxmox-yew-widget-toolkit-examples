@@ -76,14 +76,14 @@ pub use examples::ExampleWidgets;
 use yew::prelude::*;
 use yew_router::HashRouter;
 
-use pwt::prelude::*;
 use pwt::css::*;
+use pwt::prelude::*;
 
 use pwt::state::{use_selection, LanguageInfo, NavigationContainer, Selection};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{
-    CatalogLoader, Pane, Panel, RtlSwitcher, SelectionView, SelectionViewRenderInfo, SplitPane, ThemeLoader,
-    ThemeModeSelector, ThemeNameSelector,
+    CatalogLoader, Pane, Panel, RtlSwitcher, SelectionView, SelectionViewRenderInfo, SplitPane,
+    ThemeLoader, ThemeModeSelector, ThemeNameSelector,
 };
 
 fn register_view(
@@ -120,20 +120,22 @@ fn MainMenu() -> Html {
 
     let mut menu = Menu::new();
 
+    menu.add_section_header("Elements");
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Buttons",
+        "button_panel",
+        |_| html! {<ButtonsDemo/>},
+    );
+
     register_view(
         &mut menu,
         &mut content,
         "Cards",
         "cards_panel",
         |_| html! {<CardsDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Gestures",
-        "gesture_panel",
-        |_| html! {<GestureDetectorDemo/>},
     );
 
     register_view(
@@ -147,17 +149,41 @@ fn MainMenu() -> Html {
     register_view(
         &mut menu,
         &mut content,
-        "7GUIs",
-        "7guis_panel",
-        |_| html! {<SevenGuisDemo/>},
+        "DataTable",
+        "datatable_panel",
+        |_| html! {<DataTableDemo/>},
     );
 
     register_view(
         &mut menu,
         &mut content,
-        "Internationalization",
-        "i18n_panel",
-        |_| html! {<I18NDemo/>},
+        "Dialogs",
+        "dialog_panel",
+        |_| html! {<DialogDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Fields",
+        "forms_panel",
+        |_| html! {<FieldsDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Menus",
+        "menu_panel",
+        |_| html! {<MenuDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Miscellaneous",
+        "miscellaneous_panel",
+        |_| html! {<MiscellaneousDemo/>},
     );
 
     register_view(
@@ -179,66 +205,13 @@ fn MainMenu() -> Html {
     register_view(
         &mut menu,
         &mut content,
-        "Tab Panel",
-        "tab_panel",
-        |_| html! {<TabPanelDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Fields",
-        "forms_panel",
-        |_| html! {<FieldsDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Buttons",
-        "button_panel",
-        |_| html! {<ButtonsDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "DataTable",
-        "datatable_panel",
-        |_| html! {<DataTableDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
         "Tree",
         "tree_panel",
         |_| html! {<TreeDemo/>},
     );
 
-    register_view(
-        &mut menu,
-        &mut content,
-        "Miscellaneous",
-        "miscellaneous_panel",
-        |_| html! {<MiscellaneousDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Movies",
-        "movies_panel",
-        |_| html! {<MovieDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Menus",
-        "menu_panel",
-        |_| html! {<MenuDemo/>},
-    );
+    menu.add_spacer();
+    menu.add_section_header("Container/Layout");
 
     register_view(
         &mut menu,
@@ -251,49 +224,9 @@ fn MainMenu() -> Html {
     register_view(
         &mut menu,
         &mut content,
-        "Navigation Rail",
-        "nav_rail_panel",
-        |_| html! {<NavigationRailDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Navigation Bar",
-        "nav_bar_panel",
-        |_| html! {<NavigationBarDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Application Bar",
-        "app_bar_panel",
-        |_| html! {<ApplicationBarDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Dialogs",
-        "dialog_panel",
-        |_| html! {<DialogDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Alignment",
-        "align_panel",
-        |_| html! {<AlignDemo/>},
-    );
-
-    register_view(
-        &mut menu,
-        &mut content,
-        "Theme",
-        "theme_panel",
-        |_| html! {<ThemeDemo/>},
+        "Tab Panel",
+        "tab_panel",
+        |_| html! {<TabPanelDemo/>},
     );
 
     let mut submenu = Menu::new();
@@ -339,12 +272,93 @@ fn MainMenu() -> Html {
         submenu,
     );
 
+    menu.add_spacer();
+    menu.add_section_header("Mobile");
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Gestures",
+        "gesture_panel",
+        |_| html! {<GestureDetectorDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Navigation Rail",
+        "nav_rail_panel",
+        |_| html! {<NavigationRailDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Navigation Bar",
+        "nav_bar_panel",
+        |_| html! {<NavigationBarDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Application Bar",
+        "app_bar_panel",
+        |_| html! {<ApplicationBarDemo/>},
+    );
+
+    menu.add_spacer();
+    menu.add_section_header("Utilities");
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Alignment",
+        "align_panel",
+        |_| html! {<AlignDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Internationalization",
+        "i18n_panel",
+        |_| html! {<I18NDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Theme",
+        "theme_panel",
+        |_| html! {<ThemeDemo/>},
+    );
+
+    menu.add_spacer();
+    menu.add_section_header("Complex Examples");
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "7GUIs",
+        "7guis_panel",
+        |_| html! {<SevenGuisDemo/>},
+    );
+
     register_view(
         &mut menu,
         &mut content,
         "Example Widgets",
         "example_widgets",
         |_| html! {<ExampleWidgets/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Movies",
+        "movies_panel",
+        |_| html! {<MovieDemo/>},
     );
 
     let drawer = NavigationDrawer::new(menu)
@@ -385,9 +399,9 @@ fn DemoApp() -> Html {
 
 #[function_component]
 fn RoutedApp() -> Html {
-    let body = html!{<DemoApp/>};
-    let body =  ThemeLoader::new(body);
-    let body =  CatalogLoader::new(body);
+    let body = html! {<DemoApp/>};
+    let body = ThemeLoader::new(body);
+    let body = CatalogLoader::new(body);
 
     html! { <HashRouter>{body}</HashRouter> }
 }
