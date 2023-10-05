@@ -1,6 +1,11 @@
+use std::rc::Rc;
+
 use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
+use pwt::props::ExtractPrimaryKey;
+use pwt::state::Store;
+use pwt::widget::data_table::{DataTable, DataTableColumn, DataTableHeader};
 use pwt::{
     props::{ContainerBuilder, EventSubscriber, WidgetBuilder},
     widget::{AlertDialog, Button, Column, Dialog, Row},
@@ -14,11 +19,45 @@ enum ViewState {
     ShowDialog,
     ShowResizableDialog,
     ShowAlert,
+    ShowGridDialog,
+}
+
+#[derive(PartialEq, Clone)]
+struct Data {
+    name: AttrValue,
+    value: AttrValue,
+}
+
+impl ExtractPrimaryKey for Data {
+    fn extract_key(&self) -> yew::virtual_dom::Key {
+        yew::virtual_dom::Key::from(self.name.to_string())
+    }
+}
+
+fn get_columns() -> Rc<Vec<DataTableHeader<Data>>> {
+    Rc::new(vec![
+        DataTableColumn::new("Name")
+            .get_property(|r: &Data| &r.name)
+            .sort_order(true)
+            .into(),
+        DataTableColumn::new("Value")
+            .get_property(|r: &Data| &r.value)
+            .into(),
+    ])
 }
 
 #[function_component]
 pub fn DialogDemo() -> Html {
     let view_state = use_state(|| ViewState::Main);
+    let mut data = Vec::with_capacity(200);
+    for i in 0..200 {
+        data.push(Data {
+            name: format!("Entry {i}").into(),
+            value: format!("Value {i}").into(),
+        });
+    }
+    let store = Store::new();
+    store.set_data(data);
 
     let close_callback = use_callback((), {
         let view_state = view_state.clone();
@@ -39,74 +78,80 @@ pub fn DialogDemo() -> Html {
         .with_child(Button::new("Show Alert").onclick({
             let view_state = view_state.clone();
             move |_| view_state.set(ViewState::ShowAlert)
+        }))
+        .with_child(Button::new("Show Grid Dialog").onclick({
+            let view_state = view_state.clone();
+            move |_| view_state.set(ViewState::ShowGridDialog)
         }));
 
-    match *view_state {
-        ViewState::Main => { /* do nothing */ }
-        ViewState::ShowAlert => {
-            row.add_child(
-                AlertDialog::new("This is an alert!")
-                    .on_close(close_callback)
-                    .draggable(true),
-            );
+    let child: Html = match *view_state {
+        ViewState::Main => {
+            /* do nothing */
+            html! {}
         }
-        ViewState::ShowDialog => {
-            row.add_child(
-                Dialog::new("Example Dialog")
-                    .draggable(true)
-                    .on_close(close_callback)
-                    .style("min-width: 200px;")
+        ViewState::ShowAlert => AlertDialog::new("This is an alert!")
+            .on_close(close_callback)
+            .draggable(true)
+            .into(),
+        ViewState::ShowDialog => Dialog::new("Example Dialog")
+            .draggable(true)
+            .on_close(close_callback)
+            .style("min-width: 200px;")
+            .with_child(
+                Column::new()
+                    .class(Flex::Fill)
+                    .class(Overflow::Auto)
+                    .with_child(html! {
+                        <div class="pwt-overflow-auto"><LoremIpsum/></div>
+                    })
                     .with_child(
-                        Column::new()
-                            .class(Flex::Fill)
-                            .class(Overflow::Auto)
-                            .with_child(html! {
-                                <div class="pwt-overflow-auto"><LoremIpsum/></div>
-                            })
-                            .with_child(
-                                Row::new()
-                                    .padding(2)
-                                    .gap(2)
-                                    .with_flex_spacer()
-                                    .class("pwt-bg-color-neutral-container-alt")
-                                    .with_child(Button::new("OK").autofocus(true).onclick({
-                                        let view_state = view_state.clone();
-                                        move |_| view_state.set(ViewState::Main)
-                                    })),
-                            ),
-                    ),
-            );
-        }
-        ViewState::ShowResizableDialog => {
-            row.add_child(
-                Dialog::new("Example Resizable Dialog")
-                    .draggable(true)
-                    .resizable(true)
-                    .on_close(close_callback)
-                    .style("min-width: 200px; min-height: 50px;")
-                    .with_child(
-                        Column::new()
-                            .class(Flex::Fill)
-                            .class(Overflow::Auto)
-                            .with_child(html! {
-                                <div class="pwt-overflow-auto"><LoremIpsum/></div>
-                            })
+                        Row::new()
+                            .padding(2)
+                            .gap(2)
                             .with_flex_spacer()
-                            .with_child(
-                                Row::new()
-                                    .padding(2)
-                                    .gap(2)
-                                    .with_flex_spacer()
-                                    .class("pwt-bg-color-neutral-container-alt")
-                                    .with_child(Button::new("OK").autofocus(true).onclick({
-                                        let view_state = view_state.clone();
-                                        move |_| view_state.set(ViewState::Main)
-                                    })),
-                            ),
+                            .class("pwt-bg-color-neutral-container-alt")
+                            .with_child(Button::new("OK").autofocus(true).onclick({
+                                let view_state = view_state.clone();
+                                move |_| view_state.set(ViewState::Main)
+                            })),
                     ),
-            );
-        }
-    }
+            )
+            .into(),
+        ViewState::ShowResizableDialog => Dialog::new("Example Resizable Dialog")
+            .draggable(true)
+            .resizable(true)
+            .on_close(close_callback)
+            .style("min-width: 200px; min-height: 50px;")
+            .with_child(
+                Column::new()
+                    .class(Flex::Fill)
+                    .class(Overflow::Auto)
+                    .with_child(html! {
+                        <div class="pwt-overflow-auto"><LoremIpsum/></div>
+                    })
+                    .with_flex_spacer()
+                    .with_child(
+                        Row::new()
+                            .padding(2)
+                            .gap(2)
+                            .with_flex_spacer()
+                            .class("pwt-bg-color-neutral-container-alt")
+                            .with_child(Button::new("OK").autofocus(true).onclick({
+                                let view_state = view_state.clone();
+                                move |_| view_state.set(ViewState::Main)
+                            })),
+                    ),
+            )
+            .into(),
+        ViewState::ShowGridDialog => Dialog::new("Example Resizable Dialog")
+            .draggable(true)
+            .resizable(true)
+            .on_close(close_callback)
+            .style("min-width: 200px; min-height: 50px;")
+            .with_child(DataTable::new(get_columns(), store).class(Overflow::Auto))
+            .into(),
+    };
 
+    row.add_child(child);
     row.into()
 }
