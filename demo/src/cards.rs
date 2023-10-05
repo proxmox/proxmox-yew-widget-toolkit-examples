@@ -10,7 +10,6 @@ fn card_with_text(text: &str) -> Card {
 
 #[function_component]
 pub fn CardsDemo() -> Html {
-
     let mut column = Column::new()
         .class(Flex::Fill)
         .class(Overflow::Auto)

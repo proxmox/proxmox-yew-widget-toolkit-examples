@@ -13,13 +13,10 @@ use pwt::widget::{Button, Column};
 #[function_component]
 pub fn ExampleWidgets() -> Html {
     let show_wizard = use_state(|| false);
-    let close_callback = use_callback(
-        {
-            let show_wizard = show_wizard.clone();
-            move |(), ()| show_wizard.set(false)
-        },
-        (),
-    );
+    let close_callback = use_callback((), {
+        let show_wizard = show_wizard.clone();
+        move |(), ()| show_wizard.set(false)
+    });
 
     let show_callback = {
         let show_wizard = show_wizard.clone();

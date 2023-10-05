@@ -20,13 +20,10 @@ enum ViewState {
 pub fn DialogDemo() -> Html {
     let view_state = use_state(|| ViewState::Main);
 
-    let close_callback = use_callback(
-        {
-            let view_state = view_state.clone();
-            move |(), ()| view_state.set(ViewState::Main)
-        },
-        (),
-    );
+    let close_callback = use_callback((), {
+        let view_state = view_state.clone();
+        move |(), ()| view_state.set(ViewState::Main)
+    });
 
     let mut row = Column::new()
         .padding(2)
@@ -65,17 +62,18 @@ pub fn DialogDemo() -> Html {
                             .class(Overflow::Auto)
                             .with_child(html! {
                                 <div class="pwt-overflow-auto"><LoremIpsum/></div>
-                            }).with_child(
-                            Row::new()
-                                .padding(2)
-                                .gap(2)
-                                .with_flex_spacer()
-                                .class("pwt-bg-color-neutral-container-alt")
-                                .with_child(Button::new("OK").autofocus(true).onclick({
-                                    let view_state = view_state.clone();
-                                    move |_| view_state.set(ViewState::Main)
-                                })),
-                        ),
+                            })
+                            .with_child(
+                                Row::new()
+                                    .padding(2)
+                                    .gap(2)
+                                    .with_flex_spacer()
+                                    .class("pwt-bg-color-neutral-container-alt")
+                                    .with_child(Button::new("OK").autofocus(true).onclick({
+                                        let view_state = view_state.clone();
+                                        move |_| view_state.set(ViewState::Main)
+                                    })),
+                            ),
                     ),
             );
         }
@@ -90,7 +88,7 @@ pub fn DialogDemo() -> Html {
                         Column::new()
                             .class(Flex::Fill)
                             .class(Overflow::Auto)
-                            .with_child(html!{
+                            .with_child(html! {
                                 <div class="pwt-overflow-auto"><LoremIpsum/></div>
                             })
                             .with_flex_spacer()
