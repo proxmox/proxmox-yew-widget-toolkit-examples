@@ -29,6 +29,7 @@ const PAGES: &[(&str, &str)] = &[
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct Wizard {
+    #[prop_or_default]
     on_close: Option<Callback<()>>,
 }
 
