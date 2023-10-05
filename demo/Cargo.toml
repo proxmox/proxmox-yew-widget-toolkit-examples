@@ -15,13 +15,13 @@ js-sys = "0.3"
 # If you need to use the development version of Yew
 # yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
 # yew-router = { git = "https://github.com/yewstack/yew/" }
-yew = { version = "0.20",  features = ["csr"] }
-yew-router = { version = "0.17" }
+yew = { version = "0.21",  features = ["csr"] }
+yew-router = { version = "0.18" }
 pwt = { path = "../../" }
 wasm-bindgen = "0.2"
-gloo-history = "0.1"
-gloo-net = { version = "0.2", features= ["http"] }
-gloo-timers = "0.2"
+gloo-history = "0.2"
+gloo-net = { version = "0.4", features= ["http"] }
+gloo-timers = "0.3"
 serde = "1.0"
 serde_json = "1.0"
 wasm-bindgen-futures = "0.4"

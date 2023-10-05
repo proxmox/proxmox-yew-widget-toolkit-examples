@@ -10,6 +10,6 @@ edition = "2021"
 [dependencies]
 wasm-logger = "0.2"
 log = "0.4.6"
-yew = { version = "0.20",  features = ["csr"] }
+yew = { version = "0.21",  features = ["csr"] }
 pwt = { path = "../../" }
 wasm-bindgen = "0.2"
