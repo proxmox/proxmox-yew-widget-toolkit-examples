@@ -20,7 +20,7 @@ impl Component for App {
     type Properties = ();
 
     fn create(ctx: &Context<Self>) -> Self {
-        let loader: Loader<Value> = Loader::new(ctx.link().callback(|_| Msg::DataChange))
+        let loader: Loader<Value> = Loader::new().on_change(ctx.link().callback(|_| Msg::DataChange))
             .loader("/data/test_data.js");
 
         loader.load();
