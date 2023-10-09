@@ -223,12 +223,18 @@ impl Component for PwtWizard {
                     .label(*id)
                     .disabled(disabled),
                 Form::new()
+                    .class(Overflow::Auto)
+                    .class(Flex::Fill)
                     .form_context(self.form_ctx[i].clone())
                     .with_child(input_panel),
             );
         }
 
-        let mut summary = Column::new().gap(1).padding(1);
+        let mut summary = Column::new()
+            .gap(1)
+            .padding(1)
+            .class(Overflow::Auto)
+            .class(Flex::Fill);
         for (i, val) in self
             .form_ctx
             .iter()
