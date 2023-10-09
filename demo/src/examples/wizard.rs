@@ -4,27 +4,31 @@ use pwt::{
     css::{ColorScheme, Flex, Overflow},
     props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, FieldBuilder, WidgetBuilder},
     state::Selection,
-    widget::{form::Field, Button, Column, Dialog, InputPanel, Row, TabBarItem, TabPanel},
+    widget::{
+        form::{Boolean, Combobox, Field, Form, FormContext, Number},
+        Button, Column, Dialog, InputPanel, Row, TabBarItem, TabPanel,
+    },
 };
 use yew::html;
 use yew::virtual_dom::{VComp, VNode};
 use yew::{html::IntoEventCallback, Callback, Component, Properties};
 
-const PAGES: &[(&str, &str)] = &[
+const PAGES: &[(&str, &str, &[u8])] = &[
     (
         "General",
         "General Information, please enter text to continue.",
+        &[0, 1, 2, 3, 4, 5],
     ),
-    ("Options", "Some Options, please enter text to continue."),
+    (
+        "Options",
+        "Some Options, please enter text to continue.",
+        &[5, 4, 3, 2, 1, 0],
+    ),
     (
         "Details",
         "Detailed Information, please enter text to continue.",
+        &[0, 2, 1, 3, 4, 5],
     ),
-    (
-        "Additional",
-        "Additional Information, please enter text to continue.",
-    ),
-    ("Last", "Last Page, please enter text to be able to finish."),
 ];
 
 #[derive(Clone, Properties, PartialEq)]
@@ -47,11 +51,12 @@ pub struct PwtWizard {
     page: usize,
     selection: Selection,
     pages_valid: HashSet<usize>,
+    form_ctx: Vec<FormContext>,
 }
 
 pub enum Msg {
     SelectPage(usize),
-    TextChange(usize, String),
+    ChangeValid(usize, bool),
     SelectionChange(Selection),
 }
 
@@ -62,10 +67,17 @@ impl Component for PwtWizard {
 
     fn create(ctx: &yew::Context<Self>) -> Self {
         let selection = Selection::new().on_select(ctx.link().callback(Msg::SelectionChange));
+        let mut form_ctx = Vec::new();
+        for i in 0..PAGES.len() {
+            form_ctx.push(FormContext::new().on_change(ctx.link().callback(
+                move |form_ctx: FormContext| Msg::ChangeValid(i, form_ctx.read().is_valid()),
+            )));
+        }
         Self {
             page: 0,
             pages_valid: HashSet::new(),
             selection,
+            form_ctx,
         }
     }
 
@@ -75,11 +87,11 @@ impl Component for PwtWizard {
                 self.page = page;
                 self.selection.select(format!("{}", self.page));
             }
-            Msg::TextChange(page, text) => {
-                if text.is_empty() {
-                    self.pages_valid.remove(&page);
-                } else {
+            Msg::ChangeValid(page, valid) => {
+                if valid {
                     self.pages_valid.insert(page);
+                } else {
+                    self.pages_valid.remove(&page);
                 }
             }
             Msg::SelectionChange(selection) => {
@@ -95,20 +107,20 @@ impl Component for PwtWizard {
     fn view(&self, ctx: &yew::Context<Self>) -> yew::Html {
         let page_num = self.page + 1;
         let mut tab_panel = TabPanel::new()
+            .class(Overflow::Auto)
             .class(Flex::Fill)
             .tab_bar_style(pwt::widget::TabBarStyle::MaterialPrimary)
             .selection(self.selection.clone());
 
         let mut next_is_disabled = false;
         for i in 0..page_num {
-            if !self.pages_valid.contains(&i) {
+            if !self.pages_valid.contains(&i) && i != PAGES.len() {
                 next_is_disabled = true;
                 break;
             }
         }
 
-        for (i, (id, text)) in PAGES.iter().enumerate() {
-            let link = ctx.link().clone();
+        for (i, (id, text, _)) in PAGES.iter().enumerate() {
             let mut disabled = false;
             for j in 0..i {
                 if !self.pages_valid.contains(&j) {
@@ -117,38 +129,150 @@ impl Component for PwtWizard {
                 }
             }
 
+            let custom_text = html! {<span key={"warning-text"}>{text}</span>};
+
+            let mut input_panel = InputPanel::new()
+                .class(Overflow::Auto)
+                .class(Flex::Fill)
+                .padding(2)
+                .with_large_custom_child(custom_text);
+
+            let field_list = PAGES[i].2;
+
+            for i in (0..field_list.len()).step_by(2) {
+                match field_list[i] {
+                    0 => input_panel.add_field(
+                        false,
+                        "Username",
+                        Field::new().name("user").required(true),
+                    ),
+                    1 => input_panel.add_field(
+                        false,
+                        "Password",
+                        Field::new()
+                            .input_type("password")
+                            .name("password")
+                            .required(true),
+                    ),
+                    2 => input_panel.add_field(
+                        false,
+                        "u8 Feld",
+                        Number::<u8>::new().name("u8-number"),
+                    ),
+                    3 => input_panel.add_field(
+                        false,
+                        "Combobox",
+                        Combobox::new()
+                            .name("combobox")
+                            .with_icon("fa fa-user", false)
+                            .with_item("Admin")
+                            .with_item("User")
+                            .with_item("Root"),
+                    ),
+                    4 => input_panel.add_field(false, "Textfield", Field::new().name("textfield")),
+                    5 => input_panel.add_field(false, "Checkbox", Boolean::new().name("checkbox")),
+                    _ => {}
+                }
+
+                match field_list[i + 1] {
+                    0 => input_panel.add_right_field(
+                        false,
+                        "Username",
+                        Field::new().name("user").required(true),
+                    ),
+                    1 => input_panel.add_right_field(
+                        false,
+                        "Password",
+                        Field::new()
+                            .input_type("password")
+                            .name("password")
+                            .required(true),
+                    ),
+                    2 => input_panel.add_right_field(
+                        false,
+                        "u8 Feld",
+                        Number::<u8>::new().name("u8-number"),
+                    ),
+                    3 => input_panel.add_right_field(
+                        false,
+                        "Combobox",
+                        Combobox::new()
+                            .name("combobox")
+                            .with_icon("fa fa-user", false)
+                            .with_item("Admin")
+                            .with_item("User")
+                            .with_item("Root"),
+                    ),
+                    4 => input_panel.add_right_field(
+                        false,
+                        "Textfield",
+                        Field::new().name("textfield"),
+                    ),
+                    5 => input_panel.add_right_field(
+                        false,
+                        "Checkbox",
+                        Boolean::new().name("checkbox"),
+                    ),
+                    _ => {}
+                }
+            }
+
             tab_panel.add_item(
                 TabBarItem::new()
                     .key(format!("{i}"))
                     .label(*id)
                     .disabled(disabled),
-                InputPanel::new()
-                    .class(Flex::Fill)
-                    .padding(2)
-                    .with_custom_child(html! {<div key={"warning-text"}>{text}</div>})
-                    .with_field(
-                        "Required Field",
-                        Field::new()
-                            .name(format!("field{i}"))
-                            .on_change(move |value| {
-                                link.send_message(Msg::TextChange(i, value));
-                            }),
-                    ),
+                Form::new()
+                    .form_context(self.form_ctx[i].clone())
+                    .with_child(input_panel),
             );
         }
 
-        let is_last = self.page + 1 >= PAGES.len();
+        let mut summary = Column::new().gap(1).padding(1);
+        for (i, val) in self
+            .form_ctx
+            .iter()
+            .map(|f| f.get_submit_data())
+            .enumerate()
+        {
+            let text = serde_json::to_string_pretty(&val).unwrap();
+            summary.add_child(
+                Row::new()
+                    .with_child(format!("{}: ", PAGES[i].0))
+                    .with_child(html! {<pre>{text}</pre>}),
+            )
+        }
+
+        tab_panel.add_item(
+            TabBarItem::new()
+                .key(format!("{}", PAGES.len()))
+                .label("Summary")
+                .disabled((0..PAGES.len()).any(|i| !self.pages_valid.contains(&i))),
+            summary,
+        );
+
+        let is_last = self.page + 1 >= PAGES.len() + 1;
         let is_first = self.page == 0;
 
-        let window = Dialog::new(format!("Wizard (Page {page_num} of {})", PAGES.len()))
-            .style("min-width: 500px")
+        let form = Form::new()
+            .class(Overflow::Auto)
+            .class(Flex::Fill)
+            .with_child(tab_panel);
+
+        let window = Dialog::new(format!("Wizard (Page {page_num} of {})", PAGES.len() + 1))
+            .style("min-width: 690px; max-height: 300px")
             .resizable(true)
             .on_close(ctx.props().on_close.clone())
             .with_child(
                 Column::new()
                     .class(Flex::Fill)
                     .class(Overflow::Auto)
-                    .with_child(Row::new().class(Flex::Fill).with_child(tab_panel))
+                    .with_child(
+                        Row::new()
+                            .class(Overflow::Auto)
+                            .class(Flex::Fill)
+                            .with_child(form),
+                    )
                     .with_child(
                         Row::new()
                             .padding(2)
