@@ -64,6 +64,15 @@ fn demo_input_panel() -> Html {
                 .with_item("Admin")
                 .with_item("User"),
         )
+        .with_field(
+            "Combobox (disabled)",
+            Combobox::new()
+                .disabled(true)
+                .placeholder("Select a user")
+                .with_icon("fa fa-user", false)
+                .with_item("Admin")
+                .with_item("User"),
+        )
         .with_field("Long Combobox", long_combo)
         .with_field(
             "TextArea",
