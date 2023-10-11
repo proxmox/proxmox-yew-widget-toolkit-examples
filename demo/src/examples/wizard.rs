@@ -254,7 +254,9 @@ impl Component for PwtWizard {
                 .key(format!("{}", PAGES.len()))
                 .label("Summary")
                 .disabled((0..PAGES.len()).any(|i| !self.pages_valid.contains(&i))),
-            summary,
+            InputPanel::new()
+                .padding(2)
+                .with_large_custom_child(summary),
         );
 
         let is_last = self.page + 1 >= PAGES.len() + 1;
@@ -266,8 +268,6 @@ impl Component for PwtWizard {
             .with_child(tab_panel);
 
         let window = Dialog::new(format!("Wizard (Page {page_num} of {})", PAGES.len() + 1))
-            .style("min-width: 690px; max-height: 300px")
-            .resizable(true)
             .on_close(ctx.props().on_close.clone())
             .with_child(
                 Column::new()
