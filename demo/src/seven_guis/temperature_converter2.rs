@@ -1,6 +1,6 @@
 use pwt::prelude::*;
-use pwt::widget::{InputPanel, Panel, Row};
 use pwt::widget::form::{Field, Form, FormContext};
+use pwt::widget::{InputPanel, Panel, Row};
 
 pub struct TemperatureConverter2 {
     form_ctx: FormContext,
@@ -16,11 +16,16 @@ impl Component for TemperatureConverter2 {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        let form_ctx = FormContext::new()
-            .on_change(|form_ctx: FormContext| {
-                log::info!("CTX CHANGE C: {:?}", form_ctx.read().get_field_value("celsius"));
-                log::info!("CTX CHANGE F: {:?}", form_ctx.read().get_field_value("fahrenheit"));
-            });
+        let form_ctx = FormContext::new().on_change(|form_ctx: FormContext| {
+            log::info!(
+                "CTX CHANGE C: {:?}",
+                form_ctx.read().get_field_value("celsius")
+            );
+            log::info!(
+                "CTX CHANGE F: {:?}",
+                form_ctx.read().get_field_value("fahrenheit")
+            );
+        });
 
         Self { form_ctx }
     }
@@ -30,16 +35,18 @@ impl Component for TemperatureConverter2 {
             Msg::Celsius(c) => {
                 log::info!("UPDATE C '{c}'");
                 if let Ok(celsius) = c.parse::<f64>() {
-                    let fahrenheit = (celsius*9.0/5.0) + 32.0;
-                    self.form_ctx.write()
+                    let fahrenheit = (celsius * 9.0 / 5.0) + 32.0;
+                    self.form_ctx
+                        .write()
                         .set_field_value("fahrenheit", format!("{}", fahrenheit).into());
                 }
             }
             Msg::Fahrenheit(f) => {
-               log::info!("UPDATE F '{f}'");
+                log::info!("UPDATE F '{f}'");
                 if let Ok(fahrenheit) = f.parse::<f64>() {
-                    let celsius = (fahrenheit - 32.0)*5.0/9.0;
-                    self.form_ctx.write()
+                    let celsius = (fahrenheit - 32.0) * 5.0 / 9.0;
+                    self.form_ctx
+                        .write()
                         .set_field_value("celsius", format!("{}", celsius).into());
                 }
             }
@@ -49,33 +56,33 @@ impl Component for TemperatureConverter2 {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let link = ctx.link().clone();
-        let body = Form::new()
-            .form_context(self.form_ctx.clone())
-            .with_child(
-                InputPanel::new()
-                    .padding(2)
-                    .border(false)
-                    .with_field(
-                        "Celsius",
-                        Field::new()
-                            .name("celsius")
-                            .number(-273.15, None, 1.0)
-                            .on_input(link.callback(Msg::Celsius))
-                     )
-                    .with_right_field(
-                        "Fahrenheit",
-                        Field::new()
-                            .name("fahrenheit")
-                            .number(-459.67, None, 1.0)
-                            .on_input(link.callback(Msg::Fahrenheit))
-                    )
-            );
+        let body = Form::new().form_context(self.form_ctx.clone()).with_child(
+            InputPanel::new()
+                .padding(2)
+                .border(false)
+                .with_field(
+                    "Celsius",
+                    Field::new()
+                        .name("celsius")
+                        .number(-273.15, None, 1.0)
+                        .on_input(link.callback(Msg::Celsius)),
+                )
+                .with_right_field(
+                    "Fahrenheit",
+                    Field::new()
+                        .name("fahrenheit")
+                        .number(-459.67, None, 1.0)
+                        .on_input(link.callback(Msg::Fahrenheit)),
+                ),
+        );
 
-        Row::new().with_child(
-            Panel::new()
-                .border(true)
-                .title("Temperature Converter (FormContext)")
-                .with_child(body)
-        ).into()
+        Row::new()
+            .with_child(
+                Panel::new()
+                    .border(true)
+                    .title("Temperature Converter (FormContext)")
+                    .with_child(body),
+            )
+            .into()
     }
 }

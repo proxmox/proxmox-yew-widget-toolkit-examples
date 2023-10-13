@@ -1,10 +1,10 @@
 use std::rc::Rc;
 
 use pwt::prelude::*;
-use pwt::widget::{Button, Column, Container, Panel, Row};
 use pwt::widget::form::{Combobox, Field};
+use pwt::widget::{Button, Column, Container, Panel, Row};
 
-thread_local!{
+thread_local! {
     static FLIGHT_MODE: Rc<Vec<AttrValue>> = Rc::new(vec![
         "one-way flight".into(),
         "return flight".into(),
@@ -20,33 +20,32 @@ pub struct FlightBooker {
 }
 
 impl FlightBooker {
-
     fn view_booking(&self, ctx: &Context<Self>, booking: &(String, Option<String>)) -> Html {
         let msg = match booking {
             (start_date, None) => {
                 format!("You have booked a one-way flight on {start_date}")
             }
             (start_date, Some(return_date)) => {
-                format!("You have booked a return flight on {start_date}, returning on {return_date}")
+                format!(
+                    "You have booked a return flight on {start_date}, returning on {return_date}"
+                )
             }
         };
         Container::new()
             .padding(2)
-            .with_child(
-                Column::new()
-                    .gap(2)
-                    .with_child(msg)
-                    .with_child(
-                        Button::new("Continue")
-                            .onclick(ctx.link().callback(|_| Msg::Continue))
-                    )
-            )
+            .with_child(Column::new().gap(2).with_child(msg).with_child(
+                Button::new("Continue").onclick(ctx.link().callback(|_| Msg::Continue)),
+            ))
             .into()
     }
 
     fn view_form(&self, ctx: &Context<Self>) -> Html {
         let combo = Combobox::new()
-            .default(if self.with_return_flight {"return flight" } else { "one-way flight"})
+            .default(if self.with_return_flight {
+                "return flight"
+            } else {
+                "one-way flight"
+            })
             .items(FLIGHT_MODE.with(Rc::clone))
             .on_change(ctx.link().callback(Msg::Mode));
 
@@ -155,11 +154,13 @@ impl Component for FlightBooker {
             None => self.view_form(ctx),
         };
 
-        Row::new().with_child(
-            Panel::new()
-                .border(true)
-                .title("Flight Booker")
-                .with_child(body)
-        ).into()
+        Row::new()
+            .with_child(
+                Panel::new()
+                    .border(true)
+                    .title("Flight Booker")
+                    .with_child(body),
+            )
+            .into()
     }
 }

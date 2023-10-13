@@ -1,6 +1,6 @@
 use pwt::prelude::*;
-use pwt::widget::{InputPanel, Panel, Row};
 use pwt::widget::form::Field;
+use pwt::widget::{InputPanel, Panel, Row};
 
 pub struct TemperatureConverter {
     celsius: Option<f64>,
@@ -27,11 +27,11 @@ impl Component for TemperatureConverter {
         match msg {
             Msg::Celsius(c) => {
                 self.celsius = c.parse::<f64>().ok();
-                self.fahrenheit = self.celsius.map(|c| (c*9.0/5.0) + 32.0);
+                self.fahrenheit = self.celsius.map(|c| (c * 9.0 / 5.0) + 32.0);
             }
             Msg::Fahrenheit(f) => {
                 self.fahrenheit = f.parse::<f64>().ok();
-                self.celsius = self.fahrenheit.map(|f| (f - 32.0)*5.0/9.0);
+                self.celsius = self.fahrenheit.map(|f| (f - 32.0) * 5.0 / 9.0);
             }
         }
         true
@@ -39,7 +39,10 @@ impl Component for TemperatureConverter {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let celsius = self.celsius.map(|c| c.to_string()).unwrap_or(String::new());
-        let fahrenheit = self.fahrenheit.map(|f| f.to_string()).unwrap_or(String::new());
+        let fahrenheit = self
+            .fahrenheit
+            .map(|f| f.to_string())
+            .unwrap_or(String::new());
 
         let body = InputPanel::new()
             .padding(2)
@@ -49,21 +52,23 @@ impl Component for TemperatureConverter {
                 Field::new()
                     .value(celsius)
                     .number(-273.15, None, 1.0)
-                    .on_input(ctx.link().callback(Msg::Celsius))
+                    .on_input(ctx.link().callback(Msg::Celsius)),
             )
             .with_right_field(
                 "Fahrenheit",
                 Field::new()
                     .value(fahrenheit)
                     .number(-459.67, None, 1.0)
-                    .on_input(ctx.link().callback(Msg::Fahrenheit))
+                    .on_input(ctx.link().callback(Msg::Fahrenheit)),
             );
 
-        Row::new().with_child(
-            Panel::new()
-                .border(true)
-                .title("Temperature Converter (Controlled)")
-                .with_child(body)
-        ).into()
+        Row::new()
+            .with_child(
+                Panel::new()
+                    .border(true)
+                    .title("Temperature Converter (Controlled)")
+                    .with_child(body),
+            )
+            .into()
     }
 }

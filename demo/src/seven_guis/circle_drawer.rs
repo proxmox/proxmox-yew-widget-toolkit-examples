@@ -1,11 +1,11 @@
 use indexmap::IndexMap;
 
-use yew::virtual_dom::Key;
 use pwt::prelude::*;
+use yew::virtual_dom::Key;
 
-use pwt::widget::{Button, Container, Dialog, Panel, Toolbar};
 use pwt::widget::canvas::{Canvas, Circle};
 use pwt::widget::form::Field;
+use pwt::widget::{Button, Container, Dialog, Panel, Toolbar};
 
 pub enum Msg {
     Undo,
@@ -34,28 +34,30 @@ pub struct CircleDrawer {
 }
 
 impl CircleDrawer {
-
     fn create_resize_dialog(&self, ctx: &Context<Self>) -> Dialog {
-
-        let circle = self.undo.iter().rev()
+        let circle = self
+            .undo
+            .iter()
+            .rev()
             .find(|circle| circle.id == self.selected)
             .unwrap();
 
         Dialog::new(format!(
             "Adjust diameter of circle at ({}, {})",
-            circle.x,
-            circle.y,
+            circle.x, circle.y,
         ))
-            .on_close(ctx.link().callback(|_| Msg::CloseDialog))
-            .with_child(
-                Field::new()
-                    .number(10.0, 200.0, 1.0)
-                    .input_type("range")
-                    .value(format!("{}", circle.r))
-                    .on_change(ctx.link().callback(|v: String| {
+        .on_close(ctx.link().callback(|_| Msg::CloseDialog))
+        .with_child(
+            Field::new()
+                .number(10.0, 200.0, 1.0)
+                .input_type("range")
+                .value(format!("{}", circle.r))
+                .on_change(
+                    ctx.link().callback(|v: String| {
                         Msg::ChangeRadius(v.parse::<f32>().unwrap() as usize)
-                    }))
-            )
+                    }),
+                ),
+        )
     }
 
     fn create_canvas(&self, ctx: &Context<Self>) -> Canvas {
@@ -67,9 +69,10 @@ impl CircleDrawer {
             .oncontextmenu(Callback::from(move |e: MouseEvent| {
                 e.prevent_default();
             }))
-            .onclick(ctx.link().callback(|e: MouseEvent| {
-                Msg::CreateCircle(e.offset_x(), e.offset_y())
-            }));
+            .onclick(
+                ctx.link()
+                    .callback(|e: MouseEvent| Msg::CreateCircle(e.offset_x(), e.offset_y())),
+            );
 
         // use latest state, but keep drawing order
         let mut map = IndexMap::new();
@@ -93,9 +96,7 @@ impl CircleDrawer {
                         e.prevent_default();
                         Msg::CircleClick(id)
                     }))
-                    .onmouseover(ctx.link().callback(move |_| {
-                        Msg::Select(id)
-                    }))
+                    .onmouseover(ctx.link().callback(move |_| Msg::Select(id))),
             );
         }
 
@@ -110,13 +111,13 @@ impl CircleDrawer {
                 Button::new("Undo")
                     .class("pwt-scheme-neutral-alt")
                     .disabled(self.undo.is_empty())
-                    .onclick(ctx.link().callback(|_| Msg::Undo))
+                    .onclick(ctx.link().callback(|_| Msg::Undo)),
             )
             .with_child(
                 Button::new("Redo")
                     .class("pwt-scheme-neutral-alt")
                     .disabled(self.redo.is_empty())
-                    .onclick(ctx.link().callback(|_| Msg::Redo))
+                    .onclick(ctx.link().callback(|_| Msg::Redo)),
             )
             .with_flex_spacer()
     }
@@ -162,30 +163,36 @@ impl Component for CircleDrawer {
                 let id = self.unique_id_counter;
                 self.unique_id_counter += 1;
 
-                self.undo.push(CircleState { id, x, y, r: random_radius()})
+                self.undo.push(CircleState {
+                    id,
+                    x,
+                    y,
+                    r: random_radius(),
+                })
             }
-            Msg::ChangeRadius(new_radius) => {
-                match self.undo.last_mut() {
-                    Some(CircleState { id, r, .. }) if *id == self.selected => {
-                        *r = new_radius;
-                    }
-                    _ => {
-                        let mut circle = self.undo.iter().rev()
-                            .find(|circle| circle.id == self.selected)
-                            .unwrap()
-                            .clone();
-                        circle.r = new_radius;
-                        self.undo.push(circle);
-                    }
+            Msg::ChangeRadius(new_radius) => match self.undo.last_mut() {
+                Some(CircleState { id, r, .. }) if *id == self.selected => {
+                    *r = new_radius;
                 }
-            }
+                _ => {
+                    let mut circle = self
+                        .undo
+                        .iter()
+                        .rev()
+                        .find(|circle| circle.id == self.selected)
+                        .unwrap()
+                        .clone();
+                    circle.r = new_radius;
+                    self.undo.push(circle);
+                }
+            },
         }
         true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
-        let dialog = self.show_resize_dialog
+        let dialog = self
+            .show_resize_dialog
             .then(|| self.create_resize_dialog(ctx));
 
         Panel::new()
@@ -197,7 +204,7 @@ impl Component for CircleDrawer {
                     .class("pwt-bg-color-surface")
                     .padding_x(2)
                     .padding_bottom(2)
-                    .with_child(self.create_canvas(ctx))
+                    .with_child(self.create_canvas(ctx)),
             )
             .with_optional_child(dialog)
             .into()
@@ -207,7 +214,7 @@ impl Component for CircleDrawer {
 fn random_radius() -> usize {
     use std::cell::RefCell;
 
-    thread_local!{
+    thread_local! {
         static SEED: RefCell<usize> = RefCell::new(13456374);
     }
 
