@@ -1,5 +1,7 @@
 use pwt::prelude::*;
-use pwt::widget::form::{Checkbox, Combobox, Field, Form, TextArea, Tristate, TristateBoolean};
+use pwt::widget::form::{
+    Checkbox, Combobox, Field, Form, InputType, TextArea, Tristate, TristateBoolean,
+};
 use pwt::widget::{Container, InputPanel};
 
 fn demo_input_panel() -> Html {
@@ -19,9 +21,9 @@ fn demo_input_panel() -> Html {
                 .with_icon("fa fa-search", true)
                 .placeholder("Search"),
         )
-        .with_field("Password", Field::new().input_type("password"))
-        .with_field("Range field", Field::new().input_type("range"))
-        .with_field("Numberfield", Field::new().input_type("number"))
+        .with_field("Password", Field::new().input_type(InputType::Password))
+        .with_field("Range field", Field::new().input_type(InputType::Range))
+        .with_field("Numberfield", Field::new().input_type(InputType::Number))
         .with_field(
             "Numberfield with limits",
             Field::new().number(0.0, 150.0, 2.0),

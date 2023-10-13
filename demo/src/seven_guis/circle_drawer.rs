@@ -4,7 +4,7 @@ use pwt::prelude::*;
 use yew::virtual_dom::Key;
 
 use pwt::widget::canvas::{Canvas, Circle};
-use pwt::widget::form::Field;
+use pwt::widget::form::{Field, InputType};
 use pwt::widget::{Button, Container, Dialog, Panel, Toolbar};
 
 pub enum Msg {
@@ -50,7 +50,7 @@ impl CircleDrawer {
         .with_child(
             Field::new()
                 .number(10.0, 200.0, 1.0)
-                .input_type("range")
+                .input_type(InputType::Range)
                 .value(format!("{}", circle.r))
                 .on_change(
                     ctx.link().callback(|v: String| {

@@ -5,7 +5,7 @@ use pwt::{
     props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, FieldBuilder, WidgetBuilder},
     state::Selection,
     widget::{
-        form::{Boolean, Combobox, Field, Form, FormContext, Number},
+        form::{Boolean, Combobox, Field, Form, FormContext, InputType, Number},
         Button, Column, Dialog, InputPanel, Row, TabBarItem, TabPanel,
     },
 };
@@ -150,7 +150,7 @@ impl Component for PwtWizard {
                         false,
                         "Password",
                         Field::new()
-                            .input_type("password")
+                            .input_type(InputType::Password)
                             .name("password")
                             .required(true),
                     ),
@@ -184,7 +184,7 @@ impl Component for PwtWizard {
                         false,
                         "Password",
                         Field::new()
-                            .input_type("password")
+                            .input_type(InputType::Password)
                             .name("password")
                             .required(true),
                     ),

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use pwt::prelude::*;
-use pwt::widget::form::{Combobox, Field};
+use pwt::widget::form::{Combobox, Field, InputType};
 use pwt::widget::{Button, Column, Container, Panel, Row};
 
 thread_local! {
@@ -52,13 +52,13 @@ impl FlightBooker {
         let flight_date = Field::new()
             .required(true)
             .on_change(ctx.link().callback(Msg::StartDate))
-            .input_type("date");
+            .input_type(InputType::Date);
 
         let return_date = Field::new()
             .required(true)
             .disabled(!self.with_return_flight)
             .on_change(ctx.link().callback(Msg::ReturnDate))
-            .input_type("date");
+            .input_type(InputType::Date);
 
         let book = Button::new("Book")
             .disabled(!self.enable_book)
