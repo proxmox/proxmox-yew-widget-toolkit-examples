@@ -4,7 +4,7 @@ use pwt::prelude::*;
 
 use pwt::widget::form::{
     Boolean, Checkbox, Combobox, Field, Form, FormContext, Number, ResetButton, SubmitButton,
-    Tristate, TristateBoolean,
+    Tristate, TristateBoolean, InputType,
 };
 use pwt::widget::{InputPanel, Panel, Row};
 
@@ -63,7 +63,7 @@ impl Component for MyForm {
                 Field::new()
                     .name("password")
                     .required(true)
-                    .input_type("password"),
+                    .input_type(InputType::Password),
             )
             .with_field(
                 "Confirm Password",
@@ -71,10 +71,10 @@ impl Component for MyForm {
                     .name("confirm_password")
                     .required(true)
                     .submit(false)
-                    .input_type("password"),
+                    .input_type(InputType::Password),
             )
             .with_field(
-                "Number1",
+                "Number1 (text)",
                 Field::new()
                     .name("number1")
                     .number(3.0, 10.0, 1.0)
