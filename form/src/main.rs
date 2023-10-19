@@ -80,7 +80,7 @@ impl Component for MyForm {
                     .number(3.0, 10.0, 1.0)
                     .default("4"),
             )
-            .with_field("Number2 (f64)", Number::<f64>::new().name("number2"))
+            .with_field("Number2 (f64)", Number::<f64>::new().name("number2").default(4.1))
             .with_field("Number3 (u64)", Number::<u64>::new().name("number3"))
             .with_field("Number4 (i8)", Number::<i8>::new().name("number4"))
             .with_field("Checkbox1", Checkbox::new().name("checkbox1").default(true))
