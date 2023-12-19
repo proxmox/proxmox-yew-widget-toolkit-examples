@@ -96,6 +96,13 @@ pub fn MiscellaneousDemo() -> Html {
         .with_child(meter.clone().value(320.0))
         .with_child(meter.clone().value(420.0))
         .with_child(meter.clone().value(460.0))
+
+        .with_child("Meter with text (min 200, max 500, low 350, height 450, optimum 200)")
+        .with_child(meter.clone().value(220.0).render_text(|v: &f32| v.to_string()))
+        .with_child(meter.clone().value(320.0).render_text(|v: &f32| v.to_string()))
+        .with_child(meter.clone().value(420.0).render_text(|v: &f32| v.to_string()))
+        .with_child(meter.clone().value(460.0).render_text(|v: &f32| v.to_string()))
+
         .with_child(mini_scoll_demo1())
         .with_child(mini_scoll_demo2())
         .with_child(load_mask_demo())
