@@ -1,7 +1,7 @@
 use pwt::touch::prelude::*;
 
 use pwt::touch::Scaffold;
-use pwt::widget::{Column, Card};
+use pwt::widget::{Card, Column};
 
 use yew_router::prelude::*;
 

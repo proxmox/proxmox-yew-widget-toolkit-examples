@@ -1,6 +1,6 @@
 use gloo_console as console;
-use yew::prelude::*;
 use pwt::prelude::*;
+use yew::prelude::*;
 
 use serde_json::Value;
 
@@ -20,7 +20,8 @@ impl Component for App {
     type Properties = ();
 
     fn create(ctx: &Context<Self>) -> Self {
-        let loader: Loader<Value> = Loader::new().on_change(ctx.link().callback(|_| Msg::DataChange))
+        let loader: Loader<Value> = Loader::new()
+            .on_change(ctx.link().callback(|_| Msg::DataChange))
             .loader("/data/test_data.js");
 
         loader.load();
@@ -38,7 +39,6 @@ impl Component for App {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-
         // Use loader.render to correcty show load mask and load errors
         let content = self.loader.render(|data| {
             Column::new()
@@ -54,7 +54,6 @@ impl Component for App {
             .with_child(content) // display data
             .into()
     }
-
 }
 
 fn main() {

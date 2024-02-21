@@ -1,11 +1,10 @@
 use pwt::prelude::*;
-use pwt::widget::{Button, Container, Panel, LanguageSelector};
+use pwt::widget::{Button, Container, LanguageSelector, Panel};
 
 use pwt::ngettext;
 
 #[function_component]
 pub fn I18NDemo() -> Html {
-
     // TRANSLATORS: This is a comment
     log::info!("{}", tr!("This is a test!"));
     let state = use_state(|| 0);

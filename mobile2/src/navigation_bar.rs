@@ -1,5 +1,5 @@
-use pwt::widget::TabBarItem;
 use pwt::touch::NavigationBar;
+use pwt::widget::TabBarItem;
 
 pub fn navigation_bar() -> NavigationBar {
     let items = vec![

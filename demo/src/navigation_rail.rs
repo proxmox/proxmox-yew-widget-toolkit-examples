@@ -1,8 +1,8 @@
-use pwt::css::{JustifyContent, Flex};
+use pwt::css::{Flex, JustifyContent};
 use pwt::prelude::*;
+use pwt::state::NavigationContainer;
 use pwt::touch::{Fab, NavigationRail};
 use pwt::widget::{Row, TabBarItem};
-use pwt::state::NavigationContainer;
 
 #[function_component]
 pub fn NavigationRailDemo() -> Html {
@@ -31,7 +31,7 @@ pub fn NavigationRailDemo() -> Html {
             Row::new()
                 .class(Flex::Fill)
                 .border_start(true)
-                .with_child(rail)
-            )
+                .with_child(rail),
+        )
         .into()
 }

@@ -3,7 +3,6 @@ use pwt::widget::Column;
 
 #[function_component]
 pub fn LoremIpsum() -> Html {
-
     Column::new()
         .padding(2)
         .gap(2)

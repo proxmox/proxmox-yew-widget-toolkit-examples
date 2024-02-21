@@ -11,37 +11,37 @@ use pwt::widget::data_table::*;
 
 #[function_component]
 pub fn DataTableDemo() -> Html {
-
     let header0 = DataTableColumn::selection_indicator();
 
     let header1 = DataTableColumn::new("RecordId")
         .width("max-content")
         .sorter(usize::cmp)
         .sort_order(false)
-        .render(|n: &usize| html!{n.to_string()});
+        .render(|n: &usize| html! {n.to_string()});
 
-
-    let header2 = DataTableColumn::new("TEHE2")
-        .flex(1)
-        .render(|n: &usize| html!{
+    let header2 = DataTableColumn::new("TEHE2").flex(1).render(|n: &usize| {
+        html! {
             <>
                 <h3>{"This is a header"}</h3>
                 <p>{format!("This is record {n} with more than one line")}</p>
                 <p><a tabindex="-1" href="/">{"This is a link"}</a></p>
                 <input tabindex="-1" class="pwt-input"/>
             </>
-        });
+        }
+    });
 
     let header3 = DataTableColumn::new("TESTHEADER3")
         .percentage(20)
-        .render(|n: &usize| html!{format!("This is record {n} (a longer line)")});
+        .render(|n: &usize| html! {format!("This is record {n} (a longer line)")});
 
     let extract_key = ExtractKeyFn::new(|n: &usize| (*n).into());
     let extract_key2 = extract_key.clone();
 
     let store = use_state(move || {
         let mut data: Vec<usize> = Vec::new();
-        for i in 0..30_000 { data.push(i); }
+        for i in 0..30_000 {
+            data.push(i);
+        }
 
         let store = Store::with_extract_key(extract_key2);
         store.write().set_data(data);
@@ -87,10 +87,10 @@ pub fn DataTableDemo() -> Html {
         .border(true)
         .min_row_height(110)
         .autoselect(false)
-    //.cell_class("pwt-p-2 pwt-fs-4")
-    //.vertical_align("middle")
-    //.min_row_height(100)
-    //.header_class("pwt-scheme-primary-container pwt-fs-4")
+        //.cell_class("pwt-p-2 pwt-fs-4")
+        //.vertical_align("middle")
+        //.min_row_height(100)
+        //.header_class("pwt-scheme-primary-container pwt-fs-4")
         .bordered(true)
         .selection(selection)
         .into()

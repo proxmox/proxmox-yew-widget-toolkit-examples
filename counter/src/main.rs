@@ -1,6 +1,6 @@
 use pwt::prelude::*;
 
-use pwt::widget::{Column, Button, Panel, Toolbar};
+use pwt::widget::{Button, Column, Panel, Toolbar};
 
 pub enum Msg {
     Increment,
@@ -39,22 +39,12 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
         let toolbar = Toolbar::new()
             .border_bottom(true)
-            .with_child(
-                Button::new("Increment")
-                    .onclick(ctx.link().callback(|_| Msg::Increment))
-            )
-            .with_child(
-                Button::new("Decrement")
-                    .onclick(ctx.link().callback(|_| Msg::Decrement))
-            )
+            .with_child(Button::new("Increment").onclick(ctx.link().callback(|_| Msg::Increment)))
+            .with_child(Button::new("Decrement").onclick(ctx.link().callback(|_| Msg::Decrement)))
             .with_flex_spacer()
-            .with_child(
-                Button::new("Reset")
-                    .onclick(ctx.link().callback(|_| Msg::Reset))
-            );
+            .with_child(Button::new("Reset").onclick(ctx.link().callback(|_| Msg::Reset)));
 
         let content = Column::new()
             .padding(2)
@@ -68,7 +58,6 @@ impl Component for App {
             .with_child(content)
             .into()
     }
-
 }
 
 fn main() {

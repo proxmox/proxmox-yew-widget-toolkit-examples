@@ -12,7 +12,6 @@ impl Component for App {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-
         let toolbar = Toolbar::new()
             .border_bottom(true)
             .with_flex_spacer()

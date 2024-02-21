@@ -3,8 +3,7 @@ use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{Button, Column, Row, ThemeModeSelector};
 
 use pwt::touch::{
-    ApplicationBar, Fab, MaterialApp, PageController, Scaffold, SnackBar,
-    SnackBarController,
+    ApplicationBar, Fab, MaterialApp, PageController, Scaffold, SnackBar, SnackBarController,
 };
 use pwt::widget::{ActionIcon, Card};
 
@@ -60,7 +59,6 @@ fn switch(path: &str) -> Vec<Html> {
         Route::NotFound => vec![html! {<NotFound/>}],
     }
 }
-
 
 #[function_component]
 fn Home() -> Html {
@@ -128,7 +126,6 @@ fn Home() -> Html {
         .into()
 }
 
-
 #[function_component]
 fn Favorite() -> Html {
     Scaffold::with_title("Favorite")
@@ -174,7 +171,6 @@ fn TestPage2() -> Html {
         .into()
 }
 
-
 #[function_component]
 pub fn NotFound() -> Html {
     Scaffold::new()
@@ -192,9 +188,7 @@ pub fn NotFound() -> Html {
 
 #[function_component]
 fn App() -> Html {
-    MaterialApp::new(switch)
-        .snackbar_bottom_offset(220)
-        .into()
+    MaterialApp::new(switch).snackbar_bottom_offset(220).into()
 }
 
 fn main() {

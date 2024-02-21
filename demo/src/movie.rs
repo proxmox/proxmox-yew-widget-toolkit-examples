@@ -1,8 +1,8 @@
 use std::rc::Rc;
 
+use gloo_net::http::Request;
 use pwt::css::{Flex, Overflow};
 use serde::Deserialize;
-use gloo_net::http::Request;
 
 use yew::prelude::*;
 use yew::virtual_dom::Key;
@@ -28,17 +28,19 @@ impl ExtractPrimaryKey for Record {
 }
 
 fn load_movie_list(store: &Store<Record>) {
-
     let url = "https://raw.githubusercontent.com/prust/wikipedia-movie-data/master/movies.json";
 
     let store = store.clone();
 
     wasm_bindgen_futures::spawn_local(async move {
-
         let response = match Request::get(url).send().await {
             Ok(response) => {
                 if !response.ok() {
-                    log::error!("Load failed - {}: {}", response.status(), response.status_text());
+                    log::error!(
+                        "Load failed - {}: {}",
+                        response.status(),
+                        response.status_text()
+                    );
                     return;
                 }
                 response
@@ -74,7 +76,7 @@ fn load_movie_list(store: &Store<Record>) {
     });
 }
 
-thread_local!{
+thread_local! {
     static COLUMNS: Rc<Vec<DataTableHeader<Record>>> = Rc::new(vec![
         DataTableColumn::new("Title")
             .sorter(|r1: &Record, r2: &Record| r1.title.cmp(&r2.title))
@@ -113,7 +115,6 @@ thread_local!{
 
 #[function_component]
 pub fn MovieDemo() -> Html {
-
     let columns = COLUMNS.with(Rc::clone);
 
     let store = use_state(move || {

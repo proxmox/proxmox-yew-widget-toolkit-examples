@@ -1,8 +1,8 @@
 use pwt::css::Flex;
 use pwt::prelude::*;
+use pwt::state::NavigationContainer;
 use pwt::touch::NavigationBar;
 use pwt::widget::{Column, TabBarItem};
-use pwt::state::NavigationContainer;
 
 #[function_component]
 pub fn NavigationBarDemo() -> Html {

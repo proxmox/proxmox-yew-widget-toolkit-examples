@@ -1,5 +1,5 @@
-use pwt::prelude::*;
 use pwt::css::ColorScheme;
+use pwt::prelude::*;
 use pwt::widget::{Button, Panel, Row};
 
 use web_sys::Element;

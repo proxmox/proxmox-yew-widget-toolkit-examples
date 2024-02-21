@@ -88,13 +88,13 @@ fn panel_with_menubar() -> Html {
             .with_item(submenu2.clone())
             .with_item(<Container as Into<Html>>::into(
                 // Create a custom menu item
-                Container::new()
-                    .class("pwt-menu-item")
-                    .with_child(Button::new("Button2").tabindex(-1).onclick(
-                        |event: MouseEvent| {
+                Container::new().class("pwt-menu-item").with_child(
+                    Button::new("Button2")
+                        .tabindex(-1)
+                        .onclick(|event: MouseEvent| {
                             dispatch_menu_close_event(&event);
-                        },
-                    )),
+                        }),
+                ),
             ))
             .with_item(submenu3)
             .with_item(MenuItem::new("Submenu1 Item2")),

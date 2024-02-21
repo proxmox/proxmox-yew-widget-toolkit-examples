@@ -1,10 +1,9 @@
-
 use yew_router::prelude::Navigator;
 
 use pwt::prelude::*;
-use pwt::widget::{Row, ThemeModeSelector};
-use pwt::widget::nav::{NavigationDrawer, Menu, MenuItem};
 use pwt::touch::PageController;
+use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
+use pwt::widget::{Row, ThemeModeSelector};
 
 use super::Route;
 
