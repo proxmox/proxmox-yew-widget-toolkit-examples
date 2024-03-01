@@ -3,7 +3,7 @@ use yew::prelude::*;
 use pwt::css::ColorScheme;
 use pwt::prelude::*;
 use pwt::touch::{Fab, FabMenu, FabMenuAlign, FabMenuDirection};
-use pwt::widget::{ActionIcon, Button, Column, Row, SegmentedButton};
+use pwt::widget::{ActionIcon, Button, Column, FileButton, Row, SegmentedButton};
 
 #[function_component]
 pub fn ButtonsDemo() -> Html {
@@ -173,7 +173,19 @@ pub fn ButtonsDemo() -> Html {
         .with_child(
             Button::new("Delete")
                 .icon_class("fa fa-trash-o")
+                .onclick(|_| log::info!("CLICK"))
                 .class("rounded"),
+        )
+        .with_child("File Buttons")
+        .with_child(
+            Row::new()
+                .gap(2)
+                .with_child(
+                    FileButton::new("Downlaod").icon_class("fa fa-download").accept("image/*").multiple(true)
+                )
+                .with_child(
+                    FileButton::new_icon("fa fa-download")
+                )
         )
         .with_child("Round Icon Button")
         .with_child(Button::new_icon("fa fa-trash-o").class("circle"))
