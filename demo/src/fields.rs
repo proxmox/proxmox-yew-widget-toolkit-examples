@@ -22,7 +22,7 @@ fn demo_input_panel() -> Html {
                 .placeholder("Search"),
         )
         .with_field("Password", Field::new().input_type(InputType::Password))
-        .with_field("Range field", Field::new().input_type(InputType::Range))
+        .with_field("Range field", Field::new().range(0.0, 100.0, 1.0))
         .with_field("Numberfield", Field::new().input_type(InputType::Number))
         .with_field(
             "Numberfield with limits",
