@@ -96,6 +96,7 @@ pub fn DialogDemo() -> Html {
         ViewState::ShowDialog => Dialog::new("Example Dialog")
             .draggable(true)
             .on_close(close_callback)
+            .width(800)
             .min_width(200)
             .with_child(
                 Column::new()
@@ -121,6 +122,7 @@ pub fn DialogDemo() -> Html {
             .draggable(true)
             .resizable(true)
             .on_close(close_callback)
+            .width(800)
             .min_width(200)
             .min_height(50)
             .with_child(
@@ -144,10 +146,12 @@ pub fn DialogDemo() -> Html {
                     ),
             )
             .into(),
-        ViewState::ShowGridDialog => Dialog::new("Example Resizable Dialog")
+        ViewState::ShowGridDialog => Dialog::new("Example Resizable Dialog with Grid")
             .draggable(true)
             .resizable(true)
             .on_close(close_callback)
+            .width(500)
+            .height(400)
             .min_width(200)
             .min_height(50)
             .with_child(DataTable::new(get_columns(), store).class(Overflow::Auto))
