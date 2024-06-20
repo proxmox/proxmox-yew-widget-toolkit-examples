@@ -1,4 +1,5 @@
 use pwt::prelude::*;
+use pwt::props::WidgetStyleBuilder;
 use pwt::widget::form::{
     Checkbox, Combobox, Field, Form, InputType, TextArea, Tristate, TristateBoolean,
 };
@@ -11,6 +12,7 @@ fn demo_input_panel() -> Html {
     }
 
     InputPanel::new()
+        .width(500)
         .with_field(
             "Textfield (primary)",
             Field::new().class("pwt-scheme-primary"),
