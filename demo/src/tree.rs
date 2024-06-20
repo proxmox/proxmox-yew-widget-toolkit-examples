@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use pwt::css::{Flex, Overflow};
-use pwt::props::ExtractPrimaryKey;
+use pwt::props::{ExtractPrimaryKey, WidgetStyleBuilder};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -12,7 +12,7 @@ use pwt::prelude::*;
 
 //use pwt::props::Selection2;
 use pwt::state::{use_tree_store, TreeStore};
-use pwt::widget::{data_table::*, Tooltip};
+use pwt::widget::{data_table::*, Fa, Tooltip};
 use pwt::widget::{ActionIcon, Button, Row};
 
 fn test0() {
@@ -100,18 +100,18 @@ impl ExtractPrimaryKey for PveTreeEntry {
 impl PveTreeEntry {
     fn icon(&self) -> &'static str {
         match self.node_type {
-            PveType::Root => "fa-server",
-            PveType::Node => "fa-building",
-            PveType::Ct => "fa-cube",
-            PveType::Vm => "fa-desktop",
+            PveType::Root => "server",
+            PveType::Node => "building",
+            PveType::Ct => "cube",
+            PveType::Vm => "desktop",
         }
     }
 
-    fn style(&self) -> &'static str {
+    fn color(&self) -> &'static str {
         match self.status {
             Some(PveStatus::Online) => "",
-            Some(PveStatus::Offline) => "color: #FF6C59;",
-            Some(PveStatus::Running) => "color: #21BF4B;",
+            Some(PveStatus::Offline) => "#FF6C59",
+            Some(PveStatus::Running) => "#21BF4b",
             Some(PveStatus::Stopped) => "",
             None => "",
         }
@@ -249,9 +249,12 @@ pub fn TreeDemo() -> Html {
                 }
                 _ => {}
             }
-            let class = classes!(args.record().icon(), "fa", "fa-fw", "pwt-pe-2");
-            let style = args.record().style();
-            html! {<><i {class} {style} /> {args.record().text.to_string()}</>}
+            let record = args.record();
+            let icon = Fa::new(record.icon())
+                .fixed_width()
+                .padding_end(2)
+                .style("color", record.color());
+            html! {<>{icon} {args.record().text.to_string()}</>}
         });
 
     let column2 = DataTableColumn::new("Buttons").render(|record: &PveTreeEntry| {
