@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 
 use pwt::css::Flex;
 use pwt::prelude::*;
+use pwt::props::WidgetStyleBuilder;
 use pwt::touch::{
     GestureDetector, GestureDragEvent, GestureSwipeEvent, Slidable, SlidableAction,
     SlidableActionMouseEvent,
@@ -54,7 +55,7 @@ impl Component for GestureDetectorDemo {
 
         let content = Container::new()
             .class(Flex::Fill)
-            .attribute("style", "touch-action:none;")
+            .style("touch-action", "none")
             .padding(4)
             .with_child(
                 Button::new("Button inside GestureDetector")

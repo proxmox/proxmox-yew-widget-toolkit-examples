@@ -1,3 +1,4 @@
+use pwt::props::WidgetStyleBuilder;
 use serde_json::Value;
 
 use pwt::prelude::*;
@@ -6,7 +7,7 @@ use pwt::widget::form::{
     Boolean, Checkbox, Combobox, Field, Form, FormContext, InputType, Number, ResetButton,
     SubmitButton, Tristate, TristateBoolean,
 };
-use pwt::widget::{InputPanel, Panel, Row};
+use pwt::widget::{Container, InputPanel, Panel, Row};
 
 pub struct MyForm {
     form_ctx: FormContext,
@@ -136,9 +137,12 @@ impl Component for MyForm {
 
         let data_view = self.data.clone().map(|data| {
             let text = serde_json::to_string_pretty(&data).unwrap();
-            Panel::new()
-                .title("Submit Data")
-                .with_child(html! {<div class="pwt-p-2" style="white-space: pre;">{text}</div>})
+            Panel::new().title("Submit Data").with_child(
+                Container::new()
+                    .padding(2)
+                    .style("white-space", "pre")
+                    .with_child(text),
+            )
         });
 
         Panel::new()

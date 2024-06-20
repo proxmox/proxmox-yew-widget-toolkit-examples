@@ -2,6 +2,7 @@ use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
 use pwt::dom::IntoHtmlElement;
+use pwt::props::WidgetStyleBuilder;
 use pwt::widget::align::{align_to, align_to_xy, AlignOptions, GrowDirection, Point};
 use pwt::widget::Panel;
 use pwt::{
@@ -48,10 +49,6 @@ pub fn AlignDemo() -> Html {
         let button_ref = button_ref.clone();
         let text_ref = text_ref.clone();
         gloo_timers::callback::Timeout::new(100, move || {
-            if let Some(el) = text_ref.clone().into_html_element() {
-                // ignore errors
-                let _ = el.style().set_property("display", "");
-            }
             align(button_ref.clone(), text_ref.clone(), Point::Center);
         })
         .forget();
@@ -94,7 +91,7 @@ pub fn AlignDemo() -> Html {
             Panel::new()
                 .border(true)
                 .title("Floating")
-                .attribute("style", "display:none")
+                .style("position", "fixed")
                 .with_child(html!(<div class="pwt-p-2">{ "Content" }</div>))
                 .node_ref(text_ref.clone()),
         )
