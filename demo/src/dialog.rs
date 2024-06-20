@@ -3,7 +3,7 @@ use std::rc::Rc;
 use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
-use pwt::props::ExtractPrimaryKey;
+use pwt::props::{ExtractPrimaryKey, WidgetStyleBuilder};
 use pwt::state::Store;
 use pwt::widget::data_table::{DataTable, DataTableColumn, DataTableHeader};
 use pwt::{
@@ -96,7 +96,7 @@ pub fn DialogDemo() -> Html {
         ViewState::ShowDialog => Dialog::new("Example Dialog")
             .draggable(true)
             .on_close(close_callback)
-            .style("min-width: 200px;")
+            .min_width(200)
             .with_child(
                 Column::new()
                     .class(Flex::Fill)
@@ -121,7 +121,8 @@ pub fn DialogDemo() -> Html {
             .draggable(true)
             .resizable(true)
             .on_close(close_callback)
-            .style("min-width: 200px; min-height: 50px;")
+            .min_width(200)
+            .min_height(50)
             .with_child(
                 Column::new()
                     .class(Flex::Fill)
@@ -147,7 +148,8 @@ pub fn DialogDemo() -> Html {
             .draggable(true)
             .resizable(true)
             .on_close(close_callback)
-            .style("min-width: 200px; min-height: 50px;")
+            .min_width(200)
+            .min_height(50)
             .with_child(DataTable::new(get_columns(), store).class(Overflow::Auto))
             .into(),
     };
