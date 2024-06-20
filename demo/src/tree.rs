@@ -1,7 +1,5 @@
 use std::rc::Rc;
 
-use pwt::css::{Flex, Overflow};
-use pwt::props::{ExtractPrimaryKey, WidgetStyleBuilder};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -11,6 +9,8 @@ use yew::virtual_dom::Key;
 use pwt::prelude::*;
 
 //use pwt::props::Selection2;
+use pwt::css::{Flex, Overflow};
+use pwt::props::ExtractPrimaryKey;
 use pwt::state::{use_tree_store, TreeStore};
 use pwt::widget::{data_table::*, Fa, Tooltip};
 use pwt::widget::{ActionIcon, Button, Row};

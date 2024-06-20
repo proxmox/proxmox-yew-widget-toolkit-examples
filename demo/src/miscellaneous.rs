@@ -1,8 +1,9 @@
-use pwt::css::{Flex, Overflow};
-use pwt::touch::{SnackBar, SnackBarController, SnackBarManager};
 use yew::prelude::*;
 
 use pwt::prelude::*;
+
+use pwt::css::{Flex, Overflow};
+use pwt::touch::{SnackBar, SnackBarController, SnackBarManager};
 use pwt::widget::{Button, Column, Mask, Meter, MiniScroll, MiniScrollMode, Panel, Progress, Row};
 
 fn mini_scoll_demo1() -> Html {

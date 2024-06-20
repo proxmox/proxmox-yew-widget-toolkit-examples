@@ -1,4 +1,3 @@
-use pwt::props::WidgetStyleBuilder;
 use serde_json::Value;
 
 use pwt::prelude::*;

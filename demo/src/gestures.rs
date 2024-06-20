@@ -2,7 +2,6 @@ use std::collections::VecDeque;
 
 use pwt::css::Flex;
 use pwt::prelude::*;
-use pwt::props::WidgetStyleBuilder;
 use pwt::touch::{
     GestureDetector, GestureDragEvent, GestureSwipeEvent, Slidable, SlidableAction,
     SlidableActionMouseEvent,

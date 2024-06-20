@@ -2,7 +2,6 @@ use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
 use pwt::dom::IntoHtmlElement;
-use pwt::props::WidgetStyleBuilder;
 use pwt::widget::align::{align_to, align_to_xy, AlignOptions, GrowDirection, Point};
 use pwt::widget::Panel;
 use pwt::{

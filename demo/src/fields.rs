@@ -1,5 +1,4 @@
 use pwt::prelude::*;
-use pwt::props::WidgetStyleBuilder;
 use pwt::widget::form::{
     Checkbox, Combobox, Field, Form, InputType, TextArea, Tristate, TristateBoolean,
 };

@@ -3,7 +3,7 @@ use std::rc::Rc;
 use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
-use pwt::props::{ExtractPrimaryKey, WidgetStyleBuilder};
+use pwt::props::ExtractPrimaryKey;
 use pwt::state::Store;
 use pwt::widget::data_table::{DataTable, DataTableColumn, DataTableHeader};
 use pwt::{
