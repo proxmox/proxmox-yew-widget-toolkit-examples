@@ -3,7 +3,7 @@ use std::rc::Rc;
 use pwt::{
     css::{ColorScheme, Flex},
     prelude::*,
-    props::ExtractPrimaryKey,
+    props::{ExtractPrimaryKey, WidgetStyleBuilder},
     state::Store,
     widget::{
         data_table::{DataTable, DataTableColumn, DataTableHeader},
@@ -146,7 +146,7 @@ impl Component for WidgetColumnGrid {
                                     .striped(false)
                                     .class(Flex::Fill),
                             )
-                            .attribute("style", "height: 200px;"),
+                            .height(200),
                     )
                     .with_child(
                         Row::new().margin(1).with_child(
