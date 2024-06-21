@@ -87,7 +87,6 @@ pub fn DataTableDemo() -> Html {
         .border(true)
         .min_row_height(110)
         .autoselect(false)
-        //.cell_class("pwt-p-2 pwt-fs-4")
         //.vertical_align("middle")
         //.min_row_height(100)
         //.header_class("pwt-scheme-primary-container pwt-fs-4")
