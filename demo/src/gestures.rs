@@ -45,7 +45,7 @@ impl Component for GestureDetectorDemo {
         let log_panel = Panel::new()
             .border(false)
             .title("Gesture detection log")
-            .with_child(Container::new().tag("pre").padding(2).with_child({
+            .with_child(Container::from_tag("pre").padding(2).with_child({
                 self.logs
                     .iter()
                     .map(|t| html! {format!("{t}\n")})
