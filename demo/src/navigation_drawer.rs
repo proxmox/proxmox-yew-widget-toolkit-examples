@@ -71,7 +71,12 @@ pub fn NavigationDrawerDemo() -> Html {
     let drawer = NavigationDrawer::new(menu)
         .class(Overflow::Auto) // allow to shrink
         .router(true)
-        .header(html! {<div class="pwt-p-2 pwt-font-size-title-large">{"Menu Header"}</div>})
+        .header(
+            Container::new()
+                .padding(2)
+                .class("pwt-font-size-title-large")
+                .with_child("Menu Header"),
+        )
         .selection(selection.clone())
         .border_start(true)
         .on_select({

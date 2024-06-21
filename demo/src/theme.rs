@@ -3,7 +3,8 @@ use yew::prelude::*;
 use pwt::prelude::*;
 use pwt::state::NavigationContainer;
 use pwt::widget::{
-    Button, Column, Panel, Row, SelectionViewRenderInfo, TabBarItem, TabPanel, ThemeDensitySelector,
+    Button, Column, Container, Panel, Row, SelectionViewRenderInfo, TabBarItem, TabPanel,
+    ThemeDensitySelector,
 };
 
 use pwt::css::{ColorScheme, Flex, Overflow};
@@ -19,38 +20,34 @@ static COLOR_SCHEMES: &[ColorScheme] = &[
 ];
 
 fn color_palette(color: &str, title: &str) -> Html {
-    let percentage = [99, 95, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5];
-    let colors: Html = percentage
-        .iter()
-        .map(|p| {
-            let class = format!(
-                "pwt-bg-color-{}-{} pwt-color-{}-{} pwt-p-2",
-                color,
-                p,
-                color,
-                if *p <= 50 { 99 } else { 10 },
-            );
+    let class = format!("pwt-bg-color-{color} pwt-color-on-{color}");
 
-            html! {
-                <div {class}>{format!("{}-{}", color, p)}</div>
-            }
-        })
-        .collect();
+    let variant_class = format!("pwt-bg-color-{color}-container pwt-color-on-{color}-container",);
 
-    let class = format!("pwt-bg-color-{} pwt-color-on-{} pwt-p-4", color, color,);
+    let mut col = Column::new()
+        .with_child(Container::new().padding(4).class(class).with_child(title))
+        .with_child(
+            Container::new()
+                .class(variant_class)
+                .padding(4)
+                .with_child("Container variant"),
+        );
 
-    let variant_class = format!(
-        "pwt-bg-color-{}-container pwt-color-on-{}-container pwt-p-4",
-        color, color,
-    );
+    for p in [99, 95, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5] {
+        let class = format!(
+            "pwt-bg-color-{color}-{p} pwt-color-{color}-{}",
+            if p <= 50 { 99 } else { 10 },
+        );
 
-    html! {
-        <div>
-            <div {class}>{title}</div>
-            <div class={variant_class}>{"Container variant"}</div>
-            {colors}
-        </div>
+        col.add_child(
+            Container::new()
+                .padding(2)
+                .class(class)
+                .with_child(format!("{}-{}", color, p)),
+        )
     }
+
+    col.into()
 }
 
 fn color_panel(_: &SelectionViewRenderInfo) -> Html {

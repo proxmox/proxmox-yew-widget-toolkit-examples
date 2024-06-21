@@ -4,7 +4,8 @@ use pwt::widget::{Card, Column};
 
 fn card_with_text(text: &str) -> Card {
     Card::new()
-        .class("pwt-d-flex pwt-justify-content-center pwt-align-items-center pwt-p-4")
+        .padding(4)
+        .class("pwt-d-flex pwt-justify-content-center pwt-align-items-center")
         .with_child(text)
 }
 

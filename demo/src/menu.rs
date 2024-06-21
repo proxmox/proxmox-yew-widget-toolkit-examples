@@ -39,7 +39,7 @@ fn panel_with_menu_button() -> Html {
         .border(true)
         .title("Menu Button Example")
         .with_child(toolbar)
-        .with_child(html! {<p class="pwt-p-2">{text}</p>})
+        .with_child(Container::new().tag("p").padding(2).with_child(text))
         .into()
 }
 
@@ -124,7 +124,7 @@ fn panel_with_menubar() -> Html {
                 .with_child(menubar.clone())
                 .class("pwt-border-bottom"),
         )
-        .with_child(html! {<p class="pwt-p-2">{text}</p>})
+        .with_child(Container::new().tag("p").padding(2).with_child(text))
         .into()
 }
 

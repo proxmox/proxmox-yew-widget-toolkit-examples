@@ -91,7 +91,7 @@ pub fn AlignDemo() -> Html {
                 .border(true)
                 .title("Floating")
                 .style("position", "fixed")
-                .with_child(html!(<div class="pwt-p-2">{ "Content" }</div>))
+                .with_child(Container::new().padding(2).with_child("Content"))
                 .node_ref(text_ref.clone()),
         )
         .into()

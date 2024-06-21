@@ -3,7 +3,7 @@ use yew_router::prelude::Navigator;
 use pwt::prelude::*;
 use pwt::touch::PageController;
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
-use pwt::widget::{Row, ThemeModeSelector};
+use pwt::widget::{Container, Row, ThemeModeSelector};
 
 use super::Route;
 
@@ -43,7 +43,12 @@ pub fn create_drawer(page_controller: PageController, navigator: Navigator) -> N
 
     let header = Row::new()
         .class("pwt-align-items-center")
-        .with_child(html! {<div class="pwt-p-2 pwt-font-size-title-large">{"Menu Header"}</div>})
+        .with_child(
+            Container::new()
+                .padding(2)
+                .class("pwt-font-size-title-large")
+                .with_child("Menu Header"),
+        )
         .with_child(ThemeModeSelector::new());
 
     NavigationDrawer::new(menu)

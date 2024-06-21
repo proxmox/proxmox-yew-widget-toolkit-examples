@@ -1,7 +1,7 @@
 use pwt::prelude::*;
 
 use pwt::widget::form::Field;
-use pwt::widget::{Button, Column, Row, Tooltip};
+use pwt::widget::{Button, Column, Container, Row, Tooltip};
 
 #[function_component]
 pub fn TooltipDemo() -> Html {
@@ -16,21 +16,21 @@ pub fn TooltipDemo() -> Html {
         )
         .with_child(
             Tooltip::new("Anything may have a tooltip, i.e this text.")
-                .class("pwt-mt-4")
+                .margin_top(4)
                 .tip("Simple text with a tooltip.")
         )
         .with_child(html!{<div/>})
         .with_child(
             Tooltip::new("Tooltips may have rich html content.")
-                .class("pwt-mt-4")
+                .margin_top(4)
                 .rich_tip(
                     Column::new()
                         .with_child(html!{<h6>{"Rich Tooltip"}</h6>})
                         .with_child(html!{<p>{"Rich Tooltips may contain arbitrary html content. It is possible to add interactive elements."}</p>})
-                        .with_child(Row::new().with_child(Button::new("Action").class("pwt-mt-2 pwt-button-text")))
+                        .with_child(Row::new().with_child(Button::new("Action").margin_top(2).class("pwt-button-text")))
                 )
         )
-        .with_child(html!{<div class="pwt-mt-4">{"Inputs use tooltips to display validation results:"}</div>})
+        .with_child(Container::new().margin_top(4).with_child("Inputs use tooltips to display validation results:"))
         .with_child(html!{
             <form novalidate={true}> // disable broser validation popup
             {

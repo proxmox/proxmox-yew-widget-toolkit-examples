@@ -27,11 +27,15 @@ pub fn I18NDemo() -> Html {
                         .onclick(button_callback),
                 ),
         )
-        .with_child(html!{
-            <div class="pwt-m-2">{ngettext!("You have one new message", "You have {n} new messages", *state)}</div>
-        })
-        .with_child(html!{
-            <div class="pwt-m-2">{tr!("Static number: {}", "5")}</div>
-        })
+        .with_child(Container::new().margin(2).with_child(ngettext!(
+            "You have one new message",
+            "You have {n} new messages",
+            *state
+        )))
+        .with_child(
+            Container::new()
+                .margin(2)
+                .with_child(tr!("Static number: {}", "5")),
+        )
         .into()
 }

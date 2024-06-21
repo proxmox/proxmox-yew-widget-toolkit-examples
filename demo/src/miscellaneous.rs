@@ -4,7 +4,9 @@ use pwt::prelude::*;
 
 use pwt::css::{Flex, Overflow};
 use pwt::touch::{SnackBar, SnackBarController, SnackBarManager};
-use pwt::widget::{Button, Column, Mask, Meter, MiniScroll, MiniScrollMode, Panel, Progress, Row};
+use pwt::widget::{
+    Button, Column, Container, Mask, Meter, MiniScroll, MiniScrollMode, Panel, Progress, Row,
+};
 
 fn mini_scoll_demo1() -> Html {
     let mut content = Row::new().padding(2).gap(2);
@@ -39,11 +41,12 @@ fn load_mask_demo() -> Html {
         .border(true)
         .title("Load Mask")
         .with_child(
-            Mask::new(html! {
-                <div class="pwt-p-2" style="min-height:50px;">
-                    {"You can  set a load mask above any content."}
-                </div>
-            })
+            Mask::new(
+                Container::new()
+                    .padding(2)
+                    .min_height(50)
+                    .with_child("You can  set a load mask above any content."),
+            )
             .visible(true),
         )
         .into()
@@ -54,11 +57,12 @@ fn load_with_progress_demo() -> Html {
         .border(true)
         .title("Use progress bar as bottom border")
         .with_child(Progress::new())
-        .with_child(html! {
-            <div class="pwt-p-2" style="min-height:50px;">
-                    {"You can use the progess indicator like an additional border."}
-                </div>
-        })
+        .with_child(
+            Container::new()
+                .padding(2)
+                .min_height(50)
+                .with_child("You can use the progess indicator like an additional border."),
+        )
         .into()
 }
 

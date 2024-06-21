@@ -1,6 +1,6 @@
 use pwt::touch::prelude::*;
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
-use pwt::widget::{Button, Column, Row, ThemeModeSelector};
+use pwt::widget::{Button, Column, Container, Row, ThemeModeSelector};
 
 use pwt::touch::{
     ApplicationBar, Fab, MaterialApp, PageController, Scaffold, SnackBar, SnackBarController,
@@ -175,13 +175,12 @@ fn TestPage2() -> Html {
 pub fn NotFound() -> Html {
     Scaffold::new()
         .application_bar(ApplicationBar::new().title("Page not found!"))
-        .body(html! {
-            <div class="pwt-p-2">
-                <p>{
-                    "Sorry, we are unable to fing this page. Please continue "
-                }<Link<Route> to={Route::Home}>{"here"}</Link<Route>></p>
-            </div>
-        })
+        .body(Container::new().padding(2).with_child(html! {
+            <p>
+                {"Sorry, we are unable to find this page. Please continue "}
+                <Link<Route> to={Route::Home}>{"here"}</Link<Route>>
+            </p>
+        }))
         //.navigation_bar(navigation_bar())
         .into()
 }
