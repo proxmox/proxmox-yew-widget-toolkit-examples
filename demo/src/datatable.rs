@@ -1,13 +1,14 @@
 use std::rc::Rc;
 
 use pwt::css::{Flex, Overflow};
+use pwt::widget::form::Boolean;
 use yew::prelude::*;
 
 use pwt::prelude::*;
 
 use pwt::props::ExtractKeyFn;
 use pwt::state::{use_selection, Selection, Store};
-use pwt::widget::data_table::*;
+use pwt::widget::{data_table::*, Column, InputPanel, Panel};
 
 #[function_component]
 pub fn DataTableDemo() -> Html {
@@ -80,17 +81,87 @@ pub fn DataTableDemo() -> Html {
         selection
     });
 
-    DataTable::new(columns, (*store).clone())
+    let borderless = use_state(|| false);
+    let bordered = use_state(|| true);
+    let show_headers = use_state(|| true);
+    let striped = use_state(|| true);
+    let hover = use_state(|| true);
+
+    Column::new()
         .class(Flex::Fill)
         .class(Overflow::Auto)
-        .margin(2)
-        .border(true)
-        .min_row_height(110)
-        .autoselect(false)
-        //.vertical_align("middle")
-        //.min_row_height(100)
-        //.header_class("pwt-scheme-primary-container pwt-fs-4")
-        .bordered(true)
-        .selection(selection)
+        .padding(2)
+        .gap(2)
+        .with_child(
+            Panel::new()
+                .title("DataTable Options")
+                .border(true)
+                .with_child(
+                    InputPanel::new()
+                        .padding(2)
+                        .with_field(
+                            "Borderless",
+                            Boolean::new()
+                                .name("borderless")
+                                .checked(*borderless)
+                                .on_change({
+                                    let borderless = borderless.clone();
+                                    move |v| borderless.set(v)
+                                }),
+                        )
+                        .with_field(
+                            "Bordered",
+                            Boolean::new()
+                                .name("bordered")
+                                .checked(*bordered)
+                                .on_change({
+                                    let bordered = bordered.clone();
+                                    move |v| bordered.set(v)
+                                }),
+                        )
+                        .with_field(
+                            "Show Headers",
+                            Boolean::new()
+                                .name("header")
+                                .checked(*show_headers)
+                                .on_change({
+                                    let show_headers = show_headers.clone();
+                                    move |v| show_headers.set(v)
+                                }),
+                        )
+                        .with_right_field(
+                            "Striped",
+                            Boolean::new().name("striped").checked(*striped).on_change({
+                                let striped = striped.clone();
+                                move |v| striped.set(v)
+                            }),
+                        )
+                        .with_right_field(
+                            "Hover",
+                            Boolean::new().name("hover").checked(*hover).on_change({
+                                let hover = hover.clone();
+                                move |v| hover.set(v)
+                            }),
+                        ),
+                ),
+        )
+        .with_child(
+            DataTable::new(columns, (*store).clone())
+                .class(Flex::Fill)
+                .class(Overflow::Auto)
+                .border(true)
+                .bordered(*bordered)
+                .show_header(*show_headers)
+                .borderless(*borderless)
+                .min_row_height(110)
+                .striped(*striped)
+                .hover(*hover)
+                .autoselect(false)
+                //.cell_class("pwt-p-2 pwt-fs-4")
+                //.vertical_align("middle")
+                //.min_row_height(100)
+                //.header_class("pwt-scheme-primary-container pwt-fs-4")
+                .selection(selection),
+        )
         .into()
 }
