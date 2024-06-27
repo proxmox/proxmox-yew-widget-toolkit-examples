@@ -1,6 +1,6 @@
 use pwt::prelude::*;
 use pwt::widget::form::{
-    Checkbox, Combobox, Field, Form, InputType, TextArea, Tristate, TristateBoolean,
+    Checkbox, Combobox, DisplayField, Field, Form, InputType, TextArea, Tristate, TristateBoolean,
 };
 use pwt::widget::{Container, InputPanel};
 
@@ -22,6 +22,8 @@ fn demo_input_panel() -> Html {
                 .with_icon("fa fa-search", true)
                 .placeholder("Search"),
         )
+        .with_field("Display", DisplayField::new("Some Value"))
+        .with_field("Display with long text", DisplayField::new("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempor nisi odio, sit amet efficitur purus pharetra ac."))
         .with_field("Password", Field::new().input_type(InputType::Password))
         .with_field("Range field", Field::new().range(0.0, 100.0, 1.0))
         .with_field("Numberfield", Field::new().input_type(InputType::Number))
