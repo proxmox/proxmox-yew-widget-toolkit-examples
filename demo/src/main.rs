@@ -400,8 +400,8 @@ fn DemoApp() -> Html {
 #[function_component]
 fn RoutedApp() -> Html {
     let body = html! {<DemoApp/>};
-    let body = ThemeLoader::new(body);
     let body = CatalogLoader::new(body);
+    let body = ThemeLoader::new(body);
 
     html! { <HashRouter>{body}</HashRouter> }
 }
