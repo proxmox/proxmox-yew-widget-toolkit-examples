@@ -33,5 +33,6 @@ impl Component for App {
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
+    pwt::state::set_available_themes(&["Proxmox"]);
     yew::Renderer::<App>::new().render();
 }
