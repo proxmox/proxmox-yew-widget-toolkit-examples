@@ -93,7 +93,7 @@ fn register_view(
     id: &'static str,
     renderer: impl 'static + Fn(&SelectionViewRenderInfo) -> Html,
 ) {
-    view.add_builder(id.clone(), renderer);
+    view.add_builder(id, renderer);
     menu.add_item(MenuItem::new(text).key(id));
 }
 
@@ -105,7 +105,7 @@ fn register_submenu(
     renderer: impl 'static + Fn(&SelectionViewRenderInfo) -> Html,
     submenu: Menu,
 ) {
-    view.add_builder(id.clone(), renderer);
+    view.add_builder(id, renderer);
     menu.add_item(MenuItem::new(text).key(id).submenu(submenu));
 }
 
