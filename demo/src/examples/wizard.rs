@@ -164,7 +164,7 @@ impl Component for PwtWizard {
                         "Combobox",
                         Combobox::new()
                             .name("combobox")
-                            .with_icon("fa fa-user", false)
+                            .with_trigger("fa fa-user", false)
                             .with_item("Admin")
                             .with_item("User")
                             .with_item("Root"),
@@ -198,7 +198,7 @@ impl Component for PwtWizard {
                         "Combobox",
                         Combobox::new()
                             .name("combobox")
-                            .with_icon("fa fa-user", false)
+                            .with_trigger("fa fa-user", false)
                             .with_item("Admin")
                             .with_item("User")
                             .with_item("Root"),

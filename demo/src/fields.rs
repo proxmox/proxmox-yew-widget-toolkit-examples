@@ -19,7 +19,7 @@ fn demo_input_panel() -> Html {
         .with_field(
             "Textfield (with placeholder and icon)",
             Field::new()
-                .with_icon("fa fa-search", true)
+                .with_trigger("fa fa-search", true)
                 .placeholder("Search"),
         )
         .with_field("Display", DisplayField::new("Some Value"))
@@ -65,7 +65,7 @@ fn demo_input_panel() -> Html {
             "Combobox (with icon)",
             Combobox::new()
                 .placeholder("Select a user")
-                .with_icon("fa fa-user", false)
+                .with_trigger("fa fa-user", false)
                 .with_item("Admin")
                 .with_item("User"),
         )
@@ -74,7 +74,7 @@ fn demo_input_panel() -> Html {
             Combobox::new()
                 .disabled(true)
                 .placeholder("Select a user")
-                .with_icon("fa fa-user", false)
+                .with_trigger("fa fa-user", false)
                 .with_item("Admin")
                 .with_item("User"),
         )
