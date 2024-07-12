@@ -74,6 +74,14 @@ fn demo_input_panel(alert: UseStateHandle<Option<String>>) -> Html {
                 .with_item("Item 2"),
         )
         .with_field(
+            "Combobox (editable)",
+            Combobox::new()
+                .editable(true)
+                .default("Item 1")
+                .with_item("Item 1")
+                .with_item("Item 2"),
+        )
+        .with_field(
             "Combobox (with icon)",
             Combobox::new()
                 .placeholder("Select a user")
