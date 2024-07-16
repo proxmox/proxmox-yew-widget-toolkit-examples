@@ -1,7 +1,7 @@
 use pwt::prelude::*;
 use pwt::widget::form::{
-    Checkbox, Combobox, DisplayField, Field, Form, FormContext, InputType, TextArea, Tristate,
-    TristateBoolean,
+    Checkbox, Combobox, DisplayField, Field, Form, FormContext, InputType, Number, TextArea,
+    Tristate, TristateBoolean,
 };
 use pwt::widget::{AlertDialog, Container, InputPanel, Trigger};
 
@@ -38,10 +38,10 @@ fn demo_input_panel(alert: UseStateHandle<Option<String>>) -> Html {
         .with_field("Display with long text", DisplayField::new("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempor nisi odio, sit amet efficitur purus pharetra ac."))
         .with_field("Password", Field::new().input_type(InputType::Password))
         .with_field("Range field", Field::new().range(0.0, 100.0, 1.0))
-        .with_field("Numberfield", Field::new().input_type(InputType::Number))
+        .with_field("Numberfield", Number::<i64>::new())
         .with_field(
             "Numberfield with limits",
-            Field::new().number(0.0, 150.0, 2.0),
+            Number::new().min(0.0).max(150.0).step(2.0),
         )
         .with_field("Disabled Textfield", Field::new().disabled(true))
         .with_field("Checkbox", Checkbox::new().default(true))
