@@ -1,7 +1,17 @@
 [[hooks]]
 stage="build"
 command="rust-grass"
-command_arguments= ["../../www/scss/proxmox-yew-style.scss", "dist/.stage/proxmox-yew-style.css"]
+command_arguments= ["../../www/scss/crisp-yew-style.scss", "dist/.stage/crisp-yew-style.css"]
+
+[[hooks]]
+stage="build"
+command="rust-grass"
+command_arguments= ["../../www/scss/desktop-yew-style.scss", "dist/.stage/desktop-yew-style.css"]
+
+[[hooks]]
+stage="build"
+command="rust-grass"
+command_arguments= ["../../www/scss/material-yew-style.scss", "dist/.stage/material-yew-style.css"]
 
 [watch]
 watch = ["./src", "../../src", "../../www"]

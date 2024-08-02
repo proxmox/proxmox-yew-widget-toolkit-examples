@@ -1,6 +1,5 @@
 use pwt::touch::prelude::*;
-use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
-use pwt::widget::{Button, Column, Container, Row, ThemeModeSelector};
+use pwt::widget::{Button, Column, Container};
 
 use pwt::touch::{
     ApplicationBar, Fab, MaterialApp, PageController, Scaffold, SnackBar, SnackBarController,

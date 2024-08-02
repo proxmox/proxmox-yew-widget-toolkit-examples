@@ -1,5 +1,5 @@
 use pwt::prelude::*;
-use pwt::widget::{Column, Panel, ThemeLoader, ThemeModeSelector, Toolbar};
+use pwt::widget::{Column, Panel, ThemeLoader, ThemeModeSelector, ThemeNameSelector, Toolbar};
 
 pub struct App {}
 
@@ -15,6 +15,7 @@ impl Component for App {
         let toolbar = Toolbar::new()
             .border_bottom(true)
             .with_flex_spacer()
+            .with_child(ThemeNameSelector::new())
             .with_child(ThemeModeSelector::new());
 
         let content = Column::new()
@@ -33,6 +34,6 @@ impl Component for App {
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    pwt::state::set_available_themes(&["Proxmox"]);
+    pwt::state::set_available_themes(&["Crisp", "Desktop", "Material"]);
     yew::Renderer::<App>::new().render();
 }

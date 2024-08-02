@@ -1,9 +1,8 @@
 use pwt::prelude::*;
 use pwt::state::NavigationContainer;
-use yew::prelude::*;
 
 use pwt::touch::{NavigationBar, PageView};
-use pwt::widget::{Button, Column, Panel, Row, Toolbar};
+use pwt::widget::{Button, Column, Row};
 use pwt::widget::{Container, TabBarItem};
 use yew::virtual_dom::Key;
 use yew_router::HashRouter;

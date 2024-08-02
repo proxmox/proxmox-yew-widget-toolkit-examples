@@ -1,6 +1,5 @@
 use gloo_console as console;
 use pwt::prelude::*;
-use yew::prelude::*;
 
 use serde_json::Value;
 
