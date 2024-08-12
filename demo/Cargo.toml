@@ -9,7 +9,7 @@ edition = "2021"
 
 [dependencies]
 wasm-logger = "0.2"
-indexmap = { version = "1", features = ["std"] }
+indexmap = { version = ">= 1.9", features = ["std"] }
 log = "0.4.6"
 js-sys = "0.3"
 # If you need to use the development version of Yew
