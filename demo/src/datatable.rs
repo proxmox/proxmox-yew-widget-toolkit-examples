@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use pwt::css::{Flex, Overflow};
-use pwt::widget::form::Boolean;
+use pwt::widget::form::{Boolean, Combobox};
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -84,6 +84,7 @@ pub fn DataTableDemo() -> Html {
     let show_headers = use_state(|| true);
     let striped = use_state(|| true);
     let hover = use_state(|| true);
+    let mmode = use_state(|| MultiSelectMode::Default);
 
     Column::new()
         .class(Flex::Fill)
@@ -150,6 +151,27 @@ pub fn DataTableDemo() -> Html {
                                     let multiselect = multiselect.clone();
                                     move |v| multiselect.set(v)
                                 }),
+                        )
+                        .with_right_field(
+                            "Multiselect Mode",
+                            Combobox::new()
+                                .with_item("Default")
+                                .with_item("Simple")
+                                .default("Default")
+                                .required(true)
+                                .name("multiselect")
+                                .on_change({
+                                    let mmode = mmode.clone();
+                                    move |v: String| {
+                                        let v = match v.as_str() {
+                                            "Default" => MultiSelectMode::Default,
+                                            "Simple" => MultiSelectMode::Simple,
+                                            _ => MultiSelectMode::Default,
+                                        };
+
+                                        mmode.set(v);
+                                    }
+                                }),
                         ),
                 ),
         )
@@ -164,6 +186,7 @@ pub fn DataTableDemo() -> Html {
                 .min_row_height(110)
                 .striped(*striped)
                 .hover(*hover)
+                .multiselect_mode(*mmode)
                 .autoselect(false)
                 //.cell_class("pwt-p-2 pwt-fs-4")
                 //.vertical_align("middle")
