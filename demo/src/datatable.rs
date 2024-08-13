@@ -65,21 +65,19 @@ pub fn DataTableDemo() -> Html {
         header2.clone().into(),
     ]);
 
+    let multiselect = use_state(|| true);
     let selection = use_selection(|| {
-        let selection = Selection::new()
-            .multiselect(true)
-            .on_select(|sel: Selection| {
-                let keys = sel.selected_keys();
-                if keys.len() > 10 {
-                    log::info!("Current Selection: {} records", keys.len());
-                } else {
-                    log::info!("Current Selection: {:?}", sel.selected_keys());
-                }
-            });
-        //selection.select(2);
-        //selection.select(4);
-        selection
+        Selection::new().on_select(|sel: Selection| {
+            let keys = sel.selected_keys();
+            if keys.len() > 10 {
+                log::info!("Current Selection: {} records", keys.len());
+            } else {
+                log::info!("Current Selection: {:?}", sel.selected_keys());
+            }
+        })
     });
+
+    let selection = selection.multiselect(*multiselect);
 
     let borderless = use_state(|| false);
     let bordered = use_state(|| true);
@@ -142,6 +140,16 @@ pub fn DataTableDemo() -> Html {
                                 let hover = hover.clone();
                                 move |v| hover.set(v)
                             }),
+                        )
+                        .with_right_field(
+                            "Multiselect",
+                            Boolean::new()
+                                .name("multiselect")
+                                .checked(*multiselect)
+                                .on_change({
+                                    let multiselect = multiselect.clone();
+                                    move |v| multiselect.set(v)
+                                }),
                         ),
                 ),
         )
