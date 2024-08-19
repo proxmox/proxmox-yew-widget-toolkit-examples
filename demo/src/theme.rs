@@ -124,6 +124,7 @@ fn text_panel(_: &SelectionViewRenderInfo) -> Html {
         .class(Overflow::Auto)
         .padding(2)
         .gap(1)
+        .with_child(html! {<span>{format!("{text} (Default)")}</span>})
         .with_child(html! {<span class="pwt-color-primary">{format!("{text} (Primary)")}</span>})
         .with_child(
             html! {<span class="pwt-color-secondary">{format!("{text} (Secondary)")}</span>},

@@ -13,5 +13,10 @@ stage="build"
 command="rust-grass"
 command_arguments= ["../../www/scss/desktop-yew-style.scss", "dist/.stage/desktop-yew-style.css"]
 
+[[hooks]]
+stage="build"
+command="rust-grass"
+command_arguments= ["../../www/scss/solarized-yew-style.scss", "dist/.stage/solarized-yew-style.css"]
+
 [watch]
 watch = ["./src", "../../src", "../../www"]

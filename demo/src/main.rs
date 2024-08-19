@@ -409,7 +409,7 @@ fn RoutedApp() -> Html {
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
-    static THEMES: &'static [&'static str] = &["Crisp", "Desktop", "Material"];
+    static THEMES: &'static [&'static str] = &["Crisp", "Desktop", "Material", "Solarized"];
     pwt::state::set_available_themes(THEMES);
 
     pwt::state::set_available_languages(vec![
