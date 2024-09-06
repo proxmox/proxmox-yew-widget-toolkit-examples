@@ -1,9 +1,14 @@
+use std::rc::Rc;
+
 use pwt::prelude::*;
+use pwt::state::Store;
+use pwt::widget::data_table::{DataTableColumn, DataTableHeader};
 use pwt::widget::form::{
     Checkbox, Combobox, DisplayField, Field, Form, FormContext, InputType, Number, TextArea,
     Tristate, TristateBoolean,
 };
-use pwt::widget::{AlertDialog, Container, InputPanel, Trigger};
+use pwt::widget::{AlertDialog, Container, InputPanel, SearchDropdown, Trigger};
+use yew::virtual_dom::Key;
 
 fn demo_input_panel(alert: UseStateHandle<Option<String>>) -> Html {
     let mut long_combo = Combobox::new();
@@ -99,12 +104,100 @@ fn demo_input_panel(alert: UseStateHandle<Option<String>>) -> Html {
                 .with_item("User"),
         )
         .with_field("Long Combobox", long_combo)
+        .with_field("SearchDropdown", search_dropdown())
         .with_field(
             "TextArea",
             TextArea::new().placeholder("Type some text here."),
         );
 
     Form::new().form_context(form_ctx).with_child(panel).into()
+}
+
+#[derive(Clone, PartialEq)]
+struct UserEntry {
+    id: u32,
+    first_name: &'static str,
+    last_name: &'static str,
+    country: &'static str,
+}
+static USER_LIST: &[UserEntry] = &[
+    UserEntry {
+        id: 1,
+        first_name: "Max",
+        last_name: "Mustermann",
+        country: "Austria",
+    },
+    UserEntry {
+        id: 2,
+        first_name: "Dieter",
+        last_name: "Mustermann",
+        country: "Austria",
+    },
+    UserEntry {
+        id: 3,
+        first_name: "Helene",
+        last_name: "Musterfrau",
+        country: "Germany",
+    },
+];
+
+fn user_search_columns() -> Rc<Vec<DataTableHeader<UserEntry>>> {
+    Rc::new(vec![
+        DataTableColumn::new(tr!("ID"))
+            .flex(2)
+            .show_menu(false)
+            .width("40px")
+            .justify("flex-start")
+            .render(|item: &UserEntry| html!(item.id))
+            .sorter(|a: &UserEntry, b: &UserEntry| a.id.cmp(&b.id))
+            .sort_order(true)
+            .into(),
+        DataTableColumn::new(tr!("First Name"))
+            .flex(2)
+            .show_menu(false)
+            .justify("flex-start")
+            .render(|item: &UserEntry| html!(item.first_name))
+            .sorter(|a: &UserEntry, b: &UserEntry| a.first_name.cmp(&b.first_name))
+            .sort_order(true)
+            .into(),
+        DataTableColumn::new(tr!("Last Name"))
+            .flex(2)
+            .show_menu(false)
+            .justify("flex-start")
+            .render(|item: &UserEntry| html!(item.last_name))
+            .sorter(|a: &UserEntry, b: &UserEntry| a.last_name.cmp(&b.last_name))
+            .sort_order(true)
+            .into(),
+        DataTableColumn::new(tr!("Country"))
+            .flex(2)
+            .show_menu(false)
+            .justify("flex-start")
+            .render(|item: &UserEntry| html!(item.country))
+            .sorter(|a: &UserEntry, b: &UserEntry| a.country.cmp(&b.country))
+            .sort_order(true)
+            .into(),
+    ])
+}
+
+fn search_dropdown() -> SearchDropdown<Store<UserEntry>> {
+    SearchDropdown::table(user_search_columns(), move |filter: String| async move {
+        let mut data = Vec::new();
+        let filter = filter.to_lowercase();
+        for user in USER_LIST.iter() {
+            if user.first_name.to_lowercase().contains(&filter)
+                || user.last_name.to_lowercase().contains(&filter)
+                || user.country.to_lowercase().contains(&filter)
+            {
+                data.push(user.clone());
+            }
+        }
+        let store = Store::with_extract_key(|item: &UserEntry| Key::from(item.id));
+        store.set_data(data);
+        Ok(store)
+    })
+    .on_select(|id| {
+        log::info!("SearchDropdown select {id}");
+    })
 }
 
 #[function_component]
