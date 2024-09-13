@@ -382,7 +382,6 @@ fn MainMenu() -> Html {
 fn DemoApp() -> Html {
     Panel::new()
         .class(Viewport)
-        .class(ColorScheme::Primary)
         //.class(ColorScheme::NeutralAlt)
         //.class(ColorScheme::Secondary)
         .border(false)

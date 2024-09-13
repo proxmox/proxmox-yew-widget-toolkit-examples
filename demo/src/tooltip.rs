@@ -1,11 +1,11 @@
 use pwt::prelude::*;
 
 use pwt::widget::form::Field;
-use pwt::widget::{Button, Column, Container, Row, Tooltip};
+use pwt::widget::{Button, Column, Container, Panel, Row, Tooltip};
 
 #[function_component]
 pub fn TooltipDemo() -> Html {
-    Column::new()
+    let tooltips = Column::new()
         .padding(2)
         .gap(2)
         .class("pwt-align-items-start")
@@ -46,6 +46,15 @@ pub fn TooltipDemo() -> Html {
                     )
             }
             </form>
-        })
+        });
+
+    Container::new()
+        .padding(2)
+        .with_child(
+            Panel::new()
+                .border(true)
+                .title("Tooltips")
+                .with_child(tooltips),
+        )
         .into()
 }

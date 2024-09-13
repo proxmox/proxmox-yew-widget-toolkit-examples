@@ -3,7 +3,7 @@ use yew::prelude::*;
 use pwt::css::ColorScheme;
 use pwt::prelude::*;
 use pwt::touch::{Fab, FabMenu, FabMenuAlign, FabMenuDirection};
-use pwt::widget::{ActionIcon, Button, Column, FileButton, Row, SegmentedButton};
+use pwt::widget::{ActionIcon, Button, Column, Container, FileButton, Panel, Row, SegmentedButton};
 
 #[function_component]
 pub fn ButtonsDemo() -> Html {
@@ -104,10 +104,9 @@ pub fn ButtonsDemo() -> Html {
         row.into()
     }
 
-    Column::new()
-        .padding(2)
+    let buttons = Column::new()
+        .padding(4)
         .gap(2)
-        .class("pwt-size-fit-content")
         .class("pwt-align-items-start")
         .with_child("Favorite Action Buttons (FAB) types.")
         .with_child(
@@ -181,11 +180,12 @@ pub fn ButtonsDemo() -> Html {
             Row::new()
                 .gap(2)
                 .with_child(
-                    FileButton::new("Downlaod").icon_class("fa fa-download").accept("image/*").multiple(true)
+                    FileButton::new("Downlaod")
+                        .icon_class("fa fa-download")
+                        .accept("image/*")
+                        .multiple(true),
                 )
-                .with_child(
-                    FileButton::new_icon("fa fa-download")
-                )
+                .with_child(FileButton::new_icon("fa fa-download")),
         )
         .with_child("Round Icon Button")
         .with_child(Button::new_icon("fa fa-trash-o").class("circle"))
@@ -310,6 +310,15 @@ pub fn ButtonsDemo() -> Html {
                         .with_button(Button::new("Second"))
                         .with_button(Button::new("Third").class("rounded")),
                 ),
+        );
+
+    Container::new()
+        .padding(2)
+        .with_child(
+            Panel::new()
+                .title("Buttons")
+                .with_child(buttons)
+                .border(true),
         )
         .into()
 }
