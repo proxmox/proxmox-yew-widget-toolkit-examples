@@ -1,0 +1,120 @@
+
+/* Spacer settings */
+:root {
+    --pwt-spacer-base-width: #{$spacer};
+    --pwt-spacer-0: 0;
+    --pwt-spacer-1: calc(var(--pwt-spacer-base-width) * 1);
+    --pwt-spacer-2: calc(var(--pwt-spacer-base-width) * 2);
+    --pwt-spacer-3: calc(var(--pwt-spacer-base-width) * 3);
+    --pwt-spacer-4: calc(var(--pwt-spacer-base-width) * 4);
+
+    --pwt-icon-spacer:  #{$icon_spacer}; // space between icon and text
+}
+
+.pwt-density-high {
+    --pwt-spacer-base-width: 3px;
+}
+
+.pwt-density-medium {
+    --pwt-spacer-base-width: 5px;
+}
+
+.pwt-density-touch {
+    --pwt-spacer-base-width: 10px;
+}
+
+/* Corner Shape (radius) definitions */
+:root {
+    @each $name, $value in $shape-corner {
+        --pwt-shape-corner-#{$name}: #{$value};
+    }
+
+    /* Corner shape for components */
+    --pwt-button-corner-shape: #{$button-corner-shape};
+    --pwt-fab-corner-shape: #{$fab-corner-shape};
+    --pwt-progress-corner-shape: #{$progress-corner-shape};
+    --pwt-nav-link-corner-shape: #{$nav-link-corner-shape};
+    --pwt-nav-pills-corner-shape: #{$nav-pills-corner-shape};
+    --pwt-tooltip-corner-shape:#{$tooltip-corner-shape};
+    --pwt-input-corner-shape: #{$input-corner-shape};
+    --pwt-card-corner-shape: #{$card-corner-shape};
+    --pwt-dialog-corner-shape: #{$dialog-corner-shape};
+}
+
+/* Define elevation levels */
+:root {
+    @each $level, $value in $elevation-levels {
+        --pwt-elevation-level-#{$level}: #{$value};
+    }
+}
+
+/* Define state layer opacity */
+:root {
+    @each $state, $value in $state-layer-opacity {
+        --pwt-state-layer-opacity-#{$state}: #{$value};
+    }
+
+    @each $level, $value in $elevation-levels-tint-opacity {
+        --pwt-state-layer-opacity-#{$level}: #{$value};
+    }
+}
+
+/* Font setup */
+@font-face {
+    font-family: "Roboto Flex";
+    src: url("../fonts/RobotoFlexVariableFont.ttf") format("truetype");
+}
+$pwt-font-sans-serif: "Roboto Flex";
+$pwt-font-monospace: monospace;
+
+
+@import "mixins/fonts";
+
+:root {
+    @include font("body-medium");
+}
+
+@include font_classes();
+
+@import "utilities";
+
+@include color-percentages("primary");
+@include color-percentages("secondary");
+@include color-percentages("tertiary");
+@include color-percentages("success");
+@include color-percentages("error");
+@include color-percentages("warning");
+@include color-percentages("neutral");
+@include color-percentages("neutral-alt");
+
+@each $name in $color-names {
+    @include color-scheme($name);
+    @include color-scheme("#{$name}-container");
+}
+
+@import "application_bar";
+@import "button";
+@import "card";
+@import "datatable";
+@import "dialog";
+@import "dropdown";
+@import "form";
+@import "input";
+@import "menu";
+@import "meter";
+@import "miniscroll";
+@import "miscellaneous";
+@import "nav";
+@import "navigation_bar";
+@import "navigation_rail";
+@import "page";
+@import "panel";
+@import "progress";
+@import "resize-handle";
+@import "slidable";
+@import "snackbar";
+@import "toolbar";
+@import "tooltip";
+@import "embedded_html";
+
+@import "rrd"; // only useed by proxmox RRD component

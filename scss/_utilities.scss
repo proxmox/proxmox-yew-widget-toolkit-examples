@@ -1,0 +1,398 @@
+@mixin padding-level($factor, $padding-side:  false) {
+    $property: #{if($padding-side, "padding-#{$padding-side}", "padding")};
+    #{$property}: calc(var(--pwt-spacer-base-width) * $factor) ! important;
+}
+
+@mixin margin-level($factor, $margin-side:  false) {
+    $property: #{if($margin-side, "margin-#{$margin-side}", "margin")};
+    #{$property}: calc(var(--pwt-spacer-base-width) * $factor) ! important;
+}
+
+.pwt-m {
+    @include margin-level(var(--pwt-margin-factor));
+}
+
+.pwt-ms {
+    @include margin-level(var(--pwt-margin-start-factor), "inline-start");
+}
+
+.pwt-me {
+    @include margin-level(var(--pwt-margin-end-factor), "inline-end");
+}
+
+.pwt-mt {
+    @include margin-level(var(--pwt-margin-top-factor), "top");
+}
+
+.pwt-mb {
+    @include margin-level(var(--pwt-margin-bottom-factor), "bottom");
+}
+
+.pwt-mx {
+    @include margin-level(var(--pwt-margin-x-factor), "inline");
+}
+
+.pwt-my {
+    @include margin-level(var(--pwt-margin-y-factor), "top");
+    @include margin-level(var(--pwt-margin-y-factor), "bottom");
+}
+
+.pwt-p {
+    @include padding-level(var(--pwt-padding-factor));
+}
+
+.pwt-ps {
+    @include padding-level(var(--pwt-padding-start-factor), "inline-start");
+}
+
+.pwt-pe {
+    @include padding-level(var(--pwt-padding-end-factor), "inline-end");
+}
+
+.pwt-pt {
+    @include padding-level(var(--pwt-padding-top-factor), "top");
+}
+
+.pwt-pb {
+    @include padding-level(var(--pwt-padding-bottom-factor), "bottom");
+}
+
+.pwt-px {
+    @include padding-level(var(--pwt-padding-x-factor), "inline");
+}
+
+.pwt-py {
+    @include padding-level(var(--pwt-padding-y-factor), "top");
+    @include padding-level(var(--pwt-padding-y-factor), "bottom");
+}
+
+@each $name in (0, 1, 2, 3, 4) {
+    .pwt-gap-#{$name} {
+        gap: var(--pwt-spacer-#{$name}) !important;
+    }
+
+    .pwt-column-gap-#{$name} {
+        column-gap: var(--pwt-spacer-#{$name}) !important;
+    }
+
+    .pwt-row-gap-#{$name} {
+        row-gap: var(--pwt-spacer-#{$name}) !important;
+    }
+
+    .pwt-top-#{$name} {
+        top: var(--pwt-spacer-#{$name}) !important;
+    }
+
+    .pwt-bottom-#{$name} {
+        bottom: var(--pwt-spacer-#{$name}) !important;
+    }
+
+    .pwt-left-#{$name} {
+        left: var(--pwt-spacer-#{$name}) !important;
+    }
+
+    .pwt-right-#{$name} {
+        right: var(--pwt-spacer-#{$name}) !important;
+    }
+}
+
+$white-space-values: (normal, nowrap, pre, pre-wrap, pre-line, break-spaces);
+
+@each $value in $white-space-values {
+    .pwt-white-space-#{$value} {
+        white-space: $value !important;
+    }
+}
+
+.pwt-text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+$user-select-values: (auto, none, text, all);
+
+@each $value in $user-select-values {
+    .pwt-user-select-#{$value} {
+        user-select: $value !important;
+    }
+}
+
+$text-align-values: (start, end, left, right, center, justify, justify-all);
+@each $value in $text-align-values {
+    .pwt-text-align-#{$value} {
+        text-align: $value !important;
+    }
+}
+
+$height-width-values: (
+    25: 25%,
+    50: 50%,
+    75: 75%,
+    100: 100%,
+    auto: auto,
+);
+
+@each $name, $value in $height-width-values {
+    .pwt-h-#{$name} {
+        height: $value !important;
+        box-sizing: border-box;
+    }
+
+    .pwt-w-#{$name} {
+        width: $value !important;
+        box-sizing: border-box;
+    }
+}
+
+.pwt-fit {
+    width: 100% !important;
+    height: 100% !important;
+    overflow: auto !important;
+    box-sizing: border-box;
+}
+
+.pwt-flex-fit {
+    flex: 1 1 auto;
+    overflow: auto !important;
+}
+
+// Apply "flex: 1 1 auto;" to the first child of a container
+.pwt-flex-fill-first-child > :first-child {
+    flex: 1 1 auto;
+}
+
+.pwt-viewport {
+    top: 0;
+    left: 0;
+    position: absolute;
+    display: flex !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+}
+
+$content-sizes: none auto min-content max-content fit-content;
+
+@each $name in $content-sizes {
+    .pwt-size-#{$name} {
+        width: $name !important;
+        height: $name !important;
+    }
+}
+
+$display-values: inline inline-block block grid table table-row table-cell flex inline-flex contents none;
+
+@each $name in $display-values {
+    .pwt-d-#{$name} {
+        display: $name !important;
+    }
+}
+
+$flex-values: (
+    fill: 1 1 auto, // same aus auto
+    initial: 0 1 auto,
+    auto: 1 1 auto,
+    none: 0 0 auto,
+);
+
+@each $name, $value in $flex-values {
+    .pwt-flex-#{$name} {
+	    flex: $value !important;
+    }
+}
+
+$flex-direction-values: row column row-reverse column-reverse;
+
+@each $name in $flex-direction-values {
+    .pwt-flex-direction-#{$name} {
+        flex-direction: $name !important;
+    }
+}
+
+$flex-wrap-values: wrap nowrap wrap-reverse;
+
+@each $name in $flex-wrap-values {
+    .pwt-flex-#{$name} {
+        flex-wrap: $name;
+    }
+}
+
+$justify-content-values: (
+    start,
+    end,
+    flex-start,
+    flex-end,
+    center,
+    left,
+    right,
+    normal,
+    space-between,
+    space-around,
+    space-evenly,
+    stretch
+);
+
+@each $value in $justify-content-values {
+    .pwt-justify-content-#{$value} {
+        justify-content: $value !important;
+    }
+}
+
+$align-items-values: (normal, flex-start, flex-end, center, start, end, baseline, stretch);
+
+@each $value in $align-items-values {
+    .pwt-align-items-#{$value} {
+        align-items: $value !important;
+    }
+}
+
+$align-self-values: (auto, normal, flex-start, flex-end, center, baseline, stretch);
+
+@each $value in $align-self-values {
+    .pwt-align-self-#{$value} {
+        align-self: $value !important;
+    }
+}
+
+$align-content-values: (start, center, end, space-between, space-around, stretch);
+
+@each $value in $align-items-values {
+    .pwt-align-content-#{$value} {
+        align-content: $value !important;
+    }
+}
+
+$overflow-values: auto hidden visible scroll;
+
+@each $value in $overflow-values {
+    .pwt-overflow-#{$value} {
+        overflow: $value !important;
+    }
+
+    .pwt-overflow-x-#{$value} {
+        overflow-x: $value !important;
+    }
+
+    .pwt-overflow-y-#{$value} {
+        overflow-y: $value !important;
+    }
+}
+
+$position-values: absolute fixed relative sticky static;
+
+@each $value in $position-values {
+    .pwt-position-#{$value} {
+        position: $value !important;
+    }
+}
+
+.pwt-border {
+    border: 1px solid var(--pwt-color-border) !important;
+}
+
+.pwt-no-border {
+    border: 0 !important;
+}
+
+.pwt-border-top {
+    border-top: 1px solid var(--pwt-color-border) !important;
+}
+
+.pwt-no-border-top {
+    border-top: 0 !important;
+}
+
+.pwt-border-left {
+    border-left: 1px solid var(--pwt-color-border) !important;
+}
+
+.pwt-no-border-left {
+    border-left: 0 !important;
+}
+
+.pwt-border-start {
+    border-inline-start: 1px solid var(--pwt-color-border) !important;
+}
+
+.pwt-no-border-start {
+    border-inline-start: 0 !important;
+}
+
+.pwt-border-right {
+    border-right: 1px solid var(--pwt-color-border) !important;
+}
+
+.pwt-no-border-right {
+    border-right: 0 !important;
+}
+
+.pwt-border-end {
+    border-inline-end: 1px solid var(--pwt-color-border) !important;
+}
+
+.pwt-no-border-end {
+    border-inline-end: 0 !important;
+}
+
+.pwt-border-bottom {
+    border-bottom: 1px solid var(--pwt-color-border) !important;
+}
+
+.pwt-no-border-bottom {
+    border-bottom: 0 !important;
+}
+
+.pwt-shape-circle {
+    border-radius: var(--pwt-shape-corner-full);
+    line-height: 1em;
+}
+
+@each $name in (none, extra-small, small, medium, large, extra-large, full) {
+    .pwt-shape-#{$name} {
+        border-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+
+    .pwt-shape-top-#{$name} {
+        border-top-left-radius: var(--pwt-shape-corner-#{$name}) !important;
+        border-top-right-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+
+    .pwt-shape-bottom-#{$name} {
+        border-bottom-left-radius: var(--pwt-shape-corner-#{$name}) !important;
+        border-bottom-right-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+
+    .pwt-shape-start-#{$name} {
+        border-start-start-radius: var(--pwt-shape-corner-#{$name}) !important;
+        border-end-start-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+
+    .pwt-shape-end-#{$name} {
+        border-start-end-radius: var(--pwt-shape-corner-#{$name}) !important;
+        border-end-end-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+
+    .pwt-shape-top-start-#{$name} {
+        border-start-start-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+
+    .pwt-shape-top-end-#{$name} {
+        border-start-end-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+
+    .pwt-shape-bottom-start-#{$name} {
+        border-end-start-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+
+    .pwt-shape-bottom-end-#{$name} {
+        border-end-end-radius: var(--pwt-shape-corner-#{$name}) !important;
+    }
+}
+
+@each $level, $distance in $elevation-levels {
+    .pwt-shadow#{$level} {
+        @include elevation-box-shadow($level);
+    }
+}

@@ -1,0 +1,31 @@
+.pwt-nav-menu {
+    padding: var(--pwt-spacer-1);
+}
+.pwt-nav-link {
+    padding: var(--pwt-spacer-1) 1rem;
+}
+
+.pwt-nav-menu {
+    .pwt-nav-section {
+        font-size: map-get($font-size, "title-medium");
+        padding: var(--pwt-spacer-2);
+    }
+}
+
+.pwt-tab-material {
+
+    .pwt-nav-link {
+        padding: var(--pwt-spacer-1) var(--pwt-spacer-3);
+
+        span {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+
+            &:before {
+                font-size: map-get($font-size, "headline-small")
+            }
+        }
+    }
+}

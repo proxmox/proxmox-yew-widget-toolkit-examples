@@ -1,0 +1,70 @@
+
+.pwt-snackbar {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    @include color-scheme-vars("inverse-surface");
+    @include accent-color-scheme-vars(#{$default-accent-color}-container);
+
+    @include elevation-box-shadow(3);
+    @include elevation-background-color($level: 3, $state: none);
+
+    color: var(--pwt-color);
+
+    //font-size: map-get($font-size, "body-medium");
+    @include font_and_line_height("body-medium");
+
+    border-radius: var(--pwt-shape-corner-extra-small);
+
+    .pwt-snackbar-message {
+        flex: 1 1 auto;
+        padding: calc(var(--pwt-spacer-1) + 2px); // same height as button
+    }
+
+    .pwt-snackbar-action {
+        border-radius: 0 !important;
+        box-shadow: unset !important;
+        color: var(--pwt-accent-color-background);
+        background-color: transparent;
+    }
+
+    position: fixed;
+    z-index: $zindex-modal;
+    bottom: var(--pwt-spacer-4);
+    left: var(--pwt-spacer-2);
+    right: var(--pwt-spacer-2);
+
+    &.fade-in {
+        animation: snackbar-animation-fade-in 0.2s ease-in;
+    }
+    &.fade-out {
+        animation: snackbar-animation-fade-out 0.2s ease-out;
+    }
+}
+
+@keyframes snackbar-animation-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes snackbar-animation-fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+// limit snackbar width to 840px
+@media (min-width: 840px) {
+    .pwt-snackbar {
+        left: calc((100% - 840px)/2 + var(--pwt-spacer-2));
+        width: calc(840px - var(--pwt-spacer-2) * 2);
+    }
+}

@@ -1,0 +1,59 @@
+.pwt-meter {
+	@include color-scheme-vars(surface);
+	@include accent-color-scheme-vars(#{$default-accent-color}-container);
+
+	@include font_and_line_height("label-medium");
+
+	position: relative;
+	background: var(--pwt-color-background);
+	min-height: calc(map-get($line-height, "label-medium") + 2 * var(--pwt-spacer-1));
+	border-radius: var(--pwt-progress-corner-shape);
+	overflow: hidden;
+
+	.pwt-meter-bar {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		background: var(--pwt-accent-color-background);
+
+		&.pwt-meter-distance-1 {
+			background: var(--pwt-color-warning-container);
+		}
+
+		&.pwt-meter-distance-2 {
+			background: var(--pwt-color-error-container);
+		}
+	}
+
+	.pwt-meter-text {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		text-align: center;
+		padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+		z-index: 1;
+	}
+}
+
+.pwt-meter-small {
+	@include accent-color-scheme-vars(#{$default-accent-color});
+
+	height: 4px;
+	min-height: 4px;
+
+	.pwt-meter-bar {
+		&.pwt-meter-distance-1 {
+			background: var(--pwt-color-warning);
+		}
+
+		&.pwt-meter-distance-2 {
+			background: var(--pwt-color-error);
+		}
+	}
+
+	.pwt-meter-text {
+		display: none;
+	}
+}

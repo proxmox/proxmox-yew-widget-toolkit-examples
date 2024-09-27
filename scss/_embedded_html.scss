@@ -1,0 +1,42 @@
+
+// Display content like a normal html page.
+// This resets some tags to browser defaults settings.
+// We use this to display the output from a markdown parser.
+.pwt-embedded-html {
+    /* body is always neutral */
+    color: var(--pwt-color-on-neutral);
+    background-color: var(--pwt-color-neutral);
+
+    font-size: map-get($font-size, "body-medium");
+    line-height: map-get($line-height, "body-medium");
+
+    p {
+        padding: revert;
+        margin: revert;
+    }
+
+    ul {
+        list-style: revert;
+        padding: revert;
+    }
+
+    ol {
+        list-style: revert;
+        padding: revert;
+    }
+
+    pre {
+        padding: var(--pwt-spacer-2);
+        color: var(--pwt-color-on-surface);
+        background-color: var(--pwt-color-surface);
+        font-family: $pwt-font-monospace;
+    }
+
+    strong {
+	font-variation-settings: "wght" 700; // works with Roboto Flex
+    }
+
+    em {
+	font-variation-settings: "slnt" -10; // works with Roboto Flex
+    }
+}

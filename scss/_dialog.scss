@@ -1,0 +1,242 @@
+dialog.pwt-outer-dialog {
+    overflow: visible;
+    background-color: transparent;
+    border: 0px;
+    padding: 0px;
+    outline: 0px;
+    display: flex;
+
+    & > .pwt-dialog {
+        overflow: auto;
+        flex: 1;
+        // for resize handle positioning
+        position: relative;
+    }
+}
+
+.pwt-dialog {
+    padding: 0;
+    color: var(--pwt-color-on-neutral);
+    background: var(--pwt-color-neutral);
+    border: 1px solid var(--pwt-color-border) !important;
+
+    @include elevation-box-shadow(3);
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    font-family: $pwt-font-sans-serif;
+    font-size: map-get($font-size, "body-medium");
+    font-weight: normal;
+
+    &:not(.pwt-dropdown) {
+        border-radius: var(--pwt-dialog-corner-shape);
+    }
+}
+
+.pwt-dialog:not(.pwt-dropdown)::backdrop,
+.pwt-outer-dialog:not(.pwt-dropdown)::backdrop {
+    background-color: var(--pwt-backdrop-color);
+}
+
+.pwt-dialog.pwt-dropdown::backdrop {
+    background-color: #ffffff00; // fully transparent
+}
+
+.pwt-dialog .dialog-resize-handle {
+    position: absolute;
+    opacity: 0;
+    user-select: none;
+    touch-action: none;
+
+    &.west,
+    &.east,
+    &.north-east,
+    &.north-west,
+    &.south-east,
+    &.south-west {
+        width: 5px;
+    }
+
+    &.north,
+    &.south,
+    &.north-east,
+    &.north-west,
+    &.south-east,
+    &.south-west {
+        height: 5px;
+    }
+
+    &.west {
+        top: 5px;
+        bottom: 5px;
+        left: 0px;
+        cursor: w-resize;
+    }
+
+    &.east {
+        top: 5px;
+        bottom: 5px;
+        right: 0px;
+        cursor: e-resize;
+    }
+
+    &.north {
+        top: 0px;
+        left: 5px;
+        right: 5px;
+        cursor: n-resize;
+    }
+
+    &.south {
+        bottom: 0px;
+        left: 5px;
+        right: 5px;
+        cursor: s-resize;
+    }
+
+    &.north-west {
+        top: 0px;
+        left: 0px;
+        cursor: nw-resize;
+    }
+
+    &.north-east {
+        top: 0px;
+        right: 0px;
+        cursor: ne-resize;
+    }
+
+    &.south-west {
+        bottom: 0px;
+        left: 0px;
+        cursor: sw-resize;
+    }
+
+    &.south-east {
+        bottom: 0px;
+        right: 0px;
+        cursor: se-resize;
+    }
+}
+
+// Transparent dialog covering the whole viewport
+.pwt-side-dialog {
+    position: fixed;
+    overflow: hidden;
+    touch-action: none; // important for GestureDetector on Chromium
+
+    top: 0;
+    left: 0;
+
+    box-sizing: border-box;
+    border: 0;
+    outline: 0;
+
+    width: 100vw;
+    max-width: 100vw;
+
+    height: 100vh;
+    max-height: 100vh;
+
+    margin: 0px;
+    padding: 0px;
+
+    background: transparent !important;
+}
+
+
+.pwt-side-dialog.visible::backdrop {
+    animation: backdrop-fade-in 0.2s ease forwards;
+}
+
+.pwt-side-dialog.hidden::backdrop {
+    animation: backdrop-fade-out 0.2s ease forwards;
+}
+
+@keyframes backdrop-fade-out {
+    from {
+        background: var(--pwt-backdrop-color);
+    }
+    to {
+        background: transparent;
+    }
+}
+
+@keyframes backdrop-fade-in {
+    from {
+        background: transparent;
+    }
+    to {
+        background: var(--pwt-backdrop-color);
+    }
+}
+
+// Side dialog content is inside this slider
+.pwt-side-dialog-slider {
+    position: fixed;
+    display: flex;
+
+    color: var(--pwt-color-on-neutral);
+    background-color: var(--pwt-color-neutral);
+
+    transition: transform 0.2s;
+
+    &.pwt-side-dialog-left {
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+
+        &.visible {
+            transform: translateX(0);
+        }
+
+        &.hidden {
+            transform: translateX(-100%);
+        }
+    }
+
+    &.pwt-side-dialog-right {
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+
+        &.visible {
+            transform: translateX(0);
+        }
+
+        &.hidden {
+            transform: translateX(100%);
+        }
+    }
+
+    &.pwt-side-dialog-top {
+        top: 0px;
+        left: 0px;
+        right: 0px;
+
+        &.visible {
+            transform: translateY(0);
+        }
+
+        &.hidden {
+            transform: translateY(-100%);
+        }
+    }
+
+    &.pwt-side-dialog-bottom {
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+
+        &.visible {
+            transform: translateY(0);
+        }
+
+        &.hidden {
+            transform: translateY(100%);
+        }
+    }
+}

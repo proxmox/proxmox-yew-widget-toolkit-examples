@@ -1,0 +1,173 @@
+.pwt-nav-link {
+    span {
+        display: inline-flex;
+        align-items: baseline;
+        gap: var(--pwt-icon-spacer);
+    }
+
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--pwt-icon-spacer);
+    transition: 0.1s;
+
+    user-select: none;
+    cursor: pointer;
+    white-space: nowrap !important;
+    outline: 0;
+    padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+    border-radius: var(--pwt-nav-link-corner-shape);
+    @include font_and_line_height("label-large");
+}
+
+// Pills
+.pwt-nav-pills {
+    @include color-scheme-vars(neutral-alt);
+    @include accent-color-scheme-vars(#{$default-accent-color}-container);
+
+    display: flex;
+    column-gap: 1em;
+
+    .pwt-nav-link {
+        line-height: map-get($line-height, "title-medium");
+        background: none;
+        border: 0;
+        border-radius: var(--pwt-nav-pills-corner-shape);
+
+        &:focus-visible {
+            outline: 2px solid var(--pwt-color-on-surface);
+            outline-offset: -2px;
+        }
+
+        @include state-layer();
+
+        &.active {
+            color: var(--pwt-accent-color);
+            background-color: var(--pwt-accent-color-background);
+            @include state-layer($base:  var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
+        }
+
+        &.disabled {
+            opacity: 0.5;
+            cursor: auto;
+        }
+    }
+
+    a {
+        text-decoration: none !important;
+        text-shadow: none !important;
+        color: var(--pwt-color-on-neutral);
+    }
+}
+
+.pwt-tab-material {
+    @include color-scheme-vars(neutral);
+
+    display: flex;
+    position: relative;
+    border-bottom: 1px solid var(--pwt-color-border);
+    flex: 1;
+
+    .pwt-tab-active-indicator {
+        background-color: var(--pwt-color-primary);
+        transition: 0.2s;
+        align-self: end;
+        position: absolute;
+    }
+
+    .pwt-tab-active-indicator.primary {
+        border-start-end-radius: 3px;
+        border-start-start-radius: 3px;
+        height: 3px;
+    }
+
+    .pwt-tab-active-indicator.secondary {
+        height: 2px;
+    }
+
+    .pwt-nav-link {
+        line-height: map-get($line-height, "title-medium");
+        text-align: center;
+        border: 0;
+        border-radius: 0px;
+        padding: var(--pwt-spacer-2) var(--pwt-spacer-4);
+        align-items: center;
+        justify-content: center;
+
+        &:focus-visible {
+            outline: 2px solid var(--pwt-color-on-surface);
+            outline-offset: -2px;
+        }
+
+        @include state-layer();
+
+        &.active {
+            color: var(--pwt-color-primary);
+        }
+
+        &.disabled {
+            opacity: 0.5;
+            cursor: auto;
+        }
+    }
+
+    a {
+        text-decoration: none !important;
+        text-shadow: none !important;
+        color: var(--pwt-color-on-neutral);
+    }
+}
+
+// Menu
+.pwt-nav-menu {
+    @include color-scheme-vars(surface);
+    @include accent-color-scheme-vars(#{$default-accent-color}-container);
+
+    background: var(--pwt-color-background);
+    color: var(--pwt-color);
+
+    .pwt-nav-section {
+        opacity: 0.8;
+        font-size: map-get($font-size, "label-medium");
+        padding: var(--pwt-spacer-2) var(--pwt-spacer-4);
+    }
+
+    .pwt-nav-link {
+        line-height: map-get($line-height, "title-medium");
+        background: none;
+        border: 0;
+
+        &:focus-visible {
+            outline: 2px solid var(--pwt-color-on-surface);
+            outline-offset: -2px;
+        }
+
+        @include state-layer();
+
+        &.active {
+            color: var(--pwt-accent-color);
+            background-color: var(--pwt-accent-color-background);
+            @include state-layer($base:  var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
+
+        }
+    }
+
+    a {
+        text-decoration: none !important;
+        text-shadow: none !important;
+        color: var(--pwt-color);
+    }
+}
+
+.pwt-nav-menu-icon {
+    font-size: map-get($font-size, "title-medium");
+    line-height: map-get($line-height, "title-medium");
+}
+
+.pwt-nav-menu-item-arrow {
+    font-size: map-get($font-size, "title-medium");
+    line-height: map-get($line-height, "title-medium");
+
+    &.expanded {
+        transform: scaleY(-1);
+    }
+}

@@ -1,0 +1,36 @@
+.pwt-panel {
+    @include color-scheme-vars("neutral");
+    @include accent-color-scheme-vars("primary");
+    display: flex;
+    flex-direction: column;
+    /* panel body is always neutral */
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
+}
+
+.pwt-panel-header-text {
+    cursor: initial;
+    color: var(--pwt-accent-color-background);
+    @include font_and_line_height("headline-small");
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
+}
+
+.pwt-panel-header {
+    @include color-scheme-vars("surface");
+    overflow: hidden; // avoid scrollbars
+    flex: none;
+    padding: var(--pwt-spacer-2);
+    color: var(--pwt-color);
+    background: var(--pwt-color-background);
+}
+
+.pwt-panel.pwt-rounded > .pwt-panel-header {
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.pwt-panel > .pwt-draggable {
+    touch-action: none;
+    cursor: move;
+}

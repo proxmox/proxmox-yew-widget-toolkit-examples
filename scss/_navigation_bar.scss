@@ -1,0 +1,65 @@
+.pwt-navigation-bar {
+    @include color-scheme-vars(surface-container);
+    @include accent-color-scheme-vars(#{$default-accent-color}-container);
+
+    display: flex;
+    justify-content: space-evenly;
+
+    padding: var(--pwt-spacer-1) 0 var(--pwt-spacer-2) 0;
+    gap: var(--pwt-spacer-2);
+
+    width: 100%;
+
+    @include elevation-background-color($level: 2);
+
+    .pwt-navigation-bar-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        align-items: center;
+        justify-content: center;
+        min-width: 64px;
+        min-height: 48px;
+
+        .pwt-navigation-bar-icon-container {
+            cursor: pointer;
+
+            //background: red;
+            border-radius: 10rem;
+            padding: 4px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 24px;
+            transition: width 0.2s;
+            &:focus-within,
+            &:hover {
+                width: 56px;
+                @include elevation-background-color($level: 2, $state: hover);
+            }
+
+            &:active {
+                width: 56px;
+                @include elevation-background-color($level: 2, $state: press);
+            }
+
+            &.active {
+                width: 56px;
+                color: var(--pwt-accent-color);
+                background-color: var(--pwt-accent-color-background);
+                @include state-layer($base: var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
+            }
+        }
+
+        .pwt-navigation-bar-icon {
+            font-size: map-get($font-size, "headline-small");
+        }
+
+        .pwt-navigation-bar-label {
+            font-size: map-get($font-size, "label-medium");
+        }
+    }
+}

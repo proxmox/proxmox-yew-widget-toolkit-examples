@@ -1,0 +1,25 @@
+/* Visible resize handle (vertical) */
+.row-split-handle, .column-split-handle {
+    @include state-layer();
+
+    background: color-mix(in srgb, var(--pwt-color-background) 95%, var(--pwt-color));
+
+    position: relative;
+    outline: 0;
+    touch-action: none;
+
+    &:focus-visible {
+        outline: $field-outline-size solid var(--pwt-color-focus) !important;
+        outline-offset: calc(-1 * $field-outline-size);
+    }
+}
+
+.row-split-handle {
+    width: var(--pwt-spacer-2);
+    cursor: col-resize;
+}
+
+.column-split-handle {
+    height: var(--pwt-spacer-2);
+    cursor: row-resize;
+}

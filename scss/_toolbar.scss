@@ -1,0 +1,19 @@
+.pwt-toolbar {
+    // Note: toolbar are mostly used inside a flex column,
+    // and we want to be able to set "overflow: hidden". We
+    // need to flex to none - else we get zero height.
+    flex: none;
+
+    // fixme: ???
+    &.emphased {
+        background: var(--pwt-color-neutral-alt);
+    }
+
+    .pwt-toolbar-content {
+        flex: 1 1 auto;
+        display: flex;
+        gap: var(--pwt-spacer-2);
+        padding: var(--pwt-spacer-2);
+	align-items: center;
+    }
+}

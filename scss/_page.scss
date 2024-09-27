@@ -1,0 +1,114 @@
+:root {
+    --page-animation-time: 0.3s;
+    --page-animation-in: page-animation-push-in var(--page-animation-time) ease-out;
+    --page-animation-out: page-animation-push-out var(--page-animation-time) ease-out;
+}
+
+.pwt-page-container {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    display: flex !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+
+    display: none !important;
+}
+
+@keyframes page-animation-push-in {
+    from {
+        transform: translateX(100%);
+        transform-origin: left;
+    }
+    to {
+        transform: translateX(0);
+        transform-origin: left;
+    }
+}
+
+@keyframes page-animation-push-out {
+    from {
+        transform: translateX(0);
+        transform-origin: left;
+    }
+    to {
+        transform: translateX(-100%);
+        transform-origin: left;
+    }
+}
+
+@keyframes page-animation-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes page-animation-fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes page-animation-cover-in {
+    from {
+        transform: translateX(100%);
+        transform-origin: left;
+    }
+    to {
+        transform: translateX(0);
+        transform-origin: left;
+    }
+}
+
+@keyframes page-animation-cover-out {
+    from {
+        transform: scale(1);
+        transform-origin: center;
+    }
+    to {
+        transform: scale(0.85);
+        transform-origin: center;
+    }
+}
+
+.pwt-page-container.pwt-page-visible {
+    display: block !important;
+}
+
+.pwt-page-container.pwt-page-shrink {
+    display: block !important;
+    animation: var(--page-animation-out);
+}
+
+.pwt-page-container.pwt-page-shrink-reverse {
+    display: block !important;
+    animation: var(--page-animation-out) reverse;
+}
+
+.pwt-page-container.pwt-page-grow {
+    display: block !important;
+    animation: var(--page-animation-in);
+}
+
+.pwt-page-container.pwt-page-grow-reverse {
+    display: block !important;
+    animation: var(--page-animation-in) reverse;
+}
+
+.pwt-page-animation-fade {
+    --page-animation-in: page-animation-fade-in var(--page-animation-time) ease-out;
+    --page-animation-out: page-animation-fade-out var(--page-animation-time) ease-out;
+}
+
+.pwt-page-animation-cover {
+    --page-animation-in: page-animation-cover-in var(--page-animation-time) ease-out;
+    --page-animation-out: page-animation-cover-out var(--page-animation-time) ease-out;
+}

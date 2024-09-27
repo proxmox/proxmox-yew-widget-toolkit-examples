@@ -1,0 +1,75 @@
+/* light theme color scheme */
+:root.pwt-light-mode,
+:root:not(.pwt-dark-mode) {
+    color-scheme: light;
+
+    --pwt-color-primary: var(--pwt-color-primary-40);
+    --pwt-color-on-primary: var(--pwt-color-primary-95);
+    --pwt-color-primary-container: var(--pwt-color-primary-90);
+    --pwt-color-on-primary-container: var(--pwt-color-primary-10);
+
+    --pwt-color-secondary: var(--pwt-color-secondary-60);
+    --pwt-color-on-secondary: var(--pwt-color-secondary-100);
+    --pwt-color-secondary-container: var(--pwt-color-secondary-90);
+    --pwt-color-on-secondary-container: var(--pwt-color-secondary-10);
+
+    --pwt-color-tertiary: var(--pwt-color-tertiary-40);
+    --pwt-color-on-tertiary: var(--pwt-color-tertiary-100);
+    --pwt-color-tertiary-container: var(--pwt-color-tertiary-90);
+    --pwt-color-on-tertiary-container: var(--pwt-color-tertiary-10);
+
+    --pwt-color-success: var(--pwt-color-success-60);
+    --pwt-color-on-success: var(--pwt-color-success-100);
+    --pwt-color-success-container: var(--pwt-color-success-95);
+    --pwt-color-on-success-container: var(--pwt-color-success-10);
+
+    --pwt-color-error: var(--pwt-color-error-40);
+    --pwt-color-on-error: var(--pwt-color-error-100);
+    --pwt-color-error-container: var(--pwt-color-error-90);
+    --pwt-color-on-error-container: var(--pwt-color-error-10);
+
+    --pwt-color-warning: var(--pwt-color-warning-60);
+    --pwt-color-on-warning: var(--pwt-color-warning-100);
+    --pwt-color-warning-container: var(--pwt-color-warning-80);
+    --pwt-color-on-warning-container: var(--pwt-color-warning-10);
+
+    // neutral
+    --pwt-color-neutral: var(--pwt-color-neutral-95);
+    --pwt-color-on-neutral: var(--pwt-color-neutral-30);
+    // neutral-container == surface
+    --pwt-color-neutral-container: var(--pwt-color-neutral-90);
+    --pwt-color-on-neutral-container: var(--pwt-color-neutral-30);
+
+    // surface
+    --pwt-color-surface: var(--pwt-color-neutral-90);
+    --pwt-color-on-surface: var(--pwt-color-neutral-30);
+    // surface-container == neutral
+    --pwt-color-surface-container: var(--pwt-color-neutral-95);
+    --pwt-color-on-surface-container: var(--pwt-color-neutral-30);
+
+    // inverse-surface
+    --pwt-color-inverse-surface: var(--pwt-color-neutral-10);
+    --pwt-color-on-inverse-surface: var(--pwt-color-neutral-95);
+    --pwt-color-inverse-surface-container: var(--pwt-color-neutral-10);
+    --pwt-color-on-inverse-surface-container: var(--pwt-color-neutral-100);
+
+    --pwt-color-neutral-alt: var(--pwt-color-neutral-alt-90);
+    --pwt-color-on-neutral-alt: var(--pwt-color-neutral-alt-30);
+    --pwt-color-neutral-alt-container: var(--pwt-color-neutral-alt-99);
+    --pwt-color-on-neutral-alt-container: var(--pwt-color-neutral-alt-10);
+
+    /* border and focus colors */
+    --pwt-high-contrast-border: var(--pwt-color-neutral-alt-50);
+    --pwt-color-border: var(--pwt-color-neutral-alt-80);
+    --pwt-color-focus: var(--pwt-color-neutral-10);
+
+    --pwt-color-surface-tint: var(--pwt-color-primary);
+    --pwt-color-shadow: var(--pwt-color-neutral-70);
+
+    @include color-scheme-vars(surface);
+
+    color: var(--pwt-color-on-neutral);
+    background: var(--pwt-color-neutral);
+
+    --pwt-backdrop-color: #00000030;
+}

@@ -1,0 +1,28 @@
+.pwt-slidable {
+    background-color: var(--pwt-color-surface);
+
+    .pwt-slidable-slider {
+        background-color: var(--pwt-color-neutral);
+    }
+}
+
+.pwt-slidable-action {
+    @include font_and_line_height("label-large");
+    @include color-scheme-vars("surface");
+
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    overflow: hidden;
+
+    height: 100%;
+    box-sizing: border-box;
+    padding: var(--pwt-spacer-2);
+
+    color: var(--pwt-color);
+
+    justify-content: center;
+    align-items: center;
+
+    @include state-layer();
+}

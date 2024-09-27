@@ -1,0 +1,80 @@
+.pwt-navigation-rail {
+    @include color-scheme-vars(surface);
+    @include accent-color-scheme-vars(#{$default-accent-color}-container);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+
+    padding: var(--pwt-spacer-2) var(--pwt-spacer-1);
+    gap: var(--pwt-spacer-4);
+
+    box-sizing: border-box;
+    height: 100%;
+
+    @include elevation-background-color($level: 0);
+
+    .pwt-navigation-rail-tabs {
+        display: flex;
+        flex-direction: column;
+        gap: var(--pwt-spacer-2);
+
+        flex: 1 1 auto;
+
+        .pwt-navigation-rail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            align-items: center;
+            justify-content: center;
+            min-width: 64px;
+            min-height: 48px;
+
+            display: flex;
+            flex-direction: column;
+
+            .pwt-navigation-rail-icon-container {
+                cursor: pointer;
+
+                //background: red;
+                border-radius: 10rem;
+                padding: 4px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                width: 24px;
+                transition: width 0.2s;
+
+                &:focus-within,
+                &:hover {
+                    width: 56px;
+                    @include elevation-background-color($level: 2, $state: hover);
+                }
+
+                &:active {
+                    width: 56px;
+                    @include elevation-background-color($level: 2, $state: press);
+                }
+
+                &.active {
+                    width: 56px;
+                    color: var(--pwt-accent-color);
+                    background-color: var(--pwt-accent-color-background);
+                    @include state-layer($base: var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
+                }
+            }
+
+            .pwt-navigation-rail-icon {
+                font-size: map-get($font-size, "headline-small");
+            }
+
+            .pwt-navigation-rail-label {
+                font-size: map-get($font-size, "label-medium");
+            }
+        }
+    }
+}
