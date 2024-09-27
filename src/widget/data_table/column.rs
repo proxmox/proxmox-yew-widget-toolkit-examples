@@ -1,0 +1,372 @@
+use std::rc::Rc;
+
+use derivative::Derivative;
+
+use yew::html::IntoPropValue;
+use yew::prelude::*;
+
+use yew::virtual_dom::Key;
+
+use crate::props::{CallbackMut, IntoEventCallbackMut, IntoSorterFn, RenderFn, SorterFn};
+use crate::state::TreeStore;
+
+use super::{
+    DataTableCellRenderArgs, DataTableCellRenderer, DataTableHeaderKeyboardEvent,
+    DataTableHeaderRenderer, DataTableKeyboardEvent, DataTableMouseEvent,
+};
+
+/// DataTable column properties.
+#[derive(Properties, Derivative)]
+#[derivative(Clone(bound = ""), PartialEq(bound = ""))]
+pub struct DataTableColumn<T: 'static> {
+    /// Width passed to CSS grid-template-columns.
+    #[prop_or(AttrValue::Static("auto"))]
+    pub width: AttrValue,
+    /// The name dispayed in the header (Also used as aria-label).
+    pub name: AttrValue,
+    /// Unique Column Key
+    #[prop_or_default]
+    pub key: Option<Key>,
+    /// Horizontal table cell justification (start, end, left, center, right, justify).
+    #[prop_or(AttrValue::Static("start"))]
+    pub justify: AttrValue,
+
+    // only internal, use `apply_render` instead
+    render_cell: DataTableCellRenderer<T>,
+    /// Rendert function for Header content. If set, this is used instead of `name`.
+    #[prop_or_default]
+    pub render_header: Option<DataTableHeaderRenderer<T>>,
+    /// Sorter function.
+    ///
+    /// Need to be set to enable column sorting.
+    #[prop_or_default]
+    pub sorter: Option<SorterFn<T>>,
+    /// Sort order
+    ///
+    /// - `Some(true)`: Ascending
+    /// - `Some(false)`: Descending
+    /// - `None`: do not sort this columns
+    #[prop_or_default]
+    pub sort_order: Option<bool>,
+
+    /// Hide column
+    #[prop_or_default]
+    pub hidden: bool,
+    /// Resizable flag.
+    #[prop_or(true)]
+    pub resizable: bool,
+
+    /// Show menu flag.
+    #[prop_or(true)]
+    pub show_menu: bool,
+
+    /// Cell click callback
+    #[prop_or_default]
+    pub on_cell_click: Option<CallbackMut<DataTableMouseEvent>>,
+
+    /// Cell click callback
+    #[prop_or_default]
+    pub on_cell_context_click: Option<CallbackMut<DataTableMouseEvent>>,
+
+    /// Cell dblclick callback
+    #[prop_or_default]
+    pub on_cell_dblclick: Option<CallbackMut<DataTableMouseEvent>>,
+
+    /// Cell keydown callback
+    #[prop_or_default]
+    pub on_cell_keydown: Option<CallbackMut<DataTableKeyboardEvent>>,
+
+    #[prop_or_default]
+    pub on_header_keydown: Option<CallbackMut<DataTableHeaderKeyboardEvent<T>>>,
+
+    #[prop_or_default]
+    pub tree_store: Option<TreeStore<T>>,
+}
+
+impl<T: 'static> DataTableColumn<T> {
+    /// Creates a new instance.
+    pub fn new(name: impl Into<AttrValue>) -> Self {
+        yew::props!(Self {
+            name: name.into(),
+            render_cell: DataTableCellRenderer::new(|_| html! { "-" }),
+        })
+    }
+
+    /// Genertates a column which shows a checkbox indication the
+    /// selection status.
+    pub fn selection_indicator() -> Self {
+        Self::new("selection indicator")
+            .width("max-content")
+            //   .width("2.5em")
+            .resizable(false)
+            .show_menu(false)
+            .render_header(super::render_selection_header)
+            .render_cell(super::render_selection_indicator)
+            .on_cell_click(|event: &mut DataTableMouseEvent| {
+                let record_key = event.record_key.clone();
+                if let Some(selection) = &event.selection {
+                    selection.toggle(record_key.clone());
+                    event.prevent_default();
+                    event.stop_propagation();
+                }
+            })
+            .on_header_keydown(|event: &mut DataTableHeaderKeyboardEvent<T>| {
+                if event.key() == " " {
+                    event.stop_propagation();
+                    event.prevent_default();
+                    event.send_toggle_select_all();
+                }
+            })
+            .on_cell_keydown(|event: &mut DataTableKeyboardEvent| {
+                if event.key() == " " {
+                    event.stop_propagation();
+                    event.prevent_default();
+                    if let Some(selection) = &event.selection {
+                        selection.toggle(event.record_key.clone());
+                    }
+                }
+            })
+    }
+
+    /// Genertates a column which shows the now number.
+    pub fn row_number() -> Self {
+        Self::new("Row")
+            .width("max-content")
+            .render_cell(super::render_row_number)
+    }
+
+    /// Builder style method to set the yew `key` property
+    pub fn key(mut self, key: impl Into<Key>) -> Self {
+        self.key = Some(key.into());
+        self
+    }
+
+    /// Builder style method to set the column width.
+    pub fn width(mut self, width: impl Into<AttrValue>) -> Self {
+        self.set_width(width);
+        self
+    }
+
+    /// Method to set the column width.
+    pub fn set_width(&mut self, width: impl Into<AttrValue>) {
+        self.width = width.into();
+    }
+
+    /// Builder style method to set the column width as flex fraction.
+    pub fn flex(mut self, flex: usize) -> Self {
+        self.set_flex(flex);
+        self
+    }
+
+    /// Method to set the column width as flex fraction.
+    pub fn set_flex(&mut self, flex: usize) {
+        self.set_width(format!("{flex}fr"));
+    }
+
+    /// Builder style method to set a fixed column width.
+    pub fn fixed(mut self, size: usize) -> Self {
+        self.set_fixed(size);
+        self
+    }
+
+    /// Method to set a fixed column width.
+    pub fn set_fixed(&mut self, size: usize) {
+        self.set_width(format!("{size}px"));
+    }
+
+    /// Builder style method to set the column width as percentage.
+    pub fn percentage(mut self, percentage: usize) -> Self {
+        self.set_percentage(percentage);
+        self
+    }
+
+    /// Method to set the column width as percentage.
+    pub fn set_percentage(&mut self, percentage: usize) {
+        self.set_width(format!("{percentage}%"));
+    }
+
+    /// Builder style method to set the horizontal cell justification.
+    pub fn justify(mut self, justify: impl Into<AttrValue>) -> Self {
+        self.set_justify(justify);
+        self
+    }
+
+    /// Method to set the horizontal cell justification.
+    pub fn set_justify(&mut self, justify: impl Into<AttrValue>) {
+        self.justify = justify.into();
+    }
+
+    /// Builder style method to set the render function.
+    pub fn render(self, render: impl Into<RenderFn<T>>) -> Self {
+        let render = render.into();
+        self.render_cell(move |args: &mut DataTableCellRenderArgs<T>| render.apply(args.record))
+    }
+
+    /// Builder style method to set the cell render function.
+    pub fn render_cell(mut self, render: impl Into<DataTableCellRenderer<T>>) -> Self {
+        self.render_cell = render.into();
+        self
+    }
+
+    /// Builder style method to set the header render function
+    pub fn render_header(mut self, render: impl Into<DataTableHeaderRenderer<T>>) -> Self {
+        self.render_header = Some(render.into());
+        self
+    }
+
+    /// Builder style method to set the sort function.
+    pub fn sorter(mut self, sorter: impl IntoSorterFn<T>) -> Self {
+        self.sorter = sorter.into_sorter_fn();
+        self
+    }
+
+    /// Builder style method to set the sort order
+    pub fn sort_order(mut self, order: impl IntoPropValue<Option<bool>>) -> Self {
+        self.sort_order = order.into_prop_value();
+        self
+    }
+
+    /// Builder style method to set the hidden flag.
+    pub fn hidden(mut self, hidden: bool) -> Self {
+        self.set_hidden(hidden);
+        self
+    }
+
+    /// Method to set the hidden flag.
+    pub fn set_hidden(&mut self, hidden: bool) {
+        self.hidden = hidden;
+    }
+
+    /// Builder style method to set the resizable flag.
+    pub fn resizable(mut self, hidden: bool) -> Self {
+        self.set_resizable(hidden);
+        self
+    }
+
+    /// Method to set the resizable flag.
+    pub fn set_resizable(&mut self, resizable: bool) {
+        self.resizable = resizable;
+    }
+
+    /// Builder style method to set the show_menu flag.
+    pub fn show_menu(mut self, hidden: bool) -> Self {
+        self.set_show_menu(hidden);
+        self
+    }
+
+    /// Method to set the show_menu flag.
+    pub fn set_show_menu(&mut self, show_menu: bool) {
+        self.show_menu = show_menu;
+    }
+
+    /// Builder style method to set the cell click callback.
+    pub fn on_cell_click(mut self, cb: impl IntoEventCallbackMut<DataTableMouseEvent>) -> Self {
+        self.on_cell_click = cb.into_event_cb_mut();
+        self
+    }
+
+    /// Builder style method to set the cell context click callback.
+    pub fn on_cell_context_click(
+        mut self,
+        cb: impl IntoEventCallbackMut<DataTableMouseEvent>,
+    ) -> Self {
+        self.on_cell_context_click = cb.into_event_cb_mut();
+        self
+    }
+
+    /// Builder style method to set the cell dblclick callback.
+    pub fn on_cell_dblclick(mut self, cb: impl IntoEventCallbackMut<DataTableMouseEvent>) -> Self {
+        self.on_cell_dblclick = cb.into_event_cb_mut();
+        self
+    }
+
+    /// Builder style method to set the cell keydown callback.
+    pub fn on_cell_keydown(
+        mut self,
+        cb: impl IntoEventCallbackMut<DataTableKeyboardEvent>,
+    ) -> Self {
+        self.on_cell_keydown = cb.into_event_cb_mut();
+        self
+    }
+
+    /// Builder style method to set the header keydown callback.
+    pub fn on_header_keydown(
+        mut self,
+        cb: impl IntoEventCallbackMut<DataTableHeaderKeyboardEvent<T>>,
+    ) -> Self {
+        self.on_header_keydown = cb.into_event_cb_mut();
+        self
+    }
+
+    /// Builder style method to set a get_property_fn for renderer and sorter
+    /// the given fn must return a reference
+    pub fn get_property<E: Ord + std::fmt::Display>(
+        self,
+        get_property_fn: impl 'static + Fn(&T) -> &E,
+    ) -> Self {
+        let get_property_fn = Rc::new(get_property_fn);
+        self.sorter({
+            let get_property_fn = get_property_fn.clone();
+            move |itema: &T, itemb: &T| get_property_fn(itema).cmp(&get_property_fn(itemb))
+        })
+        .render(move |item: &T| html! {{get_property_fn(item)}})
+    }
+
+    /// Builder style method to set a get_property_fn for renderer and sorter
+    /// the given fn must return an owned type
+    /// NOTE: on sort this will be called multiple times per entry, so use with caution for large
+    /// lists
+    pub fn get_property_owned<E: Ord + std::fmt::Display>(
+        self,
+        get_property_fn: impl 'static + Fn(&T) -> E,
+    ) -> Self {
+        let get_property_fn = Rc::new(get_property_fn);
+        self.sorter({
+            let get_property_fn = get_property_fn.clone();
+            move |itema: &T, itemb: &T| get_property_fn(itema).cmp(&get_property_fn(itemb))
+        })
+        .render(move |item: &T| html! {{get_property_fn(item)}})
+    }
+
+    /// Builder style method for [`Self::set_tree_column`]
+    pub fn tree_column(mut self, store: impl IntoPropValue<Option<TreeStore<T>>>) -> Self {
+        self.set_tree_column(store);
+        self
+    }
+
+    /// Makes the column into a tree column by providing a TreeStore
+    ///
+    /// this automatically sets up the tree rendering and the expanding and
+    /// collapsing handlers
+    pub fn set_tree_column(&mut self, store: impl IntoPropValue<Option<TreeStore<T>>>) {
+        let store = store.into_prop_value();
+        self.tree_store = store.clone();
+
+        let on_cell_keydown = self.on_cell_keydown.take();
+        self.on_cell_keydown = Some(CallbackMut::from(
+            move |event: &mut DataTableKeyboardEvent| {
+                if event.key() == " " {
+                    if let Some(store) = &store {
+                        if let Some(mut node) = store.write().lookup_node_mut(&event.record_key) {
+                            node.set_expanded(!node.expanded());
+                        }
+                    }
+                }
+
+                if let Some(on_cell_keydown) = &on_cell_keydown {
+                    on_cell_keydown.emit(event);
+                }
+            },
+        ));
+    }
+
+    /// Renders and returns the cell content
+    pub fn apply_render(&self, args: &mut DataTableCellRenderArgs<T>) -> Html {
+        if let Some(store) = &self.tree_store {
+            let content = self.render_cell.apply(args);
+            super::render_tree_node_impl(args, content, Some(store.clone()))
+        } else {
+            self.render_cell.apply(args)
+        }
+    }
+}

@@ -1,0 +1,265 @@
+use std::rc::Rc;
+
+use yew::html::{IntoEventCallback, IntoPropValue};
+use yew::prelude::*;
+use yew::virtual_dom::Key;
+
+// #[cfg(feature = "proxmox-schema")]
+// use proxmox_schema::Schema;
+
+use crate::prelude::*;
+use crate::props::{IntoOptionalRenderFn, IntoTextFilterFn, RenderFn, TextFilterFn};
+use crate::state::Store;
+use crate::widget::data_table::{DataTable, DataTableColumn, DataTableHeader};
+use crate::widget::{GridPicker, Trigger};
+
+use super::{IntoValidateFn, Selector, SelectorRenderArgs, ValidateFn};
+
+use pwt_macros::{builder, widget};
+
+/// Combobox widget
+///
+/// Allows to select text options.
+///
+/// # Note: No multiselect
+///
+/// Comboboxes with multi-select suffers from severe usability problems, because
+/// there is not enough room to display the selected values when the combobox
+/// is collapsed. Therefore, we have not implemented the multiselect mode.
+///
+/// Please consider using a flat grid instead. If there are few choices,
+/// a segmented button may also be an option.
+#[widget(pwt=crate, comp=PwtCombobox, @input)]
+#[derive(Clone, PartialEq, Properties)]
+#[builder]
+pub struct Combobox {
+    /// Default value.
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or_default]
+    pub default: Option<AttrValue>,
+
+    /// Make the input editable.
+    #[prop_or_default]
+    #[builder]
+    pub editable: bool,
+
+    /// Item list.
+    #[prop_or_default]
+    pub items: Rc<Vec<AttrValue>>,
+
+    /// Change callback
+    #[builder_cb(IntoEventCallback, into_event_callback, String)]
+    #[prop_or_default]
+    pub on_change: Option<Callback<String>>,
+
+    /// Validation function.
+    #[prop_or_default]
+    pub validate: Option<ValidateFn<(String, Store<AttrValue>)>>,
+
+    /// Show filter
+    ///
+    /// Defaul behavior is to show the filter for pickers with more than 10 items.
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or_default]
+    pub show_filter: Option<bool>,
+
+    /// Custom filter function.
+    #[builder_cb(IntoTextFilterFn, into_text_filter_fn, AttrValue)]
+    #[prop_or_default]
+    pub filter: Option<TextFilterFn<AttrValue>>,
+
+    /// Display the output of this function instead of displaying values directly.
+    ///
+    /// Note: selectors using this feature are not editable (editable property is ignored)!
+    ///
+    /// Also consider adding a custom filter function to filter on visible.
+    #[builder_cb(IntoOptionalRenderFn, into_optional_render_fn, AttrValue)]
+    #[prop_or_default]
+    pub render_value: Option<RenderFn<AttrValue>>,
+
+    /// Icons to show on the left (false) or right(true) side of the input
+    #[prop_or_default]
+    #[builder]
+    pub trigger: Vec<(Trigger, bool)>,
+}
+
+impl Combobox {
+    /// Create a new instance.
+    pub fn new() -> Self {
+        yew::props!(Self {})
+    }
+
+    /// Builder style method to add an selectable item.
+    pub fn with_item(mut self, item: impl IntoPropValue<AttrValue>) -> Self {
+        self.add_item(item);
+        self
+    }
+
+    /// Method to add an selectable item.
+    pub fn add_item(&mut self, item: impl IntoPropValue<AttrValue>) {
+        Rc::make_mut(&mut self.items).push(item.into_prop_value());
+    }
+
+    /// Builder style method to set items
+    pub fn items(mut self, items: Rc<Vec<AttrValue>>) -> Self {
+        self.set_items(items);
+        self
+    }
+
+    /// Method to set items
+    pub fn set_items(&mut self, items: Rc<Vec<AttrValue>>) {
+        self.items = items;
+    }
+
+    /// Builder style method to set the validate callback
+    pub fn validate(mut self, validate: impl IntoValidateFn<(String, Store<AttrValue>)>) -> Self {
+        self.set_validate(validate);
+        self
+    }
+
+    /// Method to set the validate callback
+    pub fn set_validate(&mut self, validate: impl IntoValidateFn<(String, Store<AttrValue>)>) {
+        self.validate = validate.into_validate_fn();
+    }
+
+    // /// Builder style method to set the validation schema
+    // #[cfg(feature = "proxmox-schema")]
+    // pub fn schema(mut self, schema: &'static Schema) -> Self {
+    //     self.set_schema(schema);
+    //     self
+    // }
+
+    // /// Method to set the validation schema
+    // #[cfg(feature = "proxmox-schema")]
+    // pub fn set_schema(&mut self, schema: &'static Schema) {
+    //     self.set_validate(move |(value, _store): &(String, _)| {
+    //         schema.parse_simple_value(value)?;
+    //         Ok(())
+    //     });
+    // }
+
+    /// Builder style method to add an trigger
+    pub fn with_trigger(mut self, trigger: impl Into<Trigger>, right: bool) -> Self {
+        self.add_trigger(trigger, right);
+        self
+    }
+
+    /// Method to add an trigger
+    pub fn add_trigger(&mut self, trigger: impl Into<Trigger>, right: bool) {
+        self.trigger.push((trigger.into(), right));
+    }
+}
+
+pub enum Msg {
+    Reposition,
+}
+
+#[doc(hidden)]
+pub struct PwtCombobox {
+    store: Store<AttrValue>,
+    columns: Rc<Vec<DataTableHeader<AttrValue>>>,
+}
+
+impl Component for PwtCombobox {
+    type Message = Msg;
+    type Properties = Combobox;
+
+    fn create(ctx: &Context<Self>) -> Self {
+        let props = ctx.props();
+
+        let store = Store::with_extract_key(|item: &AttrValue| Key::from(item.as_str()));
+        if !props.items.is_empty() {
+            store.set_data(props.items.as_ref().clone());
+        }
+
+        let render_value = props
+            .render_value
+            .clone()
+            .unwrap_or_else(|| RenderFn::new(|value: &AttrValue| html! {value}));
+        let columns = Rc::new(vec![DataTableColumn::new("Value")
+            .show_menu(false)
+            .render(render_value)
+            .into()]);
+
+        Self { store, columns }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::Reposition => true, // just trigger a redraw
+        }
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>, old_props: &Self::Properties) -> bool {
+        let props = ctx.props();
+        if props.items != old_props.items {
+            if !props.items.is_empty() {
+                self.store.set_data(props.items.as_ref().clone());
+            } else {
+                self.store.clear();
+            }
+        }
+        true
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let props = ctx.props();
+        let link = ctx.link().clone();
+
+        let show_filter = props.show_filter.unwrap_or_else(|| {
+            if self.store.data_len() > 10 {
+                true
+            } else {
+                false
+            }
+        });
+
+        let filter = props.filter.clone();
+
+        let columns = Rc::clone(&self.columns);
+        let picker = move |args: &SelectorRenderArgs<Store<AttrValue>>| {
+            // TODO use a simpler list widget without virtual scroll support?
+            let table = DataTable::new(columns.clone(), args.store.clone())
+                //.class("pwt-fit")
+                .striped(false)
+                .borderless(true)
+                .bordered(false)
+                .show_header(false);
+
+            let mut picker = GridPicker::new(table)
+                .selection(args.selection.clone())
+                .show_filter(show_filter)
+                .filter(filter.clone())
+                .on_select(args.controller.on_select_callback());
+
+            if show_filter {
+                picker.set_on_filter_change({
+                    let link = link.clone();
+                    move |_| {
+                        link.send_message(Msg::Reposition);
+                    }
+                });
+            }
+
+            picker.into()
+        };
+
+        Selector::new(self.store.clone(), picker)
+            .with_std_props(&props.std_props)
+            .with_input_props(&props.input_props)
+            .editable(props.editable)
+            .default(&props.default)
+            .validate(props.validate.clone())
+            .render_value(props.render_value.clone())
+            .trigger(props.trigger.clone())
+            .on_change({
+                let on_change = props.on_change.clone();
+                move |key: Key| {
+                    if let Some(on_change) = &on_change {
+                        on_change.emit(key.to_string());
+                    }
+                }
+            })
+            .into()
+    }
+}
