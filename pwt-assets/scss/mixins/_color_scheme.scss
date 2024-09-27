@@ -1,0 +1,78 @@
+@use "sass:math";
+
+@mixin color-scheme-vars($name, $important: false) {
+    --pwt-color-background: var(--pwt-color-#{$name}) #{if($important, "!important", "")};
+    --pwt-color: var(--pwt-color-on-#{$name}) #{if($important, " !important", " ")};
+}
+
+@mixin accent-color-scheme-vars($name, $important: false) {
+    --pwt-accent-color-background: var(--pwt-color-#{$name}) #{if($important, "!important", "")};
+    --pwt-accent-color: var(--pwt-color-on-#{$name}) #{if($important, " !important", " ")};
+}
+
+@mixin outline-button-color-scheme-vars($name, $base: surface, $important: false) {
+    --pwt-color-background: var(--pwt-color-#{$base}) #{if($important, "!important", "")};
+    --pwt-color: var(--pwt-color-#{$name}) #{if($important, " !important", " ")};
+}
+
+@mixin color-scheme($name) {
+    .pwt-scheme-#{$name} {
+        @include color-scheme-vars($name, $important: true);
+    }
+
+    .pwt-accent-#{$name} {
+        @include accent-color-scheme-vars($name, $important: true);
+    }
+
+    //.pwt-scheme-#{$name}.pwt-button-text {
+    //    @include outline-button-color-scheme-vars($name, $base: neutral, $important: true);
+    //}
+
+    //.pwt-scheme-#{$name}.pwt-button-elevated,
+    //.pwt-scheme-#{$name}.pwt-button-outline,
+    //.pwt-scheme-#{$name}.pwt-action-icon {
+    //    @include outline-button-color-scheme-vars($name, $important: true);
+    //}
+
+    .pwt-color-#{$name} {
+        color: var(--pwt-color-#{$name});
+    }
+
+    .pwt-bg-color-#{$name} {
+        background-color: var(--pwt-color-#{$name});
+    }
+
+    .pwt-color-on-#{$name} {
+        color: var(--pwt-color-on-#{$name});
+    }
+
+    // also define classes for SVG properties
+
+    .pwt-fill-#{$name} {
+        fill: var(--pwt-color-#{$name});
+    }
+
+    .pwt-fill-on-#{$name} {
+        fill: var(--pwt-color-on-#{$name});
+    }
+
+    .pwt-stroke-#{$name} {
+        stroke: var(--pwt-color-#{$name});
+    }
+
+    .pwt-stroke-on-#{$name} {
+        stroke: var(--pwt-color-on-#{$name});
+    }
+}
+
+@mixin color-percentages($name) {
+    @each $percentage in $color-scheme-values {
+        .pwt-color-#{$name}-#{$percentage} {
+            color: var(--pwt-color-#{$name}-#{$percentage});
+        }
+
+        .pwt-bg-color-#{$name}-#{$percentage} {
+            background-color: var(--pwt-color-#{$name}-#{$percentage});
+        }
+    }
+}

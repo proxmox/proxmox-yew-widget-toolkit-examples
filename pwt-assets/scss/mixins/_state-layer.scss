@@ -1,0 +1,46 @@
+@use "sass:math";
+
+@mixin elevation-box-shadow($level) {
+    box-shadow: var(--pwt-color-shadow) 0px calc(var(--pwt-elevation-level-#{$level}) / 2)
+        var(--pwt-elevation-level-#{$level});
+}
+
+@mixin elevation-background-color(
+    $base: var(--pwt-color-background), // surface background color (or transparent)
+    $tint: var(--pwt-color-surface-tint), // surface tint color
+    $color: var(--pwt-color), // surface forground color
+    $level: 0, // elevation level
+    $state: none // state layer state
+) {
+    @if (($base == transparent) or ($level == 0)) {
+        background-color: color-mix(in srgb, #{$color} var(--pwt-state-layer-opacity-#{$state}), #{$base});
+    } @else {
+        --pwt-tmp-elevation-color: color-mix(in srgb, #{$tint} var(--pwt-state-layer-opacity-#{$level}), #{$base});
+        background-color: color-mix(
+            in srgb,
+            #{$color} var(--pwt-state-layer-opacity-#{$state}),
+            var(--pwt-tmp-elevation-color)
+        );
+    }
+}
+
+@mixin state-layer-background($state) {
+    @include elevation-background-color($state: $state);
+}
+
+@mixin state-layer(
+    $base: var(--pwt-color-background), // surface background color (or transparent)
+    $tint: var(--pwt-color-surface-tint), // surface tint color
+    $color: var(--pwt-color), // surface forground color
+    $level: 0, // elevation level
+) {
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed),
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include elevation-background-color($base, $tint, $color, $level, hover);
+    }
+
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+        @include elevation-background-color($base, $tint, $color, $level, press);
+    }
+}

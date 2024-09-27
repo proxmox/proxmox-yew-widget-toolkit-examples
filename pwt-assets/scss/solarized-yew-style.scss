@@ -1,0 +1,14 @@
+/// Solarized Theme
+///
+/// This Theme uses colors from the Solarized (see https://ethanschoonover.com/solarized/)
+/// color palette. We use HCT tonal palettes to compute color from seed values, so
+/// the generated colors does not exactly match the original colors.
+///
+/// See: https://en.wikipedia.org/wiki/Solarized
+
+@import "theme_pre";
+@import "solarized/theme_colors_solarized";
+@import "solarized/theme_scheme_dark_solarized";
+@import "solarized/theme_scheme_light_solarized";
+@import "solarized/theme_config_solarized";
+@import "theme_post";

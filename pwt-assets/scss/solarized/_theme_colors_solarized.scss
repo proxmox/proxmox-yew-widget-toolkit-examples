@@ -1,0 +1,43 @@
+// Color setup
+
+// Colors from: https://en.wikipedia.org/wiki/Solarized
+$color-solarized-base03: #002b36;
+$color-solarized-base02: #073642;
+$color-solarized-base01: #586e75;
+$color-solarized-base00: #657b83;
+$color-solarized-base0: #839496;
+$color-solarized-base1: #93a1a1;
+$color-solarized-base2: #eee8d5;
+$color-solarized-base3: #fdf6e3;
+$color-solarized-yellow: #b58900;
+$color-solarized-orange: #cb4b16;
+$color-solarized-red: #dc322f;
+$color-solarized-magenta: #d33682;
+$color-solarized-violet: #6c71c4;
+$color-solarized-blue: #268bd2;
+$color-solarized-cyan: #2aa198;
+$color-solarized-green: #859900;
+
+$color-seed-primary: $color-solarized-yellow;
+$color-seed-secondary: $color-solarized-cyan;
+$color-seed-tertiary: $color-solarized-blue;
+$color-seed-neutral: $color-solarized-base2;
+
+$color-seed-success: $color-solarized-green;
+$color-seed-error: $color-solarized-red;
+$color-seed-warning: $color-solarized-yellow;
+
+// use primary with 5% saturation for neutral-alt
+$color-seed-neutral-alt: change-color($color-seed-primary, $saturation: 5%);
+
+/* Tonal color values */
+:root {
+    @include pwt-color-palette-vars("primary", $color-seed-primary);
+    @include pwt-color-palette-vars("secondary", $color-seed-secondary);
+    @include pwt-color-palette-vars("tertiary", $color-seed-tertiary);
+    @include pwt-color-palette-vars("success", $color-seed-success);
+    @include pwt-color-palette-vars("error", $color-seed-error);
+    @include pwt-color-palette-vars("warning", $color-seed-warning);
+    @include pwt-color-palette-vars("neutral", $color-seed-neutral);
+    @include pwt-color-palette-vars("neutral-alt", $color-seed-neutral-alt);
+}

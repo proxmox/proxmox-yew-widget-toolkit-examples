@@ -1,0 +1,66 @@
+$spacer: 3px;
+$icon-spacer: 0.5em; // space between icon and text
+
+$pwt-font-sans-serif: sans-serif;
+$pwt-font-monospace: monospace;
+
+// fixme: include resonable default color/pallette ?
+
+// font size setup
+@import "font_sizes";
+
+// state layer ocupacity levels
+
+$state-layer-opacity: (
+    none: 0%,
+    stripe: 2%,
+    hover: 8%,
+    focus: 12%,
+    press: 14%,
+    drag: 16%,
+);
+
+// corner shape level
+
+$shape-corner: (
+    none: 0px,
+    extra-small: 4px,
+    small: 8px,
+    medium: 12px,
+    large: 16px,
+    extra-large: 28px,
+    full: 10rem,
+);
+
+$button-corner-shape: map-get($shape-corner, extra-small);
+$fab-corner-shape: map-get($shape-corner, medium);
+$progress-corner-shape: map-get($shape-corner, extra-small);
+$nav-link-corner-shape: map-get($shape-corner, extra-small);
+$nav-pills-corner-shape: map-get($shape-corner, extra-small);
+$tooltip-corner-shape: map-get($shape-corner, extra-small);
+$input-corner-shape: map-get($shape-corner, extra-small);
+$card-corner-shape: map-get($shape-corner, small);
+$dialog-corner-shape: map-get($shape-corner, extra-small);
+
+$field-outline-size: 2px;
+
+$elevation-levels: (
+    0: 0px,
+    1: 2px,
+    2: 4px,
+    3: 6px,
+    4: 8px,
+    5: 12px,
+);
+
+$elevation-levels-tint-opacity: (
+    0: 0%,
+    1: 5%,
+    2: 8%,
+    3: 11%,
+    4: 12%,
+    5: 14%,
+);
+
+// default accent color (primary, secentary or tertiary)
+$default-accent-color: secondary;

@@ -1,0 +1,29 @@
+.pwt-tooltip {
+    @include color-scheme-vars("inverse-surface");
+
+    display: none;
+
+    @include elevation-box-shadow(2);
+
+    background-color: var(--pwt-color-background);
+    color: var(--pwt-color);
+    white-space: normal;
+
+    padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+    border: 1px solid var(--pwt-color-border) !important;
+    border-radius: var(--pwt-tooltip-corner-shape);
+    z-index: $zindex-tooltip;
+
+    @include font_and_line_height("body-large", $important: true);
+}
+
+.pwt-tooltip-rich {
+    @include color-scheme-vars("surface-container");
+    @include elevation-background-color($level: 2, $state: none);
+
+    border-radius: var(--pwt-dialog-corner-shape); // use same shape as dialog
+}
+
+.pwt-tooltip[data-show] {
+    display: block;
+}

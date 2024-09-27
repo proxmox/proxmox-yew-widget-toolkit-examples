@@ -1,0 +1,57 @@
+@use "sass:math";
+
+/// Cards
+
+.pwt-card {
+    @include color-scheme-vars("surface");
+
+    color: var(--pwt-color);
+
+    padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+    border-radius: var(--pwt-card-corner-shape);
+    transition: 0.1s;
+}
+
+.pwt-card:not(.pwt-card-flat):not(.pwt-card-outline) {
+    @include elevation-box-shadow(1);
+    @include elevation-background-color($level: 1, $state: none);
+
+    @each $level, $_value in $elevation-levels {
+        &.pwt-elevation#{$level} {
+            @include elevation-box-shadow($level);
+            @include elevation-background-color($level: $level, $state: none);
+        }
+    }
+
+    &.pwt-interactive {
+        &:hover {
+            @include elevation-box-shadow(2);
+            @include elevation-background-color($level: 2, $state: hover);
+        }
+
+        &:active {
+            @include elevation-box-shadow(1);
+            @include elevation-background-color($level: 1, $state: press);
+        }
+    }
+}
+
+.pwt-card.pwt-card-outline {
+    @include color-scheme-vars("neutral");
+    border: 2px solid var(--pwt-high-contrast-border);
+}
+
+.pwt-card.pwt-card-flat,
+.pwt-card.pwt-card-outline {
+    @include elevation-background-color($level: 0, $state: none);
+
+    &.pwt-interactive {
+        &:hover {
+            @include elevation-background-color($level: 0, $state: hover);
+        }
+
+        &:active {
+            @include elevation-background-color($level: 0, $state: press);
+        }
+    }
+}

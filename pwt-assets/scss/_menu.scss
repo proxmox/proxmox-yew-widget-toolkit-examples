@@ -1,0 +1,131 @@
+.pwt-submenu {
+	@include color-scheme-vars(surface);
+	background: var(--pwt-color-background);
+	color: var(--pwt-color);
+	position: fixed;
+
+	z-index: $zindex-dropdown;
+
+	border-radius: var(--pwt-shape-corner-extra-small);
+
+	@include elevation-box-shadow(2);
+
+	max-height: 100vh;
+	max-width: 100vw;
+
+	.pwt-menu {
+		overflow: hidden;
+		max-height: none;
+	}
+}
+
+// MenuBar
+ul.pwt-menubar {
+	@include color-scheme-vars(surface);
+
+	background: var(--pwt-color-background);
+	color: var(--pwt-color);
+
+	display: flex;
+	align-items: baseline;
+
+	& > li.active:focus-within {
+		@include state-layer-background(focus);
+	}
+
+	& > li:hover:not([aria-disabled=true]) {
+		@include state-layer-background(hover);
+	}
+
+	.pwt-menubar-item {
+		cursor: pointer;
+		outline: 0;
+		@include font("label-large");
+		line-height: map-get($line-height, "title-medium");
+		padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+		border: 0;
+		white-space: nowrap;
+		user-select: none;
+	}
+
+	.pwt-menubar-item:focus-visible {
+		outline: 2px solid var(--pwt-color-focus);
+		outline-offset: -2px;
+	}
+
+	.pwt-menubar-item{
+		&[disabled], &[aria-disabled=true] {
+			cursor: auto;
+			opacity: 0.5;
+		}
+	}
+
+	.pwt-menubar-item-icon {
+		font-size: map-get($font-size, "title-medium");
+		line-height: map-get($line-height, "title-medium");
+		margin-inline-end: var(--pwt-icon-spacer);
+	}
+
+	.pwt-menubar-item-arrow {
+		display: none;
+	}
+}
+
+// Menu
+ul.pwt-menu {
+	& > li {
+		position: relative;
+		outline: 0;
+		width: 100%;
+	}
+
+	& > li.active:focus-within > :not([aria-disabled=true]) {
+		@include state-layer-background(focus);
+	}
+
+	.pwt-menu-item {
+		display: flex;
+		align-items: baseline;
+		gap: var(--pwt-icon-spacer);
+
+		cursor: pointer;
+		outline: 0;
+		padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+		@include font("label-large");
+		line-height: map-get($line-height, "title-medium");
+		border: 0;
+		white-space: nowrap;
+		user-select: none;
+	}
+
+	.pwt-menu-item {
+		&[disabled], &[aria-disabled=true] {
+			cursor: auto;
+			opacity: 0.5;
+		}
+	}
+
+	.pwt-menu-item:focus-visible {
+		outline: 2px solid var(--pwt-color-focus);
+		outline-offset: -2px;
+	}
+
+	.pwt-menu-item-icon {
+		display: inline-block;
+		font-size: map-get($font-size, "title-medium");
+		line-height: map-get($line-height, "title-medium");
+		width: map-get($line-height, "title-medium");
+	}
+
+	.pwt-menu-item-arrow {
+		margin-inline-start: var(--pwt-spacer-2);
+		font-size: map-get($font-size, "title-medium");
+		line-height: map-get($line-height, "title-medium");
+	}
+}
+
+/* change arrow icon direction */
+/* Note: :dir(rtl) only works with firefox, so we cant use that. */
+html[dir="rtl"] .pwt-menu-item-arrow {
+	transform: scaleX(-1);
+}

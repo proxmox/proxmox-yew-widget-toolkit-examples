@@ -1,0 +1,41 @@
+.pwt-progress {
+	@include accent-color-scheme-vars($default-accent-color);
+	@include font_and_line_height("label-large");
+
+	position: relative;
+	background: var(--pwt-color-border);
+	overflow: hidden;
+	height: 4px;
+	min-height: 4px;
+
+	.pwt-progress-bar {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		background: var(--pwt-accent-color-background);
+	}
+
+	@keyframes infinite-progress {
+		from {
+			left: 0;
+		}
+
+		to {
+			left: calc(100% - 20%);
+		}
+	}
+
+	.pwt-progress-infinite {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 20%;
+		left: 0;
+		background: var(--pwt-accent-color-background);
+		animation-duration: 2s;
+		animation-name: infinite-progress;
+		animation-iteration-count: infinite;
+		animation-direction: alternate;
+		animation-timing-function: ease-in-out;
+	}
+}

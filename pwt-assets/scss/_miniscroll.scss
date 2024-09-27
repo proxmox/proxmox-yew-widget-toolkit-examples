@@ -1,0 +1,87 @@
+/* Minimalistic scroll bars
+*
+* Try to use very small scroll bars. Usefule for toolbars/tabbar scrolling.
+*/
+
+.pwt-mini-scroll-content-arrow {
+    overflow: hidden;
+    display: flex;
+    flex: 1 1 auto;
+}
+
+.pwt-mini-scroll-content-native {
+    display: flex;
+    flex: 1 1 auto;
+
+    overflow: auto; // for firefox
+    overflow: overlay; // for webkit (ignored by firefox)
+    //scrollbar-width: auto; // firefox
+    scrollbar-color: var(--pwt-color-border) #00000000; // firefox
+
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+        background-color: #00000000;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--pwt-color-border);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--pwt-accent-color-background);
+    }
+}
+
+.pwt-mini-scroll {
+    @include color-scheme-vars(neutral);
+    @include accent-color-scheme-vars(primary);
+
+    display: flex;
+
+    overflow: auto;
+
+   .pwt-mini-scroll-left-arrow {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: map-get($line-height, label-large);
+        width: 0;
+    }
+
+    .pwt-mini-scroll-left-arrow.visible {
+        cursor: pointer;
+        padding: var(--pwt-spacer-1);
+        width: auto;
+
+        @include state-layer();
+
+        &.disabled {
+            cursor: auto;
+            opacity: 0.5;
+        }
+    }
+
+    .pwt-mini-scroll-right-arrow {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: map-get($line-height, label-large);
+        width: 0;
+    }
+
+    .pwt-mini-scroll-right-arrow.visible {
+        cursor: pointer;
+        padding: var(--pwt-spacer-1);
+        width: auto;
+
+        @include state-layer();
+
+        &.disabled {
+            cursor: auto;
+            opacity: 0.5;
+        }
+    }
+}

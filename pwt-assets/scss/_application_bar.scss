@@ -1,0 +1,13 @@
+.pwt-application-bar {
+    @include color-scheme-vars(surface-container);
+    @include accent-color-scheme-vars(#{$default-accent-color}-container);
+
+    @include elevation-background-color($level: 2);
+    //@include elevation-box-shadow($level: 2);
+
+    .pwt-application-bar-row1 {
+        align-items: center;
+        padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+        gap: var(--pwt-spacer-2);
+    }
+}

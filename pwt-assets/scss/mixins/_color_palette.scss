@@ -1,0 +1,61 @@
+$color-names: (neutral, surface, inverse-surface, dark-surface, neutral-alt, primary, secondary, tertiary, success, error, warning);
+
+$color-scheme-values: (100, 99, 95, 90, 80, 70, 60, 50, 40, 30, 20, 15, 10, 5, 0);
+
+// use HCT to generate tonal palettes
+//
+// See: https://material.io/blog/science-of-color-design
+//
+// Note: AFAIK, there is currently no official SCSS plugin for HCT.
+
+// But There is a prototype mentioned in:
+// https://github.com/material-foundation/material-color-utilities/issues/17
+// libmonet.scss: https://gist.github.com/jpohhhh/6ade636f207bf97742d101650798a088
+
+@use "sass:list";
+@use "sass:color";
+@use "sass:math";
+
+// Generate palette use HCT tones
+@function tonal_palette($base-color) {
+    $palette: ();
+
+    $base-hct: hct_from_color($base-color);
+
+    @each $percentage in $color-scheme-values {
+        $new: hct(list.nth($base-hct, 1), list.nth($base-hct, 2), $percentage);
+        $palette: map-merge(
+            $palette,
+            (
+                $percentage: $new,
+            )
+        );
+    }
+
+    @return $palette;
+}
+
+// Generate palette use HSL lightness
+// Note: tonal_palette() produces better results
+@function tonal_palette2($base-color) {
+    $palette: ();
+
+    @each $percentage in $color-scheme-values {
+        $new: color.change($base-color, $lightness: $percentage * 1%);
+        $palette: map-merge(
+            $palette,
+            (
+                $percentage: $new,
+            )
+        );
+    }
+
+    @return $palette;
+}
+
+@mixin pwt-color-palette-vars($color-name, $base-color) {
+    $palette: tonal_palette($base-color);
+    @each $percentage in $color-scheme-values {
+        --pwt-color-#{$color-name}-#{$percentage}: #{map-get($palette, $percentage)};
+    }
+}

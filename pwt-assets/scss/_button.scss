@@ -1,0 +1,519 @@
+button,
+.pwt-button {
+    @include font_and_line_height("label-large");
+}
+
+.pwt-action-icon {
+    @include color-scheme-vars($default-accent-color);
+
+    color: var(--pwt-color-background);
+    background: none;
+
+    @include state-layer($base: transparent, $color: var(--pwt-color-background));
+
+    line-height: map-get($line-height, label-large);
+
+    display: inline-flex;
+    align-items: baseline;
+    align-items: center;
+    justify-content: center;
+    transition: 0.1s;
+
+    cursor: pointer;
+    outline: 0;
+
+    padding: var(--pwt-spacer-1);
+    border-radius: 10rem;
+    width: calc(map-get($line-height, "label-large") + 2 * var(--pwt-spacer-1)) !important;
+    box-sizing: border-box;
+    aspect-ratio: 1 / 1;
+
+    &:focus-visible {
+        outline: 2px solid var(--pwt-color-focus);
+        outline-offset: -2px;
+    }
+
+    &.disabled,
+    &:disabled,
+    &[aria-disabled=true] {
+	@include color-scheme-vars("inverse-surface");
+        cursor: auto;
+        opacity: 0.5;
+    }
+}
+
+.pwt-button {
+    @include color-scheme-vars("surface");
+
+    overflow: hidden; // reqired by ripple effect
+    flex: 0 0 auto; // do not shrink/grow buttons
+
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--pwt-icon-spacer);
+    transition: 0.1s;
+
+    position: relative; // required to set z-index
+
+    padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    white-space: nowrap !important;
+    user-select: none;
+    border: 0;
+    border-radius: var(--pwt-button-corner-shape);
+    z-index: 1; // correctly show shadows
+
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
+
+    &.disabled,
+    &:disabled,
+    &[aria-disabled=true] {
+        cursor: auto;
+        opacity: 0.5;
+        @include color-scheme-vars("surface", $important: true);
+        @include elevation-box-shadow(0);
+    }
+}
+
+// implement state layer for normal buttons
+:not(.pwt-segmented-button.pwt-button-elevated):not(.pwt-segmented-button.pwt-button-outline) > .pwt-button:not(.pwt-fab):not(.pwt-button-text):not(.pwt-button-outline):not(.pwt-button-elevated) {
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+        @include state-layer-background(press);
+        box-shadow: none;
+    }
+
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include state-layer-background(hover);
+        @include elevation-box-shadow(0);
+    }
+
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include state-layer-background(hover);
+        @include elevation-box-shadow(1);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--pwt-color-focus);
+        outline-offset: -2px;
+    }
+}
+
+.pwt-segmented-button.pwt-button-elevated > .pwt-button:not(.pwt-fab):not(.pwt-button-text):not(.pwt-button-outline):not(.pwt-button-elevated) {
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+        @include state-layer-background(press);
+        @include elevation-box-shadow(1);
+    }
+
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include state-layer-background(hover);
+        @include elevation-box-shadow(1);
+    }
+
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include state-layer-background(hover);
+        @include elevation-box-shadow(2);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--pwt-color-focus);
+        outline-offset: -2px;
+    }
+}
+
+.pwt-button.pwt-button-text {
+    @include elevation-box-shadow(0);
+    @include color-scheme-vars($default-accent-color);
+
+    color: var(--pwt-color-background);
+    background: none;
+
+    @include state-layer($base: transparent, $color: var(--pwt-color-background));
+}
+
+.pwt-button.pwt-button-outline {
+    @include elevation-box-shadow(0);
+    @include color-scheme-vars($default-accent-color);
+
+    border: 2px solid var(--pwt-high-contrast-border);
+
+    // Note: outline buttons must have same size as filled buttons
+    padding: calc(var(--pwt-spacer-1) - 2px) calc(var(--pwt-spacer-2) - 2px);
+
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include elevation-box-shadow(0);
+    }
+}
+
+.pwt-button.pwt-button-outline:not(:disabled):not(.disabled):not([aria-disabled=true]),
+.pwt-button.pwt-button-elevated:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+    @include color-scheme-vars($default-accent-color);
+
+    color: var(--pwt-color-background);
+    background-color: var(--pwt-color-neutral);
+
+    @include state-layer($base: var(--pwt-color-neutral), $color: var(--pwt-color-background));
+}
+
+.pwt-segmented-button.pwt-button-outline > .pwt-button {
+    @include elevation-box-shadow(0);
+    @include color-scheme-vars($default-accent-color);
+
+    border: 2px solid var(--pwt-high-contrast-border);
+
+    // Note: outline buttons must have same size as filled buttons
+    padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include elevation-box-shadow(0);
+    }
+}
+
+.pwt-segmented-button.pwt-button-outline:not(:disabled):not(.disabled):not([aria-disabled=true]) > .pwt-button {
+    color: var(--pwt-color-background);
+    background-color: var(--pwt-color-neutral);
+
+    @include state-layer($base: var(--pwt-color-neutral), $color: var(--pwt-color-background));
+}
+
+.pwt-segmented-button.pwt-button-elevated > .pwt-button,
+.pwt-button.pwt-button-elevated {
+    &:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+        @include elevation-box-shadow(1);
+    }
+
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+        @include elevation-box-shadow(1);
+        z-index: 1; // correctly show shadows
+    }
+
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include elevation-box-shadow(2);
+        z-index: 1; // correctly show shadows
+    }
+}
+
+// implement state layer for FAB buttons
+.pwt-button.pwt-fab {
+    @include color-scheme-vars("primary-container");
+    @include elevation-background-color($base: var(--pwt-color-background), $level: 0, $state: none);
+
+    // fixme: defazult state layer
+    &:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+        @include elevation-box-shadow(3);
+    }
+
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+        @include elevation-box-shadow(2);
+        //@include elevation-background-color(0, press);
+        @include elevation-background-color($base: var(--pwt-color-background), $level: 0, $state: press);
+    }
+
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+        @include elevation-box-shadow(4);
+        //@include elevation-background-color(0, hover);
+        @include elevation-background-color($base: var(--pwt-color-background), $level: 0, $state: hover);
+    }
+}
+
+.pwt-button.rounded {
+    border-radius: 10rem !important;
+}
+
+.pwt-button.circle {
+    border-radius: 10rem !important;
+    box-sizing: border-box;
+    width: calc(map-get($line-height, "label-large") + 2 * var(--pwt-spacer-1) + 2px);
+    aspect-ratio: 1 / 1;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+}
+
+.pwt-segmented-button {
+    white-space: nowrap;
+}
+
+.pwt-segmented-button > .pwt-button {
+    border-radius: 0px;
+    border-inline-start: 0px !important;
+}
+
+.pwt-segmented-button > .pwt-button:first-child {
+    border-start-start-radius: var(--pwt-button-corner-shape);
+    border-end-start-radius: var(--pwt-button-corner-shape);
+}
+
+.pwt-segmented-button.pwt-button-outline > .pwt-button:first-child {
+    border-inline-start: 2px solid var(--pwt-high-contrast-border) ! important;
+}
+
+.pwt-segmented-button > .pwt-button:last-child {
+    border-start-end-radius: var(--pwt-button-corner-shape);
+    border-end-end-radius: var(--pwt-button-corner-shape);
+}
+
+.pwt-segmented-button > .pwt-button.rounded {
+    border-radius: 0px !important;
+}
+
+.pwt-segmented-button > .pwt-button.rounded:first-child,
+.pwt-segmented-button.rounded > .pwt-button:first-child {
+    border-start-start-radius: 10rem !important;
+    border-end-start-radius: 10rem !important;
+}
+
+.pwt-segmented-button > .pwt-button.rounded:last-child,
+.pwt-segmented-button.rounded > .pwt-button:last-child {
+    border-start-end-radius: 10rem !important;
+    border-end-end-radius: 10rem !important;
+}
+
+.pwt-fab {
+    border-radius: var(--pwt-fab-corner-shape);
+    padding: var(--pwt-spacer-2);
+    height: calc(map-get($font-size, "headline-medium") + 2 * var(--pwt-spacer-2) + 2px);
+    min-width: calc(map-get($font-size, "headline-medium") + 2 * var(--pwt-spacer-2) + 2px);
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+
+    .pwt-fab-icon {
+        font-size: map-get($font-size, "headline-medium");
+    }
+
+    &.pwt-fab-small {
+        padding: var(--pwt-spacer-1);
+        height: calc(map-get($font-size, "title-large") + 2 * var(--pwt-spacer-1) + 2px);
+        min-width: calc(map-get($font-size, "title-large") + 2 * var(--pwt-spacer-1) + 2px);
+
+        .pwt-fab-icon {
+            font-size: map-get($font-size, "title-large");
+        }
+
+        &.pwt-fab-extended {
+            padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+        }
+    }
+
+    &.pwt-fab-large {
+        padding: var(--pwt-spacer-3);
+        height: calc(map-get($font-size, "headline-large") + 2 * var(--pwt-spacer-3) + 2px);
+        min-width: calc(map-get($font-size, "headline-large") + 2 * var(--pwt-spacer-3) + 2px);
+
+        .pwt-fab-icon {
+            font-size: map-get($font-size, "headline-large");
+        }
+    }
+}
+
+@mixin button-color-definitions($scheme) {
+    .pwt-segmented-button.pwt-scheme-#{$scheme} > .pwt-button,
+    .pwt-segmented-button > .pwt-button.pwt-scheme-#{$scheme} {
+        @include color-scheme-vars($scheme);
+    }
+}
+
+@each $scheme-name in $color-names {
+    @include button-color-definitions($scheme-name);
+}
+
+// Fab Menus
+.pwt-fab-menu-container {
+    position: relative;
+    z-index: $zindex-dropdown;
+
+    --fab-small-button-height: calc(#{map-get($font-size, "title-large")} + 2 * var(--pwt-spacer-1) + 2px);
+
+    .pwt-fab-menu-item {
+        position: absolute;
+        visibility: hidden;
+        opacity: 0;
+        top: calc(50% - var(--fab-small-button-height) / 2);
+        left: calc(50% - var(--fab-small-button-height) / 2);
+        z-index: -1;
+    }
+
+    &.pwt-fab-direction-left.pwt-fab-align-start .pwt-fab-menu-item,
+    &.pwt-fab-direction-right.pwt-fab-align-start .pwt-fab-menu-item {
+        top: 0;
+        bottom: unset;
+    }
+
+    &.pwt-fab-direction-left.pwt-fab-align-end .pwt-fab-menu-item,
+    &.pwt-fab-direction-right.pwt-fab-align-end .pwt-fab-menu-item {
+        top: unset;
+        bottom: 0;
+    }
+
+    &.pwt-fab-direction-up.pwt-fab-align-start .pwt-fab-menu-item,
+    &.pwt-fab-direction-down.pwt-fab-align-start .pwt-fab-menu-item {
+        left: 0;
+        right: unset;
+    }
+
+    &.pwt-fab-direction-up.pwt-fab-align-end .pwt-fab-menu-item,
+    &.pwt-fab-direction-down.pwt-fab-align-end .pwt-fab-menu-item {
+        left: unset;
+        right: 0;
+    }
+
+    &.active .pwt-fab-menu-item {
+        visibility: visible;
+        opacity: 1;
+        z-index: 1;
+    }
+
+    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(2) {
+        top: calc(100% + var(--pwt-spacer-2));
+    }
+
+    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(3) {
+        top: calc(100% + var(--pwt-spacer-2) + 1 * (var(--fab-small-button-height) + var(--pwt-spacer-2)));
+    }
+
+    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(4) {
+        top: calc(100% + var(--pwt-spacer-2) + 2 * (var(--fab-small-button-height) + var(--pwt-spacer-2)));
+    }
+
+    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(5) {
+        top: calc(100% + var(--pwt-spacer-2) + 3 * (var(--fab-small-button-height) + var(--pwt-spacer-2)));
+    }
+
+    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(6) {
+        top: calc(100% + var(--pwt-spacer-2) + 4 * (var(--fab-small-button-height) + var(--pwt-spacer-2)));
+    }
+
+    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(2) {
+        top: calc(0px - var(--fab-small-button-height) - var(--pwt-spacer-2));
+    }
+
+    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(3) {
+        top: calc(
+            0px - var(--fab-small-button-height) -
+                (var(--pwt-spacer-2) + 1 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
+        );
+    }
+
+    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(4) {
+        top: calc(
+            0px - var(--fab-small-button-height) -
+                (var(--pwt-spacer-2) + 2 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
+        );
+    }
+
+    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(5) {
+        top: calc(
+            0px - var(--fab-small-button-height) -
+                (var(--pwt-spacer-2) + 3 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
+        );
+    }
+
+    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(6) {
+        top: calc(
+            0px - var(--fab-small-button-height) -
+                (var(--pwt-spacer-2) + 4 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
+        );
+    }
+
+    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(2) {
+        left: calc(0px - var(--fab-small-button-height) - var(--pwt-spacer-2));
+    }
+
+    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(3) {
+        left: calc(
+            0px - var(--fab-small-button-height) -
+                (var(--pwt-spacer-2) + 1 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
+        );
+    }
+
+    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(4) {
+        left: calc(
+            0px - var(--fab-small-button-height) -
+                (var(--pwt-spacer-2) + 2 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
+        );
+    }
+
+    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(5) {
+        left: calc(
+            0px - var(--fab-small-button-height) -
+                (var(--pwt-spacer-2) + 3 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
+        );
+    }
+
+    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(6) {
+        left: calc(
+            0px - var(--fab-small-button-height) -
+                (var(--pwt-spacer-2) + 4 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
+        );
+    }
+
+    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(2) {
+        left: calc(100% + var(--pwt-spacers-2));
+    }
+
+    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(3) {
+        left: calc(100% + var(--pwt-spacers-2) + 1 * (var(--fab-small-button-height) + var(--pwt-spacers-2)));
+    }
+
+    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(4) {
+        left: calc(100% + var(--pwt-spacers-2) + 2 * (var(--fab-small-button-height) + var(--pwt-spacers-2)));
+    }
+
+    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(5) {
+        left: calc(100% + var(--pwt-spacers-2) + 3 * (var(--fab-small-button-height) + var(--pwt-spacers-2)));
+    }
+
+    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(6) {
+        left: calc(100% + var(--pwt-spacers-2) + 4 * (var(--fab-small-button-height) + var(--pwt-spacers-2)));
+    }
+}
+
+
+// Material design ripple effect
+
+:root {
+    --button-ripple-animation-time: 0.4s;
+}
+
+.pwt-button-ripple {
+    position: absolute;
+
+    background-color: rgba(255, 255, 255, 0.4);
+
+    border-radius: 50%;
+
+    --pwt-ripple-radius: 100px;
+    --pwt-ripple-x: 50%;
+    --pwt-ripple-y: 50%;
+
+    top: calc(var(--pwt-ripple-y) - var(--pwt-ripple-radius));
+    left: calc(var(--pwt-ripple-x) - var(--pwt-ripple-radius));
+    width: calc(var(--pwt-ripple-radius) * 2);
+    height: calc(var(--pwt-ripple-radius) * 2);
+
+    opacity: 0;
+}
+
+.pwt-button-ripple.animate {
+    animation: pwt-animation-button-ripple var(--button-ripple-animation-time) ease-in;
+}
+
+@keyframes pwt-animation-button-ripple {
+    from {
+        transform: scale(0);
+        opacity: 1;
+    }
+    to {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}

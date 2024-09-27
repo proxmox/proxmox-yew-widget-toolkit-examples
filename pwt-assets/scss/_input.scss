@@ -1,0 +1,339 @@
+@use "sass:math";
+
+input {
+    // Note: we dont want to set font-weight to label-large,
+    // we just want the font-size and line-height
+    //@include font_and_line_height("label-large");
+
+    font-family: $pwt-font-sans-serif;
+    font-size: map-get($font-size, "label-large");
+    line-height: map-get($line-height, "label-large");
+    min-width: 0;
+
+    accent-color: var(--pwt-color-#{$default-accent-color});
+
+    &[aria-disabled=true] {
+        pointer-events: none;
+    }
+}
+
+// This is used to display non-editable content returned by a render function,
+// when displayed value is different than submitted value (see Combobox)
+.pwt-input-content {
+    font-family: $pwt-font-sans-serif;
+    font-size: map-get($font-size, "label-large");
+    line-height: map-get($line-height, "label-large");
+}
+
+.pwt-input {
+    @include color-scheme-vars(neutral);
+    @include accent-color-scheme-vars($default-accent-color);
+
+    accent-color: var(--pwt-accent-color);
+
+    // pwt-input is a container - use to add icons, i.e the dropdown picker
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pwt-icon-spacer);
+
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
+
+    padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+    border: 1px solid var(--pwt-color-border);
+    border-radius: var(--pwt-input-corner-shape);
+
+    /// disable border, padding, margin, outline for inputs inside
+    input,
+    .pwt-input-content {
+        min-height: map-get($line-height, "label-large");
+        color: var(--pwt-color);
+        background-color: var(--pwt-color-background);
+        outline: 0 !important;
+        border: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+
+        &.non-editable {
+          caret-color: transparent;
+          cursor: pointer;
+        }
+    }
+
+    &:not(.pwt-input-type-range):focus-within, &.picker-open {
+        outline: $field-outline-size solid var(--pwt-color-focus) !important;
+        outline-offset: calc(-1 * $field-outline-size);
+    }
+
+    &:not(.disabled):not(:disabled):not([aria-disabled=true]).is-invalid {
+        border-color: var(--pwt-color-error-container) !important;
+        outline-color: var(--pwt-color-error-container) !important;
+    }
+
+    &:not(.disabled):not(:disabled):not([aria-disabled=true]).is-invalid:after {
+        content: "";
+        width: 1em;
+        height: 1em;
+        align-self: center;
+        // svg image copied from bootstrap5 css
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-size: 1em 1em;
+    }
+
+    &.disabled,
+    &:disabled,
+    &[aria-disabled=true]{
+        cursor: auto;
+        opacity: 0.5;
+    }
+}
+
+.pwt-input.pwt-input-type-number {
+    & .spinner i {
+        height: calc(map-get($line-height, "label-large") / 2);
+        line-height: calc(map-get($line-height, "label-large") / 2);
+        cursor: pointer;
+    }
+}
+
+.pwt-input.pwt-input-type-range {
+    padding: 0;
+    margin: 0;
+    vertical-align: middle;
+    background-color: transparent;
+    border: 0;
+
+    & input[type="range"] {
+        padding: var(--pwt-spacer-1) var(--pwt-spacer-2) !important;
+        height: map-get($line-height, "label-large");
+        border-radius: var(--pwt-input-corner-shape);
+
+        &:focus-visible {
+            outline: $field-outline-size solid var(--pwt-color-focus) !important;
+            outline-offset: calc(-1 * $field-outline-size);
+        }
+    }
+}
+
+.pwt-label-disabled {
+    opacity: 0.5;
+}
+
+.pwt-switch {
+    @include color-scheme-vars(neutral-alt);
+    @include accent-color-scheme-vars($default-accent-color);
+
+    display: inline-block;
+    outline: 0;
+    flex: 0 0 auto;
+    font-size: map-get($font-size, "label-large");
+    line-height: map-get($line-height, "label-large");
+    width: calc(3em - 4px);
+    background-color: var(--pwt-color-background);
+    border: 2px solid var(--pwt-color-border) !important;
+    border-radius: math.div(map-get($line-height, "label-large"), 2) + 4px;
+    padding: 2px;
+
+    &.checked:not(.disabled) {
+        background-color: var(--pwt-accent-color-background);
+    }
+
+    .pwt-switch-slider {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: map-get($line-height, "label-large") - 4px;
+        width: map-get($line-height, "label-large") - 4px;
+        color: #ffffff00; // invisible
+        background-color: var(--pwt-high-contrast-border);
+        border-radius: 50%;
+        margin: 2px;
+        transition: margin-inline-start 0.2s;
+    }
+
+    &.checked .pwt-switch-slider {
+        margin: 0px;
+        height: map-get($line-height, "label-large");
+        width: map-get($line-height, "label-large");
+        color: var(--pwt-accent-color-background);
+        background-color: var(--pwt-accent-color);
+        margin-inline-start: calc(100% - #{map-get($line-height, "label-large")});
+    }
+
+    &.checked.disabled .pwt-switch-slider {
+        color: var(--pwt-color);
+        background-color: var(--pwt-high-contrast-border);
+    }
+
+    &.is-invalid {
+        background-color: var(--pwt-color-error-container) !important;
+    }
+
+    &:focus {
+        border: 2px solid var(--pwt-color-focus) !important;
+    }
+
+    &.disabled {
+        cursor: auto;
+        opacity: 0.5;
+    }
+}
+
+.pwt-checkbox-state {
+    @include color-scheme-vars(surface);
+    @include accent-color-scheme-vars($default-accent-color);
+
+    display: inline-block;
+    padding: max(map-get($line-height, "label-large") - map-get($font-size, "label-large"), var(--pwt-spacer-1));
+    border-radius: 50%;
+    transition: background 0.3s;
+
+    @include state-layer($base: transparent, $color: var(--pwt-accent-color-background));
+}
+
+.pwt-checkbox {
+    display: inline-block;
+    outline: 0;
+    flex: 0 0 auto;
+    font-size: map-get($font-size, "label-large");
+    line-height: map-get($line-height, "label-large");
+    width: calc(1em);
+    height: calc(1em);
+    border: 1px solid var(--pwt-color-border) !important;
+    color: #ffffff00; // invisible
+    background-color: var(--pwt-color-background);
+
+    .pwt-checkbox-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &.checked {
+        color: var(--pwt-accent-color);
+        background-color: var(--pwt-accent-color-background);
+    }
+
+    &.is-invalid {
+        background-color: var(--pwt-color-error-container) !important;
+    }
+
+    &.checked.is-invalid {
+        color: var(--pwt-color-error) !important;
+    }
+
+    &:focus {
+        border: 1px solid var(--pwt-color-focus) !important;
+    }
+
+    &.disabled {
+        cursor: auto;
+        opacity: 0.5;
+    }
+
+    &.disabled.checked {
+        color: var(--pwt-color);
+        background-color: var(--pwt-color-background);
+    }
+}
+
+.pwt-radio-button {
+    position: relative;
+    display: inline-block;
+    outline: 0;
+    flex: 0 0 auto;
+    font-size: map-get($font-size, "label-large");
+    line-height: map-get($line-height, "label-large");
+    width: calc(#{map-get($line-height, "label-large")} - 4px);
+    height: calc(#{map-get($line-height, "label-large")} - 4px);
+    border: 2px solid var(--pwt-color-border) !important;
+    border-radius: 50%;
+    color: #ffffff00; // invisible
+    transition: 0.2s all linear;
+
+    .pwt-checkbox-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        visibility: hidden;
+    }
+
+    &.checked {
+        background-color: var(--pwt-accent-color-background);
+    }
+
+    &.checked.disabled:after {
+        background-color: var(--pwt-color-background);
+    }
+
+    &.checked:not(.disabled):not(:focus) {
+        border: 2px solid var(--pwt-accent-color-background) !important;
+    }
+
+    &:focus {
+        border: 2px solid var(--pwt-color-focus) !important;
+    }
+
+    &.disabled {
+        cursor: auto;
+        opacity: 0.5;
+    }
+}
+
+.pwt-textarea {
+    @include color-scheme-vars(neutral);
+    @include accent-color-scheme-vars($default-accent-color);
+    font-family: $pwt-font-monospace;
+    font-size: map-get($font-size, "label-large");
+    line-height: map-get($line-height, "label-large");
+    resize: none;
+
+    padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+    border: 1px solid var(--pwt-color-border);
+    border-radius: var(--pwt-input-corner-shape);
+
+    background-color: var(--pwt-color-background);
+
+    outline: 0;
+
+    &:focus-visible {
+        outline: $field-outline-size solid var(--pwt-color-focus) !important;
+        outline-offset: calc(-1 * $field-outline-size);
+    }
+
+    &:not(.disabled):not(:disabled):not([aria-disabled=true]).is-invalid {
+        border-color: var(--pwt-color-error-container) !important;
+        outline-color: var(--pwt-color-error-container) !important;
+    }
+
+    &.disabled,
+    &:disabled {
+        cursor: auto;
+        opacity: 0.5;
+    }
+}
+
+.pwt-input-display {
+    font-size: map-get($font-size, "body-medium");
+    line-height: map-get($line-height, "body-medium");
+    hyphens: auto;
+    text-wrap: pretty;
+    border-radius: var(--pwt-input-corner-shape);
+    padding: var(--pwt-spacer-1);
+
+    &:focus-visible, &:has(:focus-visible) {
+        outline: $field-outline-size solid var(--pwt-color-focus) !important;
+        outline-offset: calc(-1 * $field-outline-size);
+    }
+}
+
+// Removing spin buttons for <input type=number> (styling them is too clumsy)
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

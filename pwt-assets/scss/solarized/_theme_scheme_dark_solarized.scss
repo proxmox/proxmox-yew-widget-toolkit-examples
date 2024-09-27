@@ -1,0 +1,74 @@
+/* light theme color scheme */
+:root.pwt-dark-mode {
+    color-scheme: dark;
+
+    --pwt-color-primary: var(--pwt-color-primary-80);
+    --pwt-color-on-primary: var(--pwt-color-primary-30);
+    --pwt-color-primary-container: var(--pwt-color-primary-30);
+    --pwt-color-on-primary-container: var(--pwt-color-primary-90);
+
+    --pwt-color-secondary: var(--pwt-color-secondary-60);
+    --pwt-color-on-secondary: var(--pwt-color-secondary-0);
+    --pwt-color-secondary-container: var(--pwt-color-secondary-30);
+    --pwt-color-on-secondary-container: var(--pwt-color-secondary-90);
+
+    --pwt-color-tertiary: var(--pwt-color-tertiary-80);
+    --pwt-color-on-tertiary: var(--pwt-color-tertiary-20);
+    --pwt-color-tertiary-container: var(--pwt-color-tertiary-30);
+    --pwt-color-on-tertiary-container: var(--pwt-color-tertiary-90);
+
+    --pwt-color-success: var(--pwt-color-success-80);
+    --pwt-color-on-success: var(--pwt-color-success-20);
+    --pwt-color-success-container: var(--pwt-color-success-30);
+    --pwt-color-on-success-container: var(--pwt-color-success-90);
+
+    --pwt-color-error: var(--pwt-color-error-70);
+    --pwt-color-on-error: var(--pwt-color-error-10);
+    --pwt-color-error-container: var(--pwt-color-error-20);
+    --pwt-color-on-error-container: var(--pwt-color-error-90);
+
+    --pwt-color-warning: var(--pwt-color-warning-80);
+    --pwt-color-on-warning: var(--pwt-color-warning-20);
+    --pwt-color-warning-container: var(--pwt-color-warning-60);
+    --pwt-color-on-warning-container: var(--pwt-color-warning-100);
+
+    // neutral
+    --pwt-color-neutral: var(--pwt-color-neutral-30);
+    --pwt-color-on-neutral: var(--pwt-color-neutral-90);
+    // neutral-container == surface
+    --pwt-color-neutral-container: var(--pwt-color-neutral-20);
+    --pwt-color-on-neutral-container: var(--pwt-color-neutral-80);
+
+    // surface
+    --pwt-color-surface: var(--pwt-color-neutral-20);
+    --pwt-color-on-surface: var(--pwt-color-neutral-80);
+    // surface-container == neutral
+    --pwt-color-surface-container: var(--pwt-color-neutral-30);
+    --pwt-color-on-surface-container: var(--pwt-color-neutral-90);
+
+    // inverse-surface
+    --pwt-color-inverse-surface: var(--pwt-color-neutral-90);
+    --pwt-color-on-inverse-surface: var(--pwt-color-neutral-20);
+    --pwt-color-inverse-surface-container: var(--pwt-color-neutral-90);
+    --pwt-color-on-inverse-surface-container: var(--pwt-color-neutral-30);
+
+    --pwt-color-neutral-alt: var(--pwt-color-neutral-alt-30);
+    --pwt-color-on-neutral-alt: var(--pwt-color-neutral-alt-80);
+    --pwt-color-neutral-alt-container: var(--pwt-color-neutral-alt-20);
+    --pwt-color-on-neutral-alt-container: var(--pwt-color-neutral-alt-80);
+
+    /* border and focus colors */
+    --pwt-high-contrast-border: var(--pwt-color-neutral-alt-60);
+    --pwt-color-border: var(--pwt-color-neutral-alt-40);
+    --pwt-color-focus: var(--pwt-color-neutral-90);
+
+    --pwt-color-surface-tint: var(--pwt-color-primary);
+    --pwt-color-shadow: var(--pwt-color-neutral-10);
+
+    @include color-scheme-vars(surface);
+
+    color: var(--pwt-color-on-neutral);
+    background: var(--pwt-color-neutral);
+
+    --pwt-backdrop-color: #00000050;
+}

@@ -1,0 +1,77 @@
+.pwt-rrd-panel {
+    min-width: calc(800px - 2 * var(--pwt-spacer-2));
+    border: 1px solid var(--pwt-color-border);
+}
+
+.pwt-rrd-container {
+    margin: var(--pwt-spacer-2);
+}
+
+.pwt-rrd-svg {
+    user-select: none;
+}
+
+.pwt-rrd-legend-marker0 {
+    color: var(--pwt-color-secondary);
+
+    &.disabled {
+	opacity: 0.3;
+    }
+}
+
+.pwt-rrd-legend-marker1 {
+    color: var(--pwt-color-primary);
+
+    &.disabled {
+	opacity: 0.3;
+    }
+}
+
+.pwt-rrd-label-text {
+    font-size:  map-get($font-size, "label-large");
+    fill:  var(--pwt-color-on-neutral);
+}
+
+.pwt-rrd-grid {
+    stroke: var(--pwt-color-on-neutral);
+    stroke-width: 0.1;
+}
+
+.pwt-rrd-outline-path1 {
+    stroke: var(--pwt-color-secondary);
+    fill: none;
+    stroke-width: 0.6;
+}
+
+.pwt-rrd-fill-path1 {
+    stroke: none;
+    fill:  color-mix(in srgb, var(--pwt-color-secondary) var(--pwt-state-layer-opacity-5), transparent);
+}
+
+.pwt-rrd-outline-path2 {
+    stroke: var(--pwt-color-primary);
+    fill: none;
+    stroke-width: 0.6;
+}
+
+.pwt-rrd-fill-path2 {
+    stroke: none;
+    fill:  color-mix(in srgb, var(--pwt-color-primary) var(--pwt-state-layer-opacity-5), transparent);
+}
+
+.pwt-rrd-selection {
+    stroke: none;
+    fill: color-mix(in srgb, var(--pwt-color-on-neutral) var(--pwt-state-layer-opacity-3), transparent);
+}
+
+.pwt-rrd-cross {
+    stroke: var(--pwt-color-focus);
+    stroke-dasharray: 10 3;
+    stroke-width: 0.3;
+}
+
+.pwt-rrd-selected-datapoint {
+    stroke: var(--pwt-color-focus);
+    fill: none;
+    stroke-width: 0.5;
+}

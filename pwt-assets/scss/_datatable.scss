@@ -1,0 +1,213 @@
+.pwt-datatable {
+    @include color-scheme-vars(neutral);
+    color: var(--pwt-pwt-color-on-neutral);
+    background-color: var(--pwt-color-neutral);
+}
+
+.pwt-datatable-content {
+    @include font_and_line_height("body-medium");
+    border-collapse: collapse;
+    user-select: none;
+
+    td {
+        outline: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    td.cell-cursor:focus-visible {
+        outline: 1px solid var(--pwt-color-on-neutral);
+        outline-offset: -1px;
+    }
+
+    &:not(.table-borderless) tr {
+        border-bottom: 1px solid var(--pwt-color-border);
+    }
+
+    /* disbale row corsor for now (cell cursor is enough)
+    tr.row-cursor {
+	    outline: 1px solid var(--pwt-color-on-neutral);
+	    outline-offset: -2px;
+    }
+    */
+
+    tr.selected {
+        @include elevation-background-color($level: 3, $state: none);
+        &:hover {
+            @include elevation-background-color($level: 3, $state: hover);
+        }
+        &:active {
+            @include elevation-background-color($level: 3, $state: press);
+        }
+    }
+
+    td > div {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &.table-striped > tr:nth-of-type(odd):not(.selected) {
+        @include state-layer-background(stripe);
+    }
+
+    &.table-hover > tr:hover:not(.selected) {
+        cursor: pointer;
+        @include state-layer-background(hover);
+    }
+
+    &.table-bordered td {
+        border-inline-end: 1px solid var(--pwt-color-border);
+    }
+
+    &.table-borderless tr {
+        // make the border invisible
+        border-color: var(--pwt-color-neutral);
+    }
+
+    .pwt-datatable-cell {
+        padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+    }
+}
+
+.pwt-dropdown {
+    .pwt-datatable-content {
+        tr:last-child {
+            border-bottom: 0px;
+        }
+    }
+}
+
+.pwt-datatable-cell {
+    // empty, but custom theme may override/add settings
+}
+
+.pwt-datatable-header {
+    border-bottom: 2px solid var(--pwt-color-border);
+
+    &.pwt-datatable-header-hidden {
+        border-bottom: 0px;
+    }
+}
+
+.pwt-datatable-header-cell {
+    // empty, but custom theme may override/add settings
+}
+
+.pwt-datatable-header-item {
+    @include font_and_line_height("label-large");
+
+    display: flex;
+    align-items: baseline;
+
+    --pwt-tmp-trigger-opacity: 0;
+    outline: 0;
+    cursor: default;
+    text-align: start;
+    border-inline-end: 1px solid var(--pwt-color-border) !important;
+
+    &.sorted {
+        color: var(--pwt-color-primary)
+    }
+
+    .pwt-datatable-header-content {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        align-self: center;
+        flex: 1 1 auto;
+        padding: var(--pwt-spacer-2);
+        opacity: 0.7;
+    }
+
+    &.focused,
+    &:focus {
+        --pwt-tmp-trigger-opacity: 0.8;
+        background-color: var(--pwt-color-surface);
+    }
+
+    &:hover {
+        --pwt-tmp-trigger-opacity: 0.8;
+    }
+}
+
+.pwt-datatable-group-header-item {
+    @include font_and_line_height("label-large");
+    position: relative;
+    padding: var(--pwt-spacer-2);
+    cursor: default;
+    text-align: start;
+    border-inline-end: 1px solid var(--pwt-color-border);
+    border-bottom: 1px solid var(--pwt-color-border);
+    outline: 0;
+    opacity: 0.7;
+    text-align: center;
+
+    &:focus {
+        --pwt-tmp-trigger-opacity: 0.8;
+        background-color: var(--pwt-color-surface);
+    }
+}
+
+.pwt-datatable-header-menu-trigger {
+    position: absolute;
+    display: flex;
+    flex: 0 0 auto;
+    align-self: stretch;
+    align-items: center;
+    justify-content: center;
+
+    width: calc(map-get($line-height, "label-large") + 2 * var(--pwt-spacer-1));
+
+    background-color: var(--pwt-color-neutral) !important;
+    border: 0px solid !important;
+    border-inline-start: 1px solid var(--pwt-color-border) !important;
+    border-radius: 0px !important;
+    opacity: var(--pwt-tmp-trigger-opacity);
+    transition: opacity 0.2s ease-in-out;
+
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+}
+
+html[dir=rtl] .pwt-datatable-header-menu-trigger {
+    right: auto;
+    left: 0px;
+}
+
+.pwt-datatable-header-anchor {
+    position: relative;
+    flex: 0 0 auto;
+    width: 0px;
+    height: 100%;
+}
+
+.pwt-datatable-header-resize-trigger {
+    position: relative;
+    flex: 0 0 auto;
+    width: 0px;
+    height: 100%;
+    background-color: transparent;
+    cursor: col-resize;
+    z-index: $zindex-dropdown;
+}
+
+.pwt-datatable-header-resize-trigger:after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 100%;
+    background-color: transparent;
+    cursor: col-resize;
+    z-index: $zindex-dropdown;
+    top: 2px;
+    bottom: 2px;
+    left: -4px;
+}
+
+.pwt-tree-expander {
+    line-height: map-get($line-height , "body-medium");
+    cursor: pointer;
+}

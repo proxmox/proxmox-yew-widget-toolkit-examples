@@ -1,0 +1,28 @@
+
+// Color setup
+
+$color-seed-primary: #00617F; // proxmox blue
+$color-seed-secondary: #e57000; // proxmox orange
+$color-seed-tertiary: #ABBABA; // proxmox grey
+$color-seed-neutral: #fff;
+
+$color-seed-success: #33D17A;
+$color-seed-error: #E01B24;
+$color-seed-warning: #FF7800;
+$color-seed-warning: #FC0;
+
+// use primary with 5% saturation for neutral-alt
+$color-seed-neutral-alt: change-color($color-seed-primary, $saturation: 5%);
+
+
+/* Tonal color values */
+:root {
+    @include pwt-color-palette-vars("primary", $color-seed-primary);
+    @include pwt-color-palette-vars("secondary", $color-seed-secondary);
+    @include pwt-color-palette-vars("tertiary", $color-seed-tertiary);
+    @include pwt-color-palette-vars("success", $color-seed-success);
+    @include pwt-color-palette-vars("error", $color-seed-error);
+    @include pwt-color-palette-vars("warning", $color-seed-warning);
+    @include pwt-color-palette-vars("neutral", $color-seed-neutral);
+    @include pwt-color-palette-vars("neutral-alt", $color-seed-neutral-alt);
+}
