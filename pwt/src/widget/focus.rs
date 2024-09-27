@@ -1,0 +1,372 @@
+//! DOM focus management helpers.
+
+use std::{cell::Cell, rc::Rc};
+
+use gloo_timers::callback::Timeout;
+use wasm_bindgen::JsCast;
+
+use yew::prelude::*;
+
+const FOCUSABLE_SELECTOR: &str = "a:not([disabled]), button:not([disabled]), input[type=text]:not([disabled]), [tabindex]:not([disabled])";
+const FOCUSABLE_SELECTOR_ALL: &str = "a, button, input, [tabindex]";
+
+/// Test is an element can take focus.
+///
+/// Returns true if the element has an `tabindex` attribute, or if the
+/// element is of type `<a>`, `<button>`, or `<input>`.
+pub fn element_is_focusable(el: &web_sys::HtmlElement) -> bool {
+    if el.has_attribute("tabindex") {
+        return true;
+    }
+
+    matches!(el.tag_name().as_str(), "A" | "BUTTON" | "INPUT")
+}
+
+/// Move focus to the next/previous focusable element (calls [focus_next_el]).
+pub fn focus_next(node_ref: &NodeRef, backwards: bool) {
+    if let Some(el) = node_ref.cast::<web_sys::HtmlElement>() {
+        focus_next_el(el, backwards);
+    }
+}
+
+fn calculate_next(mut index: i32, backwards: bool, len: i32) -> i32 {
+    index = index.clamp(-1, len) + if backwards { -1 } else { 1 };
+    if index < 0 {
+        index = len - 1;
+    } else if index >= len {
+        index = 0;
+    }
+    index
+}
+
+/// Move focus to the next/previous focusable element.
+///
+/// This fuction use all focusable descendents of the element.
+pub fn focus_next_el(el: web_sys::HtmlElement, backwards: bool) {
+    if let Ok(list) = el.query_selector_all(FOCUSABLE_SELECTOR) {
+        let list = js_sys::Array::from(&list);
+        if list.length() == 0 {
+            return;
+        }
+
+        let window = web_sys::window().unwrap();
+        let document = window.document().unwrap();
+
+        let index = match document.active_element() {
+            Some(active_element) => list.index_of(&active_element, 0),
+            None => -1,
+        };
+
+        //log::info!("focus_next: got {} focusable elements, index {}", list.length(), index);
+
+        let next = calculate_next(index, backwards, list.length() as i32);
+
+        if let Ok(next_element) = list.get(next as u32).dyn_into::<web_sys::HtmlElement>() {
+            let _ = next_element.focus();
+        }
+    }
+}
+
+/// Returns the first focusable child element.
+///
+/// This function skips disabled elements.
+pub fn get_first_focusable(item_el: web_sys::Element) -> Option<web_sys::HtmlElement> {
+    const FOCUSABLE_SELECTOR: &str = concat!(
+        "a:not([disabled]),",
+        "button:not([disabled]),",
+        "input:not([disabled]),",
+        "[tabindex]:not([disabled])",
+    );
+
+    let focus_el = match item_el.query_selector(FOCUSABLE_SELECTOR) {
+        Ok(Some(focus_el)) => focus_el,
+        _ => return None,
+    };
+
+    match focus_el.dyn_into::<web_sys::HtmlElement>() {
+        Ok(el) => Some(el),
+        _ => None,
+    }
+}
+
+/// Move focus to the next/previous focusable child (calls [roving_tabindex_next_el]).
+pub fn roving_tabindex_next(node_ref: &NodeRef, backwards: bool, roving: bool) {
+    if let Some(el) = node_ref.cast::<web_sys::HtmlElement>() {
+        roving_tabindex_next_el(el, backwards, roving);
+    }
+}
+
+/// Move focus to the next/previous focusable child.
+///
+/// If `roving` is enabled, this also sets the `tabindex` attribute
+/// for the active child to `"0"`, and to `"-1"` for all other
+/// children.
+pub fn roving_tabindex_next_el(el: web_sys::HtmlElement, backwards: bool, roving: bool) {
+    let list = roving_tabindex_members(&el);
+
+    if list.is_empty() {
+        return;
+    }
+
+    fn get_active_index(list: &[web_sys::HtmlElement]) -> i32 {
+        let window = web_sys::window().unwrap();
+        let document = window.document().unwrap();
+        let active_el = document.active_element();
+        let active_node: Option<&web_sys::Node> = active_el.as_deref();
+
+        let mut index = 0;
+        for (i, node) in list.iter().enumerate() {
+            if node.contains(active_node) {
+                index = i as i32;
+            }
+        }
+        index
+    }
+
+    let index = get_active_index(&list);
+
+    let mut next = calculate_next(index, backwards, list.len() as i32);
+
+    if roving {
+        for node in list.iter() {
+            node.set_tab_index(-1);
+        }
+    }
+
+    while next != index {
+        let next_element = &list[next as usize];
+        let _ = next_element.focus();
+        if get_active_index(&list) == next {
+            if roving {
+                next_element.set_tab_index(0);
+            }
+            break;
+        }
+        next = calculate_next(next, backwards, list.len() as i32);
+    }
+}
+
+/// Test if a child has focus.
+///
+/// # Note
+///
+/// This returns false if the element itself has focus.
+pub fn focus_inside_el(el: web_sys::HtmlElement) -> bool {
+    if let Ok(list) = el.query_selector_all(FOCUSABLE_SELECTOR) {
+        let list = js_sys::Array::from(&list);
+        if list.length() == 0 {
+            return false;
+        }
+
+        let window = web_sys::window().unwrap();
+        let document = window.document().unwrap();
+
+        let index = match document.active_element() {
+            Some(active_element) => list.index_of(&active_element, 0),
+            None => -1,
+        };
+        index >= 0
+    } else {
+        false
+    }
+}
+
+/// Update roving tabindex after focus change (calls [update_roving_tabindex_el]).
+pub fn update_roving_tabindex(node_ref: &NodeRef) {
+    if let Some(el) = node_ref.cast::<web_sys::HtmlElement>() {
+        update_roving_tabindex_el(el);
+    }
+}
+
+/// Update roving tabindex after focus change.
+pub fn update_roving_tabindex_el(el: web_sys::HtmlElement) {
+    if let Ok(child_list) = el.query_selector_all(":scope > *") {
+        let child_list = js_sys::Array::from(&child_list);
+        if child_list.length() == 0 {
+            return;
+        }
+
+        let window = web_sys::window().unwrap();
+        let document = window.document().unwrap();
+
+        let active_el = document.active_element();
+        let active_node: Option<&web_sys::Node> = active_el.as_deref();
+
+        let mut index = 0;
+        for i in 0..child_list.length() {
+            let node = child_list
+                .get(i)
+                .dyn_into::<web_sys::HtmlElement>()
+                .unwrap();
+            if node.contains(active_node) {
+                index = i;
+            }
+        }
+
+        //log::info!("update_roving_tabindex: got {} focusable elements, index {}", child_list.length(), index);
+
+        for i in 0..child_list.length() {
+            let node = child_list
+                .get(i)
+                .dyn_into::<web_sys::HtmlElement>()
+                .unwrap();
+
+            if element_is_focusable(&node) {
+                if i == index {
+                    node.set_tab_index(0);
+                } else {
+                    node.set_tab_index(-1);
+                }
+            } else if let Ok(Some(child)) = node.query_selector(FOCUSABLE_SELECTOR_ALL) {
+                let child = child.dyn_into::<web_sys::HtmlElement>().unwrap();
+                if i == index {
+                    child.set_tab_index(0);
+                } else {
+                    child.set_tab_index(-1);
+                }
+            }
+        }
+    }
+}
+
+/// Return all child elements participating in the roving tabindex algorithm.
+///
+/// The list contains all direct children which are [focusable](element_is_focusable),
+/// or the first focusable descendant for children not directly focusable.
+///
+/// The list includes disabled element.
+///
+/// # Note
+///
+/// This kind of member selection makes it possible to include more complex widget
+/// like [MenuButton](crate::widget::menu::MenuButton)s inside a
+/// [Toolbar](crate::widget::Toolbar).
+pub fn roving_tabindex_members(el: &web_sys::HtmlElement) -> Vec<web_sys::HtmlElement> {
+    let mut members: Vec<web_sys::HtmlElement> = Vec::new();
+
+    if let Ok(child_list) = el.query_selector_all(":scope > *") {
+        let child_list = js_sys::Array::from(&child_list);
+        for i in 0..child_list.length() {
+            let node = child_list
+                .get(i)
+                .dyn_into::<web_sys::HtmlElement>()
+                .unwrap();
+            if element_is_focusable(&node) {
+                members.push(node);
+            } else if let Ok(Some(child)) = node.query_selector(FOCUSABLE_SELECTOR_ALL) {
+                let first_focusable_child = child.dyn_into::<web_sys::HtmlElement>().unwrap();
+                members.push(first_focusable_child);
+            }
+        }
+    }
+
+    members
+}
+
+/// Initialize elements participating in the roving tabindex algorithm (calls [init_roving_tabindex_el]).
+pub fn init_roving_tabindex(node_ref: &NodeRef) {
+    if let Some(el) = node_ref.cast::<web_sys::HtmlElement>() {
+        init_roving_tabindex_el(el, false);
+    }
+}
+
+/// Initialize elements participating in the roving tabindex algorithm.
+///
+/// This function makes sure that exactly one element has the
+/// `tabindex` attribute set to `"0"`. All others gets a `tabindex` of
+/// `"-1"`.
+pub fn init_roving_tabindex_el(el: web_sys::HtmlElement, take_focus: bool) {
+    let list = roving_tabindex_members(&el);
+
+    if list.is_empty() {
+        return;
+    }
+
+    //log::info!("init_roving_tabindex: got {} focusable elements", list.length());
+
+    let mut default_index = 0;
+    for (i, item) in list.iter().enumerate() {
+        if item.tab_index() == 0 {
+            default_index = i;
+            break;
+        }
+    }
+
+    for (i, item) in list.iter().enumerate() {
+        if i == default_index {
+            item.set_tab_index(0);
+            if take_focus {
+                let _ = item.focus();
+            }
+        } else {
+            item.set_tab_index(-1);
+        }
+    }
+}
+
+/// Can be used to better track focus with nested elements.
+///
+/// focusin/focusout events are problematic, because sometimes they trigger
+/// in fast succession after one another, eg. out/in/out/in and rerendering
+/// after everyone makes handling certain things hard.
+///
+/// To solve this, we use a Timeout with 1ms, this will be called
+/// after all pending event handlers are called (each one replaces the
+/// previous timeout) so the last focus event "wins".
+pub struct FocusTracker {
+    // note we use Rc<Cell> here since we are single threaded
+    // and using Rc<Mutex> here compiles to basically the same thing
+    timeout: Rc<Cell<Option<Timeout>>>,
+    last_focus: Rc<Cell<bool>>,
+    on_change: Callback<bool>,
+}
+
+impl FocusTracker {
+    pub fn new(on_change: impl Into<Callback<bool>>) -> Self {
+        Self {
+            timeout: Rc::new(Cell::new(None)),
+            last_focus: Rc::new(Cell::new(false)),
+            on_change: on_change.into(),
+        }
+    }
+
+    pub fn get_focus_callback(&self, focus_in: bool) -> Callback<FocusEvent> {
+        let callback = self.on_change.clone();
+        let timeout = self.timeout.clone();
+        let last_focus = self.last_focus.clone();
+        Callback::from(move |_| {
+            let callback = callback.clone();
+            let last_focus = last_focus.clone();
+            timeout.replace(Some(Timeout::new(1, move || {
+                if last_focus.get() != focus_in {
+                    last_focus.set(focus_in);
+                    callback.emit(focus_in);
+                }
+            })));
+        })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::widget::focus::calculate_next;
+
+    #[test]
+    fn test_calculate_next() {
+        assert_eq!(calculate_next(0, false, 30), 1);
+        assert_eq!(calculate_next(1, false, 30), 2);
+        assert_eq!(calculate_next(-1, false, 30), 0);
+        assert_eq!(calculate_next(-2, false, 30), 0);
+        assert_eq!(calculate_next(29, false, 30), 0);
+        assert_eq!(calculate_next(30, false, 30), 0);
+        assert_eq!(calculate_next(15, false, 30), 16);
+
+        assert_eq!(calculate_next(0, true, 30), 29);
+        assert_eq!(calculate_next(1, true, 30), 0);
+        assert_eq!(calculate_next(-1, true, 30), 29);
+        assert_eq!(calculate_next(-2, true, 30), 29);
+        assert_eq!(calculate_next(29, true, 30), 28);
+        assert_eq!(calculate_next(30, true, 30), 29);
+        assert_eq!(calculate_next(15, true, 30), 14);
+    }
+}
