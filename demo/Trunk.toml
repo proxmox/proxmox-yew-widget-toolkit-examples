@@ -1,22 +1,17 @@
 [[hooks]]
 stage="build"
 command="rust-grass"
-command_arguments= ["../../www/scss/crisp-yew-style.scss", "dist/.stage/crisp-yew-style.css"]
+command_arguments= ["../pwt-assets/scss/crisp-yew-style.scss", "dist/.stage/crisp-yew-style.css"]
 
 [[hooks]]
 stage="build"
 command="rust-grass"
-command_arguments= ["../../www/scss/material-yew-style.scss", "dist/.stage/material-yew-style.css"]
+command_arguments= ["../pwt-assets/scss/material-yew-style.scss", "dist/.stage/material-yew-style.css"]
 
 [[hooks]]
 stage="build"
 command="rust-grass"
-command_arguments= ["../../www/scss/desktop-yew-style.scss", "dist/.stage/desktop-yew-style.css"]
-
-[[hooks]]
-stage="build"
-command="rust-grass"
-command_arguments= ["../../www/scss/solarized-yew-style.scss", "dist/.stage/solarized-yew-style.css"]
+command_arguments= ["../pwt-assets/scss/desktop-yew-style.scss", "dist/.stage/desktop-yew-style.css"]
 
 [watch]
-watch = ["./src", "../../src", "../../www"]
+watch = ["./src", "../pwt", "../pwt-assets"]
