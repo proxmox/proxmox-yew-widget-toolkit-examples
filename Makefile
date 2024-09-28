@@ -1,3 +1,5 @@
+# This makfile is a helper to update the external repositories
+# which are included as git subtree.
 
 all:
 
