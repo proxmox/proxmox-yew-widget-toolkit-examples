@@ -4,8 +4,8 @@ use pwt::prelude::*;
 use pwt::state::Store;
 use pwt::widget::data_table::{DataTableColumn, DataTableHeader};
 use pwt::widget::form::{
-    Checkbox, Combobox, DisplayField, Field, Form, FormContext, InputType, Number, TextArea,
-    Tristate, TristateBoolean,
+    Checkbox, Combobox, DisplayField, Field, Form, FormContext, InputType, Number, RadioButton,
+    TextArea, Tristate, TristateBoolean,
 };
 use pwt::widget::{AlertDialog, Container, InputPanel, Panel, SearchDropdown, Trigger};
 use yew::virtual_dom::Key;
@@ -61,15 +61,15 @@ fn demo_input_panel(alert: UseStateHandle<Option<String>>) -> Html {
         )
         .with_field(
             "Radio Group Option1",
-            Checkbox::radio().name("g1").value("opt1"),
+            RadioButton::new("opt1").name("g1"),
         )
         .with_field(
             "Radio Group Option2",
-            Checkbox::radio().name("g1").value("opt2").default(true),
+            RadioButton::new("opt2").name("g1").default(true).box_label("The default option"),
         )
         .with_field(
             "Radio Group Option3",
-            Checkbox::radio().name("g1").value("opt3"),
+            RadioButton::new("opt3").name("g1"),
         )
         .with_field(
             "Combobox",
