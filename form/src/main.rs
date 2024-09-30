@@ -3,8 +3,8 @@ use serde_json::Value;
 use pwt::prelude::*;
 
 use pwt::widget::form::{
-    Boolean, Checkbox, Combobox, Field, Form, FormContext, InputType, Number, ResetButton,
-    SubmitButton, Tristate, TristateBoolean,
+    Checkbox, Combobox, Field, Form, FormContext, InputType, Number, ResetButton, SubmitButton,
+    Tristate, TristateBoolean,
 };
 use pwt::widget::{Container, InputPanel, Panel, Row};
 
@@ -91,10 +91,10 @@ impl Component for MyForm {
                 "Checkbox2",
                 Checkbox::new().name("checkbox2").switch(true).default(true),
             )
-            .with_field("Boolean1", Boolean::new().name("boolean1").default(true))
+            .with_field("Boolean1", Checkbox::new().name("boolean1").default(true))
             .with_field(
                 "Boolean2",
-                Boolean::new().name("boolean2").switch(true).default(true),
+                Checkbox::new().name("boolean2").switch(true).default(true),
             )
             .with_field(
                 "TristateBoolean",

@@ -5,7 +5,7 @@ use pwt::{
     props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, FieldBuilder, WidgetBuilder},
     state::Selection,
     widget::{
-        form::{Boolean, Combobox, Field, Form, FormContext, InputType, Number},
+        form::{Checkbox, Combobox, Field, Form, FormContext, InputType, Number},
         Button, Column, Dialog, InputPanel, Row, TabBarItem, TabPanel,
     },
 };
@@ -170,7 +170,7 @@ impl Component for PwtWizard {
                             .with_item("Root"),
                     ),
                     4 => input_panel.add_field(false, "Textfield", Field::new().name("textfield")),
-                    5 => input_panel.add_field(false, "Checkbox", Boolean::new().name("checkbox")),
+                    5 => input_panel.add_field(false, "Checkbox", Checkbox::new().name("checkbox")),
                     _ => {}
                 }
 
@@ -211,7 +211,7 @@ impl Component for PwtWizard {
                     5 => input_panel.add_right_field(
                         false,
                         "Checkbox",
-                        Boolean::new().name("checkbox"),
+                        Checkbox::new().name("checkbox"),
                     ),
                     _ => {}
                 }

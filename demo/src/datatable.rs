@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use pwt::css::{Flex, Overflow};
-use pwt::widget::form::{Boolean, Combobox};
+use pwt::widget::form::{Checkbox, Combobox};
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -100,7 +100,7 @@ pub fn DataTableDemo() -> Html {
                         .padding(2)
                         .with_field(
                             "Borderless",
-                            Boolean::new()
+                            Checkbox::new()
                                 .name("borderless")
                                 .checked(*borderless)
                                 .on_change({
@@ -110,7 +110,7 @@ pub fn DataTableDemo() -> Html {
                         )
                         .with_field(
                             "Bordered",
-                            Boolean::new()
+                            Checkbox::new()
                                 .name("bordered")
                                 .checked(*bordered)
                                 .on_change({
@@ -120,7 +120,7 @@ pub fn DataTableDemo() -> Html {
                         )
                         .with_field(
                             "Show Headers",
-                            Boolean::new()
+                            Checkbox::new()
                                 .name("header")
                                 .checked(*show_headers)
                                 .on_change({
@@ -130,21 +130,21 @@ pub fn DataTableDemo() -> Html {
                         )
                         .with_right_field(
                             "Striped",
-                            Boolean::new().name("striped").checked(*striped).on_change({
+                            Checkbox::new().name("striped").checked(*striped).on_change({
                                 let striped = striped.clone();
                                 move |v| striped.set(v)
                             }),
                         )
                         .with_right_field(
                             "Hover",
-                            Boolean::new().name("hover").checked(*hover).on_change({
+                            Checkbox::new().name("hover").checked(*hover).on_change({
                                 let hover = hover.clone();
                                 move |v| hover.set(v)
                             }),
                         )
                         .with_right_field(
                             "Multiselect",
-                            Boolean::new()
+                            Checkbox::new()
                                 .name("multiselect")
                                 .checked(*multiselect)
                                 .on_change({
