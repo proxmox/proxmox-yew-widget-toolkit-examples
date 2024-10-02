@@ -2,7 +2,7 @@
 //!
 //! Note: These things should be much simpler when the `anchor-positioning` api
 //! is available in all browsers we want to target:
-//! https://developer.chrome.com/blog/anchor-positioning-api
+//! <https://developer.chrome.com/blog/anchor-positioning-api>
 use js_sys::Error;
 use web_sys::{window, HtmlElement};
 
@@ -409,8 +409,8 @@ fn set_position_style(
 /// aligning (for examples tooltips inside dialogs), make sure to allow visible overflow on the
 /// aligned elements, otherwise there may be issues with scrollbars
 ///
-/// Note: when aligning a `<dialog>` element, make sure to use [pwt::show_dialog] or
-/// [pwt::show_modal_dialog] to open it, and [pwt::close_dialog] to close it again. This will set
+/// Note: when aligning a `<dialog>` element, make sure to use [crate::show_dialog] or
+/// [crate::show_modal_dialog] to open it, and [crate::close_dialog] to close it again. This will set
 /// an additional attribute on the dialog that is necessary to distinguish modal and non modal
 /// dialogs (They have to be handled differently for positioning).
 pub fn align_to<B, N>(base: B, element: N, options: Option<AlignOptions>) -> Result<(), Error>

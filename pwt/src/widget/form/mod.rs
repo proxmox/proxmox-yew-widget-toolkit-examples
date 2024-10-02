@@ -6,14 +6,14 @@ pub use context::{
     FormContextState, FormContextWriteGuard,
 };
 
-mod boolean;
-pub use boolean::{Boolean, PwtBoolean};
-
 mod tristate_boolean;
 pub use tristate_boolean::{PwtTristateBoolean, Tristate, TristateBoolean};
 
 mod checkbox;
 pub use checkbox::{Checkbox, PwtCheckbox};
+
+mod radio_button;
+pub use radio_button::{PwtRadioButton, RadioButton};
 
 mod combobox;
 pub use combobox::{Combobox, PwtCombobox};

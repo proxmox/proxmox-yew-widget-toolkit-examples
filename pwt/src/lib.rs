@@ -108,13 +108,25 @@
 //!
 //! The following field types are available.
 //!
-//! - [widget::form::Checkbox]: Checkbox or Radiobox field
+//! - [widget::form::Checkbox]: Checkbox input element, which stores values as boolean by default.
+//! - [widget::form::RadioButton]: RadioButton field, which stores values as strings.
 //! - [widget::form::Combobox]: Select value from a list of options.
+//! - [widget::form::DisplayField]: Just display values (not editable).
 //! - [widget::form::Field]: Wrapper around standard Html fields.
+//! - [widget::form::Hidden]: Hidden fields.
+//! - [widget::form::Number]: Number input element for common Rust number types,
+//!   which stores values a number (not string).
 //! - [widget::form::Selector]: Select value from a picker widget.
+//! - [widget::form::TextArea]: Textarea input element.
+//! - [widget::form::TristateBoolean]: Tristate Boolean widget (yes, no, null)
 //!
 //! There are also special buttons for [reset](widget::form::ResetButton)
 //! and [submit](widget::form::SubmitButton).
+//!
+//! The [ManagedField](widget::form::ManagedField) trait is used as base
+//! for input elements, because it simplifies the interaction with the
+//! [context](widget::form::FormContext).
+//!
 //!
 //! ### Other input Elements
 //!
@@ -163,7 +175,7 @@
 //! - [touch::Fab]: Favorite action button.
 //! - [touch::FabMenu]: Favorite actions button Menu.
 //! - [touch::GestureDetector]: Gesture detector.
-//! - [touch::MaterialApp]: Helper to implement applications that uses material design gudelines.
+//! - [touch::MaterialApp]: Helper to implement applications that uses material design guidelines.
 //! - [touch::NavigationBar]: Navigation bar (bottom)
 //! - [touch::NavigationRail]: Navigation rail (left)
 //! - [touch::PageView]: A scrollable list that works page by page.
@@ -171,7 +183,7 @@
 //! - [touch::Scaffold]: Material Design visual page layout.
 //! - [touch::SideDialog]: Modal Dialog with slide in/out animations.
 //! - [touch::Slidable]: Slidable widget with directional slide actions that can be dismissed.
-//! - [touch::SnackBar]: Display iightweight messages with an optional action button.
+//! - [touch::SnackBar]: Display lightweight messages with an optional action button.
 
 //! ## Router
 //!
@@ -183,6 +195,11 @@
 //!
 //! - [widget::TabPanel]
 //! - [widget::nav::NavigationDrawer]
+//!
+//! ## Application implementation helpers
+//!
+//! - [widget::DesktopApp]: Application scaffold for desktop applications.
+//! - [touch::MaterialApp]: Helper to implement applications that uses material design guidelines.
 
 pub mod css;
 pub mod dom;
@@ -224,15 +241,15 @@ extern "C" {
     fn test_alert();
 
     //Dialog bindings
-    fn show_modal_dialog(dialog: web_sys::Node);
-    fn show_dialog(dialog: web_sys::Node);
-    fn close_dialog(dialog: web_sys::Node);
+    pub fn show_modal_dialog(dialog: web_sys::Node);
+    pub fn show_dialog(dialog: web_sys::Node);
+    pub fn close_dialog(dialog: web_sys::Node);
 }
 
 // Create wrapper which panics if called from target_arch!=wasm32
 // This allows us to run tests with "cargo test".
 #[cfg(not(target_arch = "wasm32"))]
-pub(crate) use panic_wrapper::*;
+pub use panic_wrapper::*;
 #[cfg(not(target_arch = "wasm32"))]
 mod panic_wrapper {
     pub fn show_modal_dialog(_dialog: web_sys::Node) {
