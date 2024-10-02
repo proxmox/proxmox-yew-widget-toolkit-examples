@@ -6,23 +6,28 @@ use yew::prelude::*;
 
 use pwt_macros::{builder, widget};
 
-use super::{
-    IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldState,
-    ValidateFn,
-};
 use crate::css::AlignItems;
 use crate::props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, WidgetBuilder};
 use crate::tr;
 use crate::widget::{Container, Fa, FieldLabel, Row, Tooltip};
 
-pub type PwtBoolean = ManagedFieldMaster<BooleanField>;
+use super::{
+    IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldState,
+    ValidateFn,
+};
 
-/// Checkbox input element, which stores values as boolean
-#[widget(pwt=crate, comp=ManagedFieldMaster<BooleanField>, @input, @element)]
+pub type PwtRadioButton = ManagedFieldMaster<RadioButtonField>;
+
+/// RadioButton input element.
+#[widget(pwt=crate, comp=ManagedFieldMaster<RadioButtonField>, @input, @element)]
 #[derive(Clone, PartialEq, Properties)]
 #[builder]
-pub struct Boolean {
-    /// Force value (ignored by managed fields)
+pub struct RadioButton {
+    /// RadioButton value.
+    #[builder(IntoPropValue, into_prop_value)]
+    pub value: AttrValue,
+
+    /// Force value (ignored by managed fields).
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
     pub checked: Option<bool>,
@@ -31,11 +36,6 @@ pub struct Boolean {
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
     pub default: Option<bool>,
-
-    /// Use switch style layout.
-    #[prop_or_default]
-    #[builder]
-    pub switch: bool,
 
     /// The tooltip.
     #[prop_or_default]
@@ -47,12 +47,12 @@ pub struct Boolean {
     /// ```
     /// # use anyhow::bail;
     /// # use pwt::prelude::*;
-    /// # use pwt::widget::form::Boolean;
-    /// Boolean::new()
+    /// # use pwt::widget::form::RadioButton;
+    /// RadioButton::new("value")
     ///   .submit(false)
     ///   .validate(|value: &bool| {
     ///      if !value {
-    ///         bail!("Please accept the Terms Of Service")
+    ///         bail!("Please select 'value'")
     ///      }
     ///      Ok(())
     ///    });
@@ -60,10 +60,10 @@ pub struct Boolean {
     #[prop_or_default]
     pub validate: Option<ValidateFn<bool>>,
 
-    /// Change callback
-    #[builder_cb(IntoEventCallback, into_event_callback, bool)]
+    /// Change callback.
+    #[builder_cb(IntoEventCallback, into_event_callback, String)]
     #[prop_or_default]
-    pub on_change: Option<Callback<bool>>,
+    pub on_change: Option<Callback<String>>,
 
     /// Input callback.
     ///
@@ -72,19 +72,21 @@ pub struct Boolean {
     /// - Click on the checkbox.
     /// - Click on the associated input label.
     /// - Activation by keyboard (space press).
-    #[builder_cb(IntoEventCallback, into_event_callback, bool)]
+    #[builder_cb(IntoEventCallback, into_event_callback, String)]
     #[prop_or_default]
-    pub on_input: Option<Callback<bool>>,
+    pub on_input: Option<Callback<String>>,
 
     /// A right side label for the checkbox, to display additional information
     #[prop_or_default]
     pub box_label: Option<FieldLabel>,
 }
 
-impl Boolean {
+impl RadioButton {
     /// Creates a new instance.
-    pub fn new() -> Self {
-        yew::props!(Self {})
+    pub fn new(value: impl Into<AttrValue>) -> Self {
+        yew::props!(Self {
+            value: value.into()
+        })
     }
 
     /// Builder style method to set the validate callback
@@ -113,32 +115,35 @@ impl Boolean {
         self
     }
 }
+
 pub enum Msg {
     Toggle,
 }
 
 #[doc(hidden)]
-pub struct BooleanField {}
+pub struct RadioButtonField {}
 
 #[derive(PartialEq)]
 pub struct ValidateClosure {
     validate: Option<ValidateFn<bool>>,
+    on_value: AttrValue,
 }
 
-impl ManagedField for BooleanField {
-    type Properties = Boolean;
+impl ManagedField for RadioButtonField {
     type Message = Msg;
+    type Properties = RadioButton;
     type ValidateClosure = ValidateClosure;
 
     fn validation_args(props: &Self::Properties) -> Self::ValidateClosure {
         ValidateClosure {
             validate: props.validate.clone(),
+            on_value: props.value.clone(),
         }
     }
 
     fn validator(props: &Self::ValidateClosure, value: &Value) -> Result<Value, Error> {
         let value = match value {
-            Value::Bool(value) => *value,
+            Value::String(value) => value == props.on_value,
             _ => return Err(Error::msg(tr!("got wrong data type."))),
         };
 
@@ -146,28 +151,42 @@ impl ManagedField for BooleanField {
             validate.apply(&value)?;
         }
 
-        Ok(Value::Bool(value))
+        Ok(if value {
+            Value::String(props.on_value.to_string())
+        } else {
+            Value::String(String::new())
+        })
     }
 
-    fn setup(props: &Boolean) -> ManagedFieldState {
-        let mut value = false;
-        if let Some(default) = &props.default {
-            value = *default;
-        }
-        if let Some(checked) = &props.checked {
-            value = *checked;
-        }
+    fn setup(props: &RadioButton) -> ManagedFieldState {
+        let on_value = props.value.to_string();
 
-        let valid = Ok(());
+        let default = match props.default {
+            Some(true) => on_value.clone(),
+            _ => String::new(),
+        };
 
-        let default = props.default.unwrap_or(false).into();
+        let value = match props.checked {
+            Some(true) => on_value.clone(),
+            Some(false) => String::new(),
+            None => default.clone(),
+        };
 
         ManagedFieldState {
             value: value.into(),
-            valid,
-            default,
-            radio_group: false,
+            valid: Ok(()),
+            default: default.into(),
+            radio_group: true,
             unique: false,
+        }
+    }
+
+    fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
+        let props = ctx.props();
+        let state = ctx.state();
+        let value = state.value.as_str().unwrap_or("").to_string();
+        if let Some(on_change) = &props.on_change {
+            on_change.emit(value);
         }
     }
 
@@ -183,54 +202,54 @@ impl ManagedField for BooleanField {
     fn update(&mut self, ctx: &ManagedFieldContext<Self>, msg: Self::Message) -> bool {
         let props = ctx.props();
         let state = ctx.state();
+
         match msg {
             Msg::Toggle => {
                 if props.input_props.disabled {
                     return true;
                 }
-                let checked = state.value.as_bool().unwrap_or(false);
-                let new_checked = !checked;
-                ctx.link().update_value(new_checked);
+                let on_value = props.value.to_string();
+                let value = state.value.clone();
 
-                if let Some(on_input) = &props.on_input {
-                    on_input.emit(new_checked);
+                let changes = value != on_value;
+
+                if changes {
+                    ctx.link().update_value(on_value.clone());
+
+                    if let Some(on_input) = &props.on_input {
+                        on_input.emit(on_value);
+                    }
                 }
-
-                false
+                true
             }
-        }
-    }
-
-    fn value_changed(&mut self, ctx: &ManagedFieldContext<Self>) {
-        let props = ctx.props();
-        let state = ctx.state();
-        let checked = state.value.as_bool().unwrap_or(false);
-        if let Some(on_change) = &props.on_change {
-            on_change.emit(checked);
         }
     }
 
     fn changed(&mut self, ctx: &ManagedFieldContext<Self>, _old_props: &Self::Properties) -> bool {
         let props = ctx.props();
+
         if let Some(checked) = props.checked {
-            ctx.link().force_value(Some(checked), None)
+            let on_value = props.value.to_string();
+            let value = if checked { on_value } else { String::new() };
+            ctx.link().force_value(Some(value), None);
         }
+
         true
     }
 
     fn view(&self, ctx: &ManagedFieldContext<Self>) -> Html {
         let props = ctx.props();
-        let link = ctx.link();
-        let disabled = props.input_props.disabled;
-
         let state = ctx.state();
 
-        let (value, valid) = (&state.value, &state.valid);
-        let checked = value.as_bool().unwrap_or(false);
+        let disabled = props.input_props.disabled;
 
-        let onclick = link.callback(|_| Msg::Toggle);
+        let on_value = props.value.to_string();
+        let (value, valid) = (&state.value, &state.valid);
+        let checked = *value == on_value;
+
+        let onclick = ctx.link().callback(|_| Msg::Toggle);
         let onkeyup = Callback::from({
-            let link = link.clone();
+            let link = ctx.link().clone();
             move |event: KeyboardEvent| {
                 if event.key() == " " {
                     link.send_message(Msg::Toggle);
@@ -238,36 +257,30 @@ impl ManagedField for BooleanField {
             }
         });
 
-        let (layout_class, inner_class) = match props.switch {
-            true => ("pwt-switch", "pwt-switch-slider"),
-            false => ("pwt-checkbox", "pwt-checkbox-icon"),
-        };
-
-        let checkbox = Container::new()
-            .class((!props.switch).then_some("pwt-checkbox-state"))
-            .with_child(
-                Container::new()
-                    .class(layout_class)
-                    .with_child(
-                        Container::from_tag("span")
-                            .class(inner_class)
-                            .with_child(Fa::new("check")),
-                    )
-                    .class(checked.then_some("checked"))
-                    .class(disabled.then_some("disabled"))
-                    .class(if valid.is_ok() {
-                        "is-valid"
-                    } else {
-                        "is-invalid"
-                    })
-                    .attribute(
-                        "tabindex",
-                        props.input_props.tabindex.unwrap_or(0).to_string(),
-                    )
-                    .attribute("role", "checkbox")
-                    .attribute("aria-checked", checked.then_some("true"))
-                    .onkeyup(onkeyup),
-            );
+        let checkbox = Container::new().class("pwt-checkbox-state").with_child(
+            Container::new()
+                .class("pwt-radio-button")
+                .with_child(
+                    // invisible but necessary for correct baseline alignment
+                    Container::from_tag("span")
+                        .class("pwt-checkbox-icon")
+                        .with_child(Fa::new("check")),
+                )
+                .class(checked.then_some("checked"))
+                .class(disabled.then_some("disabled"))
+                .class(if valid.is_ok() {
+                    "is-valid"
+                } else {
+                    "is-invalid"
+                })
+                .attribute(
+                    "tabindex",
+                    props.input_props.tabindex.unwrap_or(0).to_string(),
+                )
+                .attribute("role", "checkbox")
+                .attribute("aria-checked", checked.then_some("true"))
+                .onkeyup(onkeyup),
+        );
 
         let box_label = props.box_label.clone().map(|label| label.padding_start(2));
 
