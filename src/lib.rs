@@ -201,11 +201,21 @@
 //! - [widget::DesktopApp]: Application scaffold for desktop applications.
 //! - [touch::MaterialApp]: Helper to implement applications that uses material design guidelines.
 
+mod async_abort_guard;
+pub use async_abort_guard::AsyncAbortGuard;
+
+mod async_pool;
+pub use async_pool::AsyncPool;
+
 pub mod css;
 pub mod dom;
 pub mod props;
 pub mod state;
 pub mod touch;
+
+mod web_sys_abort_guard;
+pub use web_sys_abort_guard::WebSysAbortGuard;
+
 pub mod widget;
 
 #[doc(hidden)]
@@ -244,6 +254,10 @@ extern "C" {
     pub fn show_modal_dialog(dialog: web_sys::Node);
     pub fn show_dialog(dialog: web_sys::Node);
     pub fn close_dialog(dialog: web_sys::Node);
+    pub fn show_popover(popover: web_sys::Node);
+    pub fn hide_popover(popover: web_sys::Node);
+    pub fn toggle_popover(popover: web_sys::Node);
+    pub fn toggle_event_is_closed(event: web_sys::Event) -> bool;
 }
 
 // Create wrapper which panics if called from target_arch!=wasm32
@@ -259,6 +273,15 @@ mod panic_wrapper {
         unreachable!()
     }
     pub fn close_dialog(_dialog: web_sys::Node) {
+        unreachable!()
+    }
+    pub fn show_popover(popover: web_sys::Node) {
+        unreachable!()
+    }
+    pub fn hide_popover(popover: web_sys::Node) {
+        unreachable!()
+    }
+    pub fn toggle_popover(popover: web_sys::Node) {
         unreachable!()
     }
 }

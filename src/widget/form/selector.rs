@@ -10,10 +10,12 @@ use super::{
     IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldState,
     ValidateFn,
 };
+use crate::css;
 use crate::prelude::*;
 use crate::props::{IntoLoadCallback, IntoOptionalRenderFn, LoadCallback, RenderFn};
 use crate::state::{DataStore, Selection};
-use crate::widget::{error_message, Container, Dropdown, DropdownController, Trigger};
+use crate::widget::{error_message, Container, Dropdown, DropdownController, Mask, Trigger};
+use crate::AsyncAbortGuard;
 
 use pwt_macros::{builder, widget};
 
@@ -155,17 +157,21 @@ pub struct SelectorField<S: DataStore> {
     selection: Selection,
     load_error: Option<String>,
     _store_observer: S::Observer,
+    abort_load_guard: Option<AsyncAbortGuard>,
 }
 
 impl<S: DataStore + 'static> SelectorField<S> {
-    fn load(&self, ctx: &ManagedFieldContext<Self>) {
+    fn load(&mut self, ctx: &ManagedFieldContext<Self>) {
         let props = ctx.props();
         let link = ctx.link().clone();
+        self.abort_load_guard = None; // abort any previous load
         if let Some(loader) = props.loader.clone() {
-            wasm_bindgen_futures::spawn_local(async move {
-                let res = loader.apply().await;
-                link.send_message(Msg::LoadResult(res));
-            });
+            if !props.is_disabled() {
+                self.abort_load_guard = Some(AsyncAbortGuard::spawn(async move {
+                    let res = loader.apply().await;
+                    link.send_message(Msg::LoadResult(res));
+                }));
+            }
         } else {
             // just trigger a data change to set the default value.
             link.send_message(Msg::DataChange);
@@ -258,10 +264,11 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
             .store
             .add_listener(ctx.link().callback(|_| Msg::DataChange));
 
-        let me = Self {
+        let mut me = Self {
             selection,
             load_error: None,
             _store_observer,
+            abort_load_guard: None,
         };
 
         me.load(ctx);
@@ -289,6 +296,7 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
                         self.load_error = Some(err.to_string());
                     }
                 }
+                self.abort_load_guard = None;
                 true
             }
             Msg::DataChange => {
@@ -339,6 +347,10 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
             reload = true;
         }
 
+        if old_props.is_disabled() && !props.is_disabled() {
+            reload = true;
+        }
+
         if reload {
             self.load(ctx);
         }
@@ -359,11 +371,26 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
             let selection = self.selection.clone();
 
             let load_error = self.load_error.clone();
+            let is_loading = self.abort_load_guard.is_some();
 
             move |controller: &DropdownController| {
+                if is_loading {
+                    return Mask::new(Container::new().min_height(100))
+                        .visible(true)
+                        .into();
+                }
                 if let Some(load_error) = &load_error {
-                    return error_message(&format!("Error: {}", load_error))
-                        .padding(2)
+                    // make extra container so we can limit the inner message to the
+                    // width of the input field, but no less that 400 px
+                    return Container::new()
+                        .class(css::Flex::Fill)
+                        .class(css::Display::Flex)
+                        .with_child(
+                            error_message(&format!("Error: {}", load_error))
+                                .padding(2)
+                                .class(css::Flex::Fill)
+                                .width(400),
+                        )
                         .into();
                 }
 

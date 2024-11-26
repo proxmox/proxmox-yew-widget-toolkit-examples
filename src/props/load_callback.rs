@@ -177,8 +177,10 @@ pub fn set_http_get_method<F: 'static + Future<Output = Result<Value, Error>>>(
 }
 
 async fn http_get(url: String) -> Result<Value, Error> {
+    let abort = crate::WebSysAbortGuard::new()?;
     let mut init = web_sys::RequestInit::new();
     init.method("GET");
+    init.signal(Some(&abort.signal()));
 
     let js_headers = web_sys::Headers::new().map_err(|err| format_err!("{:?}", err))?;
 
