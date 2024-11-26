@@ -4,7 +4,7 @@
 all:
 
 PWT_ASSETS_DIR="pwt-assets"
-PWT_ASSETS_VERSION="192da8f5843c4fd7727ff3d17487ae8ea89d1736"
+PWT_ASSETS_VERSION="db0b9ae7e35d6488c1bc68ce43a0a4dbe101c327"
 PWT_ASSETS_REPO="https://git.proxmox.com/rust/proxmox-yew-wiget-toolkit-assets.git"
 PWT_ASSETS_REPO="gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit-assets"
 
@@ -15,7 +15,7 @@ update-pwt-assets:
     $(PWT_ASSETS_VERSION)
 
 PWT_DIR="pwt"
-PWT_VERSION="35c5cb53a28387f74e263f37354f8669effd95e7"
+PWT_VERSION="63185535762d87bbaf9c376aac4e51bd6ec85b97"
 PWT_REPO="https://git.proxmox.com/rust/proxmox-yew-wiget-toolkit.git"
 PWT_REPO="gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit"
 
