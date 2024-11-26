@@ -141,26 +141,18 @@ impl Component for PwtWizard {
 
             for i in (0..field_list.len()).step_by(2) {
                 match field_list[i] {
-                    0 => input_panel.add_field(
-                        false,
-                        "Username",
-                        Field::new().name("user").required(true),
-                    ),
+                    0 => {
+                        input_panel.add_field("Username", Field::new().name("user").required(true))
+                    }
                     1 => input_panel.add_field(
-                        false,
                         "Password",
                         Field::new()
                             .input_type(InputType::Password)
                             .name("password")
                             .required(true),
                     ),
-                    2 => input_panel.add_field(
-                        false,
-                        "u8 Feld",
-                        Number::<u8>::new().name("u8-number"),
-                    ),
+                    2 => input_panel.add_field("u8 Feld", Number::<u8>::new().name("u8-number")),
                     3 => input_panel.add_field(
-                        false,
                         "Combobox",
                         Combobox::new()
                             .name("combobox")
@@ -169,32 +161,24 @@ impl Component for PwtWizard {
                             .with_item("User")
                             .with_item("Root"),
                     ),
-                    4 => input_panel.add_field(false, "Textfield", Field::new().name("textfield")),
-                    5 => input_panel.add_field(false, "Checkbox", Checkbox::new().name("checkbox")),
+                    4 => input_panel.add_field("Textfield", Field::new().name("textfield")),
+                    5 => input_panel.add_field("Checkbox", Checkbox::new().name("checkbox")),
                     _ => {}
                 }
 
                 match field_list[i + 1] {
-                    0 => input_panel.add_right_field(
-                        false,
-                        "Username",
-                        Field::new().name("user").required(true),
-                    ),
+                    0 => input_panel
+                        .add_right_field("Username", Field::new().name("user").required(true)),
                     1 => input_panel.add_right_field(
-                        false,
                         "Password",
                         Field::new()
                             .input_type(InputType::Password)
                             .name("password")
                             .required(true),
                     ),
-                    2 => input_panel.add_right_field(
-                        false,
-                        "u8 Feld",
-                        Number::<u8>::new().name("u8-number"),
-                    ),
+                    2 => input_panel
+                        .add_right_field("u8 Feld", Number::<u8>::new().name("u8-number")),
                     3 => input_panel.add_right_field(
-                        false,
                         "Combobox",
                         Combobox::new()
                             .name("combobox")
@@ -203,16 +187,8 @@ impl Component for PwtWizard {
                             .with_item("User")
                             .with_item("Root"),
                     ),
-                    4 => input_panel.add_right_field(
-                        false,
-                        "Textfield",
-                        Field::new().name("textfield"),
-                    ),
-                    5 => input_panel.add_right_field(
-                        false,
-                        "Checkbox",
-                        Checkbox::new().name("checkbox"),
-                    ),
+                    4 => input_panel.add_right_field("Textfield", Field::new().name("textfield")),
+                    5 => input_panel.add_right_field("Checkbox", Checkbox::new().name("checkbox")),
                     _ => {}
                 }
             }
