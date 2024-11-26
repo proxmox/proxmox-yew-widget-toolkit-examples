@@ -396,3 +396,10 @@ $position-values: absolute fixed relative sticky static;
         @include elevation-box-shadow($level);
     }
 }
+
+@each $opacity in (0, 25, 50, 75, 100) {
+    .pwt-opacity-#{$opacity} {
+        $opacity: $opacity + '%';
+        opacity: #{$opacity};
+    }
+}
