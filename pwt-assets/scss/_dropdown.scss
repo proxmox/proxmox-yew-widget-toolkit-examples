@@ -8,7 +8,8 @@
 
     max-height: 100vh;
     max-width: 100vw;
-    overflow: auto;
+    /* make e.g. the header menu overflow visible */
+    overflow: visible;
 }
 
 .pwt-dropdown[data-show] {
