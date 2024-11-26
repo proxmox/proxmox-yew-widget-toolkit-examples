@@ -114,11 +114,17 @@ pub use extract_key_function::{ExtractKeyFn, ExtractPrimaryKey, IntoExtractKeyFn
 mod load_callback;
 pub use load_callback::{set_http_get_method, IntoLoadCallback, LoadCallback};
 
+mod submit_callback;
+pub use submit_callback::{IntoSubmitCallback, SubmitCallback};
+
 mod field_std_props;
 pub use field_std_props::FieldStdProps;
 
 mod field_builder;
 pub use field_builder::FieldBuilder;
+
+mod storage_location;
+pub use storage_location::{IntoStorageLocation, StorageLocation};
 
 mod widget_std_props;
 pub use widget_std_props::WidgetStdProps;
