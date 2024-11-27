@@ -1,43 +1,50 @@
 /// List and ListTile
 
+/// Used by the ListTile widget.
 .pwt-list-tile {
     @include color-scheme-vars("neutral");
-    @include elevation-background-color(0, none);
+    @include elevation-background-color($level: 0, $state: none);
 
     display: flex;
     flex-direction: row;
     align-items: center;
 
-    gap: map-get($spacers, 2);
+    gap: var(--pwt-spacer-2);
 
     color: var(--pwt-color);
 
-    padding: map-get($spacers, 2);
+    padding: var(--pwt-spacer-2);
     transition: 0.1s;
 
-
-    &[disabled], &[aria-disabled] {
+    &.disabled,
+    &[aria-disabled] {
         opacity: 0.5;
+        pointer-events: none;
     }
 
-    &.pwt-interactive:not([disabled]):not([aria-disabled=true]) {
+    &.pwt-interactive:not(.disabled):not([aria-disabled="true"]) {
         cursor: pointer;
 
         &:hover {
-            @include elevation-background-color(0, hover);
+            @include elevation-background-color($level: 0, $state: hover);
         }
 
         &:active {
-            @include elevation-background-color(0, press);
+            @include elevation-background-color($level: 0, $state: press);
         }
     }
+}
 
+/// The following classes are used by the List widget.
 
-    .pwt-list-tile-leading {
-        //background: red;
-    }
+/// Toplevel list container
+.pwt-list {
+}
 
-    .pwt-list-tile-trailing {
-        //background: red;
-    }
+/// Virtually scrolled list content
+.pwt-list-content {
+}
+
+/// Container for individual list items
+.pwt-list-item {
 }
