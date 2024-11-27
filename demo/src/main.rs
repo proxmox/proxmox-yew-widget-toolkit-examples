@@ -13,6 +13,9 @@ pub use cards::CardsDemo;
 mod gestures;
 pub use gestures::GestureDetectorDemo;
 
+mod list;
+pub use list::ListDemo;
+
 mod theme;
 use theme::ThemeDemo;
 
@@ -168,6 +171,14 @@ fn MainMenu() -> Html {
         "Fields",
         "forms_panel",
         |_| html! {<FieldsDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "List",
+        "list_panel",
+        |_| html! {<ListDemo/>},
     );
 
     register_view(
