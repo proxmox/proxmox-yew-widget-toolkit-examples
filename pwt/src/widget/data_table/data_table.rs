@@ -38,7 +38,6 @@ pub enum Msg<T: 'static> {
     DataChange,
     ScrollTo(i32, i32),
     ViewportResize(f64, f64, f64),
-    ContainerResize(f64, f64),
     TableResize(f64, f64),
     KeyDown(KeyboardEvent),
     CursorDown(usize, bool, bool),
@@ -529,10 +528,6 @@ pub struct PwtDataTable<S: DataStore> {
     row_height: f64,
     scrollbar_size: Option<f64>,
 
-    container_ref: NodeRef,
-    container_size_observer: Option<SizeObserver>,
-    container_width: f64,
-
     keypress_timeout: Option<Timeout>,
 
     focus_table: bool,
@@ -903,11 +898,6 @@ impl<S: DataStore> PwtDataTable<S> {
     fn render_table(&self, props: &DataTable<S>, offset: f64, start: usize, end: usize) -> Html {
         let virtual_scroll = props.virtual_scroll.unwrap_or(true);
         let fixed_mode = props.show_header || virtual_scroll;
-        let layout = if fixed_mode {
-            "display:table;table-layout:fixed;width:1px;"
-        } else {
-            "display:table;"
-        };
 
         let first_row = if fixed_mode && !self.column_widths.is_empty() {
             render_empty_row_with_sizes(&self.column_widths, &self.column_hidden, props.bordered)
@@ -924,10 +914,11 @@ impl<S: DataStore> PwtDataTable<S> {
             .class(props.bordered.then(|| "table-bordered"))
             .class(props.borderless.then(|| "table-borderless"))
             .node_ref(self.table_ref.clone())
-            .attribute(
-                "style",
-                format!("{} position:relative;top:{}px;", layout, offset),
-            )
+            .style("display", "table")
+            .style("table-layout", fixed_mode.then(|| "fixed"))
+            .style("width", fixed_mode.then(|| "1px")) // required by table-layout fixed
+            .style("position", "relative")
+            .style("top", format!("{offset}px"))
             .with_child(first_row);
 
         let mut cursor = self.cursor.as_ref().map(|c| c.pos);
@@ -1123,10 +1114,6 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             table_size_observer: None,
             table_height: 0.0,
 
-            container_ref: NodeRef::default(),
-            container_size_observer: None,
-            container_width: 0.0,
-
             row_height: props.min_row_height as f64,
             scrollbar_size: None,
             keypress_timeout: None,
@@ -1136,7 +1123,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
         me.init_headers(props);
 
         me.update_scroll_info(props);
-        // fixme: remove umknown keys from  selection
+        // fixme: remove unknown keys from selection
         me.update_selection_status(props);
         me
     }
@@ -1190,10 +1177,6 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
 
                 self.update_scroll_info(props);
 
-                true
-            }
-            Msg::ContainerResize(width, _height) => {
-                self.container_width = width.max(0.0);
                 true
             }
             Msg::TableResize(_width, height) => {
@@ -1643,20 +1626,18 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             .node_ref(self.scroll_ref.clone())
             .key(Key::from("table-viewport"))
             .class("pwt-flex-fill")
-            .attribute(
-                "style",
-                format!(
-                    "overflow: {}; outline: 0",
-                    if self.table_height < 1.0 {
-                        // if the content cannot be visible, omit the scrollbars
-                        "hidden"
-                    } else if column_widths > self.viewport_width {
-                        "auto"
-                    } else {
-                        "hidden auto"
-                    }
-                ),
+            .style(
+                "overflow",
+                if self.table_height < 1.0 {
+                    // if the content cannot be visible, omit the scrollbars
+                    "hidden"
+                } else if column_widths > self.viewport_width {
+                    "auto"
+                } else {
+                    "hidden auto"
+                },
             )
+            .style("outline", "0")
             // avoid https://bugzilla.mozilla.org/show_bug.cgi?id=1069739
             .attribute("tabindex", "-1")
             .attribute("role", "rowgroup")
@@ -1719,7 +1700,6 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             .class("pwt-datatable")
             .class(props.class.clone())
             .styles(props.styles.clone())
-            .node_ref(self.container_ref.clone())
             .attribute("role", "grid")
             .attribute("aria-activedescendant", active_descendant)
             .attribute("aria-rowcount", row_count.to_string())
@@ -1779,14 +1759,6 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
                         link.send_message(Msg::ViewportResize(width, height, width - client_width));
                     });
                 self.viewport_size_observer = Some(size_observer);
-            }
-
-            if let Some(el) = self.container_ref.cast::<web_sys::Element>() {
-                let link = ctx.link().clone();
-                let size_observer = SizeObserver::new(&el, move |(width, height)| {
-                    link.send_message(Msg::ContainerResize(width, height));
-                });
-                self.container_size_observer = Some(size_observer);
             }
 
             if let Some(el) = self.table_ref.cast::<web_sys::HtmlElement>() {
