@@ -5,11 +5,12 @@
     @include color-scheme-vars("neutral");
     @include elevation-background-color($level: 0, $state: none);
 
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    min-height: var(--pwt-list-tile-min-height) !important;
 
-    gap: var(--pwt-spacer-2);
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-items: center;
 
     color: var(--pwt-color);
 
@@ -18,7 +19,7 @@
 
     &.disabled,
     &[aria-disabled] {
-        opacity: 0.5;
+        opacity: 0.25;
         pointer-events: none;
     }
 
@@ -39,12 +40,15 @@
 
 /// Toplevel list container
 .pwt-list {
+    --pwt-list-tile-min-height: 100px;
 }
 
 /// Virtually scrolled list content
 .pwt-list-content {
 }
 
-/// Container for individual list items
-.pwt-list-item {
+/// List Separator
+.pwt-list-separator {
+    grid-column: 1 / -1;
+    align-items: center;
 }
