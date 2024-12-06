@@ -5,6 +5,7 @@
     @include color-scheme-vars("neutral");
     @include elevation-background-color($level: 0, $state: none);
 
+    box-sizing: border-box !important;
     min-height: var(--pwt-list-tile-min-height) !important;
 
     display: grid;
@@ -41,6 +42,9 @@
 /// Toplevel list container
 .pwt-list {
     --pwt-list-tile-min-height: 100px;
+
+    /// Avoid unlimited height
+    max-height: calc(var(--pwt-list-tile-min-height) * 100);
 }
 
 /// Virtually scrolled list content
