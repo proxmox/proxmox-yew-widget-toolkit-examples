@@ -1,4 +1,4 @@
-use pwt::css::{Flex, Overflow};
+use pwt::css::FlexFit;
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -23,8 +23,7 @@ pub fn TabPanelDemo() -> Html {
 
     fn create_panel(style: TabBarStyle, router: bool) -> TabPanel {
         let mut panel = TabPanel::new()
-            .class(Flex::Fill)
-            .class(Overflow::Auto)
+            .class(FlexFit)
             .router(router)
             .tab_bar_style(style)
             .scroll_mode(MiniScrollMode::Native)
@@ -49,8 +48,7 @@ pub fn TabPanelDemo() -> Html {
     NavigationContainer::new()
         .with_child(
             Column::new()
-                .class(Flex::Fill)
-                .class(Overflow::Auto)
+                .class(FlexFit)
                 .with_child(create_panel(TabBarStyle::Pills, true))
                 .with_child(create_panel(TabBarStyle::MaterialPrimary, true))
                 .with_child(create_panel(TabBarStyle::MaterialSecondary, true)),
