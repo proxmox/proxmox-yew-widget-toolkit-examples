@@ -15,7 +15,7 @@ update-pwt-assets:
     $(PWT_ASSETS_VERSION)
 
 PWT_DIR="pwt"
-PWT_VERSION="a6d2ce9650f675870db1c70450d7cb69cc7c1298"
+PWT_VERSION="213557ad7d22a597321dfe8ff3d338490ffb361a"
 PWT_REPO="https://git.proxmox.com/rust/proxmox-yew-wiget-toolkit.git"
 PWT_REPO="gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit"
 
