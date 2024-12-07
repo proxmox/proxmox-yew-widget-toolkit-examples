@@ -1,3 +1,6 @@
+mod dynamic;
+use dynamic::DynamicListDemo;
+
 use pwt::prelude::*;
 
 use pwt::state::NavigationContainer;
@@ -100,6 +103,10 @@ pub fn ListDemo() -> Html {
         .with_item_builder(
             TabBarItem::new().key(format!("column")).label("Columns"),
             |_| list_columns(),
+        )
+        .with_item_builder(
+            TabBarItem::new().key(format!("dynamic")).label("Dynamic"),
+            |_| html! {<DynamicListDemo/>},
         );
 
     NavigationContainer::new().with_child(tap_panel).into()
