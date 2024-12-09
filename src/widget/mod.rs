@@ -79,7 +79,7 @@ pub use input_panel::{FieldPosition, InputPanel};
 mod language_selector;
 pub use language_selector::LanguageSelector;
 #[doc(hidden)]
-pub use language_selector::ProxmoxLanguageSelector;
+pub use language_selector::PwtLanguageSelector;
 
 // Old code, no longer used.
 // mod list_simple;
@@ -92,6 +92,8 @@ pub use list::PwtList;
 
 mod list_tile;
 pub use list_tile::ListTile;
+#[doc(hidden)]
+pub use list_tile::PwtListTile;
 
 mod mask;
 pub use mask::Mask;

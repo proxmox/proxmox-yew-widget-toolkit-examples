@@ -1,3 +1,4 @@
+use gloo_timers::callback::Timeout;
 use html::IntoPropValue;
 use wasm_bindgen::JsCast;
 use yew::virtual_dom::Key;
@@ -128,6 +129,8 @@ pub enum Msg {
     ScrollTo(i32, i32),
     TableResize(f64, f64),
     ViewportResize(f64, f64, f64),
+    TileResize,
+    DelayedTileResize,
 }
 
 #[derive(Default)]
@@ -136,15 +139,22 @@ struct SizeAccumulator {
 }
 
 impl SizeAccumulator {
+    // Update the size of a row.
+    //
+    // Returns the size difference (new height minus previous height)
     fn update_row(&mut self, index: usize, height: u64, min_row_height: u64) -> i64 {
         if self.height_list.len() <= index {
             self.height_list.resize(index + 1, min_row_height);
         }
         let diff = height as i64 - self.height_list[index] as i64;
         self.height_list[index] = height;
+        //log::info!("UPDATE ROW {} {} {}", index, height, diff);
         diff
     }
 
+    // Find the first visible row (a row ending after offset).
+    //
+    // Returns the row number, and the start offset of that row.
     fn find_start_row(&mut self, offset: u64, min_row_height: u64) -> (u64, u64) {
         if self.height_list.len() <= 2 {
             return (0, 0);
@@ -187,6 +197,9 @@ pub struct PwtList {
     start_space: SizeAccumulator,
 
     set_scroll_top: Option<usize>,
+
+    tile_resize_callback: Callback<(f64, f64)>,
+    tile_resize_timeout: Option<Timeout>,
 }
 
 impl PwtList {
@@ -315,6 +328,7 @@ impl PwtList {
             // if we have keys, we need overflow-anchor none on the scroll container
             // see: https://github.com/facebook/react/issues/27044
             row.set_key(format!("row-{pos}"));
+            row.set_resize_callback(Some(self.tile_resize_callback.clone()));
             content.add_child(row);
         }
 
@@ -332,6 +346,7 @@ impl Component for PwtList {
 
     fn create(ctx: &Context<Self>) -> Self {
         let props = ctx.props();
+
         Self {
             viewport_height: 0.0,
             viewport_width: 0.0,
@@ -349,12 +364,30 @@ impl Component for PwtList {
             start_space: SizeAccumulator::default(),
 
             set_scroll_top: None,
+
+            tile_resize_callback: ctx.link().callback(|_| Msg::TileResize),
+            tile_resize_timeout: None,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         let props = ctx.props();
         match msg {
+            Msg::DelayedTileResize => {
+                self.update_row_height(props);
+                self.update_scroll_info(props);
+                self.tile_resize_timeout = None;
+                true
+            }
+            Msg::TileResize => {
+                let link = ctx.link().clone();
+                // try to gather all update events
+                self.tile_resize_timeout = Some(Timeout::new(10, move || {
+                    link.send_message(Msg::DelayedTileResize);
+                }));
+                // avoid redraw
+                false
+            }
             Msg::ScrollTo(_x, y) => {
                 self.viewport_scroll_top = y.max(0) as usize;
                 self.update_scroll_info(props);
