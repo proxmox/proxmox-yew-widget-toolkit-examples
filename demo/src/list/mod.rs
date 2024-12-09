@@ -4,7 +4,7 @@ use dynamic::DynamicListDemo;
 use pwt::prelude::*;
 
 use pwt::state::NavigationContainer;
-use pwt::widget::{Column, Container, List, ListTile, TabBarItem, TabBarStyle, TabPanel};
+use pwt::widget::{Card, Column, Container, List, ListTile, TabBarItem, TabBarStyle, TabPanel};
 
 fn list_simple() -> Html {
     let content = List::new(10000, |pos: u64| {
@@ -32,6 +32,27 @@ fn list_simple() -> Html {
                     <p>{"Settings: flex-row layout, justify-content: space-between"}</p>
                 }),
         )
+        .with_child(content)
+        .into()
+}
+
+fn list_cards() -> Html {
+    let content = List::new(1000, |pos: u64| {
+        ListTile::new().disabled((pos % 2) == 1).with_child(
+            Card::new()
+                .class("pwt-interactive")
+                .height(60)
+                //.class(pwt::css::ColorScheme::Primary)
+                .with_child(format!("Item {pos}")),
+        )
+    })
+    .class("pwt-flex-fit");
+
+    Column::new()
+        .class(pwt::css::FlexFit)
+        .with_child(Container::new().padding(2).border_bottom(true).with_child(
+            html! {<h5>{"A List using virtual scrolling using card layout for tiles"}</h5>},
+        ))
         .with_child(content)
         .into()
 }
@@ -103,6 +124,10 @@ pub fn ListDemo() -> Html {
         .with_item_builder(
             TabBarItem::new().key(format!("column")).label("Columns"),
             |_| list_columns(),
+        )
+        .with_item_builder(
+            TabBarItem::new().key(format!("cards")).label("Cards"),
+            |_| list_cards(),
         )
         .with_item_builder(
             TabBarItem::new().key(format!("dynamic")).label("Dynamic"),
