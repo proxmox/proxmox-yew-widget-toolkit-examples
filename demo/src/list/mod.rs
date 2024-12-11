@@ -65,6 +65,7 @@ fn list_variable_size() -> Html {
             //.border(true)
             .with_child(format!("Item {pos}"))
     })
+    .min_row_height(50)
     .class("pwt-flex-fit")
     .separator(|_pos| html! {<hr/>});
 
