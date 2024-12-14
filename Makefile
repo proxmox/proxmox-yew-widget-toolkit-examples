@@ -10,9 +10,9 @@ PWT_ASSETS_REPO="gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit-
 
 update-pwt-assets:
 	git subtree pull --squash --prefix $(PWT_ASSETS_DIR) \
-    -m "Update pwt-assets subtree to $(PWT_ASSETS_VERSION)" \
-    $(PWT_ASSETS_REPO) \
-    $(PWT_ASSETS_VERSION)
+	  -m "Update pwt-assets subtree to $(PWT_ASSETS_VERSION)" \
+	  $(PWT_ASSETS_REPO) \
+	  $(PWT_ASSETS_VERSION)
 
 PWT_DIR="pwt"
 PWT_VERSION="349a9438088538c321a313e806b799e13936d267"
@@ -21,6 +21,6 @@ PWT_REPO="gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit"
 
 update-pwt:
 	git subtree pull --squash --prefix $(PWT_DIR) \
-    -m "Update pwt subtree to $(PWT_VERSION)" \
-    $(PWT_REPO) \
-    $(PWT_VERSION)
+	  -m "Update pwt subtree to $(PWT_VERSION)" \
+	  $(PWT_REPO) \
+	  $(PWT_VERSION)
