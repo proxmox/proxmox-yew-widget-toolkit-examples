@@ -25,6 +25,12 @@
 		}
 	}
 
+	&.pwt-animated {
+	    .pwt-meter-bar {
+		transition-duration: 0.5s;
+	    }
+	}
+
 	.pwt-meter-text {
 		position: absolute;
 		top: 0;

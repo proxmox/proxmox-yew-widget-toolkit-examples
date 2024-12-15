@@ -1,0 +1,28 @@
+.pwt-panel-header, ul.pwt-menubar {
+    @include color-scheme-vars("neutral");
+}
+
+.pwt-viewport.pwt-panel {
+    @include color-scheme-vars("surface");
+}
+
+.pwt-panel.pwt-border,
+.pwt-panel.pwt-rrd-panel {
+    border: 0px ! important;
+    border-top: 1px solid var(--pwt-color-surface) ! important;
+    @include elevation-box-shadow(1);
+}
+
+.pwt-nav-menu {
+    @include color-scheme-vars("dark-surface");
+}
+
+.pwt-datatable-content:not(.table-borderless) tr {
+    border-bottom: 0px;
+}
+
+.pwt-panel:has(.pwt-panel.pwt-border, .pwt-panel.pwt-rrd-panel) {
+    @include color-scheme-vars("surface");
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
+}

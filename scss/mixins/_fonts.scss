@@ -17,11 +17,11 @@
     line-height: map-get($line-height, $name) #{if($important, "!important", "")};
 }
 
-@each $name in (display, headline, title, label, body) {
-    .pwt-font-monospace {
-	font-family: $pwt-font-monospace;
-    }
+.pwt-font-monospace {
+    font-family: $pwt-font-monospace;
+}
 
+@each $name in (display, headline, title, label, body) {
     @each $size in (large, medium, small) {
         .pwt-font-#{$name}-#{$size} {
             @include font_and_line_height("#{$name}-#{$size}", $important: true);
@@ -59,6 +59,9 @@
         margin-bottom: 0.25rem;
     }
 
+    // TODO: rework sizes, it might be fine for some material use case, but the sizes here are
+    // basically all way to huge to make sense for content headings. Maybe just start out with
+    // headline-large for h1 and go down from there.
     h1,
     .h1 {
         @include font_and_line_height(display-large);
