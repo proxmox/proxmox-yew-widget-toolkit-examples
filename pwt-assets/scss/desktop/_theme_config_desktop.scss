@@ -1,3 +1,6 @@
 $spacer: 5px;
 
 $default-accent-color: primary;
+
+$nav-link-corner-shape: map-get($shape-corner, none);
+$dialog-corner-shape: map-get($shape-corner, small);

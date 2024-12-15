@@ -6,7 +6,7 @@ $line-height: (
     display-small: 44px,
     headline-large: 40px,
     headline-medium: 36px,
-    headline-small: 32px,
+    headline-small: 24px,
     title-large: 28px,
     title-medium: 24px,
     title-small: 20px,
@@ -19,12 +19,12 @@ $line-height: (
 );
 
 $font-size: (
-    display-large: 57px,
+    display-large: 50px,
     display-medium: 45px,
     display-small: 36px,
     headline-large: 32px,
     headline-medium: 28px,
-    headline-small: 24px,
+    headline-small: 20px,
     title-large: 22px,
     title-medium: 16px,
     title-small: 14px,
@@ -49,7 +49,7 @@ $font-weight: (
     body-large: 400,
     body-medium: 400,
     body-small: 400,
-    label-large: 500,
+    label-large: 350,
     label-medium: 500,
     label-small: 500,
 );
@@ -67,7 +67,7 @@ $font-width: (
     body-large: 100,
     body-medium: 100,
     body-small: 100,
-    label-large: 110,
-    label-medium: 130,
+    label-large: 100,
+    label-medium: 100,
     label-small: 130,
 );

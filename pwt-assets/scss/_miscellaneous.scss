@@ -74,7 +74,7 @@ hr,
     white-space: pre;
     font-size: map-get($font-size, "body-small");
     font-family: $pwt-font-monospace;
-    line-height: map-get($font-size, "body-small");
+    line-height: map-get($line-height, "body-small");
 }
 
 .pwt-no-outline {
