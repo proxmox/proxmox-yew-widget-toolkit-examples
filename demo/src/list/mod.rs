@@ -1,6 +1,9 @@
 mod dynamic;
 use dynamic::DynamicListDemo;
 
+mod variable;
+use variable::VariableListDemo;
+
 use pwt::prelude::*;
 
 use pwt::state::NavigationContainer;
@@ -18,8 +21,8 @@ fn list_simple() -> Html {
             .style("justify-content", "space-between")
             //.class(pwt::css::ColorScheme::Primary)
     })
-   .class("pwt-flex-fit")
-   .separator(|_pos| html! {<hr/>});
+    .separator(true)
+   .class("pwt-flex-fit");
 
     Column::new()
         .class(pwt::css::FlexFit)
@@ -57,27 +60,6 @@ fn list_cards() -> Html {
         .into()
 }
 
-fn list_variable_size() -> Html {
-    let content = List::new(10000, |pos: u64| {
-        ListTile::new()
-            .interactive(false)
-            .height(50 + (((pos % 10) as f64) * 50.0) as usize)
-            //.border(true)
-            .with_child(format!("Item {pos}"))
-    })
-    .min_row_height(50)
-    .class("pwt-flex-fit")
-    .separator(|_pos| html! {<hr/>});
-
-    Column::new()
-        .class(pwt::css::FlexFit)
-        .with_child(Container::new().padding(2).border_bottom(true).with_child(
-            html! {<h5>{"A List using virtual scrolling and variable sized items"}</h5>},
-        ))
-        .with_child(content)
-        .into()
-}
-
 fn list_columns() -> Html {
     let content = List::new(10000, |pos: u64| {
         let disabled = pos % 2 == 1;
@@ -89,8 +71,8 @@ fn list_columns() -> Html {
             .interactive(true).disabled(disabled)
             //.class(pwt::css::ColorScheme::Primary)
     })
+    .separator(true)
    .class("pwt-flex-fit")
-   .separator(|_pos| html! {<hr/>})
    .grid_template_columns("auto 1fr auto");
 
     Column::new()
@@ -120,7 +102,7 @@ pub fn ListDemo() -> Html {
             TabBarItem::new()
                 .key(format!("variable"))
                 .label("Variable Size"),
-            |_| list_variable_size(),
+            |_| html! {<VariableListDemo/>},
         )
         .with_item_builder(
             TabBarItem::new().key(format!("column")).label("Columns"),

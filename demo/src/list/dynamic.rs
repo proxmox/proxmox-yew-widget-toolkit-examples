@@ -132,7 +132,8 @@ impl Component for DynamicListDemo {
                 .with_child(html! {<div>{format!("Item {pos}")}</div>})
         })
         .min_row_height(40)
-        .separator(|_| html! {Container::new().padding_top(2)})
+        // prefetching rows with dynamic size just disturbs scrolling, so disbale it
+        .prefetch_count(0)
         .class("pwt-flex-fit");
 
         Column::new()
