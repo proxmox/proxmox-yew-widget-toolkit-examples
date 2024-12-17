@@ -1,8 +1,8 @@
 use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
+use pwt::dom::align::{align_to, align_to_xy, AlignOptions, GrowDirection, Point};
 use pwt::dom::IntoHtmlElement;
-use pwt::widget::align::{align_to, align_to_xy, AlignOptions, GrowDirection, Point};
 use pwt::widget::Panel;
 use pwt::{
     props::{ContainerBuilder, EventSubscriber, WidgetBuilder},
