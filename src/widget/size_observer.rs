@@ -1,107 +1,105 @@
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
-use wasm_bindgen::UnwrapThrowExt;
-use web_sys::Element;
-
-use crate::web_sys_ext::{ResizeObserver, ResizeObserverEntry, ResizeObserverOptions};
+use std::marker::PhantomData;
+use std::rc::Rc;
 
 use yew::prelude::*;
+use yew::virtual_dom::{VComp, VNode};
 
-type ObserverClosure = Closure<dyn Fn(Vec<ResizeObserverEntry>)>;
+use crate::props::WidgetBuilder;
 
-/// Wrapper around a ResizeObserver browser object, intended to create callbacks for size changes
-/// of an element
-pub struct SizeObserver {
-    observer: ResizeObserver,
-    // keep it alive
-    _observer_closure: ObserverClosure,
+use crate::dom::{DomSizeObserver, IntoSizeCallback, SizeCallback};
+
+/// Observe size changes.
+///
+/// This is a wrapper around another widget, which sets up a [DomSizeObserver]
+/// to track size changes.
+///
+/// ```
+/// # use pwt::widget::{Panel, SizeObserver};
+/// # fn test_size_observer() {
+/// SizeObserver::new(
+///     Panel::new().title("My Panel"),
+///     |(width, height)| {
+///         log::info!("Panel size changed: {width}x{height}");
+///     }
+/// );
+/// # }
+/// ```
+#[derive(Clone, PartialEq, Properties)]
+pub struct SizeObserver<W: WidgetBuilder + PartialEq + Clone> {
+    content: W,
+    on_resize: SizeCallback,
 }
 
-/// Custom trait to automatically handle different types of callbacks
-pub trait IntoSizeCallback<T> {
-    fn into_size_cb(self) -> SizeCallback;
-}
-
-/// Callback with width and height parameters
-impl<T> IntoSizeCallback<(f64, f64)> for T
-where
-    T: Into<Callback<(f64, f64)>>,
-{
-    fn into_size_cb(self) -> SizeCallback {
-        SizeCallback::Normal(self.into())
+impl<W: WidgetBuilder + PartialEq + Clone + 'static> SizeObserver<W> {
+    /// Creates a new instance.
+    pub fn new<X>(content: W, on_resize: impl IntoSizeCallback<X>) -> Self {
+        yew::props!(Self {
+            content,
+            on_resize: on_resize.into_size_cb()
+        })
     }
 }
 
-/// Callback with width, height, client_width and client_height parameters
-impl<T> IntoSizeCallback<(f64, f64, f64, f64)> for T
-where
-    T: Into<Callback<(f64, f64, f64, f64)>>,
-{
-    fn into_size_cb(self) -> SizeCallback {
-        SizeCallback::ClientRect(self.into())
+#[doc(hidden)]
+pub struct PwtSizeObserver<W> {
+    observer: Option<DomSizeObserver>,
+    _phantom: PhantomData<W>,
+}
+
+pub enum Msg {
+    Resize((f64, f64, f64, f64)),
+}
+
+impl<W: WidgetBuilder + PartialEq + Clone + 'static> Component for PwtSizeObserver<W> {
+    type Message = Msg;
+    type Properties = SizeObserver<W>;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {
+            observer: None,
+            _phantom: PhantomData,
+        }
     }
-}
 
-pub enum SizeCallback {
-    Normal(Callback<(f64, f64)>),
-    ClientRect(Callback<(f64, f64, f64, f64)>),
-}
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let props = ctx.props();
+        let widget = props.content.clone();
 
-impl SizeObserver {
-    fn create_observer(callback: SizeCallback) -> (ResizeObserver, ObserverClosure) {
-        let observer_closure = Closure::wrap(Box::new(move |entries: Vec<ResizeObserverEntry>| {
-            if entries.len() == 1 {
-                let el = entries[0].target();
-                let rect = el.get_bounding_client_rect();
-                match &callback {
-                    SizeCallback::Normal(cb) => cb.emit((rect.width(), rect.height())),
-                    SizeCallback::ClientRect(cb) => {
-                        let width: f64 = el.client_width().into();
-                        let height: f64 = el.client_height().into();
-                        cb.emit((rect.width(), rect.height(), width, height))
-                    }
+        widget.into()
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let props = ctx.props();
+        match msg {
+            Msg::Resize(args) => {
+                match &props.on_resize {
+                    SizeCallback::Normal(cb) => cb.emit((args.0, args.1)),
+                    SizeCallback::ClientRect(cb) => cb.emit(args),
                 }
-            } else {
-                unreachable!();
+                false
             }
-        }) as Box<dyn Fn(Vec<ResizeObserverEntry>)>);
-
-        (
-            ResizeObserver::new(observer_closure.as_ref().unchecked_ref()).unwrap_throw(),
-            observer_closure,
-        )
-    }
-
-    /// Create a new SizeObserver for the given element which calls the given callback
-    pub fn new<X>(el: &Element, callback: impl IntoSizeCallback<X>) -> Self {
-        let (observer, _observer_closure) = Self::create_observer(callback.into_size_cb());
-        observer.observe(el);
-
-        Self {
-            _observer_closure,
-            observer,
         }
     }
 
-    /// Create a new SizeObserver for the given element which calls the given callback
-    /// allows to specify ResizeObserverOptions
-    pub fn new_with_options<X>(
-        el: &Element,
-        callback: impl IntoSizeCallback<X>,
-        options: ResizeObserverOptions,
-    ) -> Self {
-        let (observer, _observer_closure) = Self::create_observer(callback.into_size_cb());
-        observer.observe_with_options(el, &options);
-
-        Self {
-            _observer_closure,
-            observer,
+    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
+        if first_render {
+            let props = ctx.props();
+            let node_ref = props.content.as_std_props().node_ref.clone();
+            let el = node_ref.cast::<web_sys::Element>().unwrap();
+            let link = ctx.link().clone();
+            let size_observer =
+                DomSizeObserver::new(&el, move |(width, height, client_width, client_height)| {
+                    link.send_message(Msg::Resize((width, height, client_width, client_height)));
+                });
+            self.observer = Some(size_observer);
         }
     }
 }
 
-impl Drop for SizeObserver {
-    fn drop(&mut self) {
-        self.observer.disconnect();
+impl<W: WidgetBuilder + PartialEq + Clone + 'static> Into<VNode> for SizeObserver<W> {
+    fn into(self) -> VNode {
+        let key = self.content.as_std_props().key.clone();
+        let comp = VComp::new::<PwtSizeObserver<W>>(Rc::new(self), key);
+        VNode::from(comp)
     }
 }
