@@ -2,5 +2,21 @@ $spacer: 5px;
 
 $default-accent-color: primary;
 
-$nav-link-corner-shape: map-get($shape-corner, none);
-$dialog-corner-shape: map-get($shape-corner, small);
+$shape-corner: map-merge($shape-corner, (
+    extra-small: 2px,
+    small: 4px,
+    medium: 6px,
+    large: 8px,
+    extra-large: 14px,
+));
+
+// mostly a re-defininition them to use above modified values.
+$button-corner-shape: map-get($shape-corner, extra-small);
+$fab-corner-shape: map-get($shape-corner, medium);
+$progress-corner-shape: map-get($shape-corner, extra-small);
+$nav-link-corner-shape: map-get($shape-corner, none); // avoid any rounded corner
+$nav-pills-corner-shape: map-get($shape-corner, extra-small);
+$tooltip-corner-shape: map-get($shape-corner, extra-small);
+$input-corner-shape: map-get($shape-corner, extra-small);
+$card-corner-shape: map-get($shape-corner, small);
+$dialog-corner-shape: map-get($shape-corner, extra-small);

@@ -67,6 +67,9 @@
     border-bottom: 1px solid var(--pwt-color-border);
     flex: 1;
 
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
+
     .pwt-tab-active-indicator {
         background-color: var(--pwt-color-primary);
         transition: 0.2s;
