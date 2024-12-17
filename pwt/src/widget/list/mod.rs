@@ -7,7 +7,7 @@ use crate::props::{EventSubscriber, WidgetBuilder};
 
 use crate::widget::Container;
 
-use super::SizeObserver;
+use crate::dom::DomSizeObserver;
 
 use pwt_macros::{builder, widget};
 
@@ -20,6 +20,8 @@ mod list_tile_observer;
 pub use list_tile_observer::ListTileObserver;
 #[doc(hidden)]
 pub use list_tile_observer::PwtListTileObserver;
+
+use super::SizeObserver;
 
 /// List with virtual scrolling (vertical).
 ///
@@ -197,12 +199,12 @@ pub struct PwtList {
     viewport_height: f64,
     viewport_width: f64,
     viewport_ref: NodeRef,
-    viewport_size_observer: Option<SizeObserver>,
+    // Note: we need access to viewport_ref element anyways, so
+    // we can also use DomSizeObserver directly (instead of SizeObserver widget)
+    viewport_size_observer: Option<DomSizeObserver>,
     viewport_scrollbar_size: Option<f64>,
     viewport_scroll_top: usize,
 
-    table_ref: NodeRef,
-    table_size_observer: Option<SizeObserver>,
     table_height: f64,
 
     scroll_info: VirtualScrollInfo,
@@ -258,13 +260,12 @@ impl PwtList {
         };
     }
 
-    fn render_content(&self, _ctx: &Context<Self>, props: &List) -> Html {
+    fn render_content(&self, ctx: &Context<Self>, props: &List) -> Html {
         let min_height = format!("{}px", props.min_row_height);
 
         let mut content = Container::new()
             .attribute("role", "none")
             .class("pwt-list-content")
-            .node_ref(self.table_ref.clone())
             .attribute("data-list-start-row", self.scroll_info.start.to_string())
             .attribute("data-list-offset", self.scroll_info.offset.to_string())
             .style("display", "grid")
@@ -304,6 +305,11 @@ impl PwtList {
             content.add_child(row);
         }
 
+        let link = ctx.link().clone();
+        let content = SizeObserver::new(content, move |(width, height)| {
+            link.send_message(Msg::TableResize(width, height));
+        });
+
         Container::new()
             .height(self.scroll_info.height)
             .attribute("role", "none")
@@ -325,8 +331,6 @@ impl Component for PwtList {
             viewport_ref: NodeRef::default(),
             viewport_scroll_top: 0,
 
-            table_ref: NodeRef::default(),
-            table_size_observer: None,
             table_height: 0.0,
             scroll_info: VirtualScrollInfo::default(),
 
@@ -349,7 +353,6 @@ impl Component for PwtList {
                 self.update_scroll_info(props);
                 self.tile_resize_timeout = None;
                 if self.scroll_diff != 0 && self.viewport_scroll_top != 0 {
-                    log::info!("TOP DIFF {}", self.scroll_diff);
                     self.set_scroll_top =
                         Some((self.viewport_scroll_top as i64 + self.scroll_diff).max(0) as usize);
                     self.scroll_diff = 0;
@@ -357,15 +360,18 @@ impl Component for PwtList {
                 true
             }
             Msg::TileResize(pos, _w, h) => {
+                if h == 0f64 {
+                    // skip invisible rows, i.e. when hidden inside a tab panel
+                    return false;
+                }
+
                 let corr =
                     self.row_heights
                         .update_row(pos as usize, h as u64, props.min_row_height);
-                log::info!("UPDATE ROW HEIGHT {pos} {h} {corr}");
 
                 //self.update_scroll_info(props);
 
                 if corr != 0 && pos < self.scroll_info.start {
-                    log::info!("CORRECTION {pos} {corr}");
                     self.scroll_diff += corr;
                 }
 
@@ -429,17 +435,10 @@ impl Component for PwtList {
             if let Some(el) = &viewport_el {
                 let link = ctx.link().clone();
                 let size_observer =
-                    SizeObserver::new(&el, move |(width, height, client_width, _)| {
+                    DomSizeObserver::new(&el, move |(width, height, client_width, _)| {
                         link.send_message(Msg::ViewportResize(width, height, width - client_width));
                     });
                 self.viewport_size_observer = Some(size_observer);
-            }
-            if let Some(el) = self.table_ref.cast::<web_sys::HtmlElement>() {
-                let link = ctx.link().clone();
-                let size_observer = SizeObserver::new(&el, move |(width, height)| {
-                    link.send_message(Msg::TableResize(width, height));
-                });
-                self.table_size_observer = Some(size_observer);
             }
         }
 

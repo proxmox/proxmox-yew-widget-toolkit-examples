@@ -15,8 +15,6 @@ mod message_box;
 pub use message_box::PwtMessageBox;
 pub use message_box::{MessageBox, MessageBoxButtons};
 
-pub mod align;
-
 mod button;
 #[doc(hidden)]
 pub use button::PwtButton;
@@ -60,8 +58,6 @@ mod file_button;
 pub use file_button::FileButton;
 #[doc(hidden)]
 pub use file_button::PwtFileButton;
-
-pub mod focus;
 
 pub mod form;
 
@@ -153,7 +149,9 @@ pub use segmented_button::PwtSegmentedButton;
 pub use segmented_button::SegmentedButton;
 
 mod size_observer;
-pub use size_observer::{IntoSizeCallback, SizeObserver};
+#[doc(hidden)]
+pub use size_observer::PwtSizeObserver;
+pub use size_observer::SizeObserver;
 
 mod tab;
 #[doc(hidden)]

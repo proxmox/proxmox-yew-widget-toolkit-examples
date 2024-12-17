@@ -11,14 +11,15 @@ use yew::html::IntoPropValue;
 use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
-use crate::dom::IntoHtmlElement;
+use crate::dom::focus::{focus_inside_el, focus_inside_input, focus_next_el};
+use crate::dom::{DomSizeObserver, IntoHtmlElement};
 use crate::prelude::*;
 use crate::props::{
     AsClassesMut, AsCssStylesMut, CallbackMut, CssLength, CssStyles, IntoEventCallbackMut,
     SorterFn, WidgetStyleBuilder,
 };
 use crate::state::{DataStore, Selection, SelectionObserver};
-use crate::widget::{get_unique_element_id, Column, Container, SizeObserver};
+use crate::widget::{get_unique_element_id, Column, Container};
 
 use super::{
     create_indexed_header_list, CellConfiguration, DataTableColumn, DataTableHeader,
@@ -85,34 +86,27 @@ pub enum MultiSelectMode {
 ///
 /// # Keyboard bindings
 ///
-/// * `Right Arrow`: Moves focus one cell to the right. If focus is on
-/// the right-most cell in the row, focus does not move.
+/// * `Right Arrow`: Moves focus one cell to the right. If focus is on the right-most cell in the
+///    row, focus does not move.
 ///
-/// * `Left Arrow`: Moves focus one cell to the left. If focus is on
-/// the left-most cell in the row, focus does not move.
+/// * `Left Arrow`: Moves focus one cell to the left. If focus is on the left-most cell in the row,
+///    focus does not move.
 ///
-/// * `Down Arrow`: Moves focus one cell down. If focus is on the
-/// bottom cell in the column, focus does not move.
+/// * `Down Arrow`: Moves focus one cell down. If focus is on the bottom cell in the column, focus
+///    does not move.
 ///
-/// * `Up Arrow`: Moves focus one cell Up. If focus is on the top cell
-/// in the column, focus does not move.
+/// * `Up Arrow`: Moves focus one cell Up. If focus is on the top cell in the column, focus does
+///    not move.
 ///
-/// * `Page Down`: Moves focus down one page. If focus is in the last
-/// row of the grid, focus does not move.
+/// * `Page Down`: Moves focus down one page. If focus is in the last row of the grid, focus does
+///    not move.
 ///
-/// * `Page Up`: Moves focus up one page. If focus is in the first row
-/// of the grid, focus does not move.
+/// * `Page Up`: Moves focus up one page. If focus is in the first row of the grid, focus does not
+///    move.
 ///
-/// * `Home`: moves focus to the first cell in the row that contains
-/// focus.
+/// * `Home`: moves focus to the first cell in the row that contains focus.
 ///
-/// * `End`: moves focus to the last cell in the row that contains
-/// focus.
-
-//
-// * Control + Home: moves focus to the first cell in the first row.
-// * Control + End: moves focus to the last cell in the last row.
-
+/// * `End`: moves focus to the last cell in the row that contains focus.
 #[derive(Properties, Derivative)]
 #[derivative(Clone(bound = ""), PartialEq(bound = ""))]
 pub struct DataTable<S: DataStore> {
@@ -520,10 +514,10 @@ pub struct PwtDataTable<S: DataStore> {
     viewport_width: f64,
     table_height: f64,
 
-    viewport_size_observer: Option<SizeObserver>,
+    viewport_size_observer: Option<DomSizeObserver>,
 
     table_ref: NodeRef,
-    table_size_observer: Option<SizeObserver>,
+    table_size_observer: Option<DomSizeObserver>,
 
     row_height: f64,
     scrollbar_size: Option<f64>,
@@ -854,7 +848,7 @@ impl<S: DataStore> PwtDataTable<S> {
             None => return false,
         };
         if let Some(cell) = dom_find_cell(&row_el, self.active_column) {
-            return crate::widget::focus::focus_inside_el(cell);
+            return focus_inside_el(cell);
         }
         false
     }
@@ -865,7 +859,7 @@ impl<S: DataStore> PwtDataTable<S> {
             None => return,
         };
         if let Some(cell) = dom_find_cell(&row_el, self.active_column) {
-            crate::widget::focus::focus_next_el(cell, backwards);
+            focus_next_el(cell, backwards);
         }
     }
 
@@ -1232,20 +1226,25 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
                     }
 
                     if self.focus_inside_cell(&record_key) {
+                        let inside_input = focus_inside_input();
                         match key {
                             "F2" | "Escape" => {
                                 event.prevent_default();
                                 self.focus_cell(&record_key);
                             }
-                            "ArrowRight" | "ArrowDown" => {
+                            "ArrowRight" | "ArrowDown" if !inside_input => {
                                 event.prevent_default();
                                 self.cell_focus_next(&record_key, false);
                             }
-                            "ArrowLeft" | "ArrowUp" => {
+                            "ArrowLeft" | "ArrowUp" if !inside_input => {
                                 event.prevent_default();
                                 self.cell_focus_next(&record_key, true);
                             }
-                            " " => {
+                            "Tab" if inside_input => {
+                                event.prevent_default();
+                                self.cell_focus_next(&record_key, !shift);
+                            }
+                            " " if !inside_input => {
                                 // avoid scrollbar default action
                                 event.prevent_default();
                             }
@@ -1755,7 +1754,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             if let Some(el) = self.scroll_ref.cast::<web_sys::Element>() {
                 let link = ctx.link().clone();
                 let size_observer =
-                    SizeObserver::new(&el, move |(width, height, client_width, _)| {
+                    DomSizeObserver::new(&el, move |(width, height, client_width, _)| {
                         link.send_message(Msg::ViewportResize(width, height, width - client_width));
                     });
                 self.viewport_size_observer = Some(size_observer);
@@ -1763,7 +1762,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
 
             if let Some(el) = self.table_ref.cast::<web_sys::HtmlElement>() {
                 let link = ctx.link().clone();
-                let size_observer = SizeObserver::new(&el, move |(width, height)| {
+                let size_observer = DomSizeObserver::new(&el, move |(width, height)| {
                     link.send_message(Msg::TableResize(width, height));
                 });
                 self.table_size_observer = Some(size_observer);
