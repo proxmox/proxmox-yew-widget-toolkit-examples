@@ -1,12 +1,11 @@
-# This makfile is a helper to update the external repositories
+# This makfile provides targets to update the repositories of our dependencies
 # which are included as git subtree.
 
 all:
 
 PWT_ASSETS_DIR="pwt-assets"
 PWT_ASSETS_VERSION="c8ed5c06fce1c193c3560bd861281bdda10e0ce3"
-PWT_ASSETS_REPO="https://git.proxmox.com/rust/proxmox-yew-wiget-toolkit-assets.git"
-PWT_ASSETS_REPO="gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit-assets"
+PWT_ASSETS_REPO="git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit-assets.git"
 
 update-pwt-assets:
 	git subtree pull --squash --prefix $(PWT_ASSETS_DIR) \
@@ -16,8 +15,7 @@ update-pwt-assets:
 
 PWT_DIR="pwt"
 PWT_VERSION="349a9438088538c321a313e806b799e13936d267"
-PWT_REPO="https://git.proxmox.com/rust/proxmox-yew-wiget-toolkit.git"
-PWT_REPO="gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit"
+PWT_REPO="git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit.git"
 
 update-pwt:
 	git subtree pull --squash --prefix $(PWT_DIR) \
