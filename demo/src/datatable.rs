@@ -130,10 +130,13 @@ pub fn DataTableDemo() -> Html {
                         )
                         .with_right_field(
                             "Striped",
-                            Checkbox::new().name("striped").checked(*striped).on_change({
-                                let striped = striped.clone();
-                                move |v| striped.set(v)
-                            }),
+                            Checkbox::new()
+                                .name("striped")
+                                .checked(*striped)
+                                .on_change({
+                                    let striped = striped.clone();
+                                    move |v| striped.set(v)
+                                }),
                         )
                         .with_right_field(
                             "Hover",

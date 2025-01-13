@@ -17,15 +17,15 @@ pub fn I18NDemo() -> Html {
     Panel::new()
         .class("pwt-flex-fit")
         .border(false)
-        .title(pgettext!("This is a panel title", "Internationalization with gettext"))
+        .title(pgettext!(
+            "This is a panel title",
+            "Internationalization with gettext"
+        ))
         .with_tool(LanguageSelector::new())
         .with_child(
             Container::new()
                 .margin(2)
-                .with_child(
-                    Button::new(tr!("Add Message"))
-                        .onclick(button_callback),
-                ),
+                .with_child(Button::new(tr!("Add Message")).onclick(button_callback)),
         )
         .with_child(Container::new().margin(2).with_child(ngettext!(
             "You have one new message",
