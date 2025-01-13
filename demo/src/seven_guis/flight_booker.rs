@@ -123,20 +123,16 @@ impl Component for FlightBooker {
             let start_date = js_sys::Date::parse(date_str);
             if start_date.is_nan() {
                 enable_book = false;
-            } else {
-                if self.with_return_flight {
-                    if let Some(date_str) = &self.return_date {
-                        let return_date = js_sys::Date::parse(date_str);
-                        if return_date.is_nan() {
-                            enable_book = false;
-                        } else {
-                            if return_date < start_date {
-                                enable_book = false;
-                            }
-                        }
-                    } else {
+            } else if self.with_return_flight {
+                if let Some(date_str) = &self.return_date {
+                    let return_date = js_sys::Date::parse(date_str);
+                    if return_date.is_nan() {
+                        enable_book = false;
+                    } else if return_date < start_date {
                         enable_book = false;
                     }
+                } else {
+                    enable_book = false;
                 }
             }
         } else {

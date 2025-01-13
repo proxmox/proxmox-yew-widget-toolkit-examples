@@ -114,7 +114,7 @@ fn register_submenu(
 
 #[function_component]
 fn MainMenu() -> Html {
-    let selection = use_selection(|| Selection::new());
+    let selection = use_selection(Selection::new);
 
     let mut content = SelectionView::new()
         .selection(selection.clone())
@@ -419,7 +419,7 @@ fn RoutedApp() -> Html {
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
-    static THEMES: &'static [&'static str] = &["Crisp", "Desktop", "Material"];
+    static THEMES: &[&str] = &["Crisp", "Desktop", "Material"];
     pwt::state::set_available_themes(THEMES);
 
     pwt::state::set_available_languages(vec![

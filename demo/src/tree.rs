@@ -233,7 +233,7 @@ pub fn TreeDemo() -> Html {
         test1();
     }
 
-    let store = use_tree_store(|| create_tree_store());
+    let store = use_tree_store(create_tree_store);
 
     let header0 = DataTableColumn::row_number();
 

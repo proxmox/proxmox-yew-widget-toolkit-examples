@@ -215,7 +215,7 @@ fn random_radius() -> usize {
     use std::cell::RefCell;
 
     thread_local! {
-        static SEED: RefCell<usize> = RefCell::new(13456374);
+        static SEED: RefCell<usize> = const { RefCell::new(13456374) };
     }
 
     let rand = SEED.with(|cell| {

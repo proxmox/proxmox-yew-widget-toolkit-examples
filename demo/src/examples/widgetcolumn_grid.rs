@@ -55,13 +55,12 @@ impl Component for WidgetColumnGrid {
                         let mut list: Vec<AttrValue> =
                             vec!["Foo".into(), "Bar".into(), "Baz".into()];
                         list.retain(|entry| {
-                            store
+                            !store
                                 .read()
                                 .iter()
-                                .find(|el| &el.selection == entry.as_str())
-                                .is_none()
+                                .any(|el| &el.selection == entry.as_str())
                         });
-                        if rec.selection != "" {
+                        if !rec.selection.is_empty() {
                             list.push(rec.selection.clone().into());
                         }
 

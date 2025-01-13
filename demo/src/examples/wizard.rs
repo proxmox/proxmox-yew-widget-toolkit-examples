@@ -37,6 +37,12 @@ pub struct Wizard {
     on_close: Option<Callback<()>>,
 }
 
+impl Default for Wizard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Wizard {
     pub fn new() -> Self {
         yew::props!(Wizard {})
@@ -307,9 +313,9 @@ impl Component for PwtWizard {
     }
 }
 
-impl Into<VNode> for Wizard {
-    fn into(self) -> VNode {
-        let comp = VComp::new::<PwtWizard>(Rc::new(self), None);
+impl From<Wizard> for VNode {
+    fn from(val: Wizard) -> Self {
+        let comp = VComp::new::<PwtWizard>(Rc::new(val), None);
         VNode::from(comp)
     }
 }

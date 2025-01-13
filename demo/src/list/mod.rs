@@ -95,25 +95,27 @@ pub fn ListDemo() -> Html {
         .router(true)
         .tab_bar_style(TabBarStyle::MaterialPrimary)
         .with_item_builder(
-            TabBarItem::new().key(format!("simple")).label("Simple"),
+            TabBarItem::new().key("simple".to_string()).label("Simple"),
             |_| list_simple(),
         )
         .with_item_builder(
             TabBarItem::new()
-                .key(format!("variable"))
+                .key("variable".to_string())
                 .label("Variable Size"),
             |_| html! {<VariableListDemo/>},
         )
         .with_item_builder(
-            TabBarItem::new().key(format!("column")).label("Columns"),
+            TabBarItem::new().key("column".to_string()).label("Columns"),
             |_| list_columns(),
         )
         .with_item_builder(
-            TabBarItem::new().key(format!("cards")).label("Cards"),
+            TabBarItem::new().key("cards".to_string()).label("Cards"),
             |_| list_cards(),
         )
         .with_item_builder(
-            TabBarItem::new().key(format!("dynamic")).label("Dynamic"),
+            TabBarItem::new()
+                .key("dynamic".to_string())
+                .label("Dynamic"),
             |_| html! {<DynamicListDemo/>},
         );
 

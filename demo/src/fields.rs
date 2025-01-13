@@ -157,7 +157,7 @@ fn user_search_columns() -> Rc<Vec<DataTableHeader<UserEntry>>> {
             .show_menu(false)
             .justify("flex-start")
             .render(|item: &UserEntry| html!(item.first_name))
-            .sorter(|a: &UserEntry, b: &UserEntry| a.first_name.cmp(&b.first_name))
+            .sorter(|a: &UserEntry, b: &UserEntry| a.first_name.cmp(b.first_name))
             .sort_order(true)
             .into(),
         DataTableColumn::new(tr!("Last Name"))
@@ -165,7 +165,7 @@ fn user_search_columns() -> Rc<Vec<DataTableHeader<UserEntry>>> {
             .show_menu(false)
             .justify("flex-start")
             .render(|item: &UserEntry| html!(item.last_name))
-            .sorter(|a: &UserEntry, b: &UserEntry| a.last_name.cmp(&b.last_name))
+            .sorter(|a: &UserEntry, b: &UserEntry| a.last_name.cmp(b.last_name))
             .sort_order(true)
             .into(),
         DataTableColumn::new(tr!("Country"))
@@ -173,7 +173,7 @@ fn user_search_columns() -> Rc<Vec<DataTableHeader<UserEntry>>> {
             .show_menu(false)
             .justify("flex-start")
             .render(|item: &UserEntry| html!(item.country))
-            .sorter(|a: &UserEntry, b: &UserEntry| a.country.cmp(&b.country))
+            .sorter(|a: &UserEntry, b: &UserEntry| a.country.cmp(b.country))
             .sort_order(true)
             .into(),
     ])

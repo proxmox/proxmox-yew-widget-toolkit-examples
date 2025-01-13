@@ -40,15 +40,12 @@ impl Component for DragDropList {
     fn update(&mut self, _ctx: &yew::Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Drop => {
-                match (self.hover_index, self.index_dragged) {
-                    (Some(mut target), Some(source)) => {
-                        let item = self.items.remove(source);
-                        if source < target {
-                            target -= 1;
-                        }
-                        self.items.insert(target, item);
+                if let (Some(mut target), Some(source)) = (self.hover_index, self.index_dragged) {
+                    let item = self.items.remove(source);
+                    if source < target {
+                        target -= 1;
                     }
-                    _ => {}
+                    self.items.insert(target, item);
                 }
                 self.hover_index = None;
                 self.index_dragged = None;

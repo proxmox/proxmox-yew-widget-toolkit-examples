@@ -62,8 +62,8 @@ impl Component for GestureDetectorDemo {
             );
 
         let detector = GestureDetector::new(content)
-            .on_drag_start(ctx.link().callback(|_| Msg::Log(format!("DRAG START"))))
-            .on_drag_end(ctx.link().callback(|_| Msg::Log(format!("DRAG END"))))
+            .on_drag_start(ctx.link().callback(|_| Msg::Log("DRAG START".to_string())))
+            .on_drag_end(ctx.link().callback(|_| Msg::Log("DRAG END".to_string())))
             .on_drag_update(ctx.link().callback(|event: GestureDragEvent| {
                 Msg::Log(format!("DRAG UPDATE {} {}", event.x(), event.y(),))
             }))

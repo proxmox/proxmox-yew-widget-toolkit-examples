@@ -38,11 +38,8 @@ impl Component for TemperatureConverter {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let celsius = self.celsius.map(|c| c.to_string()).unwrap_or(String::new());
-        let fahrenheit = self
-            .fahrenheit
-            .map(|f| f.to_string())
-            .unwrap_or(String::new());
+        let celsius = self.celsius.map(|c| c.to_string()).unwrap_or_default();
+        let fahrenheit = self.fahrenheit.map(|f| f.to_string()).unwrap_or_default();
 
         let body = InputPanel::new()
             .padding(2)

@@ -123,10 +123,7 @@ pub fn MovieDemo() -> Html {
         store
     });
 
-    let selection = use_selection(|| {
-        let selection = Selection::new().multiselect(true);
-        selection
-    });
+    let selection = use_selection(|| Selection::new().multiselect(true));
 
     Mask::new(
         DataTable::new(columns, (*store).clone())
