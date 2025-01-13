@@ -43,7 +43,7 @@ enum Route {
 }
 
 fn switch(path: &str) -> Vec<Html> {
-    let route = Route::recognize(&path).unwrap_or_default();
+    let route = Route::recognize(path).unwrap_or_default();
     match route {
         Route::Home | Route::HomeAlias => vec![html! {<Home/>}],
         Route::Settings => vec![html! {<Settings/>}],
@@ -51,7 +51,7 @@ fn switch(path: &str) -> Vec<Html> {
             html! {<Settings/>},
             // fixme: we cannot use Switch here, because that render NotFound during page stack transitions
             // html! { <Switch<SubSettings> render={switch_subsettings} />},
-            SubSettings::switch(SubSettings::recognize(&path).unwrap_or_default()),
+            SubSettings::switch(SubSettings::recognize(path).unwrap_or_default()),
         ],
         Route::Favorite => vec![html! {<Favorite/>}],
         Route::Profile => vec![html! {<Profile/>}],
