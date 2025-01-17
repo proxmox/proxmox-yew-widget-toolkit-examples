@@ -1,3 +1,8 @@
+.pwt-panel-header,
+ul.pwt-menubar {
+    @include color-scheme-vars("neutral");
+}
+
 .pwt-nav-menu {
     padding: var(--pwt-spacer-1);
 }
@@ -13,7 +18,6 @@
 }
 
 .pwt-tab-material {
-
     .pwt-nav-link {
         padding: var(--pwt-spacer-1) var(--pwt-spacer-3);
 
@@ -24,8 +28,18 @@
             gap: 0;
 
             &:before {
-                font-size: map-get($font-size, "headline-small")
+                font-size: map-get($font-size, "headline-small");
             }
         }
+    }
+}
+
+// overwrite content spacer layout
+// - use elevated box with box-shadow
+.pwt-content-spacer {
+    & > *:not(:only-child) {
+        border: 0px !important;
+        border-top: 1px solid var(--pwt-color-surface) !important;
+        @include elevation-box-shadow(1);
     }
 }

@@ -1,15 +1,12 @@
-.pwt-panel-header, ul.pwt-menubar {
+.pwt-panel-header,
+ul.pwt-menubar {
     @include color-scheme-vars("neutral");
-}
-
-.pwt-viewport.pwt-panel {
-    @include color-scheme-vars("surface");
 }
 
 .pwt-panel.pwt-border,
 .pwt-panel.pwt-rrd-panel {
-    border: 0px ! important;
-    border-top: 1px solid var(--pwt-color-surface) ! important;
+    border: 0px !important;
+    border-top: 1px solid var(--pwt-color-surface) !important;
     @include elevation-box-shadow(1);
 }
 
@@ -17,12 +14,44 @@
     @include color-scheme-vars("dark-surface");
 }
 
-.pwt-datatable-content:not(.table-borderless) tr {
-    border-bottom: 0px;
+// overwrite content spacer layout
+// - use elevated box with box-shadow
+// - use bigger spacing
+.pwt-content-spacer {
+    padding: var(--pwt-spacer-4);
+    gap: var(--pwt-spacer-4);
+
+    & > *:not(:only-child) {
+        border: 0px !important;
+        border-top: 1px solid var(--pwt-color-surface) !important;
+        @include elevation-box-shadow(1);
+    }
 }
 
-.pwt-panel:has(.pwt-panel.pwt-border, .pwt-panel.pwt-rrd-panel) {
-    @include color-scheme-vars("surface");
-    color: var(--pwt-color);
-    background-color: var(--pwt-color-background);
+.pwt-content-spacer-padding {
+    padding: var(--pwt-spacer-4);
+}
+
+h1, .h1 {
+    @include font_and_line_height(headline-large);
+}
+
+h2, .h2 {
+    @include font_and_line_height(headline-medium);
+}
+
+h3, .h3 {
+    @include font_and_line_height(title-large);
+}
+
+h4, .h4 {
+    @include font_and_line_height(headline-small);
+}
+
+h5, .h5 {
+    @include font_and_line_height(title-medium);
+}
+
+h6, .h6 {
+    @include font_and_line_height(title-small);
 }
