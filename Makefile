@@ -4,7 +4,7 @@
 all:
 
 PWT_ASSETS_DIR="pwt-assets"
-PWT_ASSETS_VERSION="c8ed5c06fce1c193c3560bd861281bdda10e0ce3"
+PWT_ASSETS_VERSION="2335e3430f10f57f79d8419624c1e20a3d90bcb6"
 PWT_ASSETS_REPO="git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit-assets.git"
 
 update-pwt-assets:
