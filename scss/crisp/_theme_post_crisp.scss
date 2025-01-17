@@ -1,0 +1,5 @@
+// overwrite content spacer layout
+// - use neutral color scheme
+.pwt-content-spacer {
+    @include color-scheme-vars("neutral");
+}

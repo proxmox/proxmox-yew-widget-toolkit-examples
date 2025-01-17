@@ -1,0 +1,29 @@
+.pwt-content-spacer {
+    @include color-scheme-vars("surface");
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
+
+    padding: var(--pwt-spacer-2);
+    gap: var(--pwt-spacer-2);
+
+    display: flex;
+    flex-direction: column;
+
+    &:has(> *:only-child) {
+        padding: 0px;
+    }
+
+    & > * {
+        @include color-scheme-vars("neutral");
+        color: var(--pwt-color);
+        background-color: var(--pwt-color-background);
+    }
+
+    & > *:not(:only-child) {
+        border: 1px solid var(--pwt-color-border);
+    }
+}
+
+.pwt-content-spacer-padding {
+    padding: var(--pwt-spacer-2);
+}
