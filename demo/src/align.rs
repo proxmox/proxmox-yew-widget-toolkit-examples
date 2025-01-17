@@ -1,4 +1,3 @@
-use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 
 use pwt::dom::align::{align_to, align_to_xy, AlignOptions, GrowDirection, Point};
@@ -73,9 +72,8 @@ pub fn AlignDemo() -> Html {
     }
 
     Row::new()
-        .class(Flex::Fill)
-        .class(Overflow::Auto)
-        .padding(2)
+        .class(pwt::css::FlexFit)
+        .class("pwt-content-spacer-padding")
         .gap(2)
         .with_child(column)
         .with_flex_spacer()

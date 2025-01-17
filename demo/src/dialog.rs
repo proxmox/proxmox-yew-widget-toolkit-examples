@@ -6,10 +6,9 @@ use pwt::prelude::*;
 use pwt::props::ExtractPrimaryKey;
 use pwt::state::Store;
 use pwt::widget::data_table::{DataTable, DataTableColumn, DataTableHeader};
-use pwt::widget::Container;
 use pwt::{
     props::{ContainerBuilder, EventSubscriber, WidgetBuilder},
-    widget::{AlertDialog, Button, Column, Dialog, Panel, Row},
+    widget::{AlertDialog, Button, Column, Dialog, Row},
 };
 
 use crate::LoremIpsum;
@@ -66,7 +65,9 @@ pub fn DialogDemo() -> Html {
     });
 
     let mut row = Column::new()
-        .padding(4)
+        .class("pwt-content-spacer-padding")
+        .class(pwt::css::FlexFit)
+        .class(pwt::css::AlignItems::Start)
         .gap(2)
         .with_child(Button::new("Show Dialog").onclick({
             let view_state = view_state.clone();
@@ -160,8 +161,5 @@ pub fn DialogDemo() -> Html {
     };
 
     row.add_child(child);
-    Container::new()
-        .padding(2)
-        .with_child(Panel::new().border(true).title("Dialogs").with_child(row))
-        .into()
+    row.into()
 }

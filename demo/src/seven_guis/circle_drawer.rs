@@ -105,7 +105,6 @@ impl CircleDrawer {
 
     fn create_toolbar(&self, ctx: &Context<Self>) -> Toolbar {
         Toolbar::new()
-            .class("pwt-bg-color-surface")
             .with_flex_spacer()
             .with_child(
                 Button::new("Undo")
@@ -201,7 +200,6 @@ impl Component for CircleDrawer {
             .with_child(self.create_toolbar(ctx))
             .with_child(
                 Container::new()
-                    .class("pwt-bg-color-surface")
                     .padding_x(2)
                     .padding_bottom(2)
                     .with_child(self.create_canvas(ctx)),

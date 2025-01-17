@@ -1,6 +1,5 @@
 use std::rc::Rc;
 
-use pwt::css::{Flex, Overflow};
 use pwt::widget::form::{Checkbox, Combobox};
 use yew::prelude::*;
 
@@ -87,101 +86,96 @@ pub fn DataTableDemo() -> Html {
     let mmode = use_state(|| MultiSelectMode::Default);
 
     Column::new()
-        .class(Flex::Fill)
-        .class(Overflow::Auto)
-        .padding(2)
-        .gap(2)
+        .class("pwt-content-spacer")
+        .class(pwt::css::FlexFit)
         .with_child(
-            Panel::new()
-                .title("DataTable Options")
-                .border(true)
-                .with_child(
-                    InputPanel::new()
-                        .padding(2)
-                        .with_field(
-                            "Borderless",
-                            Checkbox::new()
-                                .name("borderless")
-                                .checked(*borderless)
-                                .on_change({
-                                    let borderless = borderless.clone();
-                                    move |v| borderless.set(v)
-                                }),
-                        )
-                        .with_field(
-                            "Bordered",
-                            Checkbox::new()
-                                .name("bordered")
-                                .checked(*bordered)
-                                .on_change({
-                                    let bordered = bordered.clone();
-                                    move |v| bordered.set(v)
-                                }),
-                        )
-                        .with_field(
-                            "Show Headers",
-                            Checkbox::new()
-                                .name("header")
-                                .checked(*show_headers)
-                                .on_change({
-                                    let show_headers = show_headers.clone();
-                                    move |v| show_headers.set(v)
-                                }),
-                        )
-                        .with_right_field(
-                            "Striped",
-                            Checkbox::new()
-                                .name("striped")
-                                .checked(*striped)
-                                .on_change({
-                                    let striped = striped.clone();
-                                    move |v| striped.set(v)
-                                }),
-                        )
-                        .with_right_field(
-                            "Hover",
-                            Checkbox::new().name("hover").checked(*hover).on_change({
-                                let hover = hover.clone();
-                                move |v| hover.set(v)
+            Panel::new().title("DataTable Options").with_child(
+                InputPanel::new()
+                    .padding(2)
+                    .with_field(
+                        "Borderless",
+                        Checkbox::new()
+                            .name("borderless")
+                            .checked(*borderless)
+                            .on_change({
+                                let borderless = borderless.clone();
+                                move |v| borderless.set(v)
                             }),
-                        )
-                        .with_right_field(
-                            "Multiselect",
-                            Checkbox::new()
-                                .name("multiselect")
-                                .checked(*multiselect)
-                                .on_change({
-                                    let multiselect = multiselect.clone();
-                                    move |v| multiselect.set(v)
-                                }),
-                        )
-                        .with_right_field(
-                            "Multiselect Mode",
-                            Combobox::new()
-                                .with_item("Default")
-                                .with_item("Simple")
-                                .default("Default")
-                                .required(true)
-                                .name("multiselect")
-                                .on_change({
-                                    let mmode = mmode.clone();
-                                    move |v: String| {
-                                        let v = match v.as_str() {
-                                            "Default" => MultiSelectMode::Default,
-                                            "Simple" => MultiSelectMode::Simple,
-                                            _ => MultiSelectMode::Default,
-                                        };
+                    )
+                    .with_field(
+                        "Bordered",
+                        Checkbox::new()
+                            .name("bordered")
+                            .checked(*bordered)
+                            .on_change({
+                                let bordered = bordered.clone();
+                                move |v| bordered.set(v)
+                            }),
+                    )
+                    .with_field(
+                        "Show Headers",
+                        Checkbox::new()
+                            .name("header")
+                            .checked(*show_headers)
+                            .on_change({
+                                let show_headers = show_headers.clone();
+                                move |v| show_headers.set(v)
+                            }),
+                    )
+                    .with_right_field(
+                        "Striped",
+                        Checkbox::new()
+                            .name("striped")
+                            .checked(*striped)
+                            .on_change({
+                                let striped = striped.clone();
+                                move |v| striped.set(v)
+                            }),
+                    )
+                    .with_right_field(
+                        "Hover",
+                        Checkbox::new().name("hover").checked(*hover).on_change({
+                            let hover = hover.clone();
+                            move |v| hover.set(v)
+                        }),
+                    )
+                    .with_right_field(
+                        "Multiselect",
+                        Checkbox::new()
+                            .name("multiselect")
+                            .checked(*multiselect)
+                            .on_change({
+                                let multiselect = multiselect.clone();
+                                move |v| multiselect.set(v)
+                            }),
+                    )
+                    .with_right_field(
+                        "Multiselect Mode",
+                        Combobox::new()
+                            .with_item("Default")
+                            .with_item("Simple")
+                            .default("Default")
+                            .required(true)
+                            .name("multiselect")
+                            .on_change({
+                                let mmode = mmode.clone();
+                                move |v: String| {
+                                    let v = match v.as_str() {
+                                        "Default" => MultiSelectMode::Default,
+                                        "Simple" => MultiSelectMode::Simple,
+                                        _ => MultiSelectMode::Default,
+                                    };
 
-                                        mmode.set(v);
-                                    }
-                                }),
-                        ),
-                ),
+                                    mmode.set(v);
+                                }
+                            }),
+                    ),
+            ),
         )
         .with_child(
             DataTable::new(columns, (*store).clone())
-                .class(Flex::Fill)
-                .class(Overflow::Auto)
+                .class(pwt::css::FlexFit)
+                .min_height(300)
                 .border(true)
                 .bordered(*bordered)
                 .show_header(*show_headers)

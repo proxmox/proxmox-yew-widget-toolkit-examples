@@ -17,6 +17,8 @@ mod list;
 pub use list::ListDemo;
 
 mod theme;
+use pwt::widget::Column;
+use pwt::widget::Toolbar;
 use theme::ThemeDemo;
 
 mod lorem_ipsum;
@@ -85,7 +87,7 @@ use pwt::prelude::*;
 use pwt::state::{use_selection, LanguageInfo, NavigationContainer, Selection};
 use pwt::widget::nav::{Menu, MenuItem, NavigationDrawer};
 use pwt::widget::{
-    CatalogLoader, Pane, Panel, RtlSwitcher, SelectionView, SelectionViewRenderInfo, SplitPane,
+    CatalogLoader, Pane, RtlSwitcher, SelectionView, SelectionViewRenderInfo, SplitPane,
     ThemeLoader, ThemeModeSelector, ThemeNameSelector,
 };
 
@@ -391,18 +393,22 @@ fn MainMenu() -> Html {
 
 #[function_component]
 fn DemoApp() -> Html {
-    Panel::new()
-        .class(Viewport)
-        //.class(ColorScheme::NeutralAlt)
-        //.class(ColorScheme::Secondary)
-        .border(false)
+    let header = Toolbar::new()
         .attribute("role", "banner")
         .attribute("aria-label", "Demo")
-        .title("Proxmox Yew Widget Toolkit Demo Application")
-        .with_tool(html! {{"RTL"}})
-        .with_tool(RtlSwitcher::new())
-        .with_tool(ThemeNameSelector::new())
-        .with_tool(ThemeModeSelector::new())
+        .class("pwt-bg-color-neutral-alt")
+        .class("pwt-color-on-neutral-alt")
+        .border_bottom(true)
+        .with_child(html! {<h3>{"Proxmox Yew Widget Toolkit Demo Application"}</h3>})
+        .with_flex_spacer()
+        .with_child(html! {{"RTL"}})
+        .with_child(RtlSwitcher::new())
+        .with_child(ThemeNameSelector::new())
+        .with_child(ThemeModeSelector::new());
+
+    Column::new()
+        .class(Viewport)
+        .with_child(header)
         .with_child(html! {<MainMenu/>})
         .into()
 }

@@ -2,7 +2,6 @@ use yew::prelude::*;
 
 use pwt::prelude::*;
 
-use pwt::css::{Flex, Overflow};
 use pwt::touch::{SnackBar, SnackBarController, SnackBarManager};
 use pwt::widget::{
     Button, Column, Container, Mask, Meter, MiniScroll, MiniScrollMode, Panel, Progress, Row,
@@ -86,9 +85,8 @@ pub fn MiscellaneousDemo() -> Html {
     });
 
     Column::new()
-        .class(Flex::Fill)
-        .class(Overflow::Auto)
-        .padding(2)
+        .class(pwt::css::FlexFit)
+        .class("pwt-content-spacer-padding")
         .gap(2)
         .with_child("Progress indicator (ongoing progress)")
         .with_child(Progress::new())

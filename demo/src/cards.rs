@@ -1,4 +1,3 @@
-use pwt::css::{Flex, Overflow};
 use pwt::prelude::*;
 use pwt::widget::{Card, Column};
 
@@ -12,9 +11,7 @@ fn card_with_text(text: &str) -> Card {
 #[function_component]
 pub fn CardsDemo() -> Html {
     let mut column = Column::new()
-        .class(Flex::Fill)
-        .class(Overflow::Auto)
-        .padding(2)
+        .class(pwt::css::FlexFit)
         .gap(4)
         .with_child(card_with_text("Default Card"));
 
@@ -28,6 +25,7 @@ pub fn CardsDemo() -> Html {
     }
 
     column
+        .class("pwt-content-spacer-padding")
         .with_child(
             card_with_text("Filled Card (primary)")
                 .class("pwt-interactive")

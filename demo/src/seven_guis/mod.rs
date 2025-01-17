@@ -21,9 +21,9 @@ use pwt::widget::Column;
 #[function_component]
 pub fn SevenGuisDemo() -> Html {
     Column::new()
-        .padding(2)
-        .class("pwt-size-fit-content")
-        .gap(3)
+        .class("pwt-content-spacer")
+        .class("pwt-align-items-start")
+        .class(pwt::css::FlexFit)
         .with_child(html! {<CircleDrawer/>})
         .with_child(html! {<Counter/>})
         .with_child(html! {<TemperatureConverter/>})

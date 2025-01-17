@@ -15,7 +15,7 @@ pub fn I18NDemo() -> Html {
     };
 
     Panel::new()
-        .class("pwt-flex-fit")
+        .class(pwt::css::FlexFit)
         .border(false)
         .title(pgettext!(
             "This is a panel title",

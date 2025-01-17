@@ -7,7 +7,7 @@ use pwt::widget::{
     ThemeDensitySelector,
 };
 
-use pwt::css::{ColorScheme, Flex, Overflow};
+use pwt::css::{ColorScheme, Flex, FlexFit, Overflow};
 static COLOR_SCHEMES: &[ColorScheme] = &[
     ColorScheme::Neutral,
     ColorScheme::Surface,
@@ -140,9 +140,7 @@ fn text_panel(_: &SelectionViewRenderInfo) -> Html {
 pub fn ThemeDemo() -> Html {
     let panel = TabPanel::new()
         .router(true)
-        .class(Flex::Fill)
-        .class(Overflow::Auto)
-        .title("Theme settings preview")
+        .class(FlexFit)
         .with_item_builder(TabBarItem::new().key("fonts").label("Fonts"), fonts_panel)
         .with_item_builder(TabBarItem::new().key("colors").label("Colors"), color_panel)
         .with_item_builder(TabBarItem::new().key("boxes").label("Boxes"), box_panel)

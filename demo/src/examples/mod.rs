@@ -24,9 +24,9 @@ pub fn ExampleWidgets() -> Html {
     };
 
     let mut column = Column::new()
-        .padding(2)
-        .class("pwt-size-fit-content")
-        .gap(3)
+        .class("pwt-content-spacer")
+        .class("pwt-align-items-start")
+        .class(pwt::css::FlexFit)
         .with_child(html! {<WidgetColumnGrid/>})
         .with_child(html! {<DragDropList/>})
         .with_child(Button::new("Show Wizard").onclick(show_callback));

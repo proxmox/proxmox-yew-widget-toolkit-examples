@@ -8,8 +8,6 @@ use yew::virtual_dom::Key;
 
 use pwt::prelude::*;
 
-//use pwt::props::Selection2;
-use pwt::css::{Flex, Overflow};
 use pwt::props::ExtractPrimaryKey;
 use pwt::state::{use_tree_store, TreeStore};
 use pwt::widget::{data_table::*, Fa, Tooltip};
@@ -332,10 +330,7 @@ pub fn TreeDemo() -> Html {
     ]);
 
     DataTable::new(columns, store.clone())
-        .class(Flex::Fill)
-        .class(Overflow::Auto)
-        .margin(2)
-        .border(true)
+        .class(pwt::css::FlexFit)
         .bordered(false)
         .borderless(true)
         .hover(true)

@@ -131,9 +131,8 @@ fn panel_with_menubar() -> Html {
 #[function_component]
 pub fn MenuDemo() -> Html {
     Column::new()
-        .class("pwt-size-fit-content")
-        .padding(2)
-        .gap(3)
+        .class("pwt-content-spacer")
+        .class(pwt::css::FlexFit)
         .with_child(panel_with_menu_button())
         .with_child(panel_with_menubar())
         .into()

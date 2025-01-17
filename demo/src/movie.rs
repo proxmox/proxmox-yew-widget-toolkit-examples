@@ -1,7 +1,6 @@
 use std::rc::Rc;
 
 use gloo_net::http::Request;
-use pwt::css::{Flex, Overflow};
 use serde::Deserialize;
 
 use yew::prelude::*;
@@ -127,16 +126,12 @@ pub fn MovieDemo() -> Html {
 
     Mask::new(
         DataTable::new(columns, (*store).clone())
-            .class(Flex::Fill)
-            .class(Overflow::Auto)
-            .border(true)
+            .class(pwt::css::FlexFit)
             .bordered(true)
             .hover(true)
             .selection(selection),
     )
-    .class(Flex::Fill)
-    .class(Overflow::Auto)
-    .margin(2)
+    .class(pwt::css::FlexFit)
     .visible(store.data_len() < 1)
     .into()
 }

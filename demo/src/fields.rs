@@ -7,7 +7,7 @@ use pwt::widget::form::{
     Checkbox, Combobox, DisplayField, Field, Form, FormContext, InputType, Number, RadioButton,
     TextArea, Tristate, TristateBoolean,
 };
-use pwt::widget::{AlertDialog, Container, InputPanel, Panel, SearchDropdown, Trigger};
+use pwt::widget::{AlertDialog, InputPanel, SearchDropdown, Trigger};
 use yew::virtual_dom::Key;
 
 fn demo_input_panel(alert: UseStateHandle<Option<String>>) -> Html {
@@ -203,17 +203,15 @@ fn search_dropdown() -> SearchDropdown<Store<UserEntry>> {
 #[function_component]
 pub fn FieldsDemo() -> Html {
     let alert = use_state(|| None);
-    Container::new()
-        .padding(2)
-        .with_child(
-            // We place the InpuPanel inside a Form so that we have a
-            // FormContext (The FormContext is required for RadioButtons).
-            Panel::new().title("Fields").border(true).with_child(
-                Form::new()
-                    .padding(2)
-                    .with_child(demo_input_panel(alert.clone())),
-            ),
-        )
+
+    // We place the InpuPanel inside a Form so that we have a
+    // FormContext (The FormContext is required for RadioButtons).
+    Form::new()
+        .class("pwt-content-spacer-padding")
+        .class("pwt-size-fit-content")
+        .class(pwt::css::FlexFit)
+        .border(false)
+        .with_child(demo_input_panel(alert.clone()))
         .with_optional_child(
             (*alert)
                 .clone()

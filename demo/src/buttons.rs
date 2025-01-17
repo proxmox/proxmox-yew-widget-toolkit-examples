@@ -3,7 +3,7 @@ use yew::prelude::*;
 use pwt::css::ColorScheme;
 use pwt::prelude::*;
 use pwt::touch::{Fab, FabMenu, FabMenuAlign, FabMenuDirection};
-use pwt::widget::{ActionIcon, Button, Column, Container, FileButton, Panel, Row, SegmentedButton};
+use pwt::widget::{ActionIcon, Button, Column, FileButton, Row, SegmentedButton};
 
 #[function_component]
 pub fn ButtonsDemo() -> Html {
@@ -104,10 +104,11 @@ pub fn ButtonsDemo() -> Html {
         row.into()
     }
 
-    let buttons = Column::new()
-        .padding(4)
-        .gap(2)
+    Column::new()
+        .class("pwt-content-spacer-padding")
+        .class(pwt::css::FlexFit)
         .class("pwt-align-items-start")
+        .gap(2)
         .with_child("Favorite Action Buttons (FAB) types.")
         .with_child(
             Row::new()
@@ -310,15 +311,6 @@ pub fn ButtonsDemo() -> Html {
                         .with_button(Button::new("Second"))
                         .with_button(Button::new("Third").class("rounded")),
                 ),
-        );
-
-    Container::new()
-        .padding(2)
-        .with_child(
-            Panel::new()
-                .title("Buttons")
-                .with_child(buttons)
-                .border(true),
         )
         .into()
 }

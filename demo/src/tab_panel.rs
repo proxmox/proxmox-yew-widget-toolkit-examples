@@ -48,6 +48,7 @@ pub fn TabPanelDemo() -> Html {
     NavigationContainer::new()
         .with_child(
             Column::new()
+                .class("pwt-content-spacer")
                 .class(FlexFit)
                 .with_child(create_panel(TabBarStyle::Pills, true))
                 .with_child(create_panel(TabBarStyle::MaterialPrimary, true))

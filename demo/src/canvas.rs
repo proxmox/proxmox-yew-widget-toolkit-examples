@@ -1,4 +1,3 @@
-use pwt::css::{Flex, Overflow};
 use yew::prelude::*;
 
 use pwt::prelude::*;
@@ -152,10 +151,8 @@ fn simple_canvas() -> Canvas {
 #[function_component]
 pub fn CanvasDemo() -> Html {
     Column::new()
-        .class(Flex::Fill)
-        .class(Overflow::Auto)
-        .padding(2)
-        .gap(2)
+        .class(pwt::css::FlexFit)
+        .class("pwt-content-spacer")
         .with_child(
             Panel::new()
                 .border(true)
