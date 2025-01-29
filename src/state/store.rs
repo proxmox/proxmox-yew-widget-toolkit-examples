@@ -20,7 +20,11 @@ use crate::state::{optional_rc_ptr_eq, DataNode, DataNodeDerefGuard, DataStore};
 /// This hook returns a [Store] that listens to [Store] change
 /// events which trigger a redraw.
 #[hook]
-pub fn use_store<F: FnOnce() -> Store<T>, T: 'static>(init_fn: F) -> Store<T> {
+pub fn use_store<F, T>(init_fn: F) -> Store<T>
+where
+    F: FnOnce() -> Store<T>,
+    T: 'static,
+{
     let redraw = use_state(|| 0);
 
     let store = use_state(init_fn);
@@ -65,6 +69,12 @@ impl<T: 'static> Drop for StoreObserver<T> {
     }
 }
 
+impl<T: ExtractPrimaryKey + 'static> Default for Store<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T: ExtractPrimaryKey + 'static> Store<T> {
     /// Creates a new instance for types implementing [ExtractPrimaryKey].
     ///
@@ -76,6 +86,18 @@ impl<T: ExtractPrimaryKey + 'static> Store<T> {
             on_change: None,
             inner: Rc::new(RefCell::new(StoreState::new(extract_key))),
         }
+    }
+}
+
+impl<T: ExtractPrimaryKey + 'static> FromIterator<T> for Store<T> {
+    fn from_iter<A>(iter: A) -> Self
+    where
+        A: IntoIterator<Item = T>,
+    {
+        let store = Self::new();
+        store.set_data(iter.into_iter().collect());
+
+        store
     }
 }
 
@@ -95,10 +117,9 @@ impl<T: 'static> Store<T> {
     /// [Store] object, so each clone can hold a single on_select
     /// callback.
     pub fn on_change(mut self, cb: impl IntoEventCallback<()>) -> Self {
-        self.on_change = match cb.into_event_callback() {
-            Some(cb) => Some(Rc::new(self.add_listener(cb))),
-            None => None,
-        };
+        self.on_change = cb
+            .into_event_callback()
+            .map(|cb| Rc::new(self.add_listener(cb)));
         self
     }
 
@@ -236,13 +257,13 @@ impl<T> Deref for StoreWriteGuard<'_, T> {
     }
 }
 
-impl<'a, T> DerefMut for StoreWriteGuard<'a, T> {
+impl<T> DerefMut for StoreWriteGuard<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.state
     }
 }
 
-impl<'a, T: 'static> Drop for StoreWriteGuard<'a, T> {
+impl<T: 'static> Drop for StoreWriteGuard<'_, T> {
     fn drop(&mut self) {
         if self.update {
             self.version += 1;
@@ -270,7 +291,7 @@ pub struct StoreNodeRef<'a, T> {
     node_id: usize,
 }
 
-impl<'a, T: 'static> DataNode<T> for StoreNodeRef<'a, T> {
+impl<T: 'static> DataNode<T> for StoreNodeRef<'_, T> {
     fn record(&self) -> DataNodeDerefGuard<T> {
         let data = &self.state.data[self.node_id];
         let guard: Box<dyn Deref<Target = T>> = Box::new(data);
@@ -371,7 +392,6 @@ impl<T: Clone + PartialEq + 'static> DataStore for Store<T> {
 ///
 /// This class provides the actual [Store] implementation, and is
 /// accessed via the [Store::read] and [Store::write] methods.
-
 pub struct StoreState<T> {
     extract_key: ExtractKeyFn<T>,
 
@@ -489,10 +509,7 @@ impl<T: 'static> StoreState<T> {
             None => return None,
         };
 
-        let record = match self.data.get(n) {
-            Some(record) => record,
-            None => return None,
-        };
+        let record = self.data.get(n)?;
 
         Some(self.extract_key(record))
     }

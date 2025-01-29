@@ -65,6 +65,12 @@ impl<T: 'static + DeserializeOwned + Serialize> LoaderState<T> {
 #[derivative(Clone(bound = ""), PartialEq(bound = ""))]
 pub struct Loader<T>(SharedState<LoaderState<T>>);
 
+impl<T: 'static + DeserializeOwned + Serialize> Default for Loader<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T: 'static + DeserializeOwned + Serialize> Loader<T> {
     /// Create a new instance.
     pub fn new() -> Self {
@@ -136,10 +142,7 @@ impl<T: 'static + DeserializeOwned + Serialize> Loader<T> {
     }
 
     pub fn has_valid_data(&self) -> bool {
-        match self.read().data {
-            Some(Ok(_)) => true,
-            _ => false,
-        }
+        matches!(self.read().data, Some(Ok(_)))
     }
 
     pub fn render<R: Into<Html>>(&self, render: impl Fn(Rc<T>) -> R) -> Html {
@@ -148,7 +151,7 @@ impl<T: 'static + DeserializeOwned + Serialize> Loader<T> {
                 .class("pwt-text-center")
                 .padding(4)
                 .with_child(Fa::new("spinner").margin_end(1).pulse())
-                .with_child("Loading...")
+                .with_child(tr!("Loading..."))
                 .into(),
             Some(Ok(ref data)) => render(Rc::clone(data)).into(),
             Some(Err(err)) => error_message(&format!("Error: {}", err)).padding(2).into(),

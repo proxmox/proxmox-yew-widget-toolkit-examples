@@ -14,6 +14,12 @@ pub struct ThemeModeSelector {
     class: Classes,
 }
 
+impl Default for ThemeModeSelector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ThemeModeSelector {
     pub fn new() -> Self {
         yew::props!(Self {})
@@ -51,7 +57,7 @@ impl Component for PwtThemeModeSelector {
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::NextMode => {
                 let theme = match self.theme {
@@ -59,7 +65,7 @@ impl Component for PwtThemeModeSelector {
                     ThemeMode::Dark => ThemeMode::Light,
                     ThemeMode::Light => ThemeMode::System,
                 };
-                return yew::Component::update(self, ctx, Msg::SetThemeMode(theme));
+                yew::Component::update(self, _ctx, Msg::SetThemeMode(theme))
             }
             Msg::SetThemeMode(theme) => {
                 if let Err(err) = Theme::store_theme_mode(theme) {
@@ -96,9 +102,9 @@ impl Component for PwtThemeModeSelector {
     }
 }
 
-impl Into<VNode> for ThemeModeSelector {
-    fn into(self) -> VNode {
-        let comp = VComp::new::<PwtThemeModeSelector>(Rc::new(self), None);
+impl From<ThemeModeSelector> for VNode {
+    fn from(val: ThemeModeSelector) -> Self {
+        let comp = VComp::new::<PwtThemeModeSelector>(Rc::new(val), None);
         VNode::from(comp)
     }
 }

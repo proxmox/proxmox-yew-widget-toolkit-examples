@@ -27,7 +27,7 @@ pub struct DataTableRowRenderArgs<'a, T> {
     pub attributes: IndexMap<AttrValue, AttrValue>,
 }
 
-impl<'a, T> DataTableRowRenderArgs<'a, T> {
+impl<T> DataTableRowRenderArgs<'_, T> {
     /// Return the data node.
     pub fn record(&self) -> &T {
         self.record
@@ -75,6 +75,7 @@ impl<'a, T> DataTableRowRenderArgs<'a, T> {
 #[derive(Derivative)]
 #[derivative(Clone(bound = ""), PartialEq(bound = ""))]
 pub struct DataTableRowRenderCallback<T>(
+    #[allow(clippy::type_complexity)]
     #[derivative(PartialEq(compare_with = "Rc::ptr_eq"))]
     Rc<dyn Fn(&mut DataTableRowRenderArgs<T>)>,
 );

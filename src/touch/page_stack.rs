@@ -18,9 +18,9 @@ pub enum PageAnimationStyle {
     Cover,
 }
 
-impl Into<Classes> for PageAnimationStyle {
-    fn into(self) -> Classes {
-        match self {
+impl From<PageAnimationStyle> for Classes {
+    fn from(val: PageAnimationStyle) -> Self {
+        match val {
             PageAnimationStyle::Push => "pwt-page-animation-push",
             PageAnimationStyle::Fade => "pwt-page-animation-fade",
             PageAnimationStyle::Cover => "pwt-page-animation-cover",
@@ -89,10 +89,10 @@ impl Component for PwtPageStack {
         let props = ctx.props();
 
         if let Some(last) = old_props.stack.last() {
-            if props.stack.len() > old_props.stack.len() {
-                self.state = ViewState::Grow(last.clone())
-            } else if props.stack.len() < old_props.stack.len() {
-                self.state = ViewState::Shrink(last.clone());
+            match props.stack.len().cmp(&old_props.stack.len()) {
+                std::cmp::Ordering::Less => self.state = ViewState::Shrink(last.clone()),
+                std::cmp::Ordering::Greater => self.state = ViewState::Grow(last.clone()),
+                _ => {}
             }
         }
 
@@ -156,9 +156,9 @@ impl Component for PwtPageStack {
     }
 }
 
-impl Into<VNode> for PageStack {
-    fn into(self) -> VNode {
-        let comp = VComp::new::<PwtPageStack>(Rc::new(self), None);
+impl From<PageStack> for VNode {
+    fn from(val: PageStack) -> Self {
+        let comp = VComp::new::<PwtPageStack>(Rc::new(val), None);
         VNode::from(comp)
     }
 }

@@ -409,7 +409,7 @@ impl<T: 'static> PwtHeaderWidget<T> {
                 // Note: ARIA has no notation for group headers. We need
                 // to hide them to get correct column order.
                 .attribute("role", "none")
-                .attribute("tabindex", props.focusable.then(|| tabindex))
+                .attribute("tabindex", props.focusable.then_some(tabindex))
                 .attribute("id", unique_id)
                 .class("pwt-datatable-group-header-item")
                 .class(props.header_class.clone())
@@ -432,10 +432,7 @@ impl<T: 'static> PwtHeaderWidget<T> {
 
         let get_cell_el = |cell_idx| -> Option<web_sys::HtmlElement> {
             let id = self.unique_cell_id(cell_idx);
-            let el = match document.get_element_by_id(&id) {
-                Some(el) => el,
-                None => return None,
-            };
+            let el = document.get_element_by_id(&id)?;
             match el.dyn_into::<web_sys::HtmlElement>() {
                 Ok(el) => Some(el),
                 Err(_) => None,
@@ -486,7 +483,7 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
 
         Self {
             unique_id: get_unique_element_id(),
-            node_ref: props.node_ref.clone().unwrap_or(NodeRef::default()),
+            node_ref: props.node_ref.clone().unwrap_or_default(),
             state,
             cursor: None,
             observed_widths,
@@ -515,11 +512,8 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
                     .resize((col_num + 1).max(self.observed_widths.len()), None);
                 self.observed_widths[col_num] = Some(width);
 
-                let observed_widths: Vec<f64> = self
-                    .observed_widths
-                    .iter()
-                    .filter_map(|w| w.clone())
-                    .collect();
+                let observed_widths: Vec<f64> =
+                    self.observed_widths.iter().filter_map(|w| *w).collect();
 
                 if self.state.columns().len() == observed_widths.len() {
                     let on_message = props.on_message.clone();
@@ -734,10 +728,10 @@ fn headers_to_menu<T>(
     }
 }
 
-impl<T: 'static> Into<VNode> for HeaderWidget<T> {
-    fn into(self) -> VNode {
-        let key = self.key.clone();
-        let comp = VComp::new::<PwtHeaderWidget<T>>(Rc::new(self), key);
+impl<T: 'static> From<HeaderWidget<T>> for VNode {
+    fn from(val: HeaderWidget<T>) -> Self {
+        let key = val.key.clone();
+        let comp = VComp::new::<PwtHeaderWidget<T>>(Rc::new(val), key);
         VNode::from(comp)
     }
 }

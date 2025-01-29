@@ -31,7 +31,11 @@ use crate::state::{optional_rc_ptr_eq, DataNode, DataNodeDerefGuard, DataStore};
 /// This hook returns a [TreeStore] that listens to [TreeStore] change
 /// events which trigger a redraw.
 #[hook]
-pub fn use_tree_store<F: FnOnce() -> TreeStore<T>, T: 'static>(init_fn: F) -> TreeStore<T> {
+pub fn use_tree_store<F, T>(init_fn: F) -> TreeStore<T>
+where
+    F: FnOnce() -> TreeStore<T>,
+    T: 'static,
+{
     let redraw = use_state(|| 0);
 
     let tree = use_state(init_fn);
@@ -76,6 +80,12 @@ pub struct TreeStore<T: 'static> {
     inner: Rc<RefCell<KeyedSlabTree<T>>>,
 }
 
+impl<T: ExtractPrimaryKey + 'static> Default for TreeStore<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T: ExtractPrimaryKey + 'static> TreeStore<T> {
     /// Creates a new instance for types implementing [ExtractPrimaryKey].
     ///
@@ -111,10 +121,9 @@ impl<T: 'static> TreeStore<T> {
     /// [TreeStore] object, so each clone can hold a single on_select
     /// callback.
     pub fn on_change(mut self, cb: impl IntoEventCallback<()>) -> Self {
-        self.on_change = match cb.into_event_callback() {
-            Some(cb) => Some(Rc::new(self.add_listener(cb))),
-            None => None,
-        };
+        self.on_change = cb
+            .into_event_callback()
+            .map(|cb| Rc::new(self.add_listener(cb)));
         self
     }
 
@@ -319,13 +328,13 @@ impl<T> Deref for TreeStoreWriteGuard<'_, T> {
     }
 }
 
-impl<'a, T> DerefMut for TreeStoreWriteGuard<'a, T> {
+impl<T> DerefMut for TreeStoreWriteGuard<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.tree
     }
 }
 
-impl<'a, T> Drop for TreeStoreWriteGuard<'a, T> {
+impl<T> Drop for TreeStoreWriteGuard<'_, T> {
     fn drop(&mut self) {
         if self.tree.version() != self.initial_version {
             self.tree.notify_listeners();
@@ -339,7 +348,7 @@ pub struct KeyedSlabTreeBorrowRef<'a, T: 'static> {
     tree: Ref<'a, KeyedSlabTree<T>>,
 }
 
-impl<'a, T> DataNode<T> for KeyedSlabTreeBorrowRef<'a, T> {
+impl<T> DataNode<T> for KeyedSlabTreeBorrowRef<'_, T> {
     fn record(&self) -> DataNodeDerefGuard<T> {
         let guard = Box::new(RecordGuard {
             node_id: self.node_id,
@@ -365,15 +374,9 @@ impl<'a, T> DataNode<T> for KeyedSlabTreeBorrowRef<'a, T> {
         self.tree.tree.root_id == Some(self.node_id)
     }
     fn parent(&self) -> Option<Box<dyn DataNode<T> + '_>> {
-        let entry = match self.tree.get(self.node_id) {
-            Some(entry) => entry,
-            None => return None,
-        };
+        let entry = self.tree.get(self.node_id)?;
 
-        let parent_id = match entry.parent_id {
-            Some(parent_id) => parent_id,
-            None => return None,
-        };
+        let parent_id = entry.parent_id?;
 
         let parent = Box::new(KeyedSlabTreeBorrowRef {
             node_id: parent_id,

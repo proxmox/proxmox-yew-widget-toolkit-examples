@@ -38,15 +38,9 @@ pub struct PwtThemeLoader {
 }
 
 fn get_document_root() -> Option<web_sys::Element> {
-    let window = match web_sys::window() {
-        Some(window) => window,
-        None => return None,
-    };
+    let window = web_sys::window()?;
 
-    let document = match window.document() {
-        Some(document) => document,
-        None => return None,
-    };
+    let document = window.document()?;
 
     document.document_element()
 }
@@ -188,9 +182,9 @@ impl Component for PwtThemeLoader {
     }
 }
 
-impl Into<VNode> for ThemeLoader {
-    fn into(self) -> VNode {
-        let comp = VComp::new::<PwtThemeLoader>(Rc::new(self), None);
+impl From<ThemeLoader> for VNode {
+    fn from(val: ThemeLoader) -> Self {
+        let comp = VComp::new::<PwtThemeLoader>(Rc::new(val), None);
         VNode::from(comp)
     }
 }

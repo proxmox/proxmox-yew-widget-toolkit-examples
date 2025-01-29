@@ -16,7 +16,7 @@ use super::SnackBar;
 
 /// Messages sent from the [SnackBarController] to the [SnackBarManager].
 pub enum SnackBarControllerMsg {
-    Show(SnackBar),
+    Show(Box<SnackBar>),
     Dismiss(AttrValue),
     DismissCurrent,
     DismissAll,
@@ -28,6 +28,12 @@ pub enum SnackBarControllerMsg {
 #[derive(Clone, PartialEq)]
 pub struct SnackBarController {
     state: SharedState<Vec<SnackBarControllerMsg>>,
+}
+
+impl Default for SnackBarController {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SnackBarController {
@@ -52,7 +58,7 @@ impl SnackBarController {
 
         self.state
             .write()
-            .push(SnackBarControllerMsg::Show(snackbar));
+            .push(SnackBarControllerMsg::Show(Box::new(snackbar)));
 
         id
     }
@@ -93,6 +99,12 @@ pub struct SnackBarManager {
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
     pub bottom_offset: Option<u32>,
+}
+
+impl Default for SnackBarManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SnackBarManager {
@@ -179,7 +191,7 @@ impl PwtSnackBarManager {
         for msg in list.into_iter() {
             match msg {
                 SnackBarControllerMsg::Show(snackbar) => {
-                    self.queue.push_back(snackbar);
+                    self.queue.push_back(*snackbar);
                 }
                 SnackBarControllerMsg::Dismiss(id) => {
                     self.queue.retain(|s| s.id.as_ref() != Some(&id));
@@ -204,10 +216,7 @@ impl Component for PwtSnackBarManager {
 
     fn create(ctx: &Context<Self>) -> Self {
         let props = ctx.props();
-        let controller = props
-            .controller
-            .clone()
-            .unwrap_or(SnackBarController::new());
+        let controller = props.controller.clone().unwrap_or_default();
 
         let _state_observer = controller
             .state
@@ -316,10 +325,10 @@ impl Component for PwtSnackBarManager {
     }
 }
 
-impl Into<VNode> for SnackBarManager {
-    fn into(self) -> VNode {
-        let key = self.key.clone();
-        let comp = VComp::new::<PwtSnackBarManager>(Rc::new(self), key);
+impl From<SnackBarManager> for VNode {
+    fn from(val: SnackBarManager) -> Self {
+        let key = val.key.clone();
+        let comp = VComp::new::<PwtSnackBarManager>(Rc::new(val), key);
         VNode::from(comp)
     }
 }
