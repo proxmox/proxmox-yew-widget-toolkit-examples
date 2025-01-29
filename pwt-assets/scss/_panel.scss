@@ -1,3 +1,15 @@
+/// ## Panel Widget
+///
+/// Class `pwt-panel`
+///
+/// This is the top level class for panels, using a flex column layout.
+/// It set the color scheme to `neutral`, and use the color scheme variables
+/// for `color` and `background-color`. The accent color scheme is set to 'primary',
+/// and is used as color for the header text.
+///
+/// Note: color schemes can be adopted by the user,
+/// i.e. by using `pwt-panel.pwt-color-scheme-primary`
+///
 .pwt-panel {
     @include color-scheme-vars("neutral");
     @include accent-color-scheme-vars("primary");
@@ -8,15 +20,12 @@
     background-color: var(--pwt-color-background);
 }
 
-.pwt-panel-header-text {
-    cursor: initial;
-    color: var(--pwt-accent-color-background);
-    @include font_and_line_height("headline-small");
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-wrap: nowrap;
-}
-
+/// Class `pwt-panel-header`
+///
+/// Panel headers use the `surface` color scheme, and add
+/// a `--pwt-spacer-2` padding for the header text.
+///
+///
 .pwt-panel-header {
     @include color-scheme-vars("surface");
     overflow: hidden; // avoid scrollbars
@@ -24,6 +33,19 @@
     padding: var(--pwt-spacer-2);
     color: var(--pwt-color);
     background: var(--pwt-color-background);
+}
+
+/// Class `pwt-panel-header-text`
+///
+/// Header text uses font `headline-small` and the accent color from the panel.
+///
+.pwt-panel-header-text {
+    cursor: initial;
+    color: var(--pwt-accent-color-background);
+    @include font_and_line_height("headline-small");
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
 }
 
 .pwt-panel.pwt-rounded > .pwt-panel-header {

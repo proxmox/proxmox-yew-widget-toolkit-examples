@@ -1,5 +1,9 @@
-// overwrite content spacer layout
-// - use neutral color scheme
+/// ### Fine Tuning
+///
+
+/// `pwt-content-spacer`
+/// : use neutral color scheme instead of surface.
+///
 .pwt-content-spacer {
     @include color-scheme-vars("neutral");
 }

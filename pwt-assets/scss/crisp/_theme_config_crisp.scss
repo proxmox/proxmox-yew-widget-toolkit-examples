@@ -1,3 +1,13 @@
+/// ### The "Crisp" Theme
+///
+/// This theme is similar to what we currently use for our products.
+/// The `3px` spacing is very dense, allowing to pack as much info
+/// as possible onto a single page.
+///
+/// The primary color is used as default accent color.
+
+$spacer: 3px;
+
 $default-accent-color: primary;
 
 $button-corner-shape: 3px;
