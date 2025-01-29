@@ -1,6 +1,5 @@
 use std::borrow::Cow;
 
-use yew::html::IntoPropValue;
 use yew::prelude::*;
 use yew::virtual_dom::{Listeners, VList, VTag};
 
@@ -8,11 +7,18 @@ use pwt_macros::widget;
 
 use crate::css::{Display, FlexDirection};
 use crate::prelude::*;
+use crate::props::{AsClassesMut, AsCssStylesMut, PwtSpace};
 
 /// Vertical container with flex layout.
 #[widget(pwt=crate, @element, @container)]
 #[derive(Debug, Clone, PartialEq, Properties)]
 pub struct Column {}
+
+impl Default for Column {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl Column {
     /// Create a new instance.
@@ -25,15 +31,19 @@ impl Column {
     /// Builder style method to add a CSS class to set gap between children.
     ///
     /// The default CSS template defines utility classes for gaps (`pwt-gap-{gap}`).
-    pub fn gap(mut self, gap: impl IntoPropValue<Option<usize>>) -> Self {
+    pub fn gap(mut self, gap: impl Into<PwtSpace>) -> Self {
         self.add_gap(gap);
         self
     }
 
     /// Method to add a CSS class to set gap between children.
-    pub fn add_gap(&mut self, gap: impl IntoPropValue<Option<usize>>) {
-        if let Some(gap) = gap.into_prop_value() {
-            self.add_class(format!("pwt-gap-{}", gap))
+    pub fn add_gap(&mut self, gap: impl Into<PwtSpace>) {
+        match gap.into() {
+            PwtSpace::None => {}
+            PwtSpace::Pwt(factor) if factor <= 4 => {
+                self.as_classes_mut().push(format!("pwt-gap-{}", factor));
+            }
+            space => self.as_css_styles_mut().set_style("gap", space.to_string()),
         }
     }
 
@@ -51,18 +61,18 @@ impl Column {
     }
 }
 
-impl Into<VTag> for Column {
-    fn into(self) -> VTag {
-        let attributes = self.std_props.cumulate_attributes(None::<&str>);
+impl From<Column> for VTag {
+    fn from(val: Column) -> Self {
+        let attributes = val.std_props.cumulate_attributes(None::<&str>);
 
-        let listeners = Listeners::Pending(self.listeners.listeners.into_boxed_slice());
+        let listeners = Listeners::Pending(val.listeners.listeners.into_boxed_slice());
 
-        let children = VList::with_children(self.children, None);
+        let children = VList::with_children(val.children, None);
 
         VTag::__new_other(
             Cow::Borrowed("div"),
-            self.std_props.node_ref,
-            self.std_props.key,
+            val.std_props.node_ref,
+            val.std_props.key,
             attributes,
             listeners,
             children.into(),

@@ -100,7 +100,7 @@ pub fn get_available_themes() -> &'static [&'static str] {
 
 fn get_default_theme_name() -> String {
     get_available_themes()
-        .get(0)
+        .first()
         .unwrap_or(&"Material")
         .to_string()
 }
@@ -123,7 +123,7 @@ impl Default for Theme {
         Self {
             mode: ThemeMode::default(),
             density: ThemeDensity::Preset, // use default from css
-            name: String::from(get_default_theme_name()),
+            name: get_default_theme_name(),
         }
     }
 }
@@ -180,7 +180,7 @@ impl Theme {
         let name = theme.name.to_lowercase();
         let themes = get_available_themes();
 
-        if themes.iter().find(|t| t.to_lowercase() == name).is_some() {
+        if themes.iter().any(|t| t.to_lowercase() == name) {
             return theme;
         }
 
@@ -192,7 +192,7 @@ impl Theme {
     /// Store the theme mode and emit the `pwt-theme-changed` event.
     pub fn store_theme_mode(mode: ThemeMode) -> Result<(), Error> {
         if let Some(store) = local_storage() {
-            if let Err(_) = store.set_item("ThemeMode", &mode.to_string()) {
+            if store.set_item("ThemeMode", &mode.to_string()).is_err() {
                 bail!("store_them_mode: set_item failed");
             }
         } else {
@@ -207,7 +207,10 @@ impl Theme {
     /// Store the theme density and emit the `pwt-theme-changed` event.
     pub fn store_theme_density(density: ThemeDensity) -> Result<(), Error> {
         if let Some(store) = local_storage() {
-            if let Err(_) = store.set_item("ThemeDensity", &density.to_string()) {
+            if store
+                .set_item("ThemeDensity", &density.to_string())
+                .is_err()
+            {
                 bail!("store_theme_density: set_item failed");
             }
         } else {
@@ -222,7 +225,7 @@ impl Theme {
     /// Store the theme name and emit the `pwt-theme-changed` event.
     pub fn store_theme_name(name: &str) -> Result<(), Error> {
         if let Some(store) = local_storage() {
-            if let Err(_) = store.set_item("ThemeName", name) {
+            if store.set_item("ThemeName", name).is_err() {
                 bail!("store_theme_name: set_item failed");
             }
         } else {

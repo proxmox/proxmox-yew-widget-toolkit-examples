@@ -15,7 +15,6 @@ struct CellState {
 ///
 /// - column sort order
 /// - column hidden
-
 pub struct HeaderState<T: 'static> {
     //headers: Rc<Vec<IndexedHeader<T>>>,
     // map cell_idx => &IndexedHeader
@@ -128,8 +127,7 @@ impl<T: 'static> HeaderState<T> {
         let visible = group
             .children
             .iter()
-            .find(|cell| !self.get_cell_hidden(cell.cell_idx()))
-            .is_some();
+            .any(|cell| !self.get_cell_hidden(cell.cell_idx()));
         self.cell_state[cell_idx].hidden = !visible;
         self.bubble_up_hidden(group.parent);
     }

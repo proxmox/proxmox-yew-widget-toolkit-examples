@@ -558,12 +558,7 @@ fn render_empty_row_with_sizes(widths: &[f64], column_hidden: &[bool], bordered:
         .style("border-bottom-width", "0px")
         .children(
             widths.iter().enumerate()
-                .filter(|(column_num, _)| {
-                    match column_hidden.get(*column_num) {
-                        Some(true) => false,
-                        _ => true,
-                    }
-                })
+                .filter(|(column_num, _)| column_hidden.get(*column_num).map(|e| !e).unwrap_or(true))
                 .map(|(_, width)| html!{
                     // Note: we substract the border width (1.0) here
                     <td role="none" style={format!("width:{}px;height:0px;", (width - border_width).max(0.0))}></td>
@@ -599,15 +594,15 @@ impl<S: DataStore> PwtDataTable<S> {
             }
         }
 
-        props.store.filtered_record_pos(&key)
+        props.store.filtered_record_pos(key)
     }
 
     fn set_cursor(&mut self, props: &DataTable<S>, pos: Option<usize>) {
         if let Some(pos) = pos {
-            self.cursor = match props.store.lookup_filtered_record_key(pos) {
-                Some(record_key) => Some(Cursor { pos, record_key }),
-                None => None,
-            }
+            self.cursor = props
+                .store
+                .lookup_filtered_record_key(pos)
+                .map(|record_key| Cursor { pos, record_key })
         } else {
             self.cursor = None;
         }
@@ -783,11 +778,9 @@ impl<S: DataStore> PwtDataTable<S> {
                     }
                 }
                 selection.bulk_select(keys);
-            } else {
-                if let Some(key) = selection.selected_key() {
-                    if props.store.filtered_record_pos(&key).is_none() {
-                        selection.clear();
-                    }
+            } else if let Some(key) = selection.selected_key() {
+                if props.store.filtered_record_pos(&key).is_none() {
+                    selection.clear();
                 }
             }
         }
@@ -815,10 +808,9 @@ impl<S: DataStore> PwtDataTable<S> {
     }
 
     fn focus_cursor(&mut self) {
-        match &self.cursor {
-            Some(Cursor { record_key, .. }) => self.focus_cell(&record_key.clone()),
-            None => return, // nothing to do
-        };
+        if let Some(Cursor { record_key, .. }) = &self.cursor {
+            self.focus_cell(&record_key.clone())
+        }
     }
 
     fn get_row_el(&self, key: &Key) -> Option<web_sys::Element> {
@@ -866,10 +858,7 @@ impl<S: DataStore> PwtDataTable<S> {
     fn find_focused_cell(&self) -> Option<(Key, Option<usize>)> {
         let window = web_sys::window().unwrap();
         let document = window.document().unwrap();
-        let active_el = match document.active_element() {
-            Some(el) => el,
-            None => return None,
-        };
+        let active_el = document.active_element()?;
         dom_find_focus_pos(active_el, &self.unique_id)
     }
 
@@ -903,14 +892,14 @@ impl<S: DataStore> PwtDataTable<S> {
             // do not use table tag here to avoid role="table", instead set display type in style"
             .attribute("role", "none")
             .class("pwt-datatable-content")
-            .class(props.hover.then(|| "table-hover"))
-            .class(props.striped.then(|| "table-striped"))
-            .class(props.bordered.then(|| "table-bordered"))
-            .class(props.borderless.then(|| "table-borderless"))
+            .class(props.hover.then_some("table-hover"))
+            .class(props.striped.then_some("table-striped"))
+            .class(props.bordered.then_some("table-bordered"))
+            .class(props.borderless.then_some("table-borderless"))
             .node_ref(self.table_ref.clone())
             .style("display", "table")
-            .style("table-layout", fixed_mode.then(|| "fixed"))
-            .style("width", fixed_mode.then(|| "1px")) // required by table-layout fixed
+            .style("table-layout", fixed_mode.then_some("fixed"))
+            .style("width", fixed_mode.then_some("1px")) // required by table-layout fixed
             .style("position", "relative")
             .style("top", format!("{offset}px"))
             .with_child(first_row);
@@ -950,7 +939,7 @@ impl<S: DataStore> PwtDataTable<S> {
                 cell_config: self.cell_config.clone(),
                 row_render_callback: props.row_render_callback.clone(),
                 selected,
-                active_cell: active.then(|| self.active_column),
+                active_cell: active.then_some(self.active_column),
                 has_focus: active && self.has_focus,
                 is_expanded: item.expanded(),
                 is_leaf: item.is_leaf(),
@@ -1004,9 +993,7 @@ impl<S: DataStore> PwtDataTable<S> {
             0
         };
 
-        if start > 0 {
-            start -= 1;
-        }
+        start = start.saturating_sub(1);
         if (start & 1) == 1 {
             start -= 1;
         } // make it work with striped rows
@@ -1071,12 +1058,10 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             .store
             .add_listener(ctx.link().callback(|_| Msg::DataChange));
 
-        let _selection_observer = match &props.selection {
-            Some(selection) => {
-                Some(selection.add_listener(ctx.link().callback(|_| Msg::SelectionChange)))
-            }
-            None => None,
-        };
+        let _selection_observer = props
+            .selection
+            .as_ref()
+            .map(|selection| selection.add_listener(ctx.link().callback(|_| Msg::SelectionChange)));
 
         let mut me = Self {
             _phantom_store: PhantomData::<S>,
@@ -1153,7 +1138,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             Msg::ScrollTo(x, y) => {
                 self.scroll_top = y.max(0) as usize;
                 if let Some(el) = self.header_scroll_ref.cast::<web_sys::Element>() {
-                    el.set_scroll_left(x as i32);
+                    el.set_scroll_left(x);
                 }
                 self.update_scroll_info(props);
                 props.virtual_scroll.unwrap_or(true)
@@ -1615,7 +1600,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
 
         let mut active_descendant = None;
         if let Some(Cursor { record_key, .. }) = &self.cursor {
-            active_descendant = Some(self.get_unique_item_id(&record_key));
+            active_descendant = Some(self.get_unique_item_id(record_key));
         }
 
         let column_widths =
@@ -1794,10 +1779,10 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
     }
 }
 
-impl<S: DataStore + 'static> Into<VNode> for DataTable<S> {
-    fn into(self) -> VNode {
-        let key = self.key.clone();
-        let comp = VComp::new::<PwtDataTable<S>>(Rc::new(self), key);
+impl<S: DataStore + 'static> From<DataTable<S>> for VNode {
+    fn from(val: DataTable<S>) -> Self {
+        let key = val.key.clone();
+        let comp = VComp::new::<PwtDataTable<S>>(Rc::new(val), key);
         VNode::from(comp)
     }
 }
@@ -1824,37 +1809,31 @@ fn dom_find_focus_pos(el: web_sys::Element, unique_id: &str) -> Option<(Key, Opt
     let focused_el: web_sys::Node = el.clone().dyn_into().unwrap();
     let mut cur_el: Option<web_sys::Element> = Some(el);
 
-    loop {
-        match cur_el {
-            Some(el) => {
-                if el.tag_name() == "TR" {
-                    if let Some(key_str) = el.id().strip_prefix(&unique_row_prefix) {
-                        if key_str.len() == 0 {
-                            break;
-                        } // stop on errors
-                          // try to find out the column_num
-                        let children = el.children();
-                        for i in 0..children.length() {
-                            let child: web_sys::HtmlElement =
-                                children.item(i).unwrap().dyn_into().unwrap();
+    while let Some(el) = cur_el {
+        if el.tag_name() == "TR" {
+            if let Some(key_str) = el.id().strip_prefix(&unique_row_prefix) {
+                if key_str.is_empty() {
+                    break;
+                } // stop on errors
+                  // try to find out the column_num
+                let children = el.children();
+                for i in 0..children.length() {
+                    let child: web_sys::HtmlElement = children.item(i).unwrap().dyn_into().unwrap();
 
-                            if child.contains(Some(&focused_el)) {
-                                if let Some(column_num_str) = child.get_attribute("data-column-num")
-                                {
-                                    if let Ok(n) = column_num_str.parse() {
-                                        column_num = Some(n);
-                                    }
-                                }
+                    if child.contains(Some(&focused_el)) {
+                        if let Some(column_num_str) = child.get_attribute("data-column-num") {
+                            if let Ok(n) = column_num_str.parse() {
+                                column_num = Some(n);
                             }
                         }
-                        return Some((Key::from(key_str), column_num));
                     }
                 }
-                cur_el = el.parent_element().map(|el| el.dyn_into().unwrap());
+                return Some((Key::from(key_str), column_num));
             }
-            None => break,
         }
+        cur_el = el.parent_element().map(|el| el.dyn_into().unwrap());
     }
+
     None
 }
 
@@ -1867,34 +1846,28 @@ fn dom_find_record_num(event: &MouseEvent, unique_id: &str) -> Option<(Key, Opti
 
     let click_x = event.client_x() as f64;
 
-    loop {
-        match cur_el {
-            Some(el) => {
-                if el.tag_name() == "TR" {
-                    if let Some(n_str) = el.id().strip_prefix(&unique_row_prefix) {
-                        // try to find out the column_num
-                        let children = el.children();
-                        for i in 0..children.length() {
-                            let child: web_sys::HtmlElement =
-                                children.item(i).unwrap().dyn_into().unwrap();
-                            let rect = child.get_bounding_client_rect();
+    while let Some(el) = cur_el {
+        if el.tag_name() == "TR" {
+            if let Some(n_str) = el.id().strip_prefix(&unique_row_prefix) {
+                // try to find out the column_num
+                let children = el.children();
+                for i in 0..children.length() {
+                    let child: web_sys::HtmlElement = children.item(i).unwrap().dyn_into().unwrap();
+                    let rect = child.get_bounding_client_rect();
 
-                            if rect.x() < click_x && click_x < (rect.x() + rect.width()) {
-                                if let Some(column_num_str) = child.get_attribute("data-column-num")
-                                {
-                                    if let Ok(n) = column_num_str.parse() {
-                                        column_num = Some(n);
-                                    }
-                                }
+                    if rect.x() < click_x && click_x < (rect.x() + rect.width()) {
+                        if let Some(column_num_str) = child.get_attribute("data-column-num") {
+                            if let Ok(n) = column_num_str.parse() {
+                                column_num = Some(n);
                             }
                         }
-                        return Some((Key::from(n_str), column_num));
                     }
                 }
-                cur_el = el.parent_element().map(|el| el.dyn_into().unwrap());
+                return Some((Key::from(n_str), column_num));
             }
-            None => break,
         }
+        cur_el = el.parent_element().map(|el| el.dyn_into().unwrap());
     }
+
     None
 }

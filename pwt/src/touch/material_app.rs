@@ -35,6 +35,12 @@ pub struct PageController {
     state: SharedState<Vec<PageControllerMsg>>,
 }
 
+impl Default for PageController {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PageController {
     /// Create a new instance.
     pub fn new() -> Self {
@@ -304,10 +310,7 @@ impl Component for PwtMaterialApp {
             .clone()
             .unwrap_or(AnyHistory::from(HashHistory::new()));
 
-        let snackbar_controller = props
-            .snackbar_controller
-            .clone()
-            .unwrap_or(SnackBarController::new());
+        let snackbar_controller = props.snackbar_controller.clone().unwrap_or_default();
 
         let page_controller = PageController::new();
 
@@ -392,10 +395,10 @@ impl Component for PwtMaterialApp {
     }
 }
 
-impl Into<VNode> for MaterialApp {
-    fn into(self) -> VNode {
-        let key = self.key.clone();
-        let comp = VComp::new::<PwtMaterialApp>(Rc::new(self), key);
+impl From<MaterialApp> for VNode {
+    fn from(val: MaterialApp) -> Self {
+        let key = val.key.clone();
+        let comp = VComp::new::<PwtMaterialApp>(Rc::new(val), key);
         VNode::from(comp)
     }
 }
@@ -407,7 +410,9 @@ impl Into<VNode> for MaterialApp {
 #[derive(Derivative)]
 #[derivative(Clone(bound = ""), PartialEq(bound = ""))]
 pub struct PageRenderFn(
-    #[derivative(PartialEq(compare_with = "Rc::ptr_eq"))] Rc<dyn Fn(&str) -> Vec<Html>>,
+    #[allow(clippy::type_complexity)]
+    #[derivative(PartialEq(compare_with = "Rc::ptr_eq"))]
+    Rc<dyn Fn(&str) -> Vec<Html>>,
 );
 
 impl PageRenderFn {

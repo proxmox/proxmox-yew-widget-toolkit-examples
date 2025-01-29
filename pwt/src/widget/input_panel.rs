@@ -87,7 +87,8 @@ impl InputPanel {
             Container::from_tag("hr")
                 .key(key)
                 .class("pwt-w-100")
-                .margin_y(2),
+                .margin_y(2)
+                .into(),
         );
     }
 
@@ -99,7 +100,7 @@ impl InputPanel {
 
     /// Adds custom child in the first column
     pub fn add_custom_child(&mut self, child: impl Into<Html>) {
-        self.add_custom_child_impl(FieldPosition::Left, false, child);
+        self.add_custom_child_impl(FieldPosition::Left, false, child.into());
     }
 
     /// Builder style method to add a custom child in the second column
@@ -110,7 +111,7 @@ impl InputPanel {
 
     /// Adds custom child in the second column
     pub fn add_right_custom_child(&mut self, child: impl Into<Html>) {
-        self.add_custom_child_impl(FieldPosition::Right, false, child);
+        self.add_custom_child_impl(FieldPosition::Right, false, child.into());
     }
 
     /// Builder style method to add a large custom child
@@ -121,24 +122,19 @@ impl InputPanel {
 
     /// Adds large custom child
     pub fn add_large_custom_child(&mut self, child: impl Into<Html>) {
-        self.add_custom_child_impl(FieldPosition::Large, false, child);
+        self.add_custom_child_impl(FieldPosition::Large, false, child.into());
     }
 
-    fn add_custom_child_impl(
-        &mut self,
-        column: FieldPosition,
-        advanced: bool,
-        child: impl Into<Html>,
-    ) {
+    fn add_custom_child_impl(&mut self, column: FieldPosition, advanced: bool, child: Html) {
         let (row, start, span) = match column {
             FieldPosition::Left => {
                 self.left_count += 1;
-                (self.left_count, 1, 3)
+                (self.left_count, 1, 4)
             }
             FieldPosition::Right => {
                 self.two_column = true;
                 self.right_count += 1;
-                (self.right_count, 3, -1)
+                (self.right_count, 4, -1)
             }
             FieldPosition::Large => {
                 self.two_column = true;
@@ -161,7 +157,6 @@ impl InputPanel {
         };
 
         let class = classes!("pwt-align-self-center");
-        let child = child.into();
         let key = match child.key() {
             Some(key) => key.clone(),
             None => {
@@ -217,7 +212,7 @@ impl InputPanel {
         let style = if visible {
             format!("grid-row: {};", row)
         } else {
-            format!("display: none;")
+            "display: none;".to_string()
         };
 
         let label_id = crate::widget::get_unique_element_id();
@@ -360,43 +355,43 @@ impl Default for InputPanel {
     }
 }
 
-impl Into<VTag> for InputPanel {
-    fn into(mut self) -> VTag {
-        if self.two_column {
-            self.add_class("pwt-form-grid-col4")
+impl From<InputPanel> for VTag {
+    fn from(mut val: InputPanel) -> Self {
+        if val.two_column {
+            val.add_class("pwt-form-grid-col4")
         } else {
-            self.add_class("pwt-form-grid-col2")
+            val.add_class("pwt-form-grid-col2")
         }
 
-        if self.label_width.is_some() || self.field_width.is_some() {
+        if val.label_width.is_some() || val.field_width.is_some() {
             let mut column_template = format!(
                 "{} {}",
-                self.label_width
+                val.label_width
                     .as_deref()
                     .unwrap_or("minmax(130px, 0.65fr)"),
-                self.field_width.as_deref().unwrap_or("minmax(200px, 1fr)")
+                val.field_width.as_deref().unwrap_or("minmax(200px, 1fr)")
             );
 
-            if self.two_column {
+            if val.two_column {
                 column_template = format!(
                     "{} calc(var(--pwt-spacer-4) * 2) {}",
                     column_template, column_template
                 );
             }
 
-            self.set_style("grid-template-columns", column_template.to_string());
+            val.set_style("grid-template-columns", column_template.to_string());
         }
 
-        let attributes = self.std_props.cumulate_attributes(None::<&str>);
+        let attributes = val.std_props.cumulate_attributes(None::<&str>);
 
-        let listeners = Listeners::Pending(self.listeners.listeners.into_boxed_slice());
+        let listeners = Listeners::Pending(val.listeners.listeners.into_boxed_slice());
 
-        let children = VList::with_children(self.children, None);
+        let children = VList::with_children(val.children, None);
 
         VTag::__new_other(
             Cow::Borrowed("div"),
-            self.std_props.node_ref,
-            self.std_props.key,
+            val.std_props.node_ref,
+            val.std_props.key,
             attributes,
             listeners,
             children.into(),

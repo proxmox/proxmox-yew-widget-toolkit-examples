@@ -65,7 +65,7 @@ impl From<Html> for MenuEntry {
     }
 }
 
-/// Messages for the menu controller ([Menu], [MenuBar] or [MenuButton])
+/// Messages for the menu controller ([Menu] or [MenuButton])
 #[doc(hidden)]
 pub enum MenuControllerMsg {
     Next,
@@ -113,17 +113,9 @@ pub struct Menu {
     pub(crate) on_close: Option<Callback<()>>,
 }
 
-/// Operating system like menu bar.
-pub struct MenuBar;
-
-impl MenuBar {
-    /// Create a new menu bar.
-    ///
-    /// Which is just a [Menu] with special horizontal layout.
-    ///
-    /// See <https://www.w3.org/WAI/ARIA/apg/patterns/menu/>.
-    pub fn new() -> Menu {
-        Menu::new().menubar(true)
+impl Default for Menu {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -131,6 +123,13 @@ impl Menu {
     /// Create a new instance.
     pub fn new() -> Self {
         yew::props!(Self {})
+    }
+
+    /// Create a new instance with a horizontal layout.
+    ///
+    /// See <https://www.w3.org/WAI/ARIA/apg/patterns/menubar/>
+    pub fn new_menubar() -> Self {
+        Menu::new().menubar(true)
     }
 
     /// Builder style method to add a html class.
@@ -217,10 +216,7 @@ impl PwtMenu {
 
     // find the first focusable element inside an menu item
     fn get_focus_el(&self, cursor: usize) -> Option<web_sys::HtmlElement> {
-        let menu_el = match self.inner_ref.cast::<web_sys::Element>() {
-            Some(el) => el,
-            None => return None,
-        };
+        let menu_el = self.inner_ref.cast::<web_sys::Element>()?;
 
         let selector = format!(":scope > li[data-index='{}']", cursor);
         let item_el = match menu_el.query_selector(&selector) {
@@ -237,10 +233,7 @@ impl PwtMenu {
             None => return false,
         };
 
-        let res = match focus_el.focus() {
-            Ok(_) => true,
-            Err(_) => false,
-        };
+        let res = focus_el.focus().is_ok();
 
         if has_focus {
             //log::info!("FOCUS {:?}", focus_el);
@@ -380,7 +373,7 @@ impl Component for PwtMenu {
                     self.set_cursor(cursor, true);
                 }
                 //log::info!("CLOSE {} {} {}", self.unique_id, self.show_submenu, self.inside_submenu);
-                return true;
+                true
             }
             Msg::Redraw => true,
             Msg::Next => {
@@ -432,7 +425,7 @@ impl Component for PwtMenu {
                         }
                     }
                     None => {
-                        if props.children.len() == 0 {
+                        if props.children.is_empty() {
                             return false;
                         } else {
                             props.children.len() - 1
@@ -481,7 +474,7 @@ impl Component for PwtMenu {
                     }
                 }
 
-                if show == false {
+                if !show {
                     if let Some(on_close) = &props.on_close {
                         //log::info!("PROPAGATE CLOSE {} {}", self.unique_id, show);
                         on_close.emit(());
@@ -606,7 +599,7 @@ impl Component for PwtMenu {
                     .attribute("id", item_id.clone())
                     .attribute("data-index", i.to_string()) // fixme: remove
                     .attribute("role", "none")
-                    .class((active).then(|| "active"))
+                    .class((active).then_some("active"))
                     .with_child(child)
                     .onkeydown({
                         let link = ctx.link().clone();
@@ -718,9 +711,9 @@ impl Component for PwtMenu {
     }
 }
 
-impl Into<VNode> for Menu {
-    fn into(self) -> VNode {
-        let comp = VComp::new::<PwtMenu>(Rc::new(self), None);
+impl From<Menu> for VNode {
+    fn from(val: Menu) -> Self {
+        let comp = VComp::new::<PwtMenu>(Rc::new(val), None);
         VNode::from(comp)
     }
 }
@@ -730,20 +723,18 @@ impl Into<VNode> for Menu {
 // We need to use unique element IDs instead.
 fn dom_focus_inside_submenu(event: &FocusEvent, item_id: &str) -> bool {
     let mut cur_el: Option<web_sys::Element> = event.target_dyn_into();
-    loop {
-        match cur_el {
-            Some(el) => {
-                if el.id() == item_id {
-                    break;
-                }
-                if el.tag_name() == "UL" {
-                    return true;
-                }
-                cur_el = el.parent_element();
-            }
-            None => break,
+    while let Some(el) = cur_el {
+        if el.id() == item_id {
+            break;
         }
+
+        if el.tag_name() == "UL" {
+            return true;
+        }
+
+        cur_el = el.parent_element();
     }
+
     false
 }
 
