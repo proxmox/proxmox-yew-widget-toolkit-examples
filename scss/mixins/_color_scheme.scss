@@ -41,6 +41,10 @@
     .pwt-bg-color-#{$name} {
         background-color: var(--pwt-color-#{$name});
     }
+    
+    .pwt-bg-color-on-#{$name} {
+        background-color: var(--pwt-color-on-#{$name});
+    }
 
     .pwt-color-on-#{$name} {
         color: var(--pwt-color-on-#{$name});

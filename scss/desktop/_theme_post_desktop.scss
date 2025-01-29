@@ -1,7 +1,18 @@
+/// ### Fine Tuning
+///
+
+/// `pwt-panel-header`, `pwt-menubar`
+/// : use `neutral` color scheme (instead of `surface`)
+///
+
 .pwt-panel-header,
 ul.pwt-menubar {
     @include color-scheme-vars("neutral");
 }
+
+/// `pwt-panel`
+/// : use box shadows instead of normal borders
+///
 
 .pwt-panel.pwt-border,
 .pwt-panel.pwt-rrd-panel {
@@ -14,9 +25,12 @@ ul.pwt-menubar {
     @include color-scheme-vars("dark-surface");
 }
 
-// overwrite content spacer layout
-// - use elevated box with box-shadow
-// - use bigger spacing
+/// `pwt-content-spacer`
+/// : overwrite content spacer layout
+///
+///   - use elevated box with box-shadow
+///   - use bigger spacing
+///
 .pwt-content-spacer {
     padding: var(--pwt-spacer-4);
     gap: var(--pwt-spacer-4);
@@ -32,26 +46,50 @@ ul.pwt-menubar {
     padding: var(--pwt-spacer-4);
 }
 
-h1, .h1 {
+/// `h1`
+/// : use `headline-large` font
+///
+h1,
+.h1 {
     @include font_and_line_height(headline-large);
 }
 
-h2, .h2 {
+/// `h2`
+/// : use `headline-medium` font
+///
+h2,
+.h2 {
     @include font_and_line_height(headline-medium);
 }
 
-h3, .h3 {
+/// `h3`
+/// : use `title-large` font
+///
+h3,
+.h3 {
     @include font_and_line_height(title-large);
 }
 
-h4, .h4 {
+/// `h4`
+/// : use `headline-small` font
+///
+h4,
+.h4 {
     @include font_and_line_height(headline-small);
 }
 
-h5, .h5 {
+/// `h5`
+/// : use `title-medium` font
+///
+h5,
+.h5 {
     @include font_and_line_height(title-medium);
 }
 
-h6, .h6 {
+/// `h6`
+/// : use `title-small` font
+///
+h6,
+.h6 {
     @include font_and_line_height(title-small);
 }

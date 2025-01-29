@@ -1,8 +1,17 @@
+/// ### Fine Tuning
+///
+
+/// `pwt-panel-header`, `pwt-menubar`
+/// : use `neutral` color scheme (instead of `surface`)
+///
 .pwt-panel-header,
 ul.pwt-menubar {
     @include color-scheme-vars("neutral");
 }
 
+/// `pwt-nav-menu`
+/// : add padding
+///
 .pwt-nav-menu {
     padding: var(--pwt-spacer-1);
 }
@@ -17,6 +26,9 @@ ul.pwt-menubar {
     }
 }
 
+/// `pwt-tab-material`
+/// : add padding
+///
 .pwt-tab-material {
     .pwt-nav-link {
         padding: var(--pwt-spacer-1) var(--pwt-spacer-3);
@@ -34,8 +46,11 @@ ul.pwt-menubar {
     }
 }
 
-// overwrite content spacer layout
-// - use elevated box with box-shadow
+/// `pwt-content-spacer`
+/// : overwrite content spacer layout
+///
+/// - use elevated box with box-shadow
+///
 .pwt-content-spacer {
     & > *:not(:only-child) {
         border: 0px !important;

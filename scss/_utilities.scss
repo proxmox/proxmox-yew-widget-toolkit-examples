@@ -1,72 +1,91 @@
-@mixin padding-level($factor, $padding-side:  false) {
-    $property: #{if($padding-side, "padding-#{$padding-side}", "padding")};
-    #{$property}: calc(var(--pwt-spacer-base-width) * $factor) ! important;
-}
-
-@mixin margin-level($factor, $margin-side:  false) {
-    $property: #{if($margin-side, "margin-#{$margin-side}", "margin")};
-    #{$property}: calc(var(--pwt-spacer-base-width) * $factor) ! important;
-}
-
-.pwt-m {
-    @include margin-level(var(--pwt-margin-factor));
-}
-
-.pwt-ms {
-    @include margin-level(var(--pwt-margin-start-factor), "inline-start");
-}
-
-.pwt-me {
-    @include margin-level(var(--pwt-margin-end-factor), "inline-end");
-}
-
-.pwt-mt {
-    @include margin-level(var(--pwt-margin-top-factor), "top");
-}
-
-.pwt-mb {
-    @include margin-level(var(--pwt-margin-bottom-factor), "bottom");
-}
-
-.pwt-mx {
-    @include margin-level(var(--pwt-margin-x-factor), "inline");
-}
-
-.pwt-my {
-    @include margin-level(var(--pwt-margin-y-factor), "top");
-    @include margin-level(var(--pwt-margin-y-factor), "bottom");
-}
-
-.pwt-p {
-    @include padding-level(var(--pwt-padding-factor));
-}
-
-.pwt-ps {
-    @include padding-level(var(--pwt-padding-start-factor), "inline-start");
-}
-
-.pwt-pe {
-    @include padding-level(var(--pwt-padding-end-factor), "inline-end");
-}
-
-.pwt-pt {
-    @include padding-level(var(--pwt-padding-top-factor), "top");
-}
-
-.pwt-pb {
-    @include padding-level(var(--pwt-padding-bottom-factor), "bottom");
-}
-
-.pwt-px {
-    @include padding-level(var(--pwt-padding-x-factor), "inline");
-}
-
-.pwt-py {
-    @include padding-level(var(--pwt-padding-y-factor), "top");
-    @include padding-level(var(--pwt-padding-y-factor), "bottom");
-}
+/// ## Common CSS Utility classes
+///
+/// We provide CSS utility classes for commonly used styles.
+/// The goal is to style widgets primarily through the application
+/// of those CSS classes. Setting the CSS “style” directly is still possible
+/// and is recommended if no appropriate utility class is available.
+///
 
 @each $name in (0, 1, 2, 3, 4) {
+    /// ### Padding
+    ///
+    /// Padding classes comes at 5 different sizes, using a multiple
+    /// of the spacer base width (`size` in 0, 1, 2, 3, 4):
+    ///
+    /// - `pwt-p-<size>`: set `padding` to `size*spacer_width`
+    /// - `pwt-ps-<size>`: set `padding-inline-start` to `size*spacer_width`
+    /// - `pwt-pe-<size>`: set `padding-inline-end` to `size*spacer_width`
+    /// - `pwt-pt-<size>`: set `padding-top` to `size*spacer_width`
+    /// - `pwt-pb-<size>`: set `padding-bottom` to `size*spacer_width`
+    /// - `pwt-px-<size>`: set `padding-inline` to `size*spacer_width`
+    /// - `pwt-py-<size>`: set `padding-block` to `size*spacer_width`
+    ///
+    .pwt-p-#{$name} {
+        padding: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-ps-#{$name} {
+        padding-inline-start: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-pe-#{$name} {
+        padding-inline-end: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-pt-#{$name} {
+        padding-top: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-pb-#{$name} {
+        padding-bottom: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-px-#{$name} {
+        padding-inline: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-py-#{$name} {
+        padding-block: var(--pwt-spacer-#{$name}) !important;
+    }
+
+    /// ### Margin
+    ///
+    /// Margin classes comes at 5 different sizes, using a multiple
+    /// of the spacer base width (`size` in 0, 1, 2, 3, 4):
+    ///
+    /// - `pwt-m-<size>`: set `margin` to `size*spacer_width`
+    /// - `pwt-ms-<size>`: set `margin-inline-start` to `size*spacer_width`
+    /// - `pwt-me-<size>`: set `margin-inline-end` to `size*spacer_width`
+    /// - `pwt-mt-<size>`: set `margin-top` to `size*spacer_width`
+    /// - `pwt-mb-<size>`: set `margin-bottom` to `size*spacer_width`
+    /// - `pwt-mx-<size>`: set `margin-inline` to `size*spacer_width`
+    /// - `pwt-my-<size>`: set `margin-block` to `size*spacer_width`
+    ///
+    .pwt-m-#{$name} {
+        margin: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-ms-#{$name} {
+        margin-inline-start: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-me-#{$name} {
+        margin-inline-end: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-mt-#{$name} {
+        margin-top: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-mb-#{$name} {
+        margin-bottom: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-mx-#{$name} {
+        margin-inline: var(--pwt-spacer-#{$name}) !important;
+    }
+    .pwt-my-#{$name} {
+        margin-block: var(--pwt-spacer-#{$name}) !important;
+    }
+
+    /// ### Flex and Grid Gap
+    ///
+    /// Gap classes comes at 5 different sizes, using a multiple
+    /// of the spacer base width (`size` in 0, 1, 2, 3, 4):
+    ///
+    /// - `pwt-gap-<size>`: set `gap` to `size*spacer_width`
+    /// - `pwt-column-gap-<size>`: set `column-gap` to `size*spacer_width`
+    /// - `pwt-row-gap-<size>`: set `row-gap` to `size*spacer_width`
+    ///
     .pwt-gap-#{$name} {
         gap: var(--pwt-spacer-#{$name}) !important;
     }
@@ -78,32 +97,20 @@
     .pwt-row-gap-#{$name} {
         row-gap: var(--pwt-spacer-#{$name}) !important;
     }
-
-    .pwt-top-#{$name} {
-        top: var(--pwt-spacer-#{$name}) !important;
-    }
-
-    .pwt-bottom-#{$name} {
-        bottom: var(--pwt-spacer-#{$name}) !important;
-    }
-
-    .pwt-left-#{$name} {
-        left: var(--pwt-spacer-#{$name}) !important;
-    }
-
-    .pwt-right-#{$name} {
-        right: var(--pwt-spacer-#{$name}) !important;
-    }
 }
 
-$white-space-values: (normal, nowrap, pre, pre-wrap, pre-line, break-spaces);
+/// ### Text related classes
 
+$white-space-values: (normal, nowrap, pre, pre-wrap, pre-line, break-spaces);
+/// * `.pwt-white-space-<value>`: set `white-space` property to one of
+///   - `normal`, `nowrap`, `pre`, `pre-wrap`, `pre-line` or `break-spaces`.
 @each $value in $white-space-values {
     .pwt-white-space-#{$value} {
         white-space: $value !important;
     }
 }
 
+/// * `pwt-text-truncate`: truncate text if too long using ellipsis.
 .pwt-text-truncate {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -111,7 +118,8 @@ $white-space-values: (normal, nowrap, pre, pre-wrap, pre-line, break-spaces);
 }
 
 $user-select-values: (auto, none, text, all);
-
+/// * `.pwt-user-select-<value>`: set `user-select` property to one of
+///   - `auto`, `none`, `text`, `all`
 @each $value in $user-select-values {
     .pwt-user-select-#{$value} {
         user-select: $value !important;
@@ -119,6 +127,9 @@ $user-select-values: (auto, none, text, all);
 }
 
 $text-align-values: (start, end, left, right, center, justify, justify-all);
+/// * `.pwt-text-align-<value>`: set `text-align` property to one of
+///   - `start`, `end`, `left`, `right`, `center`, `justify`, `justify-all`
+///
 @each $value in $text-align-values {
     .pwt-text-align-#{$value} {
         text-align: $value !important;
@@ -131,8 +142,18 @@ $height-width-values: (
     75: 75%,
     100: 100%,
     auto: auto,
+    min-content: min-content,
+    max-content: max-content,
+    fit-content: fit-content
 );
-
+/// ### Width and Height
+///
+/// For the following values: `25`, `50`, `75`, `100`, `auto`,
+/// `min-content`, `max-content`, `fit-content`
+///
+/// - `pwt-h-<value>`: set `height` to value.
+/// - `pwt-w-<value>`: set `width` to value.
+/// - `pwt-size-<value>`: set `width` and `height` to value.
 @each $name, $value in $height-width-values {
     .pwt-h-#{$name} {
         height: $value !important;
@@ -143,8 +164,16 @@ $height-width-values: (
         width: $value !important;
         box-sizing: border-box;
     }
+
+    .pwt-size-#{$name} {
+        width: $name !important;
+        height: $name !important;
+        box-sizing: border-box;
+    }
 }
 
+/// - `pwt-fit`: fit container into partent container using 100% width and height.
+///   This can be used for non-flexbox layouts (also set `overflow: auto`).
 .pwt-fit {
     width: 100% !important;
     height: 100% !important;
@@ -152,16 +181,8 @@ $height-width-values: (
     box-sizing: border-box;
 }
 
-.pwt-flex-fit {
-    flex: 1 1 auto;
-    overflow: auto !important;
-}
-
-// Apply "flex: 1 1 auto;" to the first child of a container
-.pwt-flex-fill-first-child > :first-child {
-    flex: 1 1 auto;
-}
-
+/// - `pwt-viewport`: set dimensions and position to use the whole
+///   viewport (also set `overflow: auto`).
 .pwt-viewport {
     top: 0;
     left: 0;
@@ -172,16 +193,15 @@ $height-width-values: (
     overflow: hidden !important;
     box-sizing: border-box;
 }
+///
+/// Additionally, all those classes sets `box-sizing` to `border-box`.
+///
 
-$content-sizes: none auto min-content max-content fit-content;
-
-@each $name in $content-sizes {
-    .pwt-size-#{$name} {
-        width: $name !important;
-        height: $name !important;
-    }
-}
-
+/// ### Layout and Flexbox
+///
+/// - `pwt-d-<value>`: set `display` property to one of
+///   - `inline`, `inline-block`, `block`, `grid`, `table`, `table-row`
+///     `table-cell`, `flex`, `inline-flex`, `contents`, `none`
 $display-values: inline inline-block block grid table table-row table-cell flex inline-flex contents none;
 
 @each $name in $display-values {
@@ -190,21 +210,36 @@ $display-values: inline inline-block block grid table table-row table-cell flex 
     }
 }
 
+/// - `pwt-flex-fit`: use available space inside flexbox (`flex: 1 1 auto;overflow: auto;`)
+.pwt-flex-fit {
+    flex: 1 1 auto;
+    overflow: auto !important;
+}
+
+/// - `pwt-flex-fill-first-child`: Apply `flex: 1 1 auto;` to the first child of a container
+.pwt-flex-fill-first-child > :first-child {
+    flex: 1 1 auto;
+}
+
 $flex-values: (
-    fill: 1 1 auto, // same aus auto
-    initial: 0 1 auto,
     auto: 1 1 auto,
-    none: 0 0 auto,
+    fill: 1 1 auto,
+    initial: 0 1 auto,
+    none: 0 0 auto
 );
+/// - `pwt-flex-fill` or `pwt-flex-auto`: set `flex: 1 1 auto;`
+/// - `pwt-flex-initial`: set `flex: 0 1 auto;`
+/// - `pwt-flex-none`: set `flex: 0 0 auto;`
 
 @each $name, $value in $flex-values {
     .pwt-flex-#{$name} {
-	    flex: $value !important;
+        flex: $value !important;
     }
 }
 
 $flex-direction-values: row column row-reverse column-reverse;
-
+/// - `pwt-flex-directzion-<value>`: set `flex-direction` property to one of
+///   - `row`, `column`, `row-reverse`, `column-reverse`
 @each $name in $flex-direction-values {
     .pwt-flex-direction-#{$name} {
         flex-direction: $name !important;
@@ -212,7 +247,8 @@ $flex-direction-values: row column row-reverse column-reverse;
 }
 
 $flex-wrap-values: wrap nowrap wrap-reverse;
-
+/// - `pwt-flex-wrap-<value>`: set `flex-wrap` property to one of
+///   - `wrap`, `nowrap`, `wrap-reverse`
 @each $name in $flex-wrap-values {
     .pwt-flex-#{$name} {
         flex-wrap: $name;
@@ -233,15 +269,18 @@ $justify-content-values: (
     space-evenly,
     stretch
 );
-
+/// - `pwt-justify-content-<value>`: set `justify-content` property to one of
+///   - `start`, `end`, `flex-start`, `flex-end`, `center`, `left`, `right`,
+///     `normal`, `space-between`, `space-around`, `space-evenly`, `stretch`
 @each $value in $justify-content-values {
     .pwt-justify-content-#{$value} {
         justify-content: $value !important;
     }
 }
 
-$align-items-values: (normal, flex-start, flex-end, center, start, end, baseline, stretch);
-
+$align-items-values: (start, end, flex-start, flex-end, normal, center, baseline, stretch);
+/// - `pwt-align-items-<value>`: set `align-items` property to one of
+///   -  `start`, `end`, `flex-start`, `flex-end`, `normal`, `center`, `baseline`, `stretch`
 @each $value in $align-items-values {
     .pwt-align-items-#{$value} {
         align-items: $value !important;
@@ -249,7 +288,8 @@ $align-items-values: (normal, flex-start, flex-end, center, start, end, baseline
 }
 
 $align-self-values: (auto, normal, flex-start, flex-end, center, baseline, stretch);
-
+/// - `pwt-align-self-<value>`: set `align-self` property to one of
+///   - `auto`, `normal`, `flex-start`, `flex-end`, `center`, `baseline`, `stretch`
 @each $value in $align-self-values {
     .pwt-align-self-#{$value} {
         align-self: $value !important;
@@ -257,149 +297,176 @@ $align-self-values: (auto, normal, flex-start, flex-end, center, baseline, stret
 }
 
 $align-content-values: (start, center, end, space-between, space-around, stretch);
-
+/// - `pwt-align-content-<value>`: set `align-content` property to one of
+///   - `start`, `center`, `end`, `space-between`, `space-around`, `stretch`
 @each $value in $align-items-values {
     .pwt-align-content-#{$value} {
         align-content: $value !important;
     }
 }
 
-$overflow-values: auto hidden visible scroll;
-
+/// ### Overflow (Scrollbars)
+///
+/// For the following values: `auto`, `hidden`, `visible`, `scroll`
+///
+$overflow-values: auto clip hidden visible scroll;
 @each $value in $overflow-values {
+    /// - `pwt-overflow-<value>`: set `overflow` property to value
     .pwt-overflow-#{$value} {
         overflow: $value !important;
     }
-
+    /// - `pwt-overflow-x-<value>`: set `overflow-x` property to value
     .pwt-overflow-x-#{$value} {
         overflow-x: $value !important;
     }
-
+    /// - `pwt-overflow-y-<value>`: set `overflow-y` property to value
     .pwt-overflow-y-#{$value} {
         overflow-y: $value !important;
     }
 }
 
+/// ### Position
+///
 $position-values: absolute fixed relative sticky static;
-
+/// For the following values: `absolute`, `fixed`, `relative`, `sticky`, `static`;
+/// - `pwt-position-<value>`: set `position` property to value
 @each $value in $position-values {
     .pwt-position-#{$value} {
         position: $value !important;
     }
 }
 
+/// ### Borders
+///
+/// - `pwt-border`: add border on all sides
 .pwt-border {
     border: 1px solid var(--pwt-color-border) !important;
 }
-
+/// - `pwt-no-border`: remove all borders
 .pwt-no-border {
     border: 0 !important;
 }
-
+/// - `pwt-border-top`: add border on top
 .pwt-border-top {
     border-top: 1px solid var(--pwt-color-border) !important;
 }
-
+/// - `pwt-no-border-top`: remove top border
 .pwt-no-border-top {
     border-top: 0 !important;
 }
-
+/// - `pwt-border-left`: add border on the left side
 .pwt-border-left {
     border-left: 1px solid var(--pwt-color-border) !important;
 }
-
+/// - `pwt-no-border-left`: remove left border
 .pwt-no-border-left {
     border-left: 0 !important;
 }
-
+/// - `pwt-border-start`: add border on start side
 .pwt-border-start {
     border-inline-start: 1px solid var(--pwt-color-border) !important;
 }
-
+/// - `pwt-no-border-start`: remove start border
 .pwt-no-border-start {
     border-inline-start: 0 !important;
 }
-
+/// - `pwt-border-right`: add border on the right side
 .pwt-border-right {
     border-right: 1px solid var(--pwt-color-border) !important;
 }
-
+/// - `pwt-no-border-right`: remove right border
 .pwt-no-border-right {
     border-right: 0 !important;
 }
-
+/// - `pwt-border-end`: add border on end side
 .pwt-border-end {
     border-inline-end: 1px solid var(--pwt-color-border) !important;
 }
-
+/// - `pwt-no-border-end`: remove end border
 .pwt-no-border-end {
     border-inline-end: 0 !important;
 }
-
+/// - `pwt-border-bottom`: add border on bottom
 .pwt-border-bottom {
     border-bottom: 1px solid var(--pwt-color-border) !important;
 }
-
+/// - `pwt-no-border-bottom`: remove bottom border
 .pwt-no-border-bottom {
     border-bottom: 0 !important;
 }
 
+/// ### Shapes
+///
+/// - `pwt-shape-circle`: make it a circle (fully rounded corners)
+///
 .pwt-shape-circle {
     border-radius: var(--pwt-shape-corner-full);
     line-height: 1em;
 }
 
+/// For the following values: `none`, `extra-small`, `small`, `medium`, `large`,
+/// `extra-large`, `full`
+///
 @each $name in (none, extra-small, small, medium, large, extra-large, full) {
+    /// - `pwt-shape-<value>`: set `border-radius` to the value defined for the theme
     .pwt-shape-#{$name} {
         border-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
-
+    /// - `pwt-shape-top-<value>`: set `border-top-left-radius` and `border-top-right-radius`
     .pwt-shape-top-#{$name} {
         border-top-left-radius: var(--pwt-shape-corner-#{$name}) !important;
         border-top-right-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
-
+    /// - `pwt-shape-bottom-<value>`: set `border-bottom-left-radius` and `border-bottom-right-radius`
     .pwt-shape-bottom-#{$name} {
         border-bottom-left-radius: var(--pwt-shape-corner-#{$name}) !important;
         border-bottom-right-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
-
+    /// - `pwt-shape-start-<value>`: set `border-start-start-radius` and `border-end-start-radius`
     .pwt-shape-start-#{$name} {
         border-start-start-radius: var(--pwt-shape-corner-#{$name}) !important;
         border-end-start-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
-
+    /// - `pwt-shape-end-<value>`: set `border-start-end-radius` and `border-end-end-radius`
     .pwt-shape-end-#{$name} {
         border-start-end-radius: var(--pwt-shape-corner-#{$name}) !important;
         border-end-end-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
-
+    /// - `pwt-shape-top-start-<value>`: set `border-start-start-radius`
     .pwt-shape-top-start-#{$name} {
         border-start-start-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
-
+    /// - `pwt-shape-top-end-<value>`: set `border-start-end-radius`
     .pwt-shape-top-end-#{$name} {
         border-start-end-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
-
+    /// - `pwt-shape-bottom-start-<value>`: set `border-end-start-radius`
     .pwt-shape-bottom-start-#{$name} {
         border-end-start-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
-
+    /// - `pwt-shape-bottom-end-<value>`: set `border-end-end-radius`
     .pwt-shape-bottom-end-#{$name} {
         border-end-end-radius: var(--pwt-shape-corner-#{$name}) !important;
     }
 }
 
+/// ### Box Shadows
+///
+/// For the following elevation levels: 0, 1, 2, 3, 4, 5
 @each $level, $distance in $elevation-levels {
-    .pwt-shadow#{$level} {
+    /// - `pwt-shadow-<level>`: add box shadow as defined in the theme
+    .pwt-shadow-#{$level} {
         @include elevation-box-shadow($level);
     }
 }
 
+/// ### Rendering
+///
 @each $opacity in (0, 25, 50, 75, 100) {
+    /// - `pwt-opacity-<value>`: set `opacity` property to percentage for values in
+    ///   - 0, 25, 50, 75, 100
     .pwt-opacity-#{$opacity} {
-        $opacity: $opacity + '%';
+        $opacity: $opacity + "%";
         opacity: #{$opacity};
     }
 }

@@ -1,14 +1,25 @@
+/// ### The "Desktop" Theme
+///
+/// This theme is meant to be used on standard desktops with large
+/// screen sizes. The default spacer width is `5px`, and it uses a
+/// relatively small corner radius.
+///
+/// The primary color is used as default accent color.
+
 $spacer: 5px;
 
 $default-accent-color: primary;
 
-$shape-corner: map-merge($shape-corner, (
-    extra-small: 2px,
-    small: 4px,
-    medium: 6px,
-    large: 8px,
-    extra-large: 14px,
-));
+$shape-corner: map-merge(
+    $shape-corner,
+    (
+        extra-small: 2px,
+        small: 4px,
+        medium: 6px,
+        large: 8px,
+        extra-large: 14px
+    )
+);
 
 // mostly a re-defininition them to use above modified values.
 $button-corner-shape: map-get($shape-corner, extra-small);

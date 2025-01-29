@@ -9,3 +9,8 @@ roboto_flex_filename = "RobotoFlexVariableFont.ttf"
 
 update-roboto-flex:
 	wget "${roboto_base_url}/${roboto_flex_src}" -O "${FONT_DIR}/${roboto_flex_filename}"
+
+
+.PHONY: Documentation.md
+Documentation.md:
+	./extract-scss-doc.sh > $@
