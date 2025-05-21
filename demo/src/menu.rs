@@ -1,9 +1,7 @@
 use pwt::prelude::*;
 
 use pwt::widget::form::Form;
-use pwt::widget::menu::{
-    dispatch_menu_close_event, Menu, MenuBar, MenuButton, MenuCheckbox, MenuItem,
-};
+use pwt::widget::menu::{dispatch_menu_close_event, Menu, MenuButton, MenuCheckbox, MenuItem};
 use pwt::widget::{Button, Column, Container, Panel, Toolbar};
 
 fn panel_with_menu_button() -> Html {
@@ -100,7 +98,7 @@ fn panel_with_menubar() -> Html {
             .with_item(MenuItem::new("Submenu1 Item2")),
     );
 
-    let menubar = MenuBar::new()
+    let menubar = Menu::new_menubar()
         .class("pwt-flex-fill")
         .with_item(submenu1)
         .with_item(checkboxes)
