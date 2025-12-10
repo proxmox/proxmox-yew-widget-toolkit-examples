@@ -2,8 +2,6 @@
 
 mod action_icon;
 pub use action_icon::ActionIcon;
-#[doc(hidden)]
-pub use action_icon::PwtActionIcon;
 
 mod alert_dialog;
 pub use alert_dialog::AlertDialog;
@@ -54,8 +52,6 @@ pub use dropdown::{Dropdown, DropdownController};
 
 mod fa;
 pub use fa::Fa;
-#[doc(hidden)]
-pub use fa::PwtFa;
 
 mod file_button;
 pub use file_button::FileButton;
@@ -69,11 +65,14 @@ pub use field_label::FieldLabel;
 #[doc(hidden)]
 pub use field_label::PwtFieldLabel;
 
+mod image;
+pub use image::Image;
+
 mod input;
 pub use input::Input;
 
 mod input_panel;
-pub use input_panel::{FieldPosition, InputPanel};
+pub use input_panel::{FieldPosition, InputPanel, Labelable};
 
 mod language_selector;
 pub use language_selector::LanguageSelector;

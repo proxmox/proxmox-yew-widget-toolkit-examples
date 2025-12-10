@@ -3,7 +3,7 @@ use html::IntoPropValue;
 
 use crate::prelude::*;
 
-use crate::props::{EventSubscriber, WidgetBuilder};
+use crate::props::{EventSubscriber, PwtSpace, WidgetBuilder};
 
 use crate::widget::Container;
 
@@ -74,6 +74,50 @@ pub struct List {
     #[builder(IntoPropValue, into_prop_value)]
     pub grid_template_columns: AttrValue,
 
+    /// The list uses a html grid layout, and you can set the 'column-gap' property.
+    ///
+    ///  ```
+    /// # use pwt::prelude::*;
+    /// # use pwt::widget::{List, ListTile};
+    /// # fn create_list_tile() -> List {
+    ///     List::new(100, |pos| {
+    ///         ListTile::new()
+    ///             .with_child(html!{<span>{format!("{pos}")}</span>})
+    ///             .with_child(html!{<span>{"A simple list tile"}</span>})
+    ///     })
+    ///     // Use a two column layout.
+    ///     .grid_template_columns("auto 1fr")
+    ///     .column_gap(1)
+    /// # }
+    /// ```
+    ///
+    /// see: <https://developer.mozilla.org/en-US/docs/Web/CSS/column-gap>
+    #[prop_or(PwtSpace::None)]
+    #[builder(Into, into)]
+    pub column_gap: PwtSpace,
+
+    /// The list uses a html grid layout, and you can set the 'row-gap' property.
+    ///
+    ///  ```
+    /// # use pwt::prelude::*;
+    /// # use pwt::widget::{List, ListTile};
+    /// # fn create_list_tile() -> List {
+    ///     List::new(100, |pos| {
+    ///         ListTile::new()
+    ///             .with_child(html!{<span>{format!("{pos}")}</span>})
+    ///             .with_child(html!{<span>{"A simple list tile"}</span>})
+    ///     })
+    ///     // Use a two column layout.
+    ///     .grid_template_columns("auto 1fr")
+    ///     .row_gap(1)
+    /// # }
+    /// ```
+    ///
+    /// see: <https://developer.mozilla.org/en-US/docs/Web/CSS/row-gap>
+    #[prop_or(PwtSpace::None)]
+    #[builder(Into, into)]
+    pub row_gap: PwtSpace,
+
     /// Virtual Scroll
     ///
     /// Virtual scroll is enabled by default for lists with more than 30 rows.
@@ -109,6 +153,13 @@ impl List {
         yew::props!(List {
             item_count,
             renderer: renderer.into()
+        })
+    }
+
+    /// Create a new instance from a list of tiles.
+    pub fn from_tiles(tiles: Vec<ListTile>) -> Self {
+        Self::new(tiles.len() as u64, move |pos| {
+            tiles[pos as usize].clone().into()
         })
     }
 }
@@ -270,6 +321,20 @@ impl PwtList {
             .attribute("data-list-offset", self.scroll_info.offset.to_string())
             .style("display", "grid")
             .style("grid-template-columns", &props.grid_template_columns)
+            .style(
+                "column-gap",
+                match props.column_gap {
+                    PwtSpace::None => None,
+                    other => Some(AttrValue::from(other)),
+                },
+            )
+            .style(
+                "row-gap",
+                match props.row_gap {
+                    PwtSpace::None => None,
+                    other => Some(AttrValue::from(other)),
+                },
+            )
             .style("--pwt-list-tile-min-height", min_height)
             .style("position", "relative")
             .style("top", format!("{}px", self.scroll_info.offset));
@@ -409,13 +474,21 @@ impl Component for PwtList {
         }
     }
 
+    fn changed(&mut self, ctx: &Context<Self>, old_props: &Self::Properties) -> bool {
+        let props = ctx.props();
+
+        if props.item_count != old_props.item_count {
+            self.update_scroll_info(props);
+        }
+        true
+    }
+
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
 
         let content = self.render_content(ctx, props);
 
         Container::from_widget_props(props.std_props.clone(), Some(props.listeners.clone()))
-            .node_ref(self.viewport_ref.clone())
             .class("pwt-list")
             .attribute("role", "list")
             .style("overflow-anchor", "none")
@@ -424,7 +497,7 @@ impl Component for PwtList {
                 target.map(|el| Msg::ScrollTo(el.scroll_left(), el.scroll_top()))
             }))
             .with_child(content)
-            .into()
+            .into_html_with_ref(self.viewport_ref.clone())
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {

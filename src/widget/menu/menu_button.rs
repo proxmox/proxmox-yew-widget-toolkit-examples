@@ -6,6 +6,8 @@ use yew::prelude::*;
 use crate::dom::focus::FocusTracker;
 use crate::prelude::*;
 use crate::props::{BuilderFn, IntoOptionalBuilderFn};
+use crate::state::SharedStateObserver;
+use crate::widget::menu::MenuController;
 use crate::widget::{Button, Container};
 
 use super::{Menu, MenuControllerMsg, MenuPopper};
@@ -19,9 +21,13 @@ use pwt_macros::{builder, widget};
 #[derive(Clone, PartialEq, Properties)]
 #[builder]
 pub struct MenuButton {
+    /// Button text.
     pub text: AttrValue,
+
+    /// Icon (CSS class).
     #[prop_or_default]
     pub icon_class: Option<Classes>,
+
     /// Optional Submenu
     #[prop_or_default]
     pub menu: Option<Menu>,
@@ -38,9 +44,11 @@ pub struct MenuButton {
     /// You can then open the menu programmatically by giving the
     /// button focus.
     #[prop_or_default]
+    #[builder]
     pub autoshow_menu: bool,
 
     #[prop_or_default]
+    #[builder]
     pub disabled: bool,
 
     /// Whether to show an arrow at the end of the menu.
@@ -49,50 +57,23 @@ pub struct MenuButton {
     pub show_arrow: bool,
 
     #[prop_or_default]
+    #[builder(IntoPropValue, into_prop_value)]
     pub tabindex: Option<i32>,
 
     // Fires on menu close
     #[prop_or_default]
+    #[builder_cb(IntoEventCallback, into_event_callback, ())]
     pub on_close: Option<Callback<()>>,
+
+    #[builder_cb(IntoPropValue, into_prop_value, Option<MenuController>)]
+    #[prop_or_default]
+    pub(crate) menu_controller: Option<MenuController>,
 }
 
 impl MenuButton {
     /// Create a new menu button
     pub fn new(text: impl Into<AttrValue>) -> Self {
         yew::props!(Self { text: text.into() })
-    }
-
-    /// Builder style method to set the autoshow_menu flag
-    pub fn autoshow_menu(mut self, autoshow_menu: bool) -> Self {
-        self.set_autoshow_menu(autoshow_menu);
-        self
-    }
-
-    /// Method to set the autoshow_menu flag
-    pub fn set_autoshow_menu(&mut self, autoshow_menu: bool) {
-        self.autoshow_menu = autoshow_menu;
-    }
-
-    /// Builder style method to set the disabled flag
-    pub fn disabled(mut self, disabled: bool) -> Self {
-        self.set_disabled(disabled);
-        self
-    }
-
-    /// Method to set the disabled flag
-    pub fn set_disabled(&mut self, disabled: bool) {
-        self.disabled = disabled;
-    }
-
-    /// Builder style method to set the html tabindex attribute
-    pub fn tabindex(mut self, index: impl IntoPropValue<Option<i32>>) -> Self {
-        self.set_tabindex(index);
-        self
-    }
-
-    /// Method to set the html tabindex attribute
-    pub fn set_tabindex(&mut self, index: impl IntoPropValue<Option<i32>>) {
-        self.tabindex = index.into_prop_value();
     }
 
     /// Builder style method to set the icon class.
@@ -117,34 +98,53 @@ impl MenuButton {
         self.menu_builder = builder.into_optional_builder_fn();
         self
     }
-
-    /// Builder style method to set the on_close callback
-    pub fn on_close(mut self, cb: impl IntoEventCallback<()>) -> Self {
-        self.on_close = cb.into_event_callback();
-        self
-    }
 }
 
 pub enum Msg {
     ShowMenu,
     CloseMenu,
     FocusChange(bool),
+    Controller, // MenuController has new messages
 }
 
 #[doc(hidden)]
 pub struct PwtMenuButton {
+    align_ref: NodeRef,
     submenu_ref: NodeRef,
     popper: MenuPopper,
-    menu_controller: Callback<MenuControllerMsg>,
+    menu_controller: MenuController,
+    _menu_controller_observer: SharedStateObserver<Vec<MenuControllerMsg>>,
     show_submenu: bool,
     focus_tracker: FocusTracker,
 }
 
 impl PwtMenuButton {
-    fn restore_focus(&mut self, props: &MenuButton) {
-        if let Some(node) = props.std_props.node_ref.get() {
+    fn restore_focus(&mut self, _props: &MenuButton) {
+        if let Some(node) = self.align_ref.get() {
             if let Ok(el) = node.dyn_into::<web_sys::HtmlElement>() {
                 let _ = el.focus();
+            }
+        }
+    }
+
+    fn handle_controller_messages(&mut self, ctx: &Context<Self>) {
+        let count = self.menu_controller.state.read().len();
+        if count == 0 {
+            return;
+        } // Note: avoid endless loop
+
+        let list = self.menu_controller.state.write().split_off(0);
+
+        for msg in list.into_iter() {
+            match msg {
+                MenuControllerMsg::Open => {
+                    ctx.link().send_message(Msg::ShowMenu);
+                }
+                MenuControllerMsg::Collapse => {
+                    ctx.link().send_message(Msg::CloseMenu);
+                }
+                MenuControllerMsg::Next => { /* ignore */ }
+                MenuControllerMsg::Previous => { /* ignore  */ }
             }
         }
     }
@@ -157,42 +157,40 @@ impl Component for PwtMenuButton {
     fn create(ctx: &Context<Self>) -> Self {
         let props = ctx.props();
         let submenu_ref = NodeRef::default();
-        let popper = MenuPopper::new(props.std_props.node_ref.clone(), submenu_ref.clone(), true);
 
-        let menu_controller = {
-            let link = ctx.link().clone();
-            Callback::from(move |msg: MenuControllerMsg| {
-                match msg {
-                    MenuControllerMsg::Next => { /* ignore */ }
-                    MenuControllerMsg::Previous => { /* ignore */ }
-                    MenuControllerMsg::Collapse => link.send_message(Msg::CloseMenu),
-                }
-            })
-        };
+        let align_ref = NodeRef::default();
+
+        let popper = MenuPopper::new(align_ref.clone(), submenu_ref.clone(), true);
+
+        let menu_controller = props
+            .menu_controller
+            .clone()
+            .unwrap_or_else(|| MenuController::new());
+
+        let _menu_controller_observer = menu_controller
+            .state
+            .add_listener(ctx.link().callback(|_| Msg::Controller));
 
         let focus_tracker = FocusTracker::new(ctx.link().callback(Msg::FocusChange));
 
         Self {
+            align_ref,
             submenu_ref,
             popper,
             menu_controller,
+            _menu_controller_observer,
             show_submenu: false,
             focus_tracker,
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
-        self.popper.update_refs(
-            ctx.props().std_props.node_ref.clone(),
-            self.submenu_ref.clone(),
-        );
-
-        true
-    }
-
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         let props = ctx.props();
         match msg {
+            Msg::Controller => {
+                self.handle_controller_messages(ctx);
+                true
+            }
             Msg::ShowMenu => {
                 self.show_submenu = true;
                 true
@@ -241,13 +239,15 @@ impl Component for PwtMenuButton {
 
             Container::new()
                 .attribute("role", "none")
-                .node_ref(self.submenu_ref.clone())
                 .class("pwt-submenu")
                 .with_optional_child(menu)
+                .into_html_with_ref(self.submenu_ref.clone())
         });
 
         let mut button = Button::new(&props.text)
+            .node_ref(self.align_ref.clone())
             .show_arrow(props.show_arrow)
+            .disabled(props.disabled)
             .attribute("aria-haspopup", "true")
             .attribute("aria-expanded", self.show_submenu.then_some("true"))
             .tabindex(props.tabindex)

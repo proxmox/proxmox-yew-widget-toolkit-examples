@@ -62,6 +62,14 @@ pub struct Selector<S: DataStore + 'static> {
     #[prop_or_default]
     pub default: Option<AttrValue>,
 
+    /// Force value.
+    ///
+    /// To implement controlled components (for use without a FormContext).
+    /// This is ignored if the field has a name.
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or_default]
+    pub value: Option<AttrValue>,
+
     /// Make the input editable.
     #[prop_or_default]
     #[builder]
@@ -228,15 +236,14 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
 
     fn setup(props: &Self::Properties) -> ManagedFieldState {
         let default: Value = props.default.as_deref().unwrap_or("").to_string().into();
-        let value = default.clone();
 
-        ManagedFieldState {
-            value,
-            valid: Ok(()),
-            default,
-            radio_group: false,
-            unique: false,
-        }
+        let value = if let Some(force_value) = &props.value {
+            force_value.to_string().into()
+        } else {
+            default.clone()
+        };
+
+        ManagedFieldState::new(value, default)
     }
 
     fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
@@ -349,6 +356,11 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
             reload = true;
         }
 
+        if props.value != old_props.value {
+            ctx.link()
+                .force_value(props.value.as_ref().map(|v| v.to_string()), None);
+        }
+
         if reload {
             self.load(ctx);
         }
@@ -361,7 +373,7 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
         let state = ctx.state();
 
         let value = state.value.as_str().unwrap_or("").to_owned();
-        let valid = state.valid.clone();
+        let validation_result = &state.result;
 
         let picker = {
             let picker = props.picker.clone();
@@ -408,7 +420,7 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
             }
         };
 
-        let tip = match &valid {
+        let tip = match validation_result {
             Err(msg) => Some(msg.to_string()),
             Ok(_) => None,
         };
@@ -430,7 +442,7 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
             trigger.push((
                 Trigger::new("fa fa-times")
                     .tip(tr!("Clear Value"))
-                    .onclick(ctx.link().callback(|_| Msg::DeleteKey)),
+                    .on_activate(ctx.link().callback(|_| Msg::DeleteKey)),
                 true,
             ));
         }
@@ -439,7 +451,7 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
             .with_std_props(&props.std_props)
             .with_input_props(&props.input_props)
             .editable(props.editable)
-            .valid(valid.is_ok())
+            .valid(validation_result.is_ok())
             .onkeydown(onkeydown)
             .on_change(ctx.link().callback(|key: String| Msg::Select(key)))
             .value(value)

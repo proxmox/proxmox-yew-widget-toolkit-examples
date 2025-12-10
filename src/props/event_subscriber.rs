@@ -42,19 +42,23 @@ impl PartialEq for ListenersWrapper {
 }
 
 macro_rules! handler {
-    ($id:ident, $et:ty) => {
+    ($id:ident, $add_id:ident, $et:ty) => {
         /// Builder style method to set the callback
         fn $id(mut self, cb: impl ::yew::html::IntoEventCallback<$et>) -> Self {
+            self.$add_id(cb);
+            self
+        }
+
+        /// Method to set the callback
+        fn $add_id(&mut self, cb: impl ::yew::html::IntoEventCallback<$et>) {
             if let Some(cb) = cb.into_event_callback() {
                 let listener: ::std::rc::Rc<dyn ::yew::virtual_dom::Listener> =
                     Rc::new(yew::html::$id::Wrapper::new(cb));
                 self.as_listeners_mut().listeners.push(Some(listener));
             }
-            self
         }
     };
 }
-
 /// Defines builder methods on [ListenersWrapper].
 ///
 /// This trait defines builder method for all Html events.
@@ -68,111 +72,119 @@ pub trait EventSubscriber: Into<VNode> {
         self
     }
 
-    handler!(onauxclick, MouseEvent);
-    handler!(onclick, MouseEvent);
-    handler!(oncontextmenu, MouseEvent);
-    handler!(ondblclick, MouseEvent);
-    handler!(onmousedown, MouseEvent);
-    handler!(onmouseenter, MouseEvent);
-    handler!(onmouseleave, MouseEvent);
-    handler!(onmousemove, MouseEvent);
-    handler!(onmouseout, MouseEvent);
-    handler!(onmouseover, MouseEvent);
-    handler!(onmouseup, MouseEvent);
+    handler!(onauxclick, add_onauxclick, MouseEvent);
+    handler!(onclick, add_onclick, MouseEvent);
+    handler!(oncontextmenu, add_oncontextmenu, MouseEvent);
+    handler!(ondblclick, add_ondblclick, MouseEvent);
+    handler!(onmousedown, add_onmousedown, MouseEvent);
+    handler!(onmouseenter, add_onmouseenter, MouseEvent);
+    handler!(onmouseleave, add_onmouseleave, MouseEvent);
+    handler!(onmousemove, add_onmousemove, MouseEvent);
+    handler!(onmouseout, add_onmouseout, MouseEvent);
+    handler!(onmouseover, add_onmouseover, MouseEvent);
+    handler!(onmouseup, add_onmouseup, MouseEvent);
 
-    handler!(onkeydown, KeyboardEvent);
-    handler!(onkeyup, KeyboardEvent);
-    handler!(onkeypress, KeyboardEvent);
+    handler!(onkeydown, add_onkeydown, KeyboardEvent);
+    handler!(onkeyup, add_onkeyup, KeyboardEvent);
+    handler!(onkeypress, add_onkeypress, KeyboardEvent);
 
-    handler!(oninput, InputEvent);
+    handler!(oninput, add_oninput, InputEvent);
 
-    handler!(onblur, FocusEvent);
-    handler!(onfocus, FocusEvent);
-    handler!(onfocusin, FocusEvent);
-    handler!(onfocusout, FocusEvent);
-    handler!(onsubmit, SubmitEvent);
+    handler!(onblur, add_onblur, FocusEvent);
+    handler!(onfocus, add_onfocus, FocusEvent);
+    handler!(onfocusin, add_onfocusin, FocusEvent);
+    handler!(onfocusout, add_onfocusout, FocusEvent);
+    handler!(onsubmit, add_onsubmit, SubmitEvent);
 
-    handler!(onabort, Event);
-    handler!(oncancel, Event);
-    handler!(oncanplay, Event);
-    handler!(oncanplaythrough, Event);
-    handler!(onchange, Event);
-    handler!(onclose, Event);
-    handler!(oncuechange, Event);
-    handler!(ondurationchange, Event);
-    handler!(onemptied, Event);
-    handler!(onended, Event);
-    handler!(onerror, Event);
-    handler!(onformdata, Event);
-    handler!(oninvalid, Event);
-    handler!(onload, Event);
-    handler!(onloadeddata, Event);
-    handler!(onloadedmetadata, Event);
-    handler!(onpause, Event);
-    handler!(onplay, Event);
-    handler!(onplaying, Event);
-    handler!(onratechange, Event);
-    handler!(onreset, Event);
-    handler!(onresize, Event);
-    handler!(onscroll, Event);
-    handler!(onsecuritypolicyviolation, Event);
-    handler!(onseeked, Event);
-    handler!(onseeking, Event);
-    handler!(onselect, Event);
-    handler!(onslotchange, Event);
-    handler!(onstalled, Event);
-    handler!(onsuspend, Event);
-    handler!(ontimeupdate, Event);
-    handler!(ontoggle, Event);
-    handler!(onvolumechange, Event);
-    handler!(onwaiting, Event);
-    handler!(oncopy, Event);
-    handler!(oncut, Event);
-    handler!(onpaste, Event);
-    handler!(onpointerlockchange, Event);
-    handler!(onpointerlockerror, Event);
-    handler!(onselectionchange, Event);
-    handler!(onselectstart, Event);
-    handler!(onshow, Event);
+    handler!(onabort, add_onabort, Event);
+    handler!(oncancel, add_oncancel, Event);
+    handler!(oncanplay, add_oncanplay, Event);
+    handler!(oncanplaythrough, add_oncanplaythrough, Event);
+    handler!(onchange, add_onchange, Event);
+    handler!(onclose, add_onclose, Event);
+    handler!(oncuechange, add_oncuechange, Event);
+    handler!(ondurationchange, add_ondurationchange, Event);
+    handler!(onemptied, add_onemptied, Event);
+    handler!(onended, add_onended, Event);
+    handler!(onerror, add_onerror, Event);
+    handler!(onformdata, add_onformdata, Event);
+    handler!(oninvalid, add_oninvalid, Event);
+    handler!(onload, add_onload, Event);
+    handler!(onloadeddata, add_onloadeddata, Event);
+    handler!(onloadedmetadata, add_onloadedmetadata, Event);
+    handler!(onpause, add_onpause, Event);
+    handler!(onplay, add_onplay, Event);
+    handler!(onplaying, add_onplaying, Event);
+    handler!(onratechange, add_onratechange, Event);
+    handler!(onreset, add_onreset, Event);
+    handler!(onresize, add_onresize, Event);
+    handler!(onscroll, add_onscroll, Event);
+    handler!(
+        onsecuritypolicyviolation,
+        add_onsecuritypolicyviolation,
+        Event
+    );
+    handler!(onseeked, add_onseeked, Event);
+    handler!(onseeking, add_onseeking, Event);
+    handler!(onselect, add_onselect, Event);
+    handler!(onslotchange, add_onslotchange, Event);
+    handler!(onstalled, add_onstalled, Event);
+    handler!(onsuspend, add_onsuspend, Event);
+    handler!(ontimeupdate, add_ontimeupdate, Event);
+    handler!(ontoggle, add_ontoggle, Event);
+    handler!(onvolumechange, add_onvolumechange, Event);
+    handler!(onwaiting, add_onwaiting, Event);
+    handler!(oncopy, add_oncopy, Event);
+    handler!(oncut, add_oncut, Event);
+    handler!(onpaste, add_onpaste, Event);
+    handler!(onpointerlockchange, add_onpointerlockchange, Event);
+    handler!(onpointerlockerror, add_onpointerlockerror, Event);
+    handler!(onselectionchange, add_onselectionchange, Event);
+    handler!(onselectstart, add_onselectstart, Event);
+    handler!(onshow, add_onshow, Event);
 
-    handler!(onloadstart, ProgressEvent);
-    handler!(onprogress, ProgressEvent);
-    handler!(onloadend, ProgressEvent);
+    handler!(onloadstart, add_onloadstart, ProgressEvent);
+    handler!(onprogress, add_onprogress, ProgressEvent);
+    handler!(onloadend, add_onloadend, ProgressEvent);
 
-    handler!(ondrag, DragEvent);
-    handler!(ondragend, DragEvent);
-    handler!(ondragenter, DragEvent);
-    handler!(ondragexit, DragEvent);
-    handler!(ondragleave, DragEvent);
-    handler!(ondragover, DragEvent);
-    handler!(ondragstart, DragEvent);
-    handler!(ondrop, DragEvent);
+    handler!(ondrag, add_ondrag, DragEvent);
+    handler!(ondragend, add_ondragend, DragEvent);
+    handler!(ondragenter, add_ondragenter, DragEvent);
+    handler!(ondragexit, add_ondragexit, DragEvent);
+    handler!(ondragleave, add_ondragleave, DragEvent);
+    handler!(ondragover, add_ondragover, DragEvent);
+    handler!(ondragstart, add_ondragstart, DragEvent);
+    handler!(ondrop, add_ondrop, DragEvent);
 
-    handler!(onanimationcancel, AnimationEvent);
-    handler!(onanimationend, AnimationEvent);
-    handler!(onanimationiteration, AnimationEvent);
-    handler!(onanimationstart, AnimationEvent);
+    handler!(onanimationcancel, add_onanimationcancel, AnimationEvent);
+    handler!(onanimationend, add_onanimationend, AnimationEvent);
+    handler!(
+        onanimationiteration,
+        add_onanimationiteration,
+        AnimationEvent
+    );
+    handler!(onanimationstart, add_onanimationstart, AnimationEvent);
 
-    handler!(ongotpointercapture, PointerEvent);
-    handler!(onlostpointercapture, PointerEvent);
-    handler!(onpointercancel, PointerEvent);
-    handler!(onpointerdown, PointerEvent);
-    handler!(onpointerenter, PointerEvent);
-    handler!(onpointerleave, PointerEvent);
-    handler!(onpointermove, PointerEvent);
-    handler!(onpointerout, PointerEvent);
-    handler!(onpointerover, PointerEvent);
-    handler!(onpointerup, PointerEvent);
+    handler!(ongotpointercapture, add_ongotpointercapture, PointerEvent);
+    handler!(onlostpointercapture, add_onlostpointercapture, PointerEvent);
+    handler!(onpointercancel, add_onpointercancel, PointerEvent);
+    handler!(onpointerdown, add_onpointerdown, PointerEvent);
+    handler!(onpointerenter, add_onpointerenter, PointerEvent);
+    handler!(onpointerleave, add_onpointerleave, PointerEvent);
+    handler!(onpointermove, add_onpointermove, PointerEvent);
+    handler!(onpointerout, add_onpointerout, PointerEvent);
+    handler!(onpointerover, add_onpointerover, PointerEvent);
+    handler!(onpointerup, add_onpointerup, PointerEvent);
 
-    handler!(ontouchcancel, TouchEvent);
-    handler!(ontouchend, TouchEvent);
-    handler!(ontouchmove, TouchEvent);
-    handler!(ontouchstart, TouchEvent);
+    handler!(ontouchcancel, add_ontouchcancel, TouchEvent);
+    handler!(ontouchend, add_ontouchend, TouchEvent);
+    handler!(ontouchmove, add_ontouchmove, TouchEvent);
+    handler!(ontouchstart, add_ontouchstart, TouchEvent);
 
-    handler!(ontransitioncancel, TransitionEvent);
-    handler!(ontransitionend, TransitionEvent);
-    handler!(ontransitionrun, TransitionEvent);
-    handler!(ontransitionstart, TransitionEvent);
+    handler!(ontransitioncancel, add_ontransitioncancel, TransitionEvent);
+    handler!(ontransitionend, add_ontransitionend, TransitionEvent);
+    handler!(ontransitionrun, add_ontransitionrun, TransitionEvent);
+    handler!(ontransitionstart, add_ontransitionstart, TransitionEvent);
 
-    handler!(onwheel, WheelEvent);
+    handler!(onwheel, add_onwheel, WheelEvent);
 }

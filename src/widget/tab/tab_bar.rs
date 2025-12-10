@@ -5,11 +5,11 @@ use yew::virtual_dom::{Key, VComp, VNode};
 
 use crate::dom::focus::roving_tabindex_next;
 use crate::dom::{element_direction_rtl, DomSizeObserver, IntoHtmlElement};
-use crate::prelude::*;
 use crate::props::{IntoStorageLocation, StorageLocation};
 use crate::state::{NavigationContext, NavigationContextExt, PersistentState, Selection};
 use crate::web_sys_ext::{ResizeObserverBoxOptions, ResizeObserverOptions};
 use crate::widget::Container;
+use crate::{impl_class_prop_builder, impl_yew_std_props_builder, prelude::*};
 
 use super::TabBarItem;
 
@@ -28,10 +28,6 @@ use pwt_macros::builder;
 #[derive(Clone, Default, PartialEq, Properties)]
 #[builder]
 pub struct TabBar {
-    /// The yew node ref.
-    #[prop_or_default]
-    node_ref: NodeRef,
-
     /// The yew component key.
     #[prop_or_default]
     pub key: Option<Key>,
@@ -64,6 +60,10 @@ pub struct TabBar {
     #[prop_or_default]
     pub default_active: Option<Key>,
 
+    /// Force active key.
+    #[prop_or_default]
+    pub active: Option<Key>,
+
     /// Enable router functionality.
     ///
     /// Save/Load state from parent NavigationContainer
@@ -94,22 +94,8 @@ impl TabBar {
         yew::props!(TabBar {})
     }
 
-    /// Builder style method to set the yew `node_ref`
-    pub fn node_ref(mut self, node_ref: ::yew::html::NodeRef) -> Self {
-        self.node_ref = node_ref;
-        self
-    }
-
-    // Builder style method to set the yew `key` property.
-    pub fn key(mut self, key: impl IntoOptionalKey) -> Self {
-        self.set_key(key);
-        self
-    }
-
-    /// Method to set the yew `key` property.
-    pub fn set_key(&mut self, key: impl IntoOptionalKey) {
-        self.key = key.into_optional_key();
-    }
+    impl_yew_std_props_builder!();
+    impl_class_prop_builder!();
 
     /// Builder style method to set the persistent state ID.
     pub fn state_id(mut self, state_id: impl IntoStorageLocation) -> Self {
@@ -120,6 +106,17 @@ impl TabBar {
     /// Method to set the persistent state ID.
     pub fn set_state_id(&mut self, state_id: impl IntoStorageLocation) {
         self.state_id = state_id.into_storage_location();
+    }
+
+    // Builder style method to set `active` property.
+    pub fn active(mut self, active: impl IntoOptionalKey) -> Self {
+        self.set_active(active);
+        self
+    }
+
+    /// Method to set the yew `active` property.
+    pub fn set_active(&mut self, active: impl IntoOptionalKey) {
+        self.active = active.into_optional_key();
     }
 
     // Builder style method to set `default_active` property.
@@ -140,17 +137,6 @@ impl TabBar {
 
     pub fn add_item(&mut self, item: impl Into<TabBarItem>) {
         self.tabs.push(item.into());
-    }
-
-    /// Builder style method to add a html class
-    pub fn class(mut self, class: impl Into<Classes>) -> Self {
-        self.add_class(class);
-        self
-    }
-
-    /// Method to add a html class
-    pub fn add_class(&mut self, class: impl Into<Classes>) {
-        self.class.push(class);
     }
 
     fn get_default_active(&self) -> Option<Key> {
@@ -182,6 +168,7 @@ pub struct PwtTabBar {
     rtl: Option<bool>,
     _nav_ctx_handle: Option<ContextHandle<NavigationContext>>,
     selection: Selection,
+    node_ref: NodeRef,
     indicator_ref: NodeRef,
     active_ref: NodeRef,
     size_ref: NodeRef,
@@ -189,6 +176,10 @@ pub struct PwtTabBar {
 }
 
 fn get_active_or_default(props: &TabBar, active: &Option<Key>) -> Option<Key> {
+    if let Some(active) = &props.active {
+        return Some(active.clone());
+    }
+
     if let Some(active_key) = active.as_deref() {
         if !active_key.is_empty() && active_key != "_" {
             return active.clone();
@@ -290,6 +281,7 @@ impl Component for PwtTabBar {
             selection,
             rtl: None,
             _nav_ctx_handle,
+            node_ref: NodeRef::default(),
             indicator_ref: NodeRef::default(),
             active_ref: NodeRef::default(),
             size_ref: NodeRef::default(),
@@ -301,7 +293,7 @@ impl Component for PwtTabBar {
         let props = ctx.props();
         match msg {
             Msg::FocusIn => {
-                self.rtl = element_direction_rtl(&props.node_ref);
+                self.rtl = element_direction_rtl(&self.node_ref);
                 true
             }
             // Handle external selection changes
@@ -483,7 +475,7 @@ impl Component for PwtTabBar {
             })
             .collect::<Html>();
 
-        let tabs_ref = props.node_ref.clone();
+        let tabs_ref = self.node_ref.clone();
         let rtl = self.rtl.unwrap_or(false);
 
         let (variant_class, indicator_class) = match ctx.props().style {
@@ -506,7 +498,6 @@ impl Component for PwtTabBar {
         });
 
         Container::new()
-            .node_ref(props.node_ref.clone())
             .class(variant_class)
             .class(props.class.clone())
             .with_child(tabs)
@@ -524,7 +515,7 @@ impl Component for PwtTabBar {
                 event.prevent_default();
             })
             .onfocusin(ctx.link().callback(|_| Msg::FocusIn))
-            .into()
+            .into_html_with_ref(self.node_ref.clone())
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
@@ -546,9 +537,9 @@ impl Component for PwtTabBar {
 }
 
 impl From<TabBar> for VNode {
-    fn from(val: TabBar) -> Self {
-        let key = val.key.clone();
-        let comp = VComp::new::<PwtTabBar>(Rc::new(val), key);
+    fn from(props: TabBar) -> Self {
+        let key = props.key.clone();
+        let comp = VComp::new::<PwtTabBar>(Rc::new(props), key);
         VNode::from(comp)
     }
 }

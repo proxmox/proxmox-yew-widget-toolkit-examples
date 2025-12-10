@@ -50,43 +50,37 @@ struct FieldRegistration {
     pub options: FieldOptions,
     /// Field value
     pub value: Value,
-    // Submit value (value returned by validate)
-    submit_value: Option<Value>,
+    /// Last valid field value
+    pub last_valid: Option<Value>,
     /// Field default value.
     pub default: Value,
-    /// Validation result.
-    pub valid: Result<(), String>,
+    /// Validation result (contains the submit value)
+    pub result: Result<Value, String>,
 }
 
 impl FieldRegistration {
     fn is_dirty(&self) -> bool {
+        if self.options.disabled {
+            return false;
+        }
         // we need to compare the value that will be submitted
-        match &self.submit_value {
-            Some(submit_value) => &self.default != submit_value,
-            None => true,
+        match &self.result {
+            Ok(submit_value) => &self.default != submit_value,
+            Err(_) => true,
         }
     }
 
     fn apply_value(&mut self, value: Value) {
-        let (valid, submit_value);
-        if let Some(validate) = &self.validate {
-            match validate.apply(&value).map_err(|e| e.to_string()) {
-                Ok(value) => {
-                    submit_value = Some(value);
-                    valid = Ok(());
-                }
-                Err(e) => {
-                    submit_value = None;
-                    valid = Err(e.to_string());
-                }
-            }
+        let result = if let Some(validate) = &self.validate {
+            validate.apply(&value).map_err(|e| e.to_string())
         } else {
-            submit_value = Some(value.clone());
-            valid = Ok(());
-        }
+            Ok(value.clone())
+        };
         self.value = value;
-        self.valid = valid;
-        self.submit_value = submit_value;
+        if let Ok(submit_value) = &result {
+            self.last_valid = Some(submit_value.clone());
+        }
+        self.result = result;
     }
 }
 /// Shared form data ([Rc]<[RefCell]<[FormContextState]>>)
@@ -145,14 +139,14 @@ pub struct FieldHandle {
 
 impl FieldHandle {
     /// Lock the form context for read access.
-    pub fn read(&self) -> FormContextReadGuard {
+    pub fn read(&self) -> FormContextReadGuard<'_> {
         self.form_ctx.read()
     }
 
     /// Lock the form context for write access.
     ///
     /// Automatically notifies listeners when the guard is dropped.
-    pub fn write(&self) -> FormContextWriteGuard {
+    pub fn write(&self) -> FormContextWriteGuard<'_> {
         self.form_ctx.write()
     }
 
@@ -161,13 +155,13 @@ impl FieldHandle {
         self.get_data().0
     }
 
-    /// Returns the field validation status.
-    pub fn get_valid(&self) -> Result<(), String> {
+    /// Returns the field validation result.
+    pub fn get_valid(&self) -> Result<Value, String> {
         self.get_data().1
     }
 
-    /// Returns the field value with the validation result.
-    pub fn get_data(&self) -> (Value, Result<(), String>) {
+    /// Returns the field value with the validation result and the last valid value.
+    pub fn get_data(&self) -> (Value, Result<Value, String>, Option<Value>) {
         let key = self.key;
         self.read().get_field_data_by_slab_key(key)
     }
@@ -210,7 +204,10 @@ impl FieldHandle {
 
 impl Drop for FieldHandle {
     fn drop(&mut self) {
-        self.form_ctx.inner.borrow_mut().unregister_field(self.key);
+        let dirty_changed = self.form_ctx.inner.borrow_mut().unregister_field(self.key);
+        if dirty_changed {
+            self.form_ctx.notify_listeners();
+        }
     }
 }
 
@@ -261,7 +258,7 @@ impl FormContext {
     }
 
     /// Lock the form context for read access.
-    pub fn read(&self) -> FormContextReadGuard {
+    pub fn read(&self) -> FormContextReadGuard<'_> {
         FormContextReadGuard {
             state: self.inner.borrow(),
         }
@@ -270,7 +267,7 @@ impl FormContext {
     /// Lock the form context for write access.
     ///
     /// Automatically notifies listeners when the guard is dropped.
-    pub fn write(&self) -> FormContextWriteGuard {
+    pub fn write(&self) -> FormContextWriteGuard<'_> {
         let cloned_self = Self {
             on_change: None,
             inner: self.inner.clone(),
@@ -398,6 +395,7 @@ impl Deref for FormContextReadGuard<'_> {
 #[derive(Clone)]
 struct GroupState {
     value: Option<Value>,
+    default: Option<Value>,
     members: Vec<usize>,
     radio_count: usize,
 }
@@ -459,12 +457,19 @@ impl FormContextState {
             unique,
             options,
             value: Value::Null, // set by apply_value below
-            submit_value: None, // set by apply_value below
+            last_valid: None,
             default: default.clone(),
-            valid: Ok(()), // set by apply_value below
+            result: Ok(default.clone()), // set by apply_value below
         };
 
-        field.apply_value(value);
+        if !radio_group {
+            field.apply_value(value);
+            // update default to match the validated result, so dirty checking works correctly
+            // when the validator normalizes the value in above apply_value call.
+            if let Ok(submit_value) = &field.result {
+                field.default = submit_value.clone();
+            }
+        }
 
         let slab_key;
 
@@ -482,6 +487,7 @@ impl FormContextState {
 
         let group = self.groups.entry(name).or_insert(GroupState {
             value: None,
+            default: None,
             members: Vec::new(),
             radio_count: 0,
         });
@@ -491,6 +497,7 @@ impl FormContextState {
             if let Some(default) = default.as_str() {
                 if !default.is_empty() && group.value.is_none() {
                     group.value = Some(default.into());
+                    group.default = group.value.clone();
                 }
             }
             group.radio_count += 1;
@@ -499,20 +506,23 @@ impl FormContextState {
         slab_key
     }
 
-    fn unregister_field(&mut self, key: usize) {
+    fn unregister_field(&mut self, key: usize) -> bool {
         self.version += 1;
         if let Some(field) = self.fields.get(key) {
             if field.unique {
                 // log::info!("Keep Unique field data");
-                return;
+                return false;
             }
         }
+        let old_dirty = self.is_dirty();
         let field = self.fields.remove(key);
         let group = self.groups.get_mut(&field.name).unwrap();
         group.members.retain(|k| k != &key);
         if field.radio_group {
             group.radio_count = group.radio_count.saturating_sub(1);
         }
+        let dirty_changed = old_dirty != self.is_dirty();
+        dirty_changed
     }
 
     pub fn set_show_advanced(&mut self, show_advanced: bool) {
@@ -529,16 +539,24 @@ impl FormContextState {
             .map(|(key, _)| key)
     }
 
-    fn get_field_data_by_slab_key(&self, slab_key: usize) -> (Value, Result<(), String>) {
+    fn get_field_data_by_slab_key(
+        &self,
+        slab_key: usize,
+    ) -> (Value, Result<Value, String>, Option<Value>) {
         let field = &self.fields[slab_key];
 
         if field.radio_group {
             let group = &self.groups[&field.name];
             let value = group.value.clone().unwrap_or("".into());
-            let valid = Ok(()); // fixme
-            (value, valid)
+            let valid = Ok(value.clone()); // fixme
+            let last_valid_value = Some(value.clone()); // fixme:
+            (value, valid, last_valid_value)
         } else {
-            (field.value.clone(), field.valid.clone())
+            (
+                field.value.clone(),
+                field.result.clone(),
+                field.last_valid.clone(),
+            )
         }
     }
 
@@ -548,7 +566,7 @@ impl FormContextState {
     pub fn get_field_data(
         &self,
         name: impl IntoPropValue<AttrValue>,
-    ) -> Option<(Value, Result<(), String>)> {
+    ) -> Option<(Value, Result<Value, String>, Option<Value>)> {
         let name = name.into_prop_value();
         self.find_field_slab_id(&name)
             .map(|key| self.get_field_data_by_slab_key(key))
@@ -559,6 +577,15 @@ impl FormContextState {
     /// Returns `None` for non-existent fields.
     pub fn get_field_value(&self, name: impl IntoPropValue<AttrValue>) -> Option<Value> {
         self.get_field_data(name).map(|data| data.0)
+    }
+
+    /// Get the field last valid value.
+    ///
+    /// Returns `None` for non-existent fields, or when the filed was never valid.
+    ///
+    /// Note: This value is verified by the verification function.
+    pub fn get_last_valid_value(&self, name: impl IntoPropValue<AttrValue>) -> Option<Value> {
+        self.get_field_data(name).map(|data| data.2).flatten()
     }
 
     /// Get the field value as string.
@@ -592,12 +619,12 @@ impl FormContextState {
     pub fn text_field_data(
         &self,
         name: impl IntoPropValue<AttrValue>,
-    ) -> (String, Result<(), String>) {
+    ) -> (String, Result<Value, String>) {
         let name = name.into_prop_value();
         match self.get_field_data(&name) {
-            Some((Value::Number(n), valid)) => (n.to_string(), valid),
-            Some((Value::String(s), valid)) => (s.to_string(), valid),
-            Some((_, _valid)) => (
+            Some((Value::Number(n), valid, _)) => (n.to_string(), valid),
+            Some((Value::String(s), valid, _)) => (s.to_string(), valid),
+            Some((_, _valid, _)) => (
                 String::new(),
                 Err(format!("got unexpected type for field '{}'", name)),
             ),
@@ -605,16 +632,16 @@ impl FormContextState {
         }
     }
 
+    /// Returns the field validation result.
     pub fn get_field_valid(
         &self,
         name: impl IntoPropValue<AttrValue>,
-    ) -> Option<Result<(), String>> {
+    ) -> Option<Result<Value, String>> {
         self.get_field_data(name).map(|data| data.1)
     }
 
     fn set_field_value_by_slab_key(&mut self, slab_key: usize, value: Value, set_default: bool) {
         let field = &mut self.fields[slab_key];
-
         if field.radio_group {
             let group = self.groups.get_mut(&field.name).unwrap();
             let changed = match &group.value {
@@ -626,14 +653,7 @@ impl FormContextState {
                 self.version += 1;
             }
             if set_default {
-                for member in group.members.iter() {
-                    let group_field = &mut self.fields[*member];
-                    if group_field.value == value {
-                        group_field.default = value.clone();
-                    } else {
-                        group_field.default = String::new().into();
-                    }
-                }
+                group.default = Some(value.clone());
             }
         } else {
             if set_default && field.default != value {
@@ -672,12 +692,30 @@ impl FormContextState {
     fn update_field_options_by_slab_key(&mut self, slab_key: usize, options: FieldOptions) {
         let field = &mut self.fields[slab_key];
         field.options = options;
+        self.version += 1;
+    }
+
+    /// Check if the field identified by `name` has been changed.
+    ///
+    /// If the there is no field with `name`, `None` will be returned.
+    pub fn is_field_dirty(&self, name: impl IntoPropValue<AttrValue>) -> Option<bool> {
+        let name = name.into_prop_value();
+        self.fields
+            .iter()
+            .find(|(_key, f)| &f.name == &name)
+            .map(|(_key, f)| f.is_dirty())
     }
 
     pub fn is_dirty(&self) -> bool {
-        for (_key, field) in self.fields.iter() {
-            if field.is_dirty() {
+        for (_name, group) in self.groups.clone().iter() {
+            if group.radio_count > 0 && group.default != group.value {
                 return true;
+            }
+            for member in group.members.iter() {
+                let field = &self.fields[*member];
+                if !field.radio_group && field.is_dirty() {
+                    return true;
+                }
             }
         }
         false
@@ -685,16 +723,22 @@ impl FormContextState {
 
     pub fn dirty_count(&self) -> usize {
         let mut count = 0;
-        for (_key, field) in self.fields.iter() {
-            if field.is_dirty() {
+        for (_name, group) in self.groups.clone().iter() {
+            if group.radio_count > 0 && group.default != group.value {
                 count += 1;
+            }
+            for member in group.members.iter() {
+                let field = &self.fields[*member];
+                if !field.radio_group && field.is_dirty() {
+                    count += 1;
+                }
             }
         }
         count
     }
 
     /// Reset all form fields to their default value.
-    pub fn reset_form(&mut self) {
+    pub fn reset_form_old(&mut self) {
         let mut changes = false;
         for (_key, field) in self.fields.iter_mut() {
             if field.value != field.default {
@@ -707,9 +751,52 @@ impl FormContextState {
         }
     }
 
+    pub fn reset_form(&mut self) {
+        let mut changes = false;
+
+        for (_name, group) in self.groups.iter_mut() {
+            if group.members.is_empty() {
+                continue;
+            }
+
+            let field_keys: Vec<usize> = group
+                .members
+                .iter()
+                .filter(|k| !self.fields[**k].radio_group)
+                .copied()
+                .collect();
+
+            let radio_keys: Vec<usize> = group
+                .members
+                .iter()
+                .filter(|k| self.fields[**k].radio_group)
+                .copied()
+                .collect();
+
+            if !radio_keys.is_empty() {
+                if group.value != group.default {
+                    group.value = group.default.clone();
+                    changes = true;
+                }
+            }
+
+            for key in field_keys {
+                let field = &mut self.fields[key];
+                if field.value != field.default {
+                    changes = true;
+                    field.apply_value(field.default.clone());
+                }
+            }
+        }
+
+        if changes {
+            self.version += 1;
+        }
+    }
+
     pub fn is_valid(&self) -> bool {
         for (_key, field) in self.fields.iter() {
-            if field.valid.is_err() {
+            if !field.options.disabled && field.result.is_err() {
                 return false;
             }
         }
@@ -727,29 +814,18 @@ impl FormContextState {
         if field.radio_group {
             // fixme: do something ?
         } else {
-            let (valid, submit_value);
-            if let Some(validate) = &field.validate {
-                match validate.apply(&field.value) {
-                    Ok(value) => {
-                        submit_value = Some(value);
-                        valid = Ok(());
-                    }
-                    Err(e) => {
-                        submit_value = None;
-                        valid = Err(e.to_string());
-                    }
-                }
+            let result = if let Some(validate) = &field.validate {
+                validate.apply(&field.value).map_err(|err| err.to_string())
             } else {
-                submit_value = Some(field.value.clone());
-                valid = Ok(());
-            }
-            if valid != field.valid {
+                Ok(field.value.clone())
+            };
+
+            if result != field.result {
                 self.version += 1;
-                field.valid = valid;
-            }
-            if submit_value != field.submit_value {
-                self.version += 1;
-                field.submit_value = submit_value;
+                if let Ok(submit_value) = &result {
+                    field.last_valid = Some(submit_value.clone());
+                }
+                field.result = result;
             }
         }
     }
@@ -771,18 +847,25 @@ impl FormContextState {
         }
     }
 
-    fn set_field_valid_by_slab_key(&mut self, slab_key: usize, valid: Result<(), String>) {
+    fn set_field_valid_by_slab_key(
+        &mut self,
+        slab_key: usize,
+        validation_result: Result<Value, String>,
+    ) {
         let field = &mut self.fields[slab_key];
-        if valid != field.valid {
+        if validation_result != field.result {
             self.version += 1;
-            field.valid = valid;
+            if let Ok(submit_value) = &validation_result {
+                field.last_valid = Some(submit_value.clone());
+            }
+            field.result = validation_result;
         }
     }
 
     pub fn set_field_valid(
         &mut self,
         name: impl IntoPropValue<AttrValue>,
-        valid: Result<(), String>,
+        valid: Result<Value, String>,
     ) {
         let name = name.into_prop_value();
         if let Some(slab_key) = self.find_field_slab_id(&name) {
@@ -834,6 +917,11 @@ impl FormContextState {
                 self.set_field_value_by_slab_key(*key, value, true);
             }
         }
+    }
+
+    /// Check if the context contains a specific field name.
+    pub fn contains_field(&self, name: &str) -> bool {
+        self.groups.contains_key(name)
     }
 
     /// Get form submit data.
@@ -888,15 +976,16 @@ impl FormContextState {
             if field_keys.len() == 1 {
                 let key = field_keys[0];
                 let field = &self.fields[key];
-                let submit_empty = field.options.submit_empty;
-                if field.valid.is_ok() && field.options.submit {
-                    match &field.submit_value {
-                        None => continue,
-                        Some(value) => {
-                            if !submit_empty & value_is_empty(value) {
+                if !field.options.disabled && field.options.submit {
+                    match &field.result {
+                        Ok(value) => {
+                            if !field.options.submit_empty & value_is_empty(value) {
                                 continue;
                             }
                             data[name.deref()] = value.clone();
+                        }
+                        Err(_) => {
+                            continue; /* ignore field */
                         }
                     }
                 }
@@ -908,15 +997,16 @@ impl FormContextState {
                 let mut list = Vec::new();
                 for key in field_keys {
                     let field = &self.fields[key];
-                    let submit_empty = field.options.submit_empty;
-                    if field.valid.is_ok() && field.options.submit {
-                        match &field.submit_value {
-                            None => continue,
-                            Some(value) => {
-                                if !submit_empty & value_is_empty(value) {
+                    if field.options.submit {
+                        match &field.result {
+                            Ok(value) => {
+                                if !field.options.submit_empty & value_is_empty(value) {
                                     continue;
                                 }
                                 list.push(value.clone());
+                            }
+                            Err(_) => {
+                                continue; /* ignore field */
                             }
                         }
                     }

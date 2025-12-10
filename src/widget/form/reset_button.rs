@@ -1,38 +1,34 @@
 use wasm_bindgen::JsCast;
 
-use std::rc::Rc;
 use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::prelude::*;
-use yew::virtual_dom::{VComp, VNode};
 
 use crate::props::{EventSubscriber, WidgetBuilder};
+use crate::tr;
 use crate::widget::Button;
 
 use super::{FormContext, FormContextObserver};
 
-use pwt_macros::builder;
+use pwt_macros::{builder, widget};
 
 /// Reset button.
 ///
 /// The button automatically listens for [FormContext] changes, and
 /// enables the button only if the form is dirty (contains
 /// modified data).
+#[widget(pwt=crate, comp=crate::widget::form::PwtResetButton, @element)]
 #[derive(Clone, PartialEq, Properties)]
 #[builder]
 pub struct ResetButton {
     /// Button text (default "Reset").
-    #[prop_or(AttrValue::Static("Reset"))]
+    #[prop_or_default]
     #[builder(IntoPropValue, into_prop_value)]
-    pub text: AttrValue,
+    pub text: Option<AttrValue>,
 
     /// Reset button press callback.
     #[prop_or_default]
     #[builder_cb(IntoEventCallback, into_event_callback, ())]
     pub on_reset: Option<Callback<()>>,
-
-    /// CSS class
-    #[prop_or_default]
-    pub class: Classes,
 }
 
 impl Default for ResetButton {
@@ -45,17 +41,6 @@ impl ResetButton {
     /// Create a new instance.
     pub fn new() -> Self {
         yew::props!(Self {})
-    }
-
-    /// Builder style method to add a html class.
-    pub fn class(mut self, class: impl Into<Classes>) -> Self {
-        self.add_class(class);
-        self
-    }
-
-    /// Method to add a html class.
-    pub fn add_class(&mut self, class: impl Into<Classes>) {
-        self.class.push(class);
     }
 }
 
@@ -143,17 +128,15 @@ impl Component for PwtResetButton {
             }
         });
 
-        Button::new(&props.text)
-            .class(props.class.clone())
+        let builder = if let Some(text) = &props.text {
+            Button::new(text)
+        } else {
+            Button::new(tr!("Reset"))
+        };
+        builder
+            .with_std_props(props.as_std_props())
             .disabled(!form_dirty)
             .onclick(reset)
             .into()
-    }
-}
-
-impl From<ResetButton> for VNode {
-    fn from(val: ResetButton) -> Self {
-        let comp = VComp::new::<PwtResetButton>(Rc::new(val), None);
-        VNode::from(comp)
     }
 }

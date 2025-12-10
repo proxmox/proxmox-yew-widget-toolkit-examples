@@ -3,15 +3,19 @@ use std::rc::Rc;
 use pwt_macros::builder;
 use yew::html::IntoEventCallback;
 use yew::prelude::*;
-use yew::virtual_dom::{VComp, VNode};
+use yew::virtual_dom::{Key, VComp, VNode};
 
-use crate::prelude::*;
 use crate::widget::{Button, Dialog, Row, Toolbar};
+use crate::{impl_yew_std_props_builder, prelude::*};
 
 /// Message Box - Modal window to display various messages.
 #[builder]
 #[derive(Clone, Properties, PartialEq)]
 pub struct MessageBox {
+    /// The yew component key.
+    #[prop_or_default]
+    pub key: Option<Key>,
+
     /// Dialog title
     #[builder]
     pub title: AttrValue,
@@ -62,6 +66,8 @@ impl MessageBox {
             message: message.into()
         })
     }
+
+    impl_yew_std_props_builder!();
 }
 
 pub(crate) fn message(text: impl Into<Html>, icon_class: impl Into<Classes>) -> Row {
@@ -145,7 +151,8 @@ pub fn pwt_message_box(props: &MessageBox) -> Html {
 
 impl From<MessageBox> for VNode {
     fn from(val: MessageBox) -> Self {
-        let comp = VComp::new::<PwtMessageBox>(Rc::new(val), None);
+        let key = val.key.clone();
+        let comp = VComp::new::<PwtMessageBox>(Rc::new(val), key);
         VNode::from(comp)
     }
 }

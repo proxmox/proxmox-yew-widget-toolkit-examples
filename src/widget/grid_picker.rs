@@ -8,11 +8,11 @@ use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
-use crate::prelude::*;
 use crate::props::{FilterFn, IntoTextFilterFn, TextFilterFn};
 use crate::state::{DataStore, Selection};
 use crate::widget::data_table::DataTable;
 use crate::widget::{Column, Input, Row};
+use crate::{impl_yew_std_props_builder, prelude::*};
 
 use pwt_macros::builder;
 
@@ -31,8 +31,6 @@ use super::data_table::CellConfiguration;
 #[derivative(Clone(bound = ""), PartialEq(bound = ""))]
 #[builder]
 pub struct GridPicker<S: DataStore> {
-    #[prop_or_default]
-    node_ref: NodeRef,
     /// Yew key property.
     #[prop_or_default]
     pub key: Option<Key>,
@@ -84,27 +82,7 @@ impl<S: DataStore> GridPicker<S> {
         yew::props!(Self { table })
     }
 
-    /// Builder style method to set the yew `node_ref`
-    pub fn node_ref(mut self, node_ref: ::yew::html::NodeRef) -> Self {
-        self.set_node_ref(node_ref);
-        self
-    }
-
-    /// Method to set the yew `node_ref`
-    pub fn set_node_ref(&mut self, node_ref: ::yew::html::NodeRef) {
-        self.node_ref = node_ref;
-    }
-
-    /// Builder style method to set the yew `key` property
-    pub fn key(mut self, key: impl IntoOptionalKey) -> Self {
-        self.set_key(key);
-        self
-    }
-
-    /// Method to set the yew `key` property
-    pub fn set_key(&mut self, key: impl IntoOptionalKey) {
-        self.key = key.into_optional_key();
-    }
+    impl_yew_std_props_builder!();
 }
 
 pub enum Msg {
@@ -202,9 +180,7 @@ impl<S: DataStore + 'static> Component for PwtGridPicker<S> {
             .selection(self.selection.clone())
             .into();
 
-        let mut view = Column::new()
-            .node_ref(props.node_ref.clone())
-            .class("pwt-flex-fill pwt-overflow-auto");
+        let mut view = Column::new().class("pwt-flex-fill pwt-overflow-auto");
 
         let show_filter = props
             .show_filter

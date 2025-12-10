@@ -2,9 +2,9 @@ use std::fmt::Display;
 use std::str::FromStr;
 
 use anyhow::bail;
-use web_sys::HtmlElement;
+use web_sys::{HtmlElement, MouseEvent};
 
-use yew::html::IntoPropValue;
+use yew::html::{IntoEventCallback, IntoPropValue};
 
 use crate::dom::IntoHtmlElement;
 use crate::prelude::*;
@@ -51,6 +51,11 @@ impl FromStr for ButtonType {
 #[derive(Properties, PartialEq, Clone)]
 #[builder]
 pub struct Button {
+    /// Yew node ref used for the top level button tag.
+    #[prop_or_default]
+    #[builder(IntoPropValue, into_prop_value)]
+    pub node_ref: Option<NodeRef>,
+
     /// Button text.
     #[prop_or_default]
     pub text: Option<AttrValue>,
@@ -96,6 +101,15 @@ pub struct Button {
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
     pub button_type: ButtonType,
+
+    /// Activate callback (click, enter, space)
+    ///
+    /// Note: this is basically the same as an "onclick" handler. Buttons
+    /// elements have a default keyboard handler that raise an "onclick"
+    /// for keyboard enter/space events).
+    #[builder_cb(IntoEventCallback, into_event_callback, MouseEvent)]
+    #[prop_or_default]
+    pub on_activate: Option<Callback<MouseEvent>>,
 }
 
 impl Button {
@@ -142,6 +156,7 @@ pub enum Msg {
 
 #[doc(hidden)]
 pub struct PwtButton {
+    node_ref: NodeRef,
     ripple_pos: Option<(i32, i32, i32)>,
 }
 
@@ -149,8 +164,16 @@ impl Component for PwtButton {
     type Message = Msg;
     type Properties = Button;
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self { ripple_pos: None }
+    fn create(ctx: &Context<Self>) -> Self {
+        let node_ref = ctx
+            .props()
+            .node_ref
+            .clone()
+            .unwrap_or_else(|| NodeRef::default());
+        Self {
+            ripple_pos: None,
+            node_ref,
+        }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -161,7 +184,7 @@ impl Component for PwtButton {
                 if props.disabled {
                     return false;
                 }
-                if let Some(element) = props.std_props.node_ref.clone().into_html_element() {
+                if let Some(element) = self.node_ref.clone().into_html_element() {
                     let client = element.get_bounding_client_rect();
                     let x = event.client_x() as f64 - client.x();
                     let y = event.client_y() as f64 - client.y();
@@ -179,10 +202,21 @@ impl Component for PwtButton {
         }
     }
 
-    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         let props = ctx.props();
+
+        if let Some(new_ref) = &props.node_ref {
+            if new_ref != &self.node_ref {
+                self.node_ref = new_ref.clone();
+            }
+        }
+
+        true
+    }
+
+    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         if first_render && ctx.props().autofocus {
-            if let Some(button) = props.std_props.node_ref.cast::<HtmlElement>() {
+            if let Some(button) = self.node_ref.cast::<HtmlElement>() {
                 let _ = button.focus();
             }
         }
@@ -205,7 +239,7 @@ impl Component for PwtButton {
             if !icon_class.is_empty() {
                 // Chromium fires onclick from nested elements, so we need to suppress that manually here
                 children.push(html!{
-                    <span class="pwt-font-label-large" onclick={suppress_onclick.clone()}><i role="none" class={icon_class.clone()}></i></span>
+                    <span onclick={suppress_onclick.clone()}><i role="none" class={icon_class.clone()}></i></span>
                 });
             }
         }
@@ -237,6 +271,11 @@ impl Component for PwtButton {
         }
 
         let listeners = (!props.disabled).then_some(props.listeners.clone());
+        let on_activate = if props.disabled {
+            None
+        } else {
+            props.on_activate.clone()
+        };
 
         Container::from_widget_props(props.std_props.clone(), listeners)
             .children(children)
@@ -249,6 +288,7 @@ impl Component for PwtButton {
             .attribute("aria-label", props.aria_label.clone())
             .attribute("tabindex", props.tabindex.map(|i| i.to_string()))
             .onpointerdown(ctx.link().callback(Msg::ShowRippleAnimation))
-            .into()
+            .onclick(on_activate)
+            .into_html_with_ref(self.node_ref.clone())
     }
 }

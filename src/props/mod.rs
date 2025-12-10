@@ -5,12 +5,48 @@ use std::rc::Rc;
 
 use yew::html::IntoPropValue;
 use yew::prelude::*;
-use yew::virtual_dom::Key;
+use yew::virtual_dom::{Key, VNode, VTag};
+
+/// Like `Into<VTag>`, but allow to specify a [NodeRef].
+///
+/// This is basically an optimization to avoid an additional [NodeRef] allocation.
+pub trait IntoVTag: Sized {
+    /// Convienience helper.
+    fn into_html_with_ref(self, node_ref: NodeRef) -> VNode {
+        self.into_vtag_with_ref(node_ref).into()
+    }
+
+    /// Genertate a [VTag] with specified [NodeRef].
+    fn into_vtag_with_ref(self, node_ref: NodeRef) -> VTag;
+
+    /// Convienience helper.
+    fn into_vtag(self) -> VTag {
+        self.into_vtag_with_ref(NodeRef::default())
+    }
+}
+
+/// Provide a IntoVTag default implementation for `T: Into<VTag>`.
+///
+/// While this works, it allocate one useless NodeRef. Please implement [IntoVTag]
+/// to avoid that usless allocation.
+impl<T: Into<VTag>> IntoVTag for T {
+    fn into_vtag_with_ref(self, node_ref: NodeRef) -> VTag {
+        let mut vtag = self.into_vtag();
+        vtag.node_ref = node_ref;
+        vtag
+    }
+}
 
 /// Trait to generate inline Html.
 ///
 /// We use this for properties lite panel titles, where you usually just want text.
 /// This adds the ability to add simple inline markup.
+///
+/// Note: It is still possible to use arbitrary html (we implement it for Html and `Option<Html>`)
+///
+/// Note: There are several implementations for `Option<T>`, so it requires type annotation
+/// for `None`, i.e. `None::<&str>`. To avoid that, we implement it for the null type.
+/// Simply use `()` instead of `None::<&str>`.
 pub trait IntoOptionalInlineHtml {
     fn into_optional_inline_html(self) -> Option<Html>;
 }
@@ -24,6 +60,12 @@ impl IntoOptionalInlineHtml for Html {
 impl IntoOptionalInlineHtml for Option<Html> {
     fn into_optional_inline_html(self) -> Option<Html> {
         self
+    }
+}
+
+impl IntoOptionalInlineHtml for () {
+    fn into_optional_inline_html(self) -> Option<Html> {
+        None
     }
 }
 
@@ -168,3 +210,68 @@ pub use sorter_function::{IntoSorterFn, SorterFn};
 
 mod filter_function;
 pub use filter_function::{FilterFn, IntoFilterFn, IntoTextFilterFn, TextFilterFn};
+
+/// Implement builder functions for node_ref and key properties.
+///
+/// ```
+/// use pwt::prelude::*;
+/// use pwt::impl_yew_std_props_builder;
+/// use yew::virtual_dom::Key;
+/// pub struct MyComponentProps {
+///     pub node_ref: NodeRef,
+///     pub key: Option<Key>,
+/// }
+///
+/// impl MyComponentProps {
+///     impl_yew_std_props_builder!();
+///     // pub fn key(mut self, key: impl IntoOptionalKey) -> Self;
+///     // pub fn set_key(&mut self, key: impl IntoOptionalKey);
+/// }
+/// ```
+#[macro_export]
+macro_rules! impl_yew_std_props_builder {
+    () => {
+        /// Builder style method to set the yew `key` property
+        pub fn key(mut self, key: impl IntoOptionalKey) -> Self {
+            self.set_key(key);
+            self
+        }
+
+        /// Method to set the yew `key` property
+        pub fn set_key(&mut self, key: impl IntoOptionalKey) {
+            self.key = key.into_optional_key();
+        }
+    };
+}
+
+/// Implement builder functions for class properties.
+///
+/// ```
+/// use pwt::prelude::*;
+/// use pwt::impl_class_prop_builder;
+///
+/// pub struct MyComponentProps {
+///     class: Classes,
+/// }
+///
+/// impl MyComponentProps {
+///     impl_class_prop_builder!();
+///     // pub fn class(mut self, class: impl Into<Classes>) -> Self;
+///     // pub fn add_class(&mut self, class: impl Into<Classes>);
+/// }
+/// ```
+#[macro_export]
+macro_rules! impl_class_prop_builder {
+    () => {
+        /// Builder style method to add a html class
+        pub fn class(mut self, class: impl Into<Classes>) -> Self {
+            self.add_class(class);
+            self
+        }
+
+        /// Method to add a html class
+        pub fn add_class(&mut self, class: impl Into<Classes>) {
+            self.class.push(class);
+        }
+    };
+}

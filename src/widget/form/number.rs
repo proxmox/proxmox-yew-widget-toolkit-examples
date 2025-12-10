@@ -16,7 +16,7 @@ use super::{
     IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldState,
     ValidateFn,
 };
-use crate::props::{ContainerBuilder, EventSubscriber, WidgetBuilder};
+use crate::props::{ContainerBuilder, EventSubscriber, IntoVTag, WidgetBuilder};
 use crate::widget::{Column, Container, Input, Tooltip};
 
 use crate::tr;
@@ -26,7 +26,9 @@ const SPINNER_REPEAT_INTERVAL_MS: u32 = 50;
 
 pub type PwtNumber<T> = ManagedFieldMaster<NumberField<T>>;
 
-#[doc(hidden)]
+/// Helper trait for rust number types, implements step up/down and value to number conversion.
+///
+/// Used by [Number], which is implemented for all types implementing this trait.
 pub trait NumberTypeInfo:
     Into<Value> + PartialEq + PartialOrd + Display + Default + Debug + Copy + Clone + Sized + 'static
 {
@@ -39,6 +41,8 @@ pub trait NumberTypeInfo:
     fn step_up(&self, step: Option<Self>) -> Self;
 
     fn clamp_value(&self, min: Option<Self>, max: Option<Self>) -> Self;
+
+    fn is_decimal() -> bool;
 }
 
 impl NumberTypeInfo for f64 {
@@ -71,6 +75,9 @@ impl NumberTypeInfo for f64 {
     }
     fn clamp_value(&self, min: Option<Self>, max: Option<Self>) -> Self {
         self.clamp(min.unwrap_or(f64::MIN), max.unwrap_or(f64::MAX))
+    }
+    fn is_decimal() -> bool {
+        true
     }
 }
 
@@ -149,6 +156,9 @@ macro_rules! signed_number_impl {
             fn clamp_value(&self, min: Option<Self>, max: Option<Self>) -> Self {
                 (*self).clamp(min.unwrap_or(<$T>::MIN), max.unwrap_or(<$T>::MAX))
             }
+            fn is_decimal() -> bool {
+                false
+            }
         }
     };
 }
@@ -224,6 +234,9 @@ macro_rules! unsigned_number_impl {
             }
             fn clamp_value(&self, min: Option<Self>, max: Option<Self>) -> Self {
                 (*self).clamp(min.unwrap_or(<$T>::MIN), max.unwrap_or(<$T>::MAX))
+            }
+            fn is_decimal() -> bool {
+                false
             }
         }
     };
@@ -323,7 +336,7 @@ pub struct Number<T: NumberTypeInfo> {
     /// any result from the validation function (if any).
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
-    pub valid: Option<Result<(), String>>,
+    pub valid: Option<Result<Value, String>>,
 
     /// Default value.
     #[builder(IntoPropValue, into_prop_value)]
@@ -484,20 +497,14 @@ impl<T: NumberTypeInfo> ManagedField for NumberField<T> {
             None => Value::Null,
         };
 
-        ManagedFieldState {
-            value,
-            valid: Ok(()),
-            default,
-            radio_group: false,
-            unique: false,
-        }
+        ManagedFieldState::new(value, default)
     }
 
     fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
         let props = ctx.props();
         let state = ctx.state();
-        let data = match &state.valid {
-            Ok(()) => Some(T::value_to_number(&state.value).map_err(|err| err.to_string())),
+        let data = match &state.result {
+            Ok(value) => Some(T::value_to_number(value).map_err(|err| err.to_string())),
             Err(err) => Some(Err(err.clone())),
         };
         if let Some(on_change) = &props.on_change {
@@ -540,7 +547,7 @@ impl<T: NumberTypeInfo> ManagedField for NumberField<T> {
             }
             Msg::Up => {
                 let n = T::value_to_number(&state.value).ok();
-                let n = match (n, state.valid.is_ok()) {
+                let n = match (n, state.result.is_ok()) {
                     (None, true) => Some(T::default().clamp_value(props.min, props.max)),
                     (Some(n), _) => {
                         let next = T::step_up(&n, props.step);
@@ -560,7 +567,7 @@ impl<T: NumberTypeInfo> ManagedField for NumberField<T> {
             }
             Msg::Down => {
                 let n = T::value_to_number(&state.value).ok();
-                let n = match (n, state.valid.is_ok()) {
+                let n = match (n, state.result.is_ok()) {
                     (None, true) => Some(T::default().clamp_value(props.min, props.max)),
                     (Some(n), _) => {
                         let next = T::step_down(&n, props.step);
@@ -609,7 +616,7 @@ impl<T: NumberTypeInfo> ManagedField for NumberField<T> {
         let props = ctx.props();
         let state = ctx.state();
 
-        let (value, valid) = (&state.value, &state.valid);
+        let (value, validation_result) = (&state.value, &state.result);
         let value_text = match value {
             Value::Null => String::new(),
             Value::Number(number) => match T::value_to_number(value) {
@@ -625,9 +632,14 @@ impl<T: NumberTypeInfo> ManagedField for NumberField<T> {
             Msg::Update(input.value())
         });
 
+        let inputmode = if T::is_decimal() {
+            "decimal"
+        } else {
+            "numeric"
+        };
+
         let disabled = props.input_props.disabled;
         let input: Html = Input::new()
-            .node_ref(self.input_ref.clone())
             .with_input_props(&props.input_props)
             .class("pwt-flex-fill")
             .attribute("type", "text") // important (text, not number)
@@ -635,6 +647,7 @@ impl<T: NumberTypeInfo> ManagedField for NumberField<T> {
             .attribute("value", value_text)
             .attribute("aria-valuemin", props.min.map(|v| v.to_string()))
             .attribute("aria-valuemax", props.max.map(|v| v.to_string()))
+            .attribute("inputmode", inputmode)
             .oninput(oninput)
             .onkeydown({
                 let link = ctx.link();
@@ -655,16 +668,16 @@ impl<T: NumberTypeInfo> ManagedField for NumberField<T> {
                     event.prevent_default();
                 }
             })
-            .into();
+            .into_html_with_ref(self.input_ref.clone());
 
-        let input_container = Container::new()
+        let mut input_container = Tooltip::empty()
             .with_std_props(&props.std_props)
             .listeners(&props.listeners)
             .class("pwt-input")
             .class("pwt-input-type-number")
             .class("pwt-w-100")
             .class(disabled.then_some("disabled"))
-            .class(if valid.is_ok() {
+            .class(if validation_result.is_ok() {
                 "is-valid"
             } else {
                 "is-invalid"
@@ -695,13 +708,11 @@ impl<T: NumberTypeInfo> ManagedField for NumberField<T> {
                     ),
             );
 
-        let mut tooltip = Tooltip::new(input_container);
-
-        if let Err(msg) = &valid {
-            tooltip.set_tip(msg.clone())
+        if let Err(msg) = &validation_result {
+            input_container.set_tip(msg.clone())
         }
 
-        tooltip.into()
+        input_container.into()
     }
 
     fn rendered(&mut self, ctx: &ManagedFieldContext<Self>, first_render: bool) {

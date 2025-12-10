@@ -10,9 +10,9 @@ use yew::html::Scope;
 use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
-use crate::prelude::*;
 use crate::widget::menu::{Menu, MenuCheckbox, MenuEvent, MenuItem};
 use crate::widget::{get_unique_element_id, Container, Fa};
+use crate::{impl_yew_std_props_builder, prelude::*};
 
 use super::{
     DataTableHeaderKeyboardEvent, DataTableHeaderRenderArgs, DataTableHeaderTableLink, HeaderMsg,
@@ -24,8 +24,6 @@ use super::{
 #[derivative(Clone(bound = ""), PartialEq(bound = ""))]
 #[doc(hidden)] // only used inside this crate
 pub struct HeaderWidget<T: 'static> {
-    #[prop_or_default]
-    pub node_ref: Option<NodeRef>,
     #[prop_or_default]
     pub key: Option<Key>,
 
@@ -57,18 +55,7 @@ impl<T: 'static> HeaderWidget<T> {
         })
     }
 
-    /*
-    pub fn key(mut self, key: impl Into<Key>) -> Self {
-        self.key = Some(key.into());
-        self
-    }
-
-    /// Builder style method to set the yew `node_ref`
-    pub fn node_ref(mut self, node_ref: impl IntoPropValue<Option<NodeRef>>) -> Self {
-        self.node_ref = node_ref.into_prop_value();
-        self
-    }
-     */
+    impl_yew_std_props_builder!();
 
     /// Builder style method to set the focusable flag.
     pub fn focusable(mut self, focusable: bool) -> Self {
@@ -427,12 +414,9 @@ impl<T: 'static> PwtHeaderWidget<T> {
     }
 
     fn focus_active_cell(&self) {
-        let window = web_sys::window().unwrap();
-        let document = window.document().unwrap();
-
         let get_cell_el = |cell_idx| -> Option<web_sys::HtmlElement> {
             let id = self.unique_cell_id(cell_idx);
-            let el = document.get_element_by_id(&id)?;
+            let el = gloo_utils::document().get_element_by_id(&id)?;
             match el.dyn_into::<web_sys::HtmlElement>() {
                 Ok(el) => Some(el),
                 Err(_) => None,
@@ -483,7 +467,7 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
 
         Self {
             unique_id: get_unique_element_id(),
-            node_ref: props.node_ref.clone().unwrap_or_default(),
+            node_ref: NodeRef::default(),
             state,
             cursor: None,
             observed_widths,
@@ -605,7 +589,6 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
 
         Container::from_tag("table")
             .attribute("role", "row")
-            .node_ref(self.node_ref.clone())
             .class("pwt-d-grid")
             .style("user-select", "none")
             .style("display", "grid")
@@ -622,7 +605,7 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
                     event.prevent_default();
                 }
             })
-            .into()
+            .into_html_with_ref(self.node_ref.clone())
     }
 }
 
@@ -644,7 +627,7 @@ fn build_header_menu<T>(
 
     Menu::new()
         .with_item(
-            MenuItem::new("Sort Ascending")
+            MenuItem::new(tr!("Sort Ascending"))
                 .icon_class("fa fa-long-arrow-up")
                 .disabled(!sortable)
                 .on_select(
@@ -652,7 +635,7 @@ fn build_header_menu<T>(
                 ),
         )
         .with_item(
-            MenuItem::new("Sort Descending")
+            MenuItem::new(tr!("Sort Descending"))
                 .icon_class("fa fa-long-arrow-down")
                 .disabled(!sortable)
                 .on_select(
@@ -660,7 +643,7 @@ fn build_header_menu<T>(
                 ),
         )
         .with_separator()
-        .with_item(MenuItem::new("Columns").menu(columns_menu))
+        .with_item(MenuItem::new(tr!("Columns")).menu(columns_menu))
 }
 
 fn headers_to_menu<T>(

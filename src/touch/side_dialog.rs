@@ -8,11 +8,12 @@ use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
 use crate::dom::IntoHtmlElement;
-use crate::prelude::*;
+use crate::props::{AsCssStylesMut, CssStyles};
 use crate::state::{SharedState, SharedStateObserver};
 use crate::widget::Container;
+use crate::{impl_yew_std_props_builder, prelude::*};
 
-use super::{GestureDetector, GestureDragEvent, GestureSwipeEvent};
+use super::{GestureDetector, GestureSwipeEvent, InputEvent};
 
 // Messages sent from the [SideDialogController].
 pub enum SideDialogControllerMsg {
@@ -65,9 +66,6 @@ use pwt_macros::builder;
 #[derive(Properties, Clone, PartialEq)]
 #[builder]
 pub struct SideDialog {
-    #[prop_or_default]
-    node_ref: NodeRef,
-
     /// The yew component key.
     #[prop_or_default]
     pub key: Option<Key>,
@@ -86,8 +84,20 @@ pub struct SideDialog {
 
     #[prop_or(SideDialogLocation::Left)]
     #[builder]
-    pub direction: SideDialogLocation,
+    pub location: SideDialogLocation,
+
+    /// CSS style for the dialog window
+    #[prop_or_default]
+    pub styles: CssStyles,
 }
+
+impl AsCssStylesMut for SideDialog {
+    fn as_css_styles_mut(&mut self) -> &mut CssStyles {
+        &mut self.styles
+    }
+}
+
+impl WidgetStyleBuilder for SideDialog {}
 
 impl ContainerBuilder for SideDialog {
     fn as_children_mut(&mut self) -> &mut Vec<VNode> {
@@ -107,17 +117,7 @@ impl SideDialog {
         yew::props!(Self {})
     }
 
-    /// Builder style method to set the yew `node_ref`
-    pub fn node_ref(mut self, node_ref: ::yew::html::NodeRef) -> Self {
-        self.node_ref = node_ref;
-        self
-    }
-
-    /// Builder style method to set the yew `key` property
-    pub fn key(mut self, key: impl IntoOptionalKey) -> Self {
-        self.key = key.into_optional_key();
-        self
-    }
+    impl_yew_std_props_builder!();
 }
 
 pub enum Msg {
@@ -125,9 +125,9 @@ pub enum Msg {
     Close,
     Dismiss, // Slide out, then close
     SliderAnimationEnd,
-    DragStart(GestureDragEvent),
-    DragEnd(GestureDragEvent),
-    Drag(GestureDragEvent),
+    DragStart(InputEvent),
+    DragEnd(InputEvent),
+    Drag(InputEvent),
     Swipe(GestureSwipeEvent),
     Controller,
 }
@@ -144,6 +144,7 @@ enum SliderState {
 pub struct PwtSideDialog {
     open: bool,
     last_active: Option<web_sys::HtmlElement>, // last focused element
+    node_ref: NodeRef,
     slider_ref: NodeRef,
     slider_state: SliderState,
     drag_start: Option<(f64, f64)>,
@@ -185,9 +186,7 @@ impl Component for PwtSideDialog {
     fn create(ctx: &Context<Self>) -> Self {
         let props = ctx.props();
 
-        let window = web_sys::window().unwrap();
-        let document = window.document().unwrap();
-        let last_active = document
+        let last_active = gloo_utils::document()
             .active_element()
             .and_then(|el| el.dyn_into::<HtmlElement>().ok());
 
@@ -200,6 +199,7 @@ impl Component for PwtSideDialog {
         Self {
             open: false,
             last_active,
+            node_ref: NodeRef::default(),
             slider_ref: NodeRef::default(),
             slider_state: SliderState::Hidden,
             drag_start: None,
@@ -217,7 +217,7 @@ impl Component for PwtSideDialog {
                 if !self.open {
                     self.slider_state = SliderState::SlideIn;
 
-                    if let Some(dialog_node) = props.node_ref.get() {
+                    if let Some(dialog_node) = self.node_ref.get() {
                         crate::show_modal_dialog(dialog_node);
                         self.open = true;
                     }
@@ -227,7 +227,7 @@ impl Component for PwtSideDialog {
             Msg::Close => {
                 if self.open {
                     if let Some(on_close) = &props.on_close {
-                        if let Some(dialog_node) = props.node_ref.get() {
+                        if let Some(dialog_node) = self.node_ref.get() {
                             crate::close_dialog(dialog_node);
                         }
 
@@ -276,7 +276,7 @@ impl Component for PwtSideDialog {
                 let mut dismiss = false;
                 let threshold = 100.0;
                 if let Some((delta_x, delta_y)) = self.drag_delta {
-                    dismiss = match props.direction {
+                    dismiss = match props.location {
                         SideDialogLocation::Left => delta_x < -threshold,
                         SideDialogLocation::Right => delta_x > threshold,
                         SideDialogLocation::Top => delta_y < -threshold,
@@ -302,7 +302,7 @@ impl Component for PwtSideDialog {
             }
             Msg::Swipe(event) => {
                 let angle = event.direction; // -180 to + 180
-                let dismiss = match props.direction {
+                let dismiss = match props.location {
                     SideDialogLocation::Left => !(-135.0..=135.0).contains(&angle),
                     SideDialogLocation::Right => angle > -45.0 && angle < 45.0,
                     SideDialogLocation::Top => angle > 45.0 && angle < 135.0,
@@ -316,10 +316,9 @@ impl Component for PwtSideDialog {
         }
     }
 
-    fn destroy(&mut self, ctx: &Context<Self>) {
-        let props = ctx.props();
+    fn destroy(&mut self, _ctx: &Context<Self>) {
         // always close the dialog before restoring the focus
-        if let Some(dialog_node) = props.node_ref.get() {
+        if let Some(dialog_node) = self.node_ref.get() {
             crate::close_dialog(dialog_node);
         }
         self.restore_focus();
@@ -340,7 +339,7 @@ impl Component for PwtSideDialog {
             SliderState::Visible | SliderState::SlideIn => "visible",
         };
 
-        let slider_direction_class = match props.direction {
+        let slider_direction_class = match props.location {
             SideDialogLocation::Left => "pwt-side-dialog-left",
             SideDialogLocation::Right => "pwt-side-dialog-right",
             SideDialogLocation::Top => "pwt-side-dialog-top",
@@ -351,52 +350,64 @@ impl Component for PwtSideDialog {
         let mut transition = None;
         if let Some((delta_x, delta_y)) = self.drag_delta {
             transition = Some("none");
-            match props.direction {
+            match props.location {
                 SideDialogLocation::Left => {
                     let delta_x = delta_x.min(0.0);
-                    transform = Some(format!("translateX({delta_x}px);"));
+                    transform = Some(format!("translateX({delta_x}px)"));
                 }
                 SideDialogLocation::Right => {
                     let delta_x = delta_x.max(0.0);
-                    transform = Some(format!("translateX({delta_x}px);",));
+                    transform = Some(format!("translateX({delta_x}px)",));
                 }
                 SideDialogLocation::Top => {
                     let delta_y = delta_y.min(0.0);
-                    transform = Some(format!("translateY({delta_y}px);",));
+                    transform = Some(format!("translateY({delta_y}px)",));
                 }
                 SideDialogLocation::Bottom => {
                     let delta_y = delta_y.max(0.0);
-                    transform = Some(format!("translateY({delta_y}px);",));
+                    transform = Some(format!("translateY({delta_y}px)",));
                 }
             }
         }
 
         let dialog = Container::from_tag("dialog")
-            .node_ref(props.node_ref.clone())
             .class("pwt-side-dialog")
             .class(slider_state_class)
             .oncancel(oncancel)
+            .onclose(link.callback(|_| Msg::Close))
             .with_child(
                 Container::new()
-                    .node_ref(self.slider_ref.clone())
+                    .styles(props.styles.clone())
                     .class("pwt-side-dialog-slider")
                     .class(slider_direction_class)
                     .class(slider_state_class)
                     .style("transition", transition)
                     .style("transform", transform)
                     .ontransitionend(ctx.link().callback(|_| Msg::SliderAnimationEnd))
-                    .children(props.children.clone()),
+                    .children(props.children.clone())
+                    .into_html_with_ref(self.slider_ref.clone()),
             );
 
-        let view = GestureDetector::new(dialog)
+        let view = GestureDetector::new(dialog.into_html_with_ref(self.node_ref.clone()))
             .on_tap({
                 let slider_ref = self.slider_ref.clone();
                 let link = ctx.link().clone();
-                move |event: PointerEvent| {
+                move |event: InputEvent| {
                     if let Some(element) = slider_ref.clone().into_html_element() {
+                        if let Some(target) = event.target() {
+                            if let Ok(target) = target.dyn_into::<web_sys::Node>() {
+                                if element.contains(Some(&target)) {
+                                    // click target inside dialog
+                                    // Note: This can be outside of element.get_bounding_client_rect(), i.e.
+                                    // if we open dropdowns/menus inside a dialog.
+                                    return;
+                                }
+                            }
+                        }
+
                         let rect = element.get_bounding_client_rect();
-                        let x = event.client_x() as f64;
-                        let y = event.client_y() as f64;
+                        let x = event.x() as f64;
+                        let y = event.y() as f64;
 
                         if (rect.left() < x)
                             && (x < rect.right())
@@ -415,11 +426,14 @@ impl Component for PwtSideDialog {
             .on_drag_update(ctx.link().callback(Msg::Drag))
             .on_swipe(ctx.link().callback(Msg::Swipe));
 
-        html! {
+        let controller_context = html! {
             <ContextProvider<SideDialogController> context={self.controller.clone()}>
             {view}
             </ContextProvider<SideDialogController>>
-        }
+        };
+
+        // avoid problems with nested form
+        create_portal(controller_context, gloo_utils::body().into())
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {

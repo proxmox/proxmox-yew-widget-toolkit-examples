@@ -5,19 +5,19 @@ mod application_bar;
 pub use application_bar::{ApplicationBar, PwtApplicationBar};
 
 mod gesture_detector;
-pub use gesture_detector::{
-    GestureDetector, GestureDragEvent, GestureSwipeEvent, PwtGestureDetector,
-};
+pub use gesture_detector::{GestureDetector, GestureSwipeEvent, InputEvent, PwtGestureDetector};
 
 mod fab;
-pub use fab::{Fab, PwtFab};
+pub use fab::{Fab, FabSize, PwtFab};
 
 mod fab_menu;
-pub use fab_menu::{FabMenu, FabMenuAlign, FabMenuDirection, PwtFabMenu};
+pub use fab_menu::{
+    FabMenu, FabMenuAlign, FabMenuColor, FabMenuDirection, FabMenuEntry, PwtFabMenu,
+};
 
 mod material_app;
 pub use material_app::PageController;
-pub use material_app::{MaterialApp, PwtMaterialApp};
+pub use material_app::{MaterialApp, MaterialAppScopeExt, PwtMaterialApp};
 
 mod navigation_bar;
 pub use navigation_bar::NavigationBar;
