@@ -37,5 +37,9 @@ extract_doc "scss/crisp/_theme_post_crisp.scss"
 # Explain common utility classes
 extract_doc "scss/_utilities.scss"
 
+# Explain content spacer class
+extract_doc "scss/_content_spacer.scss"
+
 # Explain individual widget classes
+extract_doc "scss/_button.scss"
 extract_doc "scss/_panel.scss"

@@ -2,6 +2,8 @@
     @include color-scheme-vars(surface-container);
     @include accent-color-scheme-vars(#{$default-accent-color}-container);
 
+    border-top: 1px solid var(--pwt-color-border);
+
     display: flex;
     justify-content: space-evenly;
 

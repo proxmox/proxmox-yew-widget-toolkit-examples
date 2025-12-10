@@ -1,0 +1,12 @@
+/// Default mobile theme
+///
+/// Padding/spacing from Material but with Crisps color scheme
+
+@import "theme_pre";
+@import "font_sizes_material";
+@import "crisp/theme_colors_crisp";
+@import "theme_scheme_dark";
+@import "theme_scheme_light";
+@import "material/theme_config_material";
+@import "theme_post";
+@import "material/theme_post_material";

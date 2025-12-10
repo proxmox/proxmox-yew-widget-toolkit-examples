@@ -2,6 +2,9 @@
 ///
 /// Use proxmox company colors, as described in the [Proxmox Brand Guidelines](https://www.proxmox.com/images/proxmox/Proxmox-Corporate-Brandguideline-2021.pdf).
 ///
+/// Note: For light mode, This theme uses hardcoded colors for `primary`
+/// and `primary-container` to match the original theme.
+///
 $color-seed-primary: #00617f; // proxmox blue
 $color-seed-secondary: #e57000; // proxmox orange
 $color-seed-tertiary: #abbaba; // proxmox grey

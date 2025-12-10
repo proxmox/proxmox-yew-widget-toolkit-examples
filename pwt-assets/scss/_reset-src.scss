@@ -45,3 +45,8 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+// get rid of the default chrome tapping color
+* {
+  -webkit-tap-highlight-color: transparent;
+}

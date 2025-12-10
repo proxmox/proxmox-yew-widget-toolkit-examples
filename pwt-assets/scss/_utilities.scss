@@ -188,8 +188,8 @@ $height-width-values: (
     left: 0;
     position: absolute;
     display: flex !important;
-    width: 100vw !important;
-    height: 100vh !important;
+    width: 100dvw !important;
+    height: 100dvh !important;
     overflow: hidden !important;
     box-sizing: border-box;
 }
@@ -469,4 +469,20 @@ $position-values: absolute fixed relative sticky static;
         $opacity: $opacity + "%";
         opacity: #{$opacity};
     }
+}
+
+@keyframes delay-visibility {
+    from {
+        opacity: 0
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+/// - `pwt-delay-visibility`: delay visibility by animating opacity from 0 to 1
+.pwt-delay-visibility {
+    opacity: 0;
+    animation: delay-visibility 1s ease-in-out 250ms forwards;
 }

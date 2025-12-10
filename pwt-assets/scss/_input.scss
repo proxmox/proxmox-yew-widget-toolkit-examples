@@ -72,6 +72,8 @@ input {
 
     &:not(.disabled):not(:disabled):not([aria-disabled=true]).is-invalid:after {
         content: "";
+	// disable flex resizing
+	flex: 0 0 auto;
         width: 1em;
         height: 1em;
         align-self: center;

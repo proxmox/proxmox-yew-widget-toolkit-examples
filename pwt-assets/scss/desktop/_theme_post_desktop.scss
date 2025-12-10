@@ -46,6 +46,15 @@ ul.pwt-menubar {
     padding: var(--pwt-spacer-4);
 }
 
+/// `pwt-datatable-content tr`
+/// : make horizontal table borders invisible
+///
+.pwt-datatable-content {
+    &:not(.table-borderless) tr {
+        border-color: var(--pwt-elevated-background-color);
+    }
+}
+
 /// `h1`
 /// : use `headline-large` font
 ///

@@ -34,6 +34,11 @@
     //    @include outline-button-color-scheme-vars($name, $important: true);
     //}
 
+    .pwt-default-colors {
+        color: var(--pwt-color);
+        background-color: var(--pwt-color-background);
+    }
+
     .pwt-color-#{$name} {
         color: var(--pwt-color-#{$name});
     }

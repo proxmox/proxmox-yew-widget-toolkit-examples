@@ -181,6 +181,9 @@ Base colors are from <https://en.wikipedia.org/wiki/Adwaita_(design_language)>.
   - use elevated box with box-shadow
   - use bigger spacing
 
+`pwt-datatable-content tr`
+: make horizontal table borders invisible
+
 `h1`
 : use `headline-large` font
 
@@ -223,6 +226,9 @@ This theme uses the [material design baseline colors](https://m3.material.io/sty
 `pwt-tab-material`
 : add padding
 
+`pwt-datatable-content tr`
+: make horizontal table borders invisible
+
 `pwt-content-spacer`
 : overwrite content spacer layout
 
@@ -240,6 +246,9 @@ The primary color is used as default accent color.
 #### Color setup
 
 Use proxmox company colors, as described in the [Proxmox Brand Guidelines](https://www.proxmox.com/images/proxmox/Proxmox-Corporate-Brandguideline-2021.pdf).
+
+Note: For light mode, This theme uses hardcoded colors for `primary`
+and `primary-container` to match the original theme.
 
 
 ### Fine Tuning
@@ -388,6 +397,69 @@ For the following elevation levels: 0, 1, 2, 3, 4, 5
 
 - `pwt-opacity-<value>`: set `opacity` property to percentage for values in
   - 0, 25, 50, 75, 100
+
+## Content Spacer Class
+
+Class `pwt-content-spacer`
+
+This is a special class for laying out containers with one or more children.
+The purpose is that you can adopt these styles for different themes to give
+the theme a unique look in terms of container nesting. The default
+implementation uses different styles depending on the number of children.
+
+* with single child:
+  - no padding
+  - no border on child
+  - neutral color on children
+* with more than one child:
+  - two spacer padding/gap on container
+  - one pixel border on children
+  - surface color on container
+  - neutral color on children
+
+Class `pwt-content-spacer-padding`
+
+Infer the padding used by the content spacer. This is useful to create components
+using the same padding as the content spacer.
+
+
+## Button Widget
+
+Class `pwt-button`
+
+This is the top level class for the button widget. Buttons have the
+following features:
+
+- use color scheme variables
+- font `label-large`
+- use elevation and ripple effect
+
+The following classes can be used to adopt the button style:
+
+- `pwt-button-text`: text only button with transparent background and accent colored text.
+- `pwt-button-outline`: like text button, but with border.
+- `pwt-button-elevated`: like text button, but with border and elevation.
+
+It is also possible to set the color and accent color scheme.
+
+Class `pwt-segmented-button`
+
+This container class is used to implement segmented buttons.
+
+#### Button styles for mobile/touch devices
+
+The following classes can be used to adopt the button style for mobile/touch devices:
+
+- `pwt-fab`:  Floating action button (FAB)
+- `pwt-fab.pwt-fab-small`:  small FAB variant
+- `pwt-fab.pwt-fab-large`:  large FAB variant
+
+##### FAB Menus
+
+Class `pwt-fab-menu-container`
+
+This class is used to arrange FABs as a menu.
+
 
 ## Panel Widget
 

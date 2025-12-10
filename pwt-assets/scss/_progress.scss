@@ -17,11 +17,11 @@
 
 	@keyframes infinite-progress {
 		from {
-			left: 0;
+			transform: translateX(-40%) scaleX(0.2) ;
 		}
 
 		to {
-			left: calc(100% - 20%);
+			transform: translateX(40%) scaleX(0.2) ;
 		}
 	}
 
@@ -29,8 +29,9 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		width: 20%;
+		width: 100%;
 		left: 0;
+		transform: translateX(-40%) scaleX(0.2);
 		background: var(--pwt-accent-color-background);
 		animation-duration: 2s;
 		animation-name: infinite-progress;
