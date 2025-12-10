@@ -1,3 +1,4 @@
+use pwt::state::LanguageInfo;
 use pwt::touch::prelude::*;
 use pwt::widget::{Button, Column, Container};
 
@@ -191,5 +192,12 @@ fn App() -> Html {
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
+
+    pwt::state::set_available_languages(vec![LanguageInfo::new(
+        "en",
+        "English",
+        gettext_noop("English"),
+    )]);
+
     yew::Renderer::<App>::new().render();
 }

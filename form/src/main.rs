@@ -28,7 +28,7 @@ impl Component for MyForm {
             let confirm = form_ctx.read().get_field_text("confirm_password");
             if !confirm.is_empty() {
                 let valid = if pw == confirm {
-                    Ok(())
+                    Ok(confirm.into())
                 } else {
                     Err(String::from("Passwords do not match!"))
                 };

@@ -78,6 +78,8 @@ pub use fields::FieldsDemo;
 mod examples;
 pub use examples::ExampleWidgets;
 
+use web_sys::wasm_bindgen::JsCast;
+use web_sys::HtmlElement;
 use yew::prelude::*;
 use yew_router::HashRouter;
 
@@ -422,8 +424,31 @@ fn RoutedApp() -> Html {
     html! { <HashRouter>{body}</HashRouter> }
 }
 
+fn set_body(content: &str) {
+    let document = web_sys::window().unwrap().document().unwrap();
+    let body: HtmlElement = document.create_element("body").unwrap().dyn_into().unwrap();
+    body.set_inner_html(content);
+    document.set_body(Some(&body));
+}
+
+fn panic_hook() -> Box<dyn Fn(&std::panic::PanicHookInfo) + 'static + Sync + Send> {
+    Box::new(|info: &std::panic::PanicHookInfo<'_>| {
+        let msg = format!("Application panicked: {info}");
+        web_sys::console::error_1(&msg.into());
+
+        set_body(&format!(
+            r#"
+<h1 class="panicked__title">Application panicked!</h1>
+<p>Reason: {info}</p>
+"#
+        ));
+    })
+}
+
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
+
+    yew::set_custom_panic_hook(panic_hook());
 
     static THEMES: &[&str] = &["Crisp", "Desktop", "Material"];
     pwt::state::set_available_themes(THEMES);

@@ -39,8 +39,8 @@ fn demo_input_panel(alert: UseStateHandle<Option<String>>) -> Html {
                     }}), true)
                 .placeholder("Search"),
         )
-        .with_field("Display", DisplayField::new("Some Value"))
-        .with_field("Display with long text", DisplayField::new("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempor nisi odio, sit amet efficitur purus pharetra ac."))
+        .with_field("Display", DisplayField::new().value("Some Value"))
+        .with_field("Display with long text", DisplayField::new().value("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempor nisi odio, sit amet efficitur purus pharetra ac."))
         .with_field("Password", Field::new().input_type(InputType::Password))
         .with_field("Range field", Field::new().range(0.0, 100.0, 1.0))
         .with_field("Numberfield", Number::<i64>::new())

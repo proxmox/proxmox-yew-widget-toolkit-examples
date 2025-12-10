@@ -2,7 +2,7 @@ use yew::prelude::*;
 
 use pwt::css::ColorScheme;
 use pwt::prelude::*;
-use pwt::touch::{Fab, FabMenu, FabMenuAlign, FabMenuDirection};
+use pwt::touch::{Fab, FabMenu, FabMenuAlign, FabMenuDirection, FabMenuEntry};
 use pwt::widget::{ActionIcon, Button, Column, FileButton, Row, SegmentedButton};
 
 #[function_component]
@@ -114,11 +114,11 @@ pub fn ButtonsDemo() -> Html {
             Row::new()
                 .gap(4)
                 .class("pwt-align-items-center")
-                .with_child(Fab::new("fa fa-pencil").large())
+                .with_child(Fab::new("fa fa-pencil").size(pwt::touch::FabSize::Large))
                 .with_child(Fab::new("fa fa-pencil").class("pwt-scheme-secondary"))
                 .with_child(
                     Fab::new("fa fa-pencil")
-                        .small()
+                        .size(pwt::touch::FabSize::Small)
                         .class("pwt-scheme-tertiary"),
                 )
                 .with_child(
@@ -126,8 +126,8 @@ pub fn ButtonsDemo() -> Html {
                         .main_button_class("pwt-scheme-primary")
                         .direction(FabMenuDirection::Down)
                         .align(FabMenuAlign::Start)
-                        .with_child(Fab::new("fa fa-pencil").text("Edit"))
-                        .with_child(Fab::new("fa fa-trash").text("Delete")),
+                        .with_child(FabMenuEntry::new("Edit", "fa fa-pencil", |_| {}))
+                        .with_child(FabMenuEntry::new("Delete", "fa fa-trash", |_| {})),
                 ),
         )
         .with_child("Button Types")
@@ -135,7 +135,11 @@ pub fn ButtonsDemo() -> Html {
             Row::new()
                 .class("pwt-align-items-center")
                 .gap(2)
-                .with_child(Fab::new("fa fa-trash").small().text("FAB"))
+                .with_child(
+                    Fab::new("fa fa-trash")
+                        .size(pwt::touch::FabSize::Small)
+                        .text("FAB"),
+                )
                 .with_child(Button::new("Filled").class(ColorScheme::Primary))
                 .with_child(Button::new("Tonal").class(ColorScheme::PrimaryContainer))
                 .with_child(Button::new("Elevated").class("pwt-button-elevated"))

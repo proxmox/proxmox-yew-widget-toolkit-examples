@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use pwt::css::{Flex, FlexFit};
 use pwt::prelude::*;
 use pwt::touch::{
-    GestureDetector, GestureDragEvent, GestureSwipeEvent, Slidable, SlidableAction,
+    GestureDetector, GestureSwipeEvent, InputEvent, Slidable, SlidableAction,
     SlidableActionMouseEvent,
 };
 use pwt::widget::{Button, Column, Container, Panel, Row};
@@ -64,7 +64,7 @@ impl Component for GestureDetectorDemo {
         let detector = GestureDetector::new(content)
             .on_drag_start(ctx.link().callback(|_| Msg::Log("DRAG START".to_string())))
             .on_drag_end(ctx.link().callback(|_| Msg::Log("DRAG END".to_string())))
-            .on_drag_update(ctx.link().callback(|event: GestureDragEvent| {
+            .on_drag_update(ctx.link().callback(|event: InputEvent| {
                 Msg::Log(format!("DRAG UPDATE {} {}", event.x(), event.y(),))
             }))
             .on_swipe(ctx.link().callback(|event: GestureSwipeEvent| {
@@ -89,14 +89,14 @@ impl Component for GestureDetectorDemo {
         .left_actions(
             SlidableAction::new("Bookmark")
                 .icon_class("fa fa-star-o")
-                .on_click(|event: SlidableActionMouseEvent| {
+                .on_activate(|event: SlidableActionMouseEvent| {
                     event.keep_open(true);
                 }),
         )
         .right_actions(
             SlidableAction::new("Delete")
                 .icon_class("fa fa-trash")
-                .on_click(|event: SlidableActionMouseEvent| {
+                .on_activate(|event: SlidableActionMouseEvent| {
                     event.dismiss(true);
                 }),
         )

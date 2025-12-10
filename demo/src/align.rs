@@ -17,7 +17,7 @@ pub fn AlignDemo() -> Html {
         .padding(2)
         .border(true)
         .with_child("Base")
-        .node_ref(button_ref.clone());
+        .into_html_with_ref(button_ref.clone());
 
     let button_points = vec![
         ("Top", Point::Top),
@@ -90,7 +90,7 @@ pub fn AlignDemo() -> Html {
                 .title("Floating")
                 .style("position", "fixed")
                 .with_child(Container::new().padding(2).with_child("Content"))
-                .node_ref(text_ref.clone()),
+                .into_html_with_ref(text_ref.clone()),
         )
         .into()
 }
