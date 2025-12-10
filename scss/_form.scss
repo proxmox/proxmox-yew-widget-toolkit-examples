@@ -8,11 +8,6 @@
     grid-gap: var(--pwt-spacer-2) 0;
     align-items: baseline;
     width: min-content;
-
-    input {
-        min-width: 100px;
-        width: 0;
-    }
 }
 
 .pwt-form-grid-col4 {
@@ -24,11 +19,6 @@
     grid-gap: var(--pwt-spacer-2) 0;
     align-items: baseline;
     width: min-content;
-
-    input {
-        min-width: 100px;
-        width: 0;
-    }
 }
 
 // spacing between label + field

@@ -17,9 +17,10 @@
 
     height: 100%;
     box-sizing: border-box;
-    padding: var(--pwt-spacer-2);
+    padding: 0 var(--pwt-spacer-2);
 
     color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
 
     justify-content: center;
     align-items: center;

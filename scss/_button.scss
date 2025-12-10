@@ -1,8 +1,3 @@
-button,
-.pwt-button {
-    @include font_and_line_height("label-large");
-}
-
 .pwt-action-icon {
     @include color-scheme-vars($default-accent-color);
 
@@ -35,11 +30,27 @@ button,
 
     &.disabled,
     &:disabled,
-    &[aria-disabled=true] {
-	@include color-scheme-vars("inverse-surface");
+    &[aria-disabled="true"] {
+        @include color-scheme-vars("inverse-surface");
         cursor: auto;
         opacity: 0.5;
     }
+}
+
+/// ## Button Widget
+///
+/// Class `pwt-button`
+///
+/// This is the top level class for the button widget. Buttons have the
+/// following features:
+///
+/// - use color scheme variables
+/// - font `label-large`
+/// - use elevation and ripple effect
+///
+button,
+.pwt-button {
+    @include font_and_line_height("label-large");
 }
 
 .pwt-button {
@@ -70,28 +81,40 @@ button,
 
     &.disabled,
     &:disabled,
-    &[aria-disabled=true] {
+    &[aria-disabled="true"] {
         cursor: auto;
         opacity: 0.5;
-        @include color-scheme-vars("surface", $important: true);
         @include elevation-box-shadow(0);
+
+        &:not(.pwt-button-text) {
+            @include color-scheme-vars("surface", $important: true);
+        }
+        &.pwt-button-text {
+            @include color-scheme-vars("inverse-surface", $important: true);
+        }
+    }
+
+    &.medium {
+        @include font_and_line_height("title-medium");
+        padding: map-get($font-size, "title-medium") map-get($line-height, "title-medium");
     }
 }
 
 // implement state layer for normal buttons
-:not(.pwt-segmented-button.pwt-button-elevated):not(.pwt-segmented-button.pwt-button-outline) > .pwt-button:not(.pwt-fab):not(.pwt-button-text):not(.pwt-button-outline):not(.pwt-button-elevated) {
-    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
-    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+:not(.pwt-segmented-button.pwt-button-elevated):not(.pwt-segmented-button.pwt-button-outline)
+    > .pwt-button:not(.pwt-fab):not(.pwt-button-text):not(.pwt-button-outline):not(.pwt-button-elevated) {
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled="true"]),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled="true"]) {
         @include state-layer-background(press);
         box-shadow: none;
     }
 
-    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed) {
         @include state-layer-background(hover);
         @include elevation-box-shadow(0);
     }
 
-    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed) {
         @include state-layer-background(hover);
         @include elevation-box-shadow(1);
     }
@@ -102,19 +125,20 @@ button,
     }
 }
 
-.pwt-segmented-button.pwt-button-elevated > .pwt-button:not(.pwt-fab):not(.pwt-button-text):not(.pwt-button-outline):not(.pwt-button-elevated) {
-    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
-    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+.pwt-segmented-button.pwt-button-elevated
+    > .pwt-button:not(.pwt-fab):not(.pwt-button-text):not(.pwt-button-outline):not(.pwt-button-elevated) {
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled="true"]),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled="true"]) {
         @include state-layer-background(press);
         @include elevation-box-shadow(1);
     }
 
-    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed) {
         @include state-layer-background(hover);
         @include elevation-box-shadow(1);
     }
 
-    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed) {
         @include state-layer-background(hover);
         @include elevation-box-shadow(2);
     }
@@ -124,7 +148,9 @@ button,
         outline-offset: -2px;
     }
 }
-
+/// The following classes can be used to adopt the button style:
+///
+/// - `pwt-button-text`: text only button with transparent background and accent colored text.
 .pwt-button.pwt-button-text {
     @include elevation-box-shadow(0);
     @include color-scheme-vars($default-accent-color);
@@ -135,6 +161,12 @@ button,
     @include state-layer($base: transparent, $color: var(--pwt-color-background));
 }
 
+/// - `pwt-button-outline`: like text button, but with border.
+/// - `pwt-button-elevated`: like text button, but with border and elevation.
+///
+/// It is also possible to set the color and accent color scheme.
+///
+
 .pwt-button.pwt-button-outline {
     @include elevation-box-shadow(0);
     @include color-scheme-vars($default-accent-color);
@@ -144,13 +176,13 @@ button,
     // Note: outline buttons must have same size as filled buttons
     padding: calc(var(--pwt-spacer-1) - 2px) calc(var(--pwt-spacer-2) - 2px);
 
-    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed) {
         @include elevation-box-shadow(0);
     }
 }
 
-.pwt-button.pwt-button-outline:not(:disabled):not(.disabled):not([aria-disabled=true]),
-.pwt-button.pwt-button-elevated:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+.pwt-button.pwt-button-outline:not(:disabled):not(.disabled):not([aria-disabled="true"]),
+.pwt-button.pwt-button-elevated:not(:disabled):not(.disabled):not([aria-disabled="true"]) {
     @include color-scheme-vars($default-accent-color);
 
     color: var(--pwt-color-background);
@@ -159,6 +191,10 @@ button,
     @include state-layer($base: var(--pwt-color-neutral), $color: var(--pwt-color-background));
 }
 
+/// Class `pwt-segmented-button`
+///
+/// This container class is used to implement segmented buttons.
+///
 .pwt-segmented-button.pwt-button-outline > .pwt-button {
     @include elevation-box-shadow(0);
     @include color-scheme-vars($default-accent-color);
@@ -168,12 +204,12 @@ button,
     // Note: outline buttons must have same size as filled buttons
     padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
 
-    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed) {
         @include elevation-box-shadow(0);
     }
 }
 
-.pwt-segmented-button.pwt-button-outline:not(:disabled):not(.disabled):not([aria-disabled=true]) > .pwt-button {
+.pwt-segmented-button.pwt-button-outline:not(:disabled):not(.disabled):not([aria-disabled="true"]) > .pwt-button {
     color: var(--pwt-color-background);
     background-color: var(--pwt-color-neutral);
 
@@ -182,18 +218,18 @@ button,
 
 .pwt-segmented-button.pwt-button-elevated > .pwt-button,
 .pwt-button.pwt-button-elevated {
-    &:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+    &:not(:disabled):not(.disabled):not([aria-disabled="true"]) {
         @include elevation-box-shadow(1);
     }
 
-    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
-    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed),
-    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled="true"]),
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled="true"]) {
         @include elevation-box-shadow(1);
         z-index: 1; // correctly show shadows
     }
 
-    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed) {
         @include elevation-box-shadow(2);
         z-index: 1; // correctly show shadows
     }
@@ -205,19 +241,19 @@ button,
     @include elevation-background-color($base: var(--pwt-color-background), $level: 0, $state: none);
 
     // fixme: defazult state layer
-    &:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+    &:not(:disabled):not(.disabled):not([aria-disabled="true"]) {
         @include elevation-box-shadow(3);
     }
 
-    &.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]),
-    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed),
-    &:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+    &.pressed:not(:disabled):not(.disabled):not([aria-disabled="true"]),
+    &:focus-within:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed),
+    &:active:not(:disabled):not(.disabled):not([aria-disabled="true"]) {
         @include elevation-box-shadow(2);
         //@include elevation-background-color(0, press);
         @include elevation-background-color($base: var(--pwt-color-background), $level: 0, $state: press);
     }
 
-    &:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+    &:hover:not(:disabled):not(.disabled):not([aria-disabled="true"]):not(:active):not(.pressed) {
         @include elevation-box-shadow(4);
         //@include elevation-background-color(0, hover);
         @include elevation-background-color($base: var(--pwt-color-background), $level: 0, $state: hover);
@@ -253,7 +289,7 @@ button,
 }
 
 .pwt-segmented-button.pwt-button-outline > .pwt-button:first-child {
-    border-inline-start: 2px solid var(--pwt-high-contrast-border) ! important;
+    border-inline-start: 2px solid var(--pwt-high-contrast-border) !important;
 }
 
 .pwt-segmented-button > .pwt-button:last-child {
@@ -277,11 +313,24 @@ button,
     border-end-end-radius: 10rem !important;
 }
 
+/// #### Button styles for mobile/touch devices
+///
+/// The following classes can be used to adopt the button style for mobile/touch devices:
+///
+/// - `pwt-fab`:  Floating action button (FAB)
+/// - `pwt-fab.pwt-fab-small`:  small FAB variant
+/// - `pwt-fab.pwt-fab-large`:  large FAB variant
+///
+
+$normal-fab-size: calc(map-get($font-size, "headline-medium") + 2 * var(--pwt-spacer-2) + 2px);
+$small-fab-size: calc(map-get($font-size, "title-large") + 2 * var(--pwt-spacer-1) + 2px);
+$large-fab-size: calc(map-get($font-size, "headline-large") + 2 * var(--pwt-spacer-3) + 2px);
+
 .pwt-fab {
     border-radius: var(--pwt-fab-corner-shape);
     padding: var(--pwt-spacer-2);
-    height: calc(map-get($font-size, "headline-medium") + 2 * var(--pwt-spacer-2) + 2px);
-    min-width: calc(map-get($font-size, "headline-medium") + 2 * var(--pwt-spacer-2) + 2px);
+    height: $normal-fab-size;
+    min-width: $normal-fab-size;
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
@@ -290,10 +339,14 @@ button,
         font-size: map-get($font-size, "headline-medium");
     }
 
+    &.rounded {
+        border-radius: 100rem;
+    }
+
     &.pwt-fab-small {
         padding: var(--pwt-spacer-1);
-        height: calc(map-get($font-size, "title-large") + 2 * var(--pwt-spacer-1) + 2px);
-        min-width: calc(map-get($font-size, "title-large") + 2 * var(--pwt-spacer-1) + 2px);
+        height: $small-fab-size;
+        min-width: $small-fab-size;
 
         .pwt-fab-icon {
             font-size: map-get($font-size, "title-large");
@@ -306,8 +359,8 @@ button,
 
     &.pwt-fab-large {
         padding: var(--pwt-spacer-3);
-        height: calc(map-get($font-size, "headline-large") + 2 * var(--pwt-spacer-3) + 2px);
-        min-width: calc(map-get($font-size, "headline-large") + 2 * var(--pwt-spacer-3) + 2px);
+        height: $large-fab-size;
+        min-width: $large-fab-size;
 
         .pwt-fab-icon {
             font-size: map-get($font-size, "headline-large");
@@ -326,157 +379,135 @@ button,
     @include button-color-definitions($scheme-name);
 }
 
-// Fab Menus
-.pwt-fab-menu-container {
-    position: relative;
-    z-index: $zindex-dropdown;
+/// ##### FAB Menus
+///
+/// Class `pwt-fab-menu-outer`
+///
+/// This class is used to arrange the FAB and the menu.
+///
 
-    --fab-small-button-height: calc(#{map-get($font-size, "title-large")} + 2 * var(--pwt-spacer-1) + 2px);
+.pwt-fab-menu-outer {
+  display: flex;
+  flex-direction: var(--fab-menu-direction, column-reverse);
+  align-items: var(--fab-menu-align, center);
+  gap: 8px;
+  transition: 0.1s;
+}
 
-    .pwt-fab-menu-item {
-        position: absolute;
-        visibility: hidden;
-        opacity: 0;
-        top: calc(50% - var(--fab-small-button-height) / 2);
-        left: calc(50% - var(--fab-small-button-height) / 2);
-        z-index: -1;
+/// Class `pwt-fab-menu-main`
+///
+/// This class is the container for the main button, and uses for aligning
+/// the close button correctly for different directions and sizes.
+///
+
+.pwt-fab-menu-main {
+    min-height: $normal-fab-size;
+    min-width: $normal-fab-size;
+    display: flex;
+    flex-direction: var(--fab-menu-direction);
+    justify-content: flex-end;
+    align-items: var(--fab-menu-align);
+
+    &.small {
+        min-height: $small-fab-size;
+        min-width: $small-fab-size;
     }
 
-    &.pwt-fab-direction-left.pwt-fab-align-start .pwt-fab-menu-item,
-    &.pwt-fab-direction-right.pwt-fab-align-start .pwt-fab-menu-item {
-        top: 0;
-        bottom: unset;
-    }
-
-    &.pwt-fab-direction-left.pwt-fab-align-end .pwt-fab-menu-item,
-    &.pwt-fab-direction-right.pwt-fab-align-end .pwt-fab-menu-item {
-        top: unset;
-        bottom: 0;
-    }
-
-    &.pwt-fab-direction-up.pwt-fab-align-start .pwt-fab-menu-item,
-    &.pwt-fab-direction-down.pwt-fab-align-start .pwt-fab-menu-item {
-        left: 0;
-        right: unset;
-    }
-
-    &.pwt-fab-direction-up.pwt-fab-align-end .pwt-fab-menu-item,
-    &.pwt-fab-direction-down.pwt-fab-align-end .pwt-fab-menu-item {
-        left: unset;
-        right: 0;
-    }
-
-    &.active .pwt-fab-menu-item {
-        visibility: visible;
-        opacity: 1;
-        z-index: 1;
-    }
-
-    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(2) {
-        top: calc(100% + var(--pwt-spacer-2));
-    }
-
-    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(3) {
-        top: calc(100% + var(--pwt-spacer-2) + 1 * (var(--fab-small-button-height) + var(--pwt-spacer-2)));
-    }
-
-    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(4) {
-        top: calc(100% + var(--pwt-spacer-2) + 2 * (var(--fab-small-button-height) + var(--pwt-spacer-2)));
-    }
-
-    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(5) {
-        top: calc(100% + var(--pwt-spacer-2) + 3 * (var(--fab-small-button-height) + var(--pwt-spacer-2)));
-    }
-
-    &.pwt-fab-direction-down.active > .pwt-fab-menu-item:nth-child(6) {
-        top: calc(100% + var(--pwt-spacer-2) + 4 * (var(--fab-small-button-height) + var(--pwt-spacer-2)));
-    }
-
-    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(2) {
-        top: calc(0px - var(--fab-small-button-height) - var(--pwt-spacer-2));
-    }
-
-    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(3) {
-        top: calc(
-            0px - var(--fab-small-button-height) -
-                (var(--pwt-spacer-2) + 1 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
-        );
-    }
-
-    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(4) {
-        top: calc(
-            0px - var(--fab-small-button-height) -
-                (var(--pwt-spacer-2) + 2 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
-        );
-    }
-
-    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(5) {
-        top: calc(
-            0px - var(--fab-small-button-height) -
-                (var(--pwt-spacer-2) + 3 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
-        );
-    }
-
-    &.pwt-fab-direction-up.active > .pwt-fab-menu-item:nth-child(6) {
-        top: calc(
-            0px - var(--fab-small-button-height) -
-                (var(--pwt-spacer-2) + 4 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
-        );
-    }
-
-    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(2) {
-        left: calc(0px - var(--fab-small-button-height) - var(--pwt-spacer-2));
-    }
-
-    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(3) {
-        left: calc(
-            0px - var(--fab-small-button-height) -
-                (var(--pwt-spacer-2) + 1 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
-        );
-    }
-
-    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(4) {
-        left: calc(
-            0px - var(--fab-small-button-height) -
-                (var(--pwt-spacer-2) + 2 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
-        );
-    }
-
-    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(5) {
-        left: calc(
-            0px - var(--fab-small-button-height) -
-                (var(--pwt-spacer-2) + 3 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
-        );
-    }
-
-    &.pwt-fab-direction-left.active > .pwt-fab-menu-item:nth-child(6) {
-        left: calc(
-            0px - var(--fab-small-button-height) -
-                (var(--pwt-spacer-2) + 4 * (var(--fab-small-button-height) + var(--pwt-spacer-2)))
-        );
-    }
-
-    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(2) {
-        left: calc(100% + var(--pwt-spacers-2));
-    }
-
-    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(3) {
-        left: calc(100% + var(--pwt-spacers-2) + 1 * (var(--fab-small-button-height) + var(--pwt-spacers-2)));
-    }
-
-    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(4) {
-        left: calc(100% + var(--pwt-spacers-2) + 2 * (var(--fab-small-button-height) + var(--pwt-spacers-2)));
-    }
-
-    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(5) {
-        left: calc(100% + var(--pwt-spacers-2) + 3 * (var(--fab-small-button-height) + var(--pwt-spacers-2)));
-    }
-
-    &.pwt-fab-direction-right.active > .pwt-fab-menu-item:nth-child(6) {
-        left: calc(100% + var(--pwt-spacers-2) + 4 * (var(--fab-small-button-height) + var(--pwt-spacers-2)));
+    &.large {
+        min-height: $large-fab-size;
+        min-width: $large-fab-size;
     }
 }
 
+/// Class `pwt-fab-menu-container`
+///
+/// This class is the container for the fab menu items.
+///
+
+.pwt-fab-menu-container {
+    flex-direction: column;
+    align-items: var(--fab-menu-align);
+
+    display: flex;
+    gap: 4px;
+
+    flex: 1 0 auto;
+
+    --transition-delay: 0.02s;
+
+    // make gradient appear in the reverse direction
+    &:dir(rtl) {
+        --fab-menu-animation-direction: -90deg;
+        --fab-menu-animation-start: 100%;
+    }
+
+    .pwt-fab-menu-item {
+        opacity: 0;
+        z-index: -1;
+        mask:
+          linear-gradient(#000 0 0),
+          linear-gradient(var(--fab-menu-animation-direction, 90deg), #000 50%, #0000 100%) padding-box
+            var(--fab-menu-animation-start, 0%) / var(--transition-width, 100% 100%) no-repeat;
+        mask-composite: exclude;
+        transition:  0.1s;
+    }
+
+    & .pwt-fab-menu-item {
+        // input is _n and dir,
+        // when dir is 1, _n: 0 -> 0 * delay, _n: 1 -> 1 * delay, etc.
+        // when dir is -1, _n: 0 -> 6 * delay, _n: 1 -> 5 * delay, etc.
+        transition-delay: calc((var(--_n) * ((1 + var(--dir)) / 2) + (6 - var(--_n)) * ((1 - var(--dir)) / 2)) * var(--transition-delay));
+    }
+    @for $i from 1 through 6 {
+        & .pwt-fab-menu-item:nth-child(#{$i}) {
+            --_n: #{$i};
+        }
+    }
+
+    &.active .pwt-fab-menu-item {
+        --transition-width: 0% 100%;
+        opacity: 1;
+        z-index: 1;
+    }
+}
+
+/// Classes `pwt-fab-direction-{up,down}`
+///
+/// These are used to control the layout of the FAB to the menu and the direction of the animations
+///
+
+.pwt-fab-direction-up {
+    --fab-menu-direction: column-reverse;
+    & .pwt-fab-menu-container.active {
+        --dir: -1;
+    }
+    & .pwt-fab-menu-container:not(.active) {
+        --dir: 1;
+    }
+}
+
+.pwt-fab-direction-down {
+    --fab-menu-direction: column;
+    & .pwt-fab-menu-container.active {
+        --dir: 1;
+    }
+    & .pwt-fab-menu-container:not(.active) {
+        --dir: -1;
+    }
+}
+
+/// Classes `pwt-fab-align-{start,end}`
+///
+/// These are used to align the button according to the alignment
+///
+
+.pwt-fab-align-start {
+    --fab-menu-align: flex-start;
+}
+
+.pwt-fab-align-end {
+    --fab-menu-align: flex-end;
+}
 
 // Material design ripple effect
 

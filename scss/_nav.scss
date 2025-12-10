@@ -43,7 +43,7 @@
         &.active {
             color: var(--pwt-accent-color);
             background-color: var(--pwt-accent-color-background);
-            @include state-layer($base:  var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
+            @include state-layer($base: var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
         }
 
         &.disabled {
@@ -65,7 +65,6 @@
     display: flex;
     position: relative;
     border-bottom: 1px solid var(--pwt-color-border);
-    flex: 1;
 
     color: var(--pwt-color);
     background-color: var(--pwt-color-background);
@@ -149,8 +148,7 @@
         &.active {
             color: var(--pwt-accent-color);
             background-color: var(--pwt-accent-color-background);
-            @include state-layer($base:  var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
-
+            @include state-layer($base: var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
         }
     }
 

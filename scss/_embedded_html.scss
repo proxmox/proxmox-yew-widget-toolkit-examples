@@ -1,4 +1,3 @@
-
 // Display content like a normal html page.
 // This resets some tags to browser defaults settings.
 // We use this to display the output from a markdown parser.
@@ -25,18 +24,29 @@
         padding: revert;
     }
 
-    pre {
-        padding: var(--pwt-spacer-2);
+    // space between list items
+    li + li {
+        margin-top: var(--pwt-spacer-2);
+    }
+
+    code {
+        white-space: pre;
+        font-family: $pwt-font-monospace;
         color: var(--pwt-color-on-surface);
         background-color: var(--pwt-color-surface);
-        font-family: $pwt-font-monospace;
+    }
+
+    pre code {
+        display: inline-block;
+        padding: var(--pwt-spacer-2);
+        border-left: var(--pwt-spacer-1) solid var(--pwt-color-primary);
     }
 
     strong {
-	font-variation-settings: "wght" 700; // works with Roboto Flex
+        font-variation-settings: "wght" 700; // works with Roboto Flex
     }
 
     em {
-	font-variation-settings: "slnt" -10; // works with Roboto Flex
+        font-variation-settings: "slnt" -10; // works with Roboto Flex
     }
 }

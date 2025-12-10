@@ -108,6 +108,10 @@ changes the colors of the widget. The `pwt-scheme-<name>` and
 `pwt-scheme-<name>-container` helper classes can be used to set
 those variables.
 
+There is also the `pwt-default-colors` class to set the `color` and
+`background-color` properties directly to the `--pwt-color` and
+`--pwt-color-background` respectively.
+
 A similar scheme is used for widgets with an associated accent color, using
 the following CSS variables:
 

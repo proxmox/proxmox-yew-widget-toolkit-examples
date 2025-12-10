@@ -1,7 +1,8 @@
 .pwt-datatable {
     @include color-scheme-vars(neutral);
-    color: var(--pwt-pwt-color-on-neutral);
-    background-color: var(--pwt-color-neutral);
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
+    --pwt-elevated-background-color: var(--pwt-color-background);
 }
 
 .pwt-datatable-content {
@@ -63,7 +64,7 @@
 
     &.table-borderless tr {
         // make the border invisible
-        border-color: var(--pwt-color-neutral);
+        border-color: var(--pwt-elevated-background-color);
     }
 
     .pwt-datatable-cell {
@@ -108,7 +109,7 @@
     border-inline-end: 1px solid var(--pwt-color-border) !important;
 
     &.sorted {
-        color: var(--pwt-color-primary)
+        color: var(--pwt-color-primary);
     }
 
     .pwt-datatable-header-content {
@@ -167,14 +168,8 @@
     opacity: var(--pwt-tmp-trigger-opacity);
     transition: opacity 0.2s ease-in-out;
 
-    top: 0px;
-    bottom: 0px;
-    right: 0px;
-}
-
-html[dir=rtl] .pwt-datatable-header-menu-trigger {
-    right: auto;
-    left: 0px;
+    inset-block: 0px;
+    inset-inline-end: 0px;
 }
 
 .pwt-datatable-header-anchor {
@@ -208,6 +203,6 @@ html[dir=rtl] .pwt-datatable-header-menu-trigger {
 }
 
 .pwt-tree-expander {
-    line-height: map-get($line-height , "body-medium");
+    line-height: map-get($line-height, "body-medium");
     cursor: pointer;
 }

@@ -1,3 +1,27 @@
+/// ## Content Spacer Class
+///
+/// Class `pwt-content-spacer`
+///
+/// This is a special class for laying out containers with one or more children.
+/// The purpose is that you can adopt these styles for different themes to give
+/// the theme a unique look in terms of container nesting. The default
+/// implementation uses different styles depending on the number of children.
+///
+/// * with single child:
+///   - no padding
+///   - no border on child
+///   - neutral color on children
+/// * with more than one child:
+///   - two spacer padding/gap on container
+///   - one pixel border on children
+///   - surface color on container
+///   - neutral color on children
+///
+/// Class `pwt-content-spacer-padding`
+///
+/// Infer the padding used by the content spacer. This is useful to create components
+/// using the same padding as the content spacer.
+///
 .pwt-content-spacer {
     @include color-scheme-vars("surface");
     color: var(--pwt-color);
@@ -26,4 +50,10 @@
 
 .pwt-content-spacer-padding {
     padding: var(--pwt-spacer-2);
+}
+
+.pwt-content-spacer-colors {
+    @include color-scheme-vars("surface");
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
 }

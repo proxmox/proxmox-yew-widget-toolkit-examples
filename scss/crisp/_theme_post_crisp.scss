@@ -7,3 +7,7 @@
 .pwt-content-spacer {
     @include color-scheme-vars("neutral");
 }
+
+.pwt-content-spacer-colors {
+    @include color-scheme-vars("neutral");
+}

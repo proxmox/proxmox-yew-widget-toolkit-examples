@@ -46,6 +46,15 @@ ul.pwt-menubar {
     }
 }
 
+/// `pwt-datatable-content tr`
+/// : make horizontal table borders invisible
+///
+.pwt-datatable-content {
+    &:not(.table-borderless) tr {
+        border-color: var(--pwt-elevated-background-color);
+    }
+}
+
 /// `pwt-content-spacer`
 /// : overwrite content spacer layout
 ///
@@ -57,4 +66,11 @@ ul.pwt-menubar {
         border-top: 1px solid var(--pwt-color-surface) !important;
         @include elevation-box-shadow(1);
     }
+}
+
+/// `pwt-side-dialog-bottom`
+/// : overwrite corner radius
+.pwt-side-dialog-bottom {
+        border-top-left-radius: var(--pwt-shape-corner-large);
+        border-top-right-radius: var(--pwt-shape-corner-large);
 }

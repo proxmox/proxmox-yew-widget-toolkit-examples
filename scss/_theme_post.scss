@@ -61,7 +61,9 @@
 /* Font setup */
 @font-face {
     font-family: "Roboto Flex";
-    src: url("../fonts/RobotoFlexVariableFont.ttf") format("truetype");
+    src:
+      url("../fonts/RobotoFlexVariableFont.woff2") format("woff2"),
+      url("../fonts/RobotoFlexVariableFont.ttf") format("truetype");
 }
 $pwt-font-sans-serif: "Roboto Flex";
 $pwt-font-monospace: monospace;

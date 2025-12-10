@@ -138,8 +138,8 @@ dialog.pwt-outer-dialog {
     width: 100vw;
     max-width: 100vw;
 
-    height: 100vh;
-    max-height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
 
     margin: 0px;
     padding: 0px;
@@ -230,6 +230,8 @@ dialog.pwt-outer-dialog {
         bottom: 0px;
         left: 0px;
         right: 0px;
+        // for the drag handle
+        padding-top: var(--pwt-spacer-2);
 
         &.visible {
             transform: translateY(0);
@@ -237,6 +239,19 @@ dialog.pwt-outer-dialog {
 
         &.hidden {
             transform: translateY(100%);
+        }
+
+        // drag handle
+        &:before {
+            content: "";
+            height: 4px;
+            position: absolute;
+            opacity: 0.4;
+            width: var(--pwt-spacer-3);
+            background-color: var(--pwt-color-on-surface);
+            border-radius: var(--pwt-dialog-corner-shape);
+            inset-inline-start: calc(50% - var(--pwt-spacer-3) / 2);
+            inset-block-start: calc((var(--pwt-spacer-2) - 4px) / 2);
         }
     }
 }

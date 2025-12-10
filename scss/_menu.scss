@@ -10,8 +10,8 @@
 
 	@include elevation-box-shadow(2);
 
-	max-height: 100vh;
-	max-width: 100vw;
+	max-height: 100dvh;
+	max-width: 100dvw;
 
 	.pwt-menu {
 		overflow: hidden;
@@ -121,11 +121,10 @@ ul.pwt-menu {
 		margin-inline-start: var(--pwt-spacer-2);
 		font-size: map-get($font-size, "title-medium");
 		line-height: map-get($line-height, "title-medium");
-	}
-}
 
-/* change arrow icon direction */
-/* Note: :dir(rtl) only works with firefox, so we cant use that. */
-html[dir="rtl"] .pwt-menu-item-arrow {
-	transform: scaleX(-1);
+                /* change arrow icon direction */
+                &:dir(rtl) {
+                    transform: scaleX(-1);
+                }
+	}
 }
