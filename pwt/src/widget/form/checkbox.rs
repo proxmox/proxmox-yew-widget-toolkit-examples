@@ -11,7 +11,7 @@ use super::{
     ValidateFn,
 };
 use crate::css::AlignItems;
-use crate::props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, WidgetBuilder};
+use crate::props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, IntoVTag, WidgetBuilder};
 use crate::tr;
 use crate::widget::{Container, Fa, FieldLabel, Row, Tooltip};
 
@@ -138,7 +138,9 @@ pub enum Msg {
 }
 
 #[doc(hidden)]
-pub struct CheckboxField {}
+pub struct CheckboxField {
+    node_ref: NodeRef,
+}
 
 #[derive(PartialEq)]
 pub struct ValidateClosure {
@@ -198,25 +200,19 @@ impl ManagedField for CheckboxField {
             };
         }
 
-        let valid = Ok(());
-
         let default = if props.default.unwrap_or(false) {
             props.submit_on_value.clone()
         } else {
             props.submit_off_value.clone()
         };
 
-        ManagedFieldState {
-            value,
-            valid,
-            default,
-            radio_group: false,
-            unique: false,
-        }
+        ManagedFieldState::new(value, default)
     }
 
     fn create(_ctx: &ManagedFieldContext<Self>) -> Self {
-        Self {}
+        Self {
+            node_ref: NodeRef::default(),
+        }
     }
 
     fn label_clicked(&mut self, ctx: &ManagedFieldContext<Self>) -> bool {
@@ -278,11 +274,8 @@ impl ManagedField for CheckboxField {
 
         let state = ctx.state();
 
-        let (value, valid) = (&state.value, &state.valid);
-        let checked = {
-            let this = &props;
-            *value == this.submit_on_value
-        };
+        let (value, validation_result) = (&state.value, &state.result);
+        let checked = *value == props.submit_on_value;
 
         let onclick = link.callback(|_| Msg::Toggle);
         let onkeyup = Callback::from({
@@ -311,7 +304,7 @@ impl ManagedField for CheckboxField {
                     )
                     .class(checked.then_some("checked"))
                     .class(disabled.then_some("disabled"))
-                    .class(if valid.is_ok() {
+                    .class(if validation_result.is_ok() {
                         "is-valid"
                     } else {
                         "is-invalid"
@@ -322,7 +315,8 @@ impl ManagedField for CheckboxField {
                     )
                     .attribute("role", "checkbox")
                     .attribute("aria-checked", checked.then_some("true"))
-                    .onkeyup(onkeyup),
+                    .onkeyup(onkeyup)
+                    .into_html_with_ref(self.node_ref.clone()),
             );
 
         let box_label = props.box_label.clone().map(|label| label.padding_start(2));
@@ -339,11 +333,14 @@ impl ManagedField for CheckboxField {
             .listeners(&props.listeners)
             .onclick(onclick);
 
-        if let Err(msg) = &valid {
-            checkbox.set_tip(msg.clone())
-        } else if let Some(tip) = &props.tip {
-            if !disabled {
-                checkbox.set_tip(tip.clone())
+        match validation_result {
+            Err(msg) => checkbox.set_tip(msg.clone()),
+            Ok(_) => {
+                if let Some(tip) = &props.tip {
+                    if !disabled {
+                        checkbox.set_tip(tip.clone());
+                    }
+                }
             }
         }
 
@@ -354,7 +351,7 @@ impl ManagedField for CheckboxField {
         if first_render {
             let props = ctx.props();
             if props.input_props.autofocus {
-                if let Some(el) = props.std_props.node_ref.cast::<web_sys::HtmlElement>() {
+                if let Some(el) = self.node_ref.cast::<web_sys::HtmlElement>() {
                     let _ = el.focus();
                 }
             }

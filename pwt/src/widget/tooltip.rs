@@ -9,11 +9,10 @@ use crate::widget::Container;
 
 use pwt_macros::widget;
 
-#[widget(pwt=crate, comp=PwtTooltip, @element)]
+/// Tooltip Container
+#[widget(pwt=crate, comp=PwtTooltip, @element, @container)]
 #[derive(Properties, PartialEq, Clone)]
 pub struct Tooltip {
-    content: VNode,
-
     /// The tooltip content/message.
     #[prop_or_default]
     pub tip: Option<Html>,
@@ -23,10 +22,16 @@ pub struct Tooltip {
 }
 
 impl Tooltip {
+    /// Creates a new tooltip for the provided content.
     pub fn new(content: impl Into<VNode>) -> Self {
-        yew::props!(Self {
-            content: content.into()
-        })
+        yew::props!(Self {}).with_child(content.into())
+    }
+
+    /// Create an empty toolkit container.
+    ///
+    /// To add content, use the [ContainerBuilder] functions.
+    pub fn empty() -> Self {
+        yew::props!(Self {})
     }
 
     /// Builder style method to set the tooltip
@@ -65,6 +70,7 @@ pub enum Msg {
 
 #[doc(hidden)]
 pub struct PwtTooltip {
+    node_ref: NodeRef,
     tooltip_ref: NodeRef,
     align_options: AlignOptions,
     show: bool,
@@ -97,6 +103,7 @@ impl Component for PwtTooltip {
                 .offset(4.0, 4.0);
 
         Self {
+            node_ref: NodeRef::default(),
             tooltip_ref: NodeRef::default(),
             show: false,
             hover_tooltip: false,
@@ -145,7 +152,6 @@ impl Component for PwtTooltip {
 
         let tip = show_tooltip.then_some(
             Container::new()
-                .node_ref(self.tooltip_ref.clone())
                 .attribute("role", "tooltip")
                 .attribute("aria-live", "polite")
                 .attribute("data-show", show_tooltip.then_some(""))
@@ -153,13 +159,14 @@ impl Component for PwtTooltip {
                 .class(props.rich.then_some("pwt-tooltip-rich"))
                 .onmouseenter(ctx.link().callback(|_| Msg::Enter))
                 .onmouseleave(ctx.link().callback(|_| Msg::Leave))
-                .with_optional_child(props.tip.clone()),
+                .with_optional_child(props.tip.clone())
+                .into_html_with_ref(self.tooltip_ref.clone()),
         );
 
         Container::new()
             .with_std_props(&props.std_props)
             .listeners(&props.listeners)
-            .with_child(props.content.clone())
+            .children(props.children.clone())
             .onmouseenter(ctx.link().callback(|_| Msg::Show))
             .onmouseleave(ctx.link().callback(|_| Msg::Hide))
             .onfocus(ctx.link().callback(|_| Msg::Show))
@@ -174,13 +181,12 @@ impl Component for PwtTooltip {
                 }
             }))
             .with_optional_child(tip)
-            .into()
+            .into_html_with_ref(self.node_ref.clone())
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
-        let props = ctx.props();
         if self.show && ctx.props().tip.is_some() {
-            if let Some(content_node) = props.std_props.node_ref.get() {
+            if let Some(content_node) = self.node_ref.get() {
                 if let Some(tooltip_node) = self.tooltip_ref.get() {
                     let _ = align_to(content_node, tooltip_node, Some(self.align_options.clone()));
                 }

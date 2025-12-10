@@ -7,7 +7,7 @@ use yew::prelude::*;
 use pwt_macros::{builder, widget};
 
 use crate::css::AlignItems;
-use crate::props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, WidgetBuilder};
+use crate::props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, IntoVTag, WidgetBuilder};
 use crate::tr;
 use crate::widget::{Container, Fa, FieldLabel, Row, Tooltip};
 
@@ -121,7 +121,9 @@ pub enum Msg {
 }
 
 #[doc(hidden)]
-pub struct RadioButtonField {}
+pub struct RadioButtonField {
+    node_ref: NodeRef,
+}
 
 #[derive(PartialEq)]
 pub struct ValidateClosure {
@@ -172,13 +174,9 @@ impl ManagedField for RadioButtonField {
             None => default.clone(),
         };
 
-        ManagedFieldState {
-            value: value.into(),
-            valid: Ok(()),
-            default: default.into(),
-            radio_group: true,
-            unique: false,
-        }
+        let mut state = ManagedFieldState::new(value.into(), default.into());
+        state.radio_group = true;
+        state
     }
 
     fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
@@ -191,7 +189,9 @@ impl ManagedField for RadioButtonField {
     }
 
     fn create(_ctx: &ManagedFieldContext<Self>) -> Self {
-        Self {}
+        Self {
+            node_ref: NodeRef::default(),
+        }
     }
 
     fn label_clicked(&mut self, ctx: &ManagedFieldContext<Self>) -> bool {
@@ -244,7 +244,7 @@ impl ManagedField for RadioButtonField {
         let disabled = props.input_props.disabled;
 
         let on_value = props.value.to_string();
-        let (value, valid) = (&state.value, &state.valid);
+        let (value, validation_result) = (&state.value, &state.result);
         let checked = *value == on_value;
 
         let onclick = ctx.link().callback(|_| Msg::Toggle);
@@ -268,7 +268,7 @@ impl ManagedField for RadioButtonField {
                 )
                 .class(checked.then_some("checked"))
                 .class(disabled.then_some("disabled"))
-                .class(if valid.is_ok() {
+                .class(if validation_result.is_ok() {
                     "is-valid"
                 } else {
                     "is-invalid"
@@ -279,7 +279,8 @@ impl ManagedField for RadioButtonField {
                 )
                 .attribute("role", "checkbox")
                 .attribute("aria-checked", checked.then_some("true"))
-                .onkeyup(onkeyup),
+                .onkeyup(onkeyup)
+                .into_html_with_ref(self.node_ref.clone()),
         );
 
         let box_label = props.box_label.clone().map(|label| label.padding_start(2));
@@ -296,7 +297,7 @@ impl ManagedField for RadioButtonField {
             .listeners(&props.listeners)
             .onclick(onclick);
 
-        if let Err(msg) = &valid {
+        if let Err(msg) = &validation_result {
             checkbox.set_tip(msg.clone())
         } else if let Some(tip) = &props.tip {
             if !disabled {
@@ -311,7 +312,7 @@ impl ManagedField for RadioButtonField {
         if first_render {
             let props = ctx.props();
             if props.input_props.autofocus {
-                if let Some(el) = props.std_props.node_ref.cast::<web_sys::HtmlElement>() {
+                if let Some(el) = self.node_ref.cast::<web_sys::HtmlElement>() {
                     let _ = el.focus();
                 }
             }

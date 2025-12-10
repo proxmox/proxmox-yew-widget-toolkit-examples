@@ -9,9 +9,10 @@ use crate::props::FieldStdProps;
 use crate::widget::form::{
     ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldState,
 };
+use crate::widget::menu::MenuController;
 use crate::widget::Container;
 
-use super::{MenuControllerMsg, MenuEvent};
+use super::MenuEvent;
 
 use pwt_macros::builder;
 
@@ -66,8 +67,9 @@ pub struct MenuCheckbox {
     #[prop_or_default]
     pub on_change: Option<Callback<MenuEvent>>,
 
+    #[builder_cb(IntoPropValue, into_prop_value, Option<MenuController>)]
     #[prop_or_default]
-    pub(crate) menu_controller: Option<Callback<MenuControllerMsg>>,
+    pub(crate) menu_controller: Option<MenuController>,
 }
 
 impl FieldBuilder for MenuCheckbox {
@@ -91,11 +93,6 @@ impl MenuCheckbox {
             text: text.into(),
             radio_group: true,
         })
-    }
-
-    pub(crate) fn menu_controller(mut self, cb: impl IntoEventCallback<MenuControllerMsg>) -> Self {
-        self.menu_controller = cb.into_event_callback();
-        self
     }
 }
 
@@ -127,13 +124,10 @@ impl ManagedField for MenuCheckboxField {
             None => default.clone(),
         };
 
-        ManagedFieldState {
-            value: value.into(),
-            valid: Ok(()),
-            default: default.into(),
-            radio_group: props.radio_group,
-            unique: true,
-        }
+        let mut state = ManagedFieldState::new(value.into(), default.into());
+        state.radio_group = props.radio_group;
+        state.unique = true;
+        state
     }
 
     fn value_changed(&mut self, ctx: &ManagedFieldContext<Self>) {
@@ -185,7 +179,7 @@ impl ManagedField for MenuCheckboxField {
                     on_click.emit(event.clone());
                     if !event.get_keep_open() {
                         if let Some(menu_controller) = &props.menu_controller {
-                            menu_controller.emit(MenuControllerMsg::Collapse);
+                            menu_controller.collapse();
                         }
                     }
                 }

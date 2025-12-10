@@ -5,12 +5,13 @@ use yew::html::IntoPropValue;
 use yew::virtual_dom::{VComp, VNode};
 
 use crate::props::{IntoOptionalTextRenderFn, TextRenderFn};
-use crate::state::{Language, LanguageObserver};
+use crate::state::{get_language_info, Language, LanguageObserver};
+use crate::widget::rtl_switcher::set_text_direction;
 use crate::{impl_to_html, prelude::*};
 
 use pwt_macros::builder;
 
-/// Catalog loader (load I18N tralslation catalogs)
+/// Catalog loader (load I18N translation catalogs)
 ///
 /// This component uses the the language from the [Language] state, and
 /// automatically reloads the catalog on changes.
@@ -37,6 +38,11 @@ pub struct CatalogLoader {
     #[builder_cb(IntoOptionalTextRenderFn, into_optional_text_render_fn, String)]
     #[prop_or_default]
     pub url_builder: Option<TextRenderFn<String>>,
+
+    /// Default language (skip catalog loading for this language)
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or(AttrValue::Static("en"))]
+    pub default_lang: AttrValue,
 }
 
 impl CatalogLoader {
@@ -73,6 +79,17 @@ pub struct PwtCatalogLoader {
     lang: String,
     last_url: String,
     state: LoadState,
+    loaded_once: bool,
+}
+
+impl PwtCatalogLoader {
+    fn set_language(&mut self, ctx: &yew::Context<Self>, lang: Option<String>, fallback: String) {
+        let mut lang = lang.unwrap_or(fallback);
+        if lang.is_empty() {
+            lang = ctx.props().default_lang.to_string();
+        }
+        self.lang = lang;
+    }
 }
 
 impl Component for PwtCatalogLoader {
@@ -84,24 +101,31 @@ impl Component for PwtCatalogLoader {
 
         let _observer = LanguageObserver::new(ctx.link().callback(Msg::ChangeLanguage));
 
-        let lang = props
-            .lang
-            .clone()
-            .map(|l| l.to_string())
-            .unwrap_or(Language::load());
-
-        Self {
-            lang,
+        let mut this = Self {
+            lang: String::new(),
             last_url: String::new(),
             state: LoadState::Idle,
             _observer,
-        }
+            loaded_once: false,
+        };
+
+        let lang = props.lang.clone().map(|l| l.to_string());
+        this.set_language(ctx, lang, Language::load());
+        this
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         let props = ctx.props();
         match msg {
             Msg::LoadDone => {
+                if let Some(info) = get_language_info(&self.lang) {
+                    if let Err(err) = set_text_direction(info.direction) {
+                        log::error!("could not set text direction: {err}");
+                    }
+                } else {
+                    log::warn!("could not load language info for '{}'", self.lang);
+                }
+                self.loaded_once = true;
                 self.state = LoadState::Idle;
                 true
             }
@@ -110,7 +134,7 @@ impl Component for PwtCatalogLoader {
                 true
             }
             Msg::ChangeLanguage(lang) => {
-                self.lang = props.lang.clone().map(|l| l.to_string()).unwrap_or(lang);
+                self.set_language(ctx, props.lang.clone().map(|l| l.to_string()), lang);
                 true
             }
         }
@@ -119,11 +143,8 @@ impl Component for PwtCatalogLoader {
     fn changed(&mut self, ctx: &Context<Self>, old_props: &Self::Properties) -> bool {
         let props = ctx.props();
         if props.lang != old_props.lang {
-            self.lang = props
-                .lang
-                .clone()
-                .map(|l| l.to_string())
-                .unwrap_or(Language::load());
+            let lang = props.lang.clone().map(|l| l.to_string());
+            self.set_language(ctx, lang, Language::load());
         }
         true
     }
@@ -131,7 +152,7 @@ impl Component for PwtCatalogLoader {
     fn view(&self, ctx: &yew::Context<Self>) -> yew::Html {
         let props = ctx.props();
 
-        if matches!(self.state, LoadState::LoadFinished(_)) {
+        if !self.loaded_once || matches!(self.state, LoadState::LoadFinished(_)) {
             html! {}
         } else {
             html! {props.body.clone()}
@@ -142,17 +163,20 @@ impl Component for PwtCatalogLoader {
         let props = ctx.props();
         match &self.state {
             LoadState::Idle => {
-                if !self.lang.is_empty() {
-                    let url = props.lang_to_url(&self.lang);
-                    if self.last_url != url {
-                        self.state = LoadState::Loading;
-                        let link = ctx.link().clone();
+                let url = props.lang_to_url(&self.lang);
+
+                if self.last_url != url {
+                    self.state = LoadState::Loading;
+                    let link = ctx.link().clone();
+
+                    if self.lang == props.default_lang {
+                        crate::init_i18n(Catalog::empty());
+                        link.send_message(Msg::LoadFinished(url));
+                    } else {
                         crate::init_i18n_from_url(&url, move |url| {
                             link.send_message(Msg::LoadFinished(url));
                         });
                     }
-                } else {
-                    crate::init_i18n(Catalog::empty());
                 }
             }
             LoadState::Loading => { /* wait until loaded */ }

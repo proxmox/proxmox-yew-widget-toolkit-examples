@@ -1,5 +1,8 @@
 use std::rc::Rc;
 
+use anyhow::format_err;
+use indexmap::IndexMap;
+
 use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::prelude::*;
 use yew::virtual_dom::Key;
@@ -38,10 +41,25 @@ pub struct Combobox {
     #[prop_or_default]
     pub default: Option<AttrValue>,
 
+    /// Force value.
+    ///
+    /// To implement controlled components (for use without a FormContext).
+    /// This is ignored if the field has a name.
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or_default]
+    pub value: Option<AttrValue>,
+
     /// Make the input editable.
     #[prop_or_default]
     #[builder]
     pub editable: bool,
+
+    /// Force selection
+    ///
+    /// Only allow known items. Other values create a validation error.
+    #[prop_or_default]
+    #[builder]
+    pub force_selection: bool,
 
     /// Item list.
     #[prop_or_default]
@@ -93,6 +111,32 @@ impl Combobox {
     /// Create a new instance.
     pub fn new() -> Self {
         yew::props!(Self {})
+    }
+
+    /// Create a combobox from a key-value iterator.
+    ///
+    /// You can either use a `Vec<(key,value)>`, `HashMap` or `IndexMap`.
+    pub fn from_key_value_pairs<
+        K: Into<AttrValue>,
+        V: Into<Html>,
+        T: IntoIterator<Item = (K, V)>,
+    >(
+        iter: T,
+    ) -> Self {
+        let pairs: IndexMap<AttrValue, Html> = iter
+            //            .clone()
+            .into_iter()
+            .map(|(k, v)| (k.into(), v.into()))
+            .collect();
+        let items: Vec<AttrValue> = pairs.keys().map(|k| k.clone()).collect();
+        let render_value = Some(RenderFn::new(move |k: &AttrValue| match pairs.get(k) {
+            Some(v) => v.clone(),
+            None => k.into(),
+        }));
+        yew::props!(Self {
+            items: Rc::new(items),
+            render_value,
+        })
     }
 
     /// Builder style method to add an selectable item.
@@ -164,6 +208,36 @@ pub enum Msg {
 pub struct PwtCombobox {
     store: Store<AttrValue>,
     columns: Rc<Vec<DataTableHeader<AttrValue>>>,
+    validate: Option<ValidateFn<(String, Store<AttrValue>)>>,
+}
+
+impl PwtCombobox {
+    fn create_validate(props: &Combobox) -> Option<ValidateFn<(String, Store<AttrValue>)>> {
+        if props.force_selection {
+            let validate = props.validate.clone();
+            Some(ValidateFn::new(
+                move |(value, store): &(String, Store<AttrValue>)| {
+                    let found: bool = store
+                        .read()
+                        .iter()
+                        .find(|item| item.as_str() == value)
+                        .is_some();
+
+                    if !found {
+                        return Err(format_err!(tr!("no such item")));
+                    }
+
+                    if let Some(validate) = &validate {
+                        validate.apply(&(value.clone(), store.clone()))
+                    } else {
+                        Ok(())
+                    }
+                },
+            ))
+        } else {
+            props.validate.clone()
+        }
+    }
 }
 
 impl Component for PwtCombobox {
@@ -187,7 +261,11 @@ impl Component for PwtCombobox {
             .render(render_value)
             .into()]);
 
-        Self { store, columns }
+        Self {
+            store,
+            columns,
+            validate: Self::create_validate(props),
+        }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -205,6 +283,7 @@ impl Component for PwtCombobox {
                 self.store.clear();
             }
         }
+        self.validate = Self::create_validate(props);
         true
     }
 
@@ -249,9 +328,10 @@ impl Component for PwtCombobox {
         Selector::new(self.store.clone(), picker)
             .with_std_props(&props.std_props)
             .with_input_props(&props.input_props)
+            .value(&props.value)
             .editable(props.editable)
             .default(&props.default)
-            .validate(props.validate.clone())
+            .validate(self.validate.clone())
             .render_value(props.render_value.clone())
             .trigger(props.trigger.clone())
             .on_change({

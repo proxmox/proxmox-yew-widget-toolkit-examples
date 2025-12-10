@@ -130,10 +130,10 @@ impl<T: 'static + DeserializeOwned + Serialize> Loader<T> {
         self.0.add_listener(move |_| cb.emit(me.clone()))
     }
 
-    pub fn read(&self) -> SharedStateReadGuard<LoaderState<T>> {
+    pub fn read(&self) -> SharedStateReadGuard<'_, LoaderState<T>> {
         self.0.read()
     }
-    pub fn write(&self) -> SharedStateWriteGuard<LoaderState<T>> {
+    pub fn write(&self) -> SharedStateWriteGuard<'_, LoaderState<T>> {
         self.0.write()
     }
 
@@ -180,6 +180,11 @@ impl<T: 'static + DeserializeOwned + Serialize> Loader<T> {
         // we don't want to notify listeners here, because we just set up the loading
         state.notify = false;
         drop(state);
+    }
+
+    /// Abort any currently running load.
+    pub fn abort(&mut self) {
+        self.write().async_abort_guard = None;
     }
 
     pub fn reload_button(&self) -> Button {

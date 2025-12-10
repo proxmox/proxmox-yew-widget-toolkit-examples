@@ -3,47 +3,84 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use gloo_timers::callback::Timeout;
+use gloo_utils::window;
+use wasm_bindgen::JsValue;
+use web_sys::{EventTarget, Touch};
 use yew::html::IntoEventCallback;
 use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
 use crate::impl_to_html;
-use crate::props::{ContainerBuilder, EventSubscriber, WidgetBuilder, WidgetStyleBuilder};
+use crate::props::{
+    ContainerBuilder, EventSubscriber, IntoVTag, WidgetBuilder, WidgetStyleBuilder,
+};
 use crate::widget::Container;
 
-/// Like [PointerEvent](web_sys::PointerEvent) (currently no additional features)
-pub struct GestureDragEvent {
-    event: PointerEvent,
+/// An event that can happen from a [`PointerEvent`] or a [`Touch`]
+///
+/// For convenience, expose the most important values from the underlying events
+pub enum InputEvent {
+    PointerEvent(PointerEvent),
+    Touch(Touch),
 }
 
-impl GestureDragEvent {
-    fn new(event: PointerEvent) -> Self {
-        Self { event }
+impl InputEvent {
+    pub fn x(&self) -> i32 {
+        match self {
+            InputEvent::PointerEvent(pointer_event) => pointer_event.client_x(),
+            InputEvent::Touch(touch) => touch.client_x(),
+        }
+    }
+
+    pub fn y(&self) -> i32 {
+        match self {
+            InputEvent::PointerEvent(pointer_event) => pointer_event.client_y(),
+            InputEvent::Touch(touch) => touch.client_y(),
+        }
+    }
+
+    pub fn id(&self) -> i32 {
+        match self {
+            InputEvent::PointerEvent(pointer_event) => pointer_event.pointer_id(),
+            InputEvent::Touch(touch) => touch.identifier(),
+        }
+    }
+
+    pub fn target(&self) -> Option<EventTarget> {
+        match self {
+            InputEvent::PointerEvent(pointer_event) => pointer_event.target(),
+            InputEvent::Touch(touch) => touch.target(),
+        }
     }
 }
 
-impl Deref for GestureDragEvent {
-    type Target = PointerEvent;
-    fn deref(&self) -> &Self::Target {
-        &self.event
+impl From<PointerEvent> for InputEvent {
+    fn from(event: PointerEvent) -> Self {
+        Self::PointerEvent(event)
+    }
+}
+
+impl From<Touch> for InputEvent {
+    fn from(touch: Touch) -> Self {
+        Self::Touch(touch)
     }
 }
 
 /// Like [PointerEvent](web_sys::PointerEvent), but includes the swipe direction
 pub struct GestureSwipeEvent {
-    event: PointerEvent,
+    event: InputEvent,
     /// Direction angle (from -180 to +180 degree)
     pub direction: f64,
 }
 
 impl GestureSwipeEvent {
-    fn new(event: PointerEvent, direction: f64) -> Self {
+    fn new(event: InputEvent, direction: f64) -> Self {
         Self { event, direction }
     }
 }
 
 impl Deref for GestureSwipeEvent {
-    type Target = PointerEvent;
+    type Target = InputEvent;
     fn deref(&self) -> &Self::Target {
         &self.event
     }
@@ -98,20 +135,20 @@ pub struct GestureDetector {
 
     /// Callback for tap events.
     #[prop_or_default]
-    pub on_tap: Option<Callback<PointerEvent>>,
+    pub on_tap: Option<Callback<InputEvent>>,
     /// Callback for long-tap events.
     #[prop_or_default]
     pub on_long_press: Option<Callback<()>>,
 
     /// Callback for drag-start events.
     #[prop_or_default]
-    pub on_drag_start: Option<Callback<GestureDragEvent>>,
+    pub on_drag_start: Option<Callback<InputEvent>>,
     /// Callback for drag-start events.
     #[prop_or_default]
-    pub on_drag_update: Option<Callback<GestureDragEvent>>,
+    pub on_drag_update: Option<Callback<InputEvent>>,
     /// Callback for drag-start events.
     #[prop_or_default]
-    pub on_drag_end: Option<Callback<GestureDragEvent>>,
+    pub on_drag_end: Option<Callback<InputEvent>>,
 
     #[prop_or_default]
     pub on_swipe: Option<Callback<GestureSwipeEvent>>,
@@ -132,7 +169,7 @@ impl GestureDetector {
     }
 
     /// Builder style method to set the on_tap callback
-    pub fn on_tap(mut self, cb: impl IntoEventCallback<PointerEvent>) -> Self {
+    pub fn on_tap(mut self, cb: impl IntoEventCallback<InputEvent>) -> Self {
         self.on_tap = cb.into_event_callback();
         self
     }
@@ -144,19 +181,19 @@ impl GestureDetector {
     }
 
     /// Builder style method to set the on_drag_start callback
-    pub fn on_drag_start(mut self, cb: impl IntoEventCallback<GestureDragEvent>) -> Self {
+    pub fn on_drag_start(mut self, cb: impl IntoEventCallback<InputEvent>) -> Self {
         self.on_drag_start = cb.into_event_callback();
         self
     }
 
     /// Builder style method to set the on_drag_update callback
-    pub fn on_drag_update(mut self, cb: impl IntoEventCallback<GestureDragEvent>) -> Self {
+    pub fn on_drag_update(mut self, cb: impl IntoEventCallback<InputEvent>) -> Self {
         self.on_drag_update = cb.into_event_callback();
         self
     }
 
     /// Builder style method to set the on_drag_end callback
-    pub fn on_drag_end(mut self, cb: impl IntoEventCallback<GestureDragEvent>) -> Self {
+    pub fn on_drag_end(mut self, cb: impl IntoEventCallback<InputEvent>) -> Self {
         self.on_drag_end = cb.into_event_callback();
         self
     }
@@ -177,6 +214,11 @@ pub enum Msg {
 
     LongPressTimeout(i32),
     TapTimeout(i32),
+
+    TouchStart(TouchEvent),
+    TouchMove(TouchEvent),
+    TouchCancel(TouchEvent),
+    TouchEnd(TouchEvent),
 }
 
 #[derive(Copy, Clone, PartialEq)]
@@ -205,6 +247,7 @@ struct PointerState {
 
 #[doc(hidden)]
 pub struct PwtGestureDetector {
+    touch_only: bool,
     node_ref: NodeRef,
     state: DetectionState,
     pointers: HashMap<i32, PointerState>,
@@ -215,12 +258,8 @@ fn now() -> f64 {
 }
 
 impl PwtGestureDetector {
-    fn register_pointer(&mut self, ctx: &Context<Self>, event: &PointerEvent) {
+    fn register_pointer_state(&mut self, ctx: &Context<Self>, id: i32, start_x: i32, start_y: i32) {
         let props = ctx.props();
-
-        let id = event.pointer_id();
-        let start_x = event.x();
-        let start_y = event.y();
 
         let link = ctx.link().clone();
         let _long_press_timeout = Timeout::new(props.long_press_delay, move || {
@@ -251,6 +290,36 @@ impl PwtGestureDetector {
                 direction: 0f64,
             },
         );
+    }
+
+    fn register_pointer(&mut self, ctx: &Context<Self>, event: &PointerEvent) {
+        let id = event.pointer_id();
+        let start_x = event.x();
+        let start_y = event.y();
+
+        self.register_pointer_state(ctx, id, start_x, start_y);
+    }
+
+    fn register_touches(&mut self, ctx: &Context<Self>, event: &TouchEvent) {
+        for_each_changed_touch(event, |touch: Touch| {
+            let id = touch.identifier();
+            let x = touch.client_x();
+            let y = touch.client_y();
+            self.register_pointer_state(ctx, id, x, y);
+        });
+    }
+
+    fn unregister_touches<F: FnMut(i32, Touch, PointerState)>(
+        &mut self,
+        event: &TouchEvent,
+        mut func: F,
+    ) {
+        for_each_changed_touch(event, |touch: Touch| {
+            let id = touch.identifier();
+            if let Some(state) = self.pointers.remove(&id) {
+                func(id, touch, state);
+            }
+        });
     }
 
     fn unregister_pointer(&mut self, id: i32) -> Option<PointerState> {
@@ -306,10 +375,24 @@ impl PwtGestureDetector {
                 self.register_pointer(ctx, &event);
                 self.state = DetectionState::Single;
             }
+            Msg::TouchStart(event) => {
+                let pointer_count = self.pointers.len();
+                assert!(pointer_count == 0);
+                self.register_touches(ctx, &event);
+                self.state = match self.pointers.len() {
+                    0 => DetectionState::Initial,
+                    1 => DetectionState::Single,
+                    // TODO implement more touches
+                    _ => DetectionState::Double,
+                };
+            }
             Msg::PointerUp(_event) => { /* ignore */ }
             Msg::PointerMove(_event) => { /* ignore */ }
             Msg::PointerCancel(_event) => { /* ignore */ }
             Msg::PointerLeave(_event) => { /* ignore */ }
+            Msg::TouchMove(_event) => { /* ignore */ }
+            Msg::TouchCancel(_event) => { /* ignore */ }
+            Msg::TouchEnd(_event) => { /* ignore */ }
         }
         true
     }
@@ -350,6 +433,17 @@ impl PwtGestureDetector {
                 self.register_pointer(ctx, &event);
                 self.state = DetectionState::Double;
             }
+            Msg::TouchStart(event) => {
+                let pointer_count = self.pointers.len();
+                assert!(pointer_count == 1);
+                self.register_touches(ctx, &event);
+                self.state = match self.pointers.len() {
+                    0 => DetectionState::Initial,
+                    1 => DetectionState::Single,
+                    // TODO implement more touches
+                    _ => DetectionState::Double,
+                };
+            }
             Msg::PointerUp(event) => {
                 event.prevent_default();
                 let pointer_count = self.pointers.len();
@@ -365,10 +459,29 @@ impl PwtGestureDetector {
                     if !pointer_state.got_tap_timeout && distance < props.tap_tolerance {
                         if let Some(on_tap) = &props.on_tap {
                             //log::info!("tap {} {}", event.x(), event.y());
-                            on_tap.emit(event);
+                            on_tap.emit(event.into());
                         }
                     }
                 }
+            }
+            Msg::TouchEnd(event) => {
+                let pointer_count = self.pointers.len();
+                assert!(pointer_count == 1);
+                self.unregister_touches(&event, |_id, touch, pointer_state| {
+                    let distance = compute_distance(
+                        pointer_state.start_x,
+                        pointer_state.start_y,
+                        touch.client_x(),
+                        touch.client_y(),
+                    );
+                    if !pointer_state.got_tap_timeout && distance < props.tap_tolerance {
+                        if let Some(on_tap) = &props.on_tap {
+                            //log::info!("tap {} {}", event.x(), event.y());
+                            on_tap.emit(touch.into());
+                        }
+                    }
+                });
+                self.state = DetectionState::Initial;
             }
             Msg::PointerMove(event) => {
                 event.prevent_default();
@@ -387,11 +500,33 @@ impl PwtGestureDetector {
                         self.state = DetectionState::Drag;
                         self.capture_pointer(event.pointer_id());
                         if let Some(on_drag_start) = &props.on_drag_start {
-                            let event = GestureDragEvent::new(event);
-                            on_drag_start.emit(event);
+                            on_drag_start.emit(event.into());
                         }
                     }
                 }
+            }
+            Msg::TouchMove(event) => {
+                for_each_changed_touch(&event, |touch| {
+                    if let Some(pointer_state) = self.update_pointer_position(
+                        touch.identifier(),
+                        touch.client_x(),
+                        touch.client_y(),
+                    ) {
+                        let distance = compute_distance(
+                            pointer_state.start_x,
+                            pointer_state.start_y,
+                            touch.client_x(),
+                            touch.client_y(),
+                        );
+                        // Make sure it cannot be a TAP or LONG PRESS event
+                        if distance >= props.tap_tolerance {
+                            self.state = DetectionState::Drag;
+                            if let Some(on_drag_start) = &props.on_drag_start {
+                                on_drag_start.emit(touch.into());
+                            }
+                        }
+                    }
+                });
             }
             Msg::PointerCancel(event) | Msg::PointerLeave(event) => {
                 let pointer_count = self.pointers.len();
@@ -399,6 +534,12 @@ impl PwtGestureDetector {
                 if let Some(_pointer_state) = self.unregister_pointer(event.pointer_id()) {
                     self.state = DetectionState::Initial;
                 }
+            }
+            Msg::TouchCancel(event) => {
+                let pointer_count = self.pointers.len();
+                assert!(pointer_count == 1);
+                self.unregister_touches(&event, |_, _, _| {});
+                self.state = DetectionState::Initial;
             }
         }
         true
@@ -417,9 +558,22 @@ impl PwtGestureDetector {
                 self.state = DetectionState::Double;
                 //log::info!("DRAG END");
                 if let Some(on_drag_end) = &props.on_drag_end {
-                    let event = GestureDragEvent::new(event);
-                    on_drag_end.emit(event);
+                    on_drag_end.emit(event.into());
                 }
+            }
+            Msg::TouchStart(event) => {
+                let pointer_count = self.pointers.len();
+                assert!(pointer_count == 1);
+                // Abort current drags
+                self.register_touches(ctx, &event);
+                self.state = DetectionState::Double;
+                for_each_active_touch(&event, |touch| {
+                    if self.pointers.contains_key(&touch.identifier()) {
+                        if let Some(on_drag_end) = &props.on_drag_end {
+                            on_drag_end.emit(touch.into());
+                        }
+                    }
+                });
             }
             Msg::PointerUp(event) => {
                 event.prevent_default();
@@ -437,8 +591,7 @@ impl PwtGestureDetector {
                     let speed = distance / time_diff;
                     //log::info!("DRAG END {time_diff} {speed}");
                     if let Some(on_drag_end) = &props.on_drag_end {
-                        let event = GestureDragEvent::new(event.clone());
-                        on_drag_end.emit(event);
+                        on_drag_end.emit(event.clone().into());
                     }
 
                     if let Some(on_swipe) = &props.on_swipe {
@@ -453,11 +606,49 @@ impl PwtGestureDetector {
                                 event.y(),
                             );
 
-                            let event = GestureSwipeEvent::new(event, direction);
+                            let event = GestureSwipeEvent::new(event.into(), direction);
                             on_swipe.emit(event)
                         }
                     }
                 }
+            }
+            Msg::TouchEnd(event) => {
+                let pointer_count = self.pointers.len();
+                assert!(pointer_count == 1);
+                for_each_changed_touch(&event, |touch| {
+                    if let Some(pointer_state) = self.unregister_pointer(touch.identifier()) {
+                        let distance = compute_distance(
+                            pointer_state.start_x,
+                            pointer_state.start_y,
+                            touch.client_x(),
+                            touch.client_y(),
+                        );
+                        let time_diff = now() - pointer_state.start_ctime;
+                        let speed = distance / time_diff;
+                        //log::info!("DRAG END {time_diff} {speed}");
+                        if let Some(on_drag_end) = &props.on_drag_end {
+                            on_drag_end.emit(touch.clone().into());
+                        }
+
+                        if let Some(on_swipe) = &props.on_swipe {
+                            if distance > props.swipe_min_distance
+                                && time_diff < props.swipe_max_duration
+                                && speed > props.swipe_min_velocity
+                            {
+                                let direction = compute_direction(
+                                    pointer_state.start_x,
+                                    pointer_state.start_y,
+                                    touch.client_x(),
+                                    touch.client_y(),
+                                );
+
+                                let event = GestureSwipeEvent::new(touch.into(), direction);
+                                on_swipe.emit(event)
+                            }
+                        }
+                    }
+                });
+                self.state = DetectionState::Initial;
             }
             Msg::PointerMove(event) => {
                 event.prevent_default();
@@ -473,11 +664,32 @@ impl PwtGestureDetector {
                     if distance >= props.tap_tolerance || pointer_state.got_tap_timeout {
                         //log::info!("DRAG TO {} {}", event.x(), event.y());
                         if let Some(on_drag_update) = &props.on_drag_update {
-                            let event = GestureDragEvent::new(event);
-                            on_drag_update.emit(event);
+                            on_drag_update.emit(event.into());
                         }
                     }
                 }
+            }
+            Msg::TouchMove(event) => {
+                for_each_changed_touch(&event, |touch| {
+                    if let Some(pointer_state) = self.update_pointer_position(
+                        touch.identifier(),
+                        touch.client_x(),
+                        touch.client_y(),
+                    ) {
+                        let distance = compute_distance(
+                            pointer_state.start_x,
+                            pointer_state.start_y,
+                            touch.client_x(),
+                            touch.client_y(),
+                        );
+                        if distance >= props.tap_tolerance || pointer_state.got_tap_timeout {
+                            //log::info!("DRAG TO {} {}", event.x(), event.y());
+                            if let Some(on_drag_update) = &props.on_drag_update {
+                                on_drag_update.emit(touch.into());
+                            }
+                        }
+                    }
+                });
             }
             Msg::PointerCancel(event) | Msg::PointerLeave(event) => {
                 let pointer_count = self.pointers.len();
@@ -486,10 +698,20 @@ impl PwtGestureDetector {
                     self.state = DetectionState::Initial;
                     //log::info!("DRAG END");
                     if let Some(on_drag_end) = &props.on_drag_end {
-                        let event = GestureDragEvent::new(event);
-                        on_drag_end.emit(event);
+                        on_drag_end.emit(event.into());
                     }
                 }
+            }
+            Msg::TouchCancel(event) => {
+                let pointer_count = self.pointers.len();
+                assert!(pointer_count == 1);
+                self.unregister_touches(&event, |_id, touch, _pointer_state| {
+                    //log::info!("DRAG END");
+                    if let Some(on_drag_end) = &props.on_drag_end {
+                        on_drag_end.emit(touch.into());
+                    }
+                });
+                self.state = DetectionState::Initial;
             }
         }
         true
@@ -503,15 +725,31 @@ impl PwtGestureDetector {
             Msg::PointerDown(event) => {
                 self.register_pointer(ctx, &event);
             }
+            Msg::TouchStart(event) => {
+                self.register_touches(ctx, &event);
+            }
             Msg::PointerUp(event) => {
                 self.unregister_pointer(event.pointer_id());
                 if self.pointers.is_empty() {
                     self.state = DetectionState::Initial;
                 }
             }
+            Msg::TouchEnd(event) => {
+                self.unregister_touches(&event, |_, _, _| {});
+                if self.pointers.is_empty() {
+                    self.state = DetectionState::Initial;
+                }
+            }
             Msg::PointerMove(_event) => { /* ignore */ }
+            Msg::TouchMove(_event) => { /* ignore */ }
             Msg::PointerCancel(event) => {
                 self.unregister_pointer(event.pointer_id());
+                if self.pointers.is_empty() {
+                    self.state = DetectionState::Initial;
+                }
+            }
+            Msg::TouchCancel(event) => {
+                self.unregister_touches(&event, |_, _, _| {});
                 if self.pointers.is_empty() {
                     self.state = DetectionState::Initial;
                 }
@@ -532,7 +770,10 @@ impl Component for PwtGestureDetector {
     type Properties = GestureDetector;
 
     fn create(_ctx: &Context<Self>) -> Self {
+        let touch_only = window().has_own_property(&JsValue::from_str("ontouchstart"));
+
         Self {
+            touch_only,
             state: DetectionState::Initial,
             pointers: HashMap::new(),
             node_ref: NodeRef::default(),
@@ -554,17 +795,24 @@ impl Component for PwtGestureDetector {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
 
-        Container::new()
-            .node_ref(self.node_ref.clone())
+        let mut container = Container::new()
             .class("pwt-d-contents")
             .style("touch-action", "none")
-            .onpointerdown(ctx.link().callback(Msg::PointerDown))
-            .onpointerup(ctx.link().callback(Msg::PointerUp))
-            .onpointermove(ctx.link().callback(Msg::PointerMove))
-            .onpointercancel(ctx.link().callback(Msg::PointerCancel))
-            .onpointerleave(ctx.link().callback(Msg::PointerLeave))
-            .with_child(props.content.clone())
-            .into()
+            .with_child(props.content.clone());
+
+        if self.touch_only {
+            container.add_ontouchstart(ctx.link().callback(Msg::TouchStart));
+            container.add_ontouchmove(ctx.link().callback(Msg::TouchMove));
+            container.add_ontouchcancel(ctx.link().callback(Msg::TouchCancel));
+            container.add_ontouchend(ctx.link().callback(Msg::TouchEnd));
+        } else {
+            container.add_onpointerdown(ctx.link().callback(Msg::PointerDown));
+            container.add_onpointerup(ctx.link().callback(Msg::PointerUp));
+            container.add_onpointermove(ctx.link().callback(Msg::PointerMove));
+            container.add_onpointercancel(ctx.link().callback(Msg::PointerCancel));
+            container.add_onpointerleave(ctx.link().callback(Msg::PointerLeave));
+        }
+        container.into_html_with_ref(self.node_ref.clone())
     }
 }
 
@@ -590,4 +838,22 @@ fn compute_distance(x1: i32, y1: i32, x2: i32, y2: i32) -> f64 {
     let dy = (y2 - y1) as f64;
 
     (dx * dx + dy * dy).sqrt()
+}
+
+fn for_each_changed_touch<F: FnMut(Touch)>(event: &TouchEvent, mut func: F) {
+    let touch_list = event.changed_touches();
+    for i in 0..touch_list.length() {
+        if let Some(touch) = touch_list.get(i) {
+            func(touch);
+        }
+    }
+}
+
+fn for_each_active_touch<F: FnMut(Touch)>(event: &TouchEvent, mut func: F) {
+    let touch_list = event.touches();
+    for i in 0..touch_list.length() {
+        if let Some(touch) = touch_list.get(i) {
+            func(touch);
+        }
+    }
 }

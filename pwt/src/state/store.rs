@@ -3,6 +3,7 @@ use std::ops::Range;
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
+use anyhow::Error;
 use derivative::Derivative;
 use slab::Slab;
 
@@ -13,7 +14,7 @@ use yew::virtual_dom::Key;
 use crate::props::{
     ExtractKeyFn, ExtractPrimaryKey, FilterFn, IntoFilterFn, IntoSorterFn, SorterFn,
 };
-use crate::state::{optional_rc_ptr_eq, DataNode, DataNodeDerefGuard, DataStore};
+use crate::state::{optional_rc_ptr_eq, DataNode, DataNodeDerefGuard, DataStore, Selection};
 
 /// Hook to use a [Store] with functional components.
 ///
@@ -101,6 +102,29 @@ impl<T: ExtractPrimaryKey + 'static> FromIterator<T> for Store<T> {
     }
 }
 
+impl<T: Clone> Store<T> {
+    /// Returns a clone of the record that is currently selected by `selection`.
+    pub fn selected_record(&self, selection: &Selection) -> Option<T> {
+        self.read().lookup_with_selection(selection).cloned()
+    }
+
+    /// Returns a vector of clones of all records that are selected by the `selection` in
+    /// multi-select mode.
+    ///
+    /// # Note
+    ///
+    /// If a `Key` returned by `Selection::selected_keys` is not in the store, it will be filtered
+    /// from the returned vector. The vector will still contain a record for every other `Key` that
+    /// a record can be found for.
+    pub fn multi_selected_records(&self, selection: &Selection) -> Vec<T> {
+        self.read()
+            .lookup_with_multi_selection(selection)
+            .into_iter()
+            .cloned()
+            .collect()
+    }
+}
+
 impl<T: 'static> Store<T> {
     /// Creates a new instance with the specifies extract key function.
     pub fn with_extract_key(extract_key: impl Into<ExtractKeyFn<T>>) -> Self {
@@ -128,10 +152,19 @@ impl<T: 'static> Store<T> {
     /// # Panics
     ///
     /// Panics if the value is currently mutably locked.
-    pub fn read(&self) -> StoreReadGuard<T> {
-        StoreReadGuard {
-            state: self.inner.borrow(),
-        }
+    pub fn read(&self) -> StoreReadGuard<'_, T> {
+        self.try_read()
+            .expect("Could not acquire read lock on store!")
+    }
+
+    /// Try to lock this store for read access.
+    ///
+    /// Will return an error if the lock could not be acquired due to a write lock still being in
+    /// place.
+    pub fn try_read(&self) -> Result<StoreReadGuard<'_, T>, Error> {
+        Ok(StoreReadGuard {
+            state: self.inner.try_borrow()?,
+        })
     }
 
     /// Lock this store for write access.
@@ -141,12 +174,20 @@ impl<T: 'static> Store<T> {
     /// Panics if the store is already locked.
     /// When the returned [StoreWriteGuard] is dropped, the store listeners
     /// are notified. To prevent that use [StoreWriteGuard::skip_update]
-    pub fn write(&self) -> StoreWriteGuard<T> {
-        let state = self.inner.borrow_mut();
-        StoreWriteGuard {
-            state,
+    pub fn write(&self) -> StoreWriteGuard<'_, T> {
+        self.try_write()
+            .expect("Could not acquire write lock on store!")
+    }
+
+    /// Try to lock this store for write access.
+    ///
+    /// Will return an error if the lock could not be acquired due to a read or write lock still
+    /// being in place.
+    pub fn try_write(&self) -> Result<StoreWriteGuard<'_, T>, Error> {
+        Ok(StoreWriteGuard {
+            state: self.inner.try_borrow_mut()?,
             update: true,
-        }
+        })
     }
 
     // DataStore trait implementation, so that we can use those
@@ -292,7 +333,7 @@ pub struct StoreNodeRef<'a, T> {
 }
 
 impl<T: 'static> DataNode<T> for StoreNodeRef<'_, T> {
-    fn record(&self) -> DataNodeDerefGuard<T> {
+    fn record(&self) -> DataNodeDerefGuard<'_, T> {
         let data = &self.state.data[self.node_id];
         let guard: Box<dyn Deref<Target = T>> = Box::new(data);
         DataNodeDerefGuard { guard }
@@ -539,6 +580,30 @@ impl<T: 'static> StoreState<T> {
     /// Find a record by its key (mutable).
     pub fn lookup_record_mut(&mut self, key: &Key) -> Option<&mut T> {
         self.record_pos(key).map(|n| &mut self.data[n])
+    }
+
+    /// Find the record that has the same key as is currently selected by `selection`.
+    pub fn lookup_with_selection(&self, selection: &Selection) -> Option<&T> {
+        if let Some(ref key) = selection.selected_key() {
+            return self.lookup_record(key);
+        }
+
+        None
+    }
+
+    /// Get all records that are selected by the `selection` in multi-select mode.
+    ///
+    /// # Note
+    ///
+    /// If a `Key` returned by `Selection::selected_keys` is not in the store, it will be filtered
+    /// from the returned vector. The vector will still contain a record for every other `Key` that
+    /// a record can be found for.
+    pub fn lookup_with_multi_selection(&self, selection: &Selection) -> Vec<&T> {
+        selection
+            .selected_keys()
+            .iter()
+            .filter_map(|k| self.lookup_record(k))
+            .collect()
     }
 }
 

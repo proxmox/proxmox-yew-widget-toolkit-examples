@@ -1,14 +1,13 @@
 use yew::{
     html::{IntoEventCallback, IntoPropValue},
-    virtual_dom::Key,
-    AttrValue, Callback, Component, Properties,
+    AttrValue, Callback, Component, NodeRef, Properties,
 };
 
 use pwt_macros::{builder, widget};
 
-use crate::touch::prelude::{EventSubscriber, WidgetBuilder, WidgetStyleBuilder};
+use crate::touch::prelude::{EventSubscriber, WidgetBuilder};
 
-use super::{Container, Fa, Tooltip};
+use super::{Fa, Tooltip};
 
 /// This represents a Trigger for a field, like the icon to toggle a dropdown,
 /// show/hide password, etc.
@@ -20,16 +19,10 @@ use super::{Container, Fa, Tooltip};
 #[derive(Clone, PartialEq, Properties)]
 #[builder]
 pub struct Trigger {
-    #[prop_or_default]
-    pub key: Option<Key>,
-
-    /// The default icon to show
-    pub icon: AttrValue,
-
     /// The callback when the trigger is clicked
     #[prop_or_default]
     #[builder_cb(IntoEventCallback, into_event_callback, yew::MouseEvent)]
-    pub onclick: Option<Callback<yew::MouseEvent>>,
+    pub on_activate: Option<Callback<yew::MouseEvent>>,
 
     /// An optional tooltip
     #[prop_or_default]
@@ -39,9 +32,9 @@ pub struct Trigger {
 
 impl Trigger {
     pub fn new(icon: impl IntoPropValue<AttrValue>) -> Self {
-        yew::props!(Self {
-            icon: icon.into_prop_value()
-        })
+        yew::props!(Self {})
+            .class(icon.into_prop_value())
+            .tabindex(-1)
     }
 }
 
@@ -56,25 +49,26 @@ impl Component for PwtTrigger {
     }
 
     fn view(&self, ctx: &yew::Context<Self>) -> yew::Html {
-        let props = ctx.props();
-        let pointer_cls = props.onclick.as_ref().map(|_| "pwt-pointer");
-        let icon = Container::from_tag("i")
-            .with_std_props(&props.std_props)
-            .tabindex(-1)
-            .class(&props.icon)
-            .class(pointer_cls)
-            .onclick({
-                let onclick = props.onclick.clone().into_event_callback();
-                onclick.map(|onclick| {
-                    move |value: yew::MouseEvent| {
-                        onclick.emit(value.clone());
-                        value.prevent_default();
-                        value.stop_propagation();
-                    }
-                })
+        let mut props = ctx.props().clone();
+        if let Some(on_activate) = props.on_activate.clone() {
+            props.add_onclick(move |value: yew::MouseEvent| {
+                on_activate.emit(value.clone());
+                value.prevent_default();
+                value.stop_propagation();
             });
+        }
 
-        Tooltip::new(icon).tip(&props.tip).into()
+        let pointer_cls = props.on_activate.as_ref().map(|_| "pwt-pointer");
+
+        let icon = props.std_props.into_vtag(
+            "i".into(),
+            NodeRef::default(),
+            pointer_cls,
+            Some(props.listeners),
+            None,
+        );
+
+        Tooltip::new(icon).tip(props.tip).into()
     }
 }
 
@@ -82,7 +76,14 @@ impl Component for PwtTrigger {
 
 impl From<Fa> for Trigger {
     fn from(value: Fa) -> Self {
-        Trigger::new("").class(value.class).styles(value.style)
+        let Fa {
+            std_props,
+            listeners,
+        } = value;
+        yew::props!(Self {
+            std_props,
+            listeners
+        })
     }
 }
 

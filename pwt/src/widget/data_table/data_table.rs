@@ -7,7 +7,7 @@ use derivative::Derivative;
 use gloo_timers::callback::Timeout;
 use wasm_bindgen::JsCast;
 
-use yew::html::IntoPropValue;
+use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
@@ -110,8 +110,6 @@ pub enum MultiSelectMode {
 #[derive(Properties, Derivative)]
 #[derivative(Clone(bound = ""), PartialEq(bound = ""))]
 pub struct DataTable<S: DataStore> {
-    #[prop_or_default]
-    node_ref: NodeRef,
     /// Yew key property.
     #[prop_or_default]
     pub key: Option<Key>,
@@ -212,6 +210,10 @@ pub struct DataTable<S: DataStore> {
 
     #[prop_or_default]
     pub multiselect_mode: MultiSelectMode,
+
+    /// Table scroll callback
+    #[prop_or_default]
+    pub on_table_scroll: Option<Callback<Event>>,
 }
 
 impl<S: DataStore> AsClassesMut for DataTable<S> {
@@ -241,28 +243,8 @@ impl<S: DataStore> DataTable<S> {
         yew::props!(DataTable<S> { headers, store })
     }
 
-    /// Builder style method to set the yew `node_ref`.
-    pub fn node_ref(mut self, node_ref: ::yew::html::NodeRef) -> Self {
-        self.node_ref = node_ref;
-        self
-    }
-
-    /// Builder style method to set the yew `key` property.
-    pub fn key(mut self, key: impl IntoOptionalKey) -> Self {
-        self.key = key.into_optional_key();
-        self
-    }
-
-    /// Builder style method to add a html class.
-    pub fn class(mut self, class: impl Into<Classes>) -> Self {
-        self.add_class(class);
-        self
-    }
-
-    /// Method to add a html class.
-    pub fn add_class(&mut self, class: impl Into<Classes>) {
-        self.class.push(class);
-    }
+    crate::impl_yew_std_props_builder!();
+    crate::impl_class_prop_builder!();
 
     /// Builder style method to set the configuration for cells.
     pub fn cell_configuration(mut self, config: impl Into<CellConfiguration>) -> Self {
@@ -454,6 +436,12 @@ impl<S: DataStore> DataTable<S> {
         multiselect_mode: impl IntoPropValue<MultiSelectMode>,
     ) -> Self {
         self.set_multiselect_mode(multiselect_mode);
+        self
+    }
+
+    /// Builder style method to set the table scroll callback.
+    pub fn on_table_scroll(mut self, cb: impl IntoEventCallback<Event>) -> Self {
+        self.on_table_scroll = cb.into_event_callback();
         self
     }
 }
@@ -815,9 +803,7 @@ impl<S: DataStore> PwtDataTable<S> {
 
     fn get_row_el(&self, key: &Key) -> Option<web_sys::Element> {
         let id = self.get_unique_item_id(key);
-        let window = web_sys::window().unwrap();
-        let document = window.document().unwrap();
-        document.get_element_by_id(&id)
+        gloo_utils::document().get_element_by_id(&id)
     }
 
     fn focus_cell(&mut self, key: &Key) {
@@ -856,9 +842,7 @@ impl<S: DataStore> PwtDataTable<S> {
     }
 
     fn find_focused_cell(&self) -> Option<(Key, Option<usize>)> {
-        let window = web_sys::window().unwrap();
-        let document = window.document().unwrap();
-        let active_el = document.active_element()?;
+        let active_el = gloo_utils::document().active_element()?;
         dom_find_focus_pos(active_el, &self.unique_id)
     }
 
@@ -896,10 +880,9 @@ impl<S: DataStore> PwtDataTable<S> {
             .class(props.striped.then_some("table-striped"))
             .class(props.bordered.then_some("table-bordered"))
             .class(props.borderless.then_some("table-borderless"))
-            .node_ref(self.table_ref.clone())
             .style("display", "table")
             .style("table-layout", fixed_mode.then_some("fixed"))
-            .style("width", fixed_mode.then_some("1px")) // required by table-layout fixed
+            .style("width", if fixed_mode { "1px" } else { "100%" }) // table-layout fixed requires 1px
             .style("position", "relative")
             .style("top", format!("{offset}px"))
             .with_child(first_row);
@@ -913,13 +896,25 @@ impl<S: DataStore> PwtDataTable<S> {
             }
         }
 
+        // keep track of keys that are displayed, to avoid duplicates
+        let mut key_set = HashSet::new();
+
         for (filtered_pos, item) in props.store.filtered_data_range(start..end) {
-            let record_key = props.store.extract_key(&*item.record());
+            let mut record_key = props.store.extract_key(&*item.record());
 
             let mut selected = false;
             if let Some(selection) = &props.selection {
                 selected = selection.contains(&record_key);
             }
+
+            if key_set.contains(&record_key) {
+                #[cfg(debug_assertions)]
+                log::error!("duplicate key found: {record_key}");
+                // avoid duplicate key by adding the row num to the key
+                record_key = Key::from(format!("{filtered_pos}-{record_key}"))
+            }
+
+            key_set.insert(record_key.clone());
 
             let active = cursor
                 .map(|cursor| cursor == filtered_pos)
@@ -949,7 +944,7 @@ impl<S: DataStore> PwtDataTable<S> {
             table.add_child(row);
         }
 
-        table.into()
+        table.into_html_with_ref(self.table_ref.clone())
     }
 
     fn render_scroll_content(&self, props: &DataTable<S>) -> Html {
@@ -1606,8 +1601,17 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
         let column_widths =
             self.column_widths.iter().sum::<f64>() + self.scrollbar_size.unwrap_or_default();
 
+        let on_table_scroll = {
+            let on_table_scroll = props.on_table_scroll.clone();
+            move |event: Event| {
+                if let Some(on_table_scroll) = &on_table_scroll {
+                    on_table_scroll.emit(event);
+                }
+            }
+        };
+
         let viewport = Container::new()
-            .node_ref(self.scroll_ref.clone())
+            .onscroll(on_table_scroll)
             .key(Key::from("table-viewport"))
             .class("pwt-flex-fill")
             .style(
@@ -1667,7 +1671,8 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
                         link.send_message(Msg::ItemClick(row_num, col_num, event, true));
                     }
                 }
-            });
+            })
+            .into_html_with_ref(self.scroll_ref.clone());
 
         let multiselect = props
             .selection
@@ -1695,7 +1700,6 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             .with_child(
                 Container::new() // scollable for header
                     .key(Key::from("table-header"))
-                    .node_ref(self.header_scroll_ref.clone())
                     .attribute("role", "rowgroup")
                     .attribute("aria-label", "table header")
                     .style("flex", "0 0 auto")
@@ -1713,7 +1717,8 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
                             .selection_status(self.selection_status)
                             .header_class(header_class)
                             .reserve_scroll_space(self.scrollbar_size.unwrap_or_default()),
-                    ),
+                    )
+                    .into_html_with_ref(self.header_scroll_ref.clone()),
             )
             .with_child(viewport)
             .into()

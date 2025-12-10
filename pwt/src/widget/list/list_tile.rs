@@ -1,10 +1,11 @@
 use std::borrow::Cow;
 
-use yew::html::IntoPropValue;
+use wasm_bindgen::JsCast;
+use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::prelude::*;
 use yew::virtual_dom::VTag;
 
-use crate::props::{ListenersWrapper, WidgetStdProps};
+use crate::props::{EventSubscriber, IntoVTag, ListenersWrapper, WidgetBuilder, WidgetStdProps};
 
 use pwt_macros::{builder, widget};
 
@@ -43,6 +44,13 @@ pub struct ListTile {
     #[prop_or_default]
     #[builder(IntoPropValue, into_prop_value)]
     force_height: Option<u32>,
+
+    /// Activate callback (click, enter, space)
+    ///
+    /// This also sets the tabindex property to "0" to enable keyboard focus.
+    #[builder_cb(IntoEventCallback, into_event_callback, Event)]
+    #[prop_or_default]
+    on_activate: Option<Callback<Event>>,
 }
 
 impl ListTile {
@@ -60,18 +68,43 @@ impl ListTile {
     }
 }
 
-impl From<ListTile> for VTag {
-    fn from(val: ListTile) -> Self {
+impl IntoVTag for ListTile {
+    fn into_vtag_with_ref(mut self, node_ref: NodeRef) -> VTag {
         let classes = classes!(
             "pwt-list-tile",
-            val.interactive.then_some("pwt-interactive"),
-            val.disabled.then_some("disabled")
+            self.interactive.then_some("pwt-interactive"),
+            self.disabled.then_some("disabled")
         );
-        val.std_props.into_vtag(
+
+        if !self.disabled {
+            if let Some(on_activate) = self.on_activate.clone() {
+                self.set_tabindex(0);
+                self.add_onclick({
+                    let on_activate = on_activate.clone();
+                    move |event: MouseEvent| {
+                        event.stop_propagation();
+                        on_activate.emit(event.unchecked_into());
+                    }
+                });
+                self.add_onkeydown({
+                    let on_activate = on_activate.clone();
+                    move |event: KeyboardEvent| match event.key().as_str() {
+                        "Enter" | " " => {
+                            event.stop_propagation();
+                            on_activate.emit(event.unchecked_into());
+                        }
+                        _ => {}
+                    }
+                });
+            }
+        }
+
+        self.std_props.into_vtag(
             Cow::Borrowed("div"),
+            node_ref,
             Some(classes),
-            Some(val.listeners),
-            Some(val.children),
+            Some(self.listeners),
+            Some(self.children),
         )
     }
 }

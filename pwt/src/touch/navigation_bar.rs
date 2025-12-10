@@ -5,6 +5,8 @@ use yew::html::IntoPropValue;
 use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
+use crate::impl_class_prop_builder;
+use crate::impl_yew_std_props_builder;
 use crate::prelude::*;
 use crate::props::{ContainerBuilder, EventSubscriber, WidgetBuilder};
 use crate::state::{NavigationContext, NavigationContextExt, Selection};
@@ -22,7 +24,7 @@ use pwt_macros::builder;
 /// a [NavigationContainer](crate::state::NavigationContainer) and
 /// set the router flag.
 
-// Note: This is Similatr to TabBar without keyboard support.
+// Note: This is Similar to TabBar without keyboard support.
 #[derive(Properties, Clone, PartialEq)]
 #[builder]
 pub struct NavigationBar {
@@ -30,12 +32,16 @@ pub struct NavigationBar {
     #[prop_or_default]
     pub key: Option<Key>,
 
+    /// CSS class.
+    #[prop_or_default]
+    pub class: Classes,
+
     /// Navigation bar items.
     items: Vec<TabBarItem>,
 
     /// Selection object to store the currently selected tab key.
     ///
-    /// The optional selction object allows you to control and observe the state from outside.
+    /// The optional selection object allows you to control and observe the state from outside.
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
     pub selection: Option<Selection>,
@@ -48,6 +54,10 @@ pub struct NavigationBar {
     /// Default active key.
     #[prop_or_default]
     pub default_active: Option<Key>,
+
+    /// Force active key.
+    #[prop_or_default]
+    pub active: Option<Key>,
 
     /// Enable router functionality.
     ///
@@ -63,15 +73,18 @@ impl NavigationBar {
         yew::props!(Self { items })
     }
 
-    // Builder style method to set the yew `key` property.
-    pub fn key(mut self, key: impl IntoOptionalKey) -> Self {
-        self.set_key(key);
+    impl_yew_std_props_builder!();
+    impl_class_prop_builder!();
+
+    // Builder style method to set `active` property.
+    pub fn active(mut self, active: impl IntoOptionalKey) -> Self {
+        self.set_active(active);
         self
     }
 
-    /// Method to set the yew `key` property.
-    pub fn set_key(&mut self, key: impl IntoOptionalKey) {
-        self.key = key.into_optional_key();
+    /// Method to set the yew `active` property.
+    pub fn set_active(&mut self, active: impl IntoOptionalKey) {
+        self.active = active.into_optional_key();
     }
 
     // Builder style method to set `default_active` property.
@@ -113,6 +126,9 @@ pub struct PwtNavigationBar {
 }
 
 fn get_active_or_default(props: &NavigationBar, active: &Option<Key>) -> Option<Key> {
+    if let Some(active) = &props.active {
+        return Some(active.clone());
+    }
     if let Some(active_key) = active.as_deref() {
         if !active_key.is_empty() && active_key != "_" {
             return active.clone();
@@ -214,7 +230,7 @@ impl Component for PwtNavigationBar {
             }
             // Handle internal selection changes
             Msg::Select(key, update_route) => {
-                log::info!("select {:?}", key);
+                // log::info!("select {:?}", key);
 
                 let key = get_active_or_default(props, &key);
                 if self.active == key {
@@ -308,6 +324,7 @@ impl Component for PwtNavigationBar {
 
         Container::new()
             .class("pwt-navigation-bar")
+            .class(props.class.clone())
             .children(children)
             .into()
     }

@@ -15,7 +15,7 @@ use yew::virtual_dom::VNode;
 use crate::dom::DomSizeObserver;
 use crate::prelude::*;
 use crate::props::CssLength;
-use crate::touch::{GestureDetector, GestureDragEvent, GestureSwipeEvent};
+use crate::touch::{GestureDetector, GestureSwipeEvent, InputEvent};
 use crate::widget::{Container, Row};
 
 use pwt_macros::widget;
@@ -43,6 +43,12 @@ pub struct Slidable {
     /// Without a callback, dismiss is disabled on slidables without actions.
     #[prop_or_default]
     pub on_dismiss: Option<Callback<()>>,
+
+    #[prop_or_default]
+    /// Tap callback.
+    ///
+    /// Called when the main item is tapped.
+    pub on_tap: Option<Callback<InputEvent>>,
 }
 
 impl Slidable {
@@ -80,6 +86,17 @@ impl Slidable {
         self.on_dismiss = cb.into_event_callback();
         self
     }
+
+    /// Builder style method to set the `on_tap` callback.
+    pub fn on_tap(mut self, cb: impl IntoEventCallback<InputEvent>) -> Self {
+        self.set_on_tap(cb);
+        self
+    }
+
+    /// Method to set the `on_tap` callback.
+    pub fn set_on_tap(&mut self, cb: impl IntoEventCallback<InputEvent>) {
+        self.on_tap = cb.into_event_callback();
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -116,15 +133,16 @@ pub struct PwtSlidable {
 
 pub enum Msg {
     StartDismissTransition,
-    Drag(GestureDragEvent),
-    DragStart(GestureDragEvent),
-    DragEnd(GestureDragEvent),
+    Drag(InputEvent),
+    DragStart(InputEvent),
+    DragEnd(InputEvent),
     Swipe(GestureSwipeEvent),
     LeftResize(f64),
     RightResize(f64),
     ContentResize(f64, f64),
     TransitionEnd,
     Controller(SlidableControllerMsg),
+    OnTap(InputEvent),
 }
 
 impl PwtSlidable {
@@ -158,18 +176,17 @@ impl PwtSlidable {
         let actions = props.left_actions.clone();
 
         Row::new()
-            .node_ref(self.left_ref.clone())
             .class("pwt-w-100 pwt-h-100")
             .with_child(
                 Container::new()
-                    .node_ref(self.left_action_ref.clone())
                     .height(CssLength::Fraction(1.0))
                     .min_width(0)
                     .style("flex", "0 1 auto")
-                    .with_optional_child(actions),
+                    .with_optional_child(actions)
+                    .into_html_with_ref(self.left_action_ref.clone()),
             )
             .with_child(html! {<div style="flex: 1 1 auto;"></div>})
-            .into()
+            .into_html_with_ref(self.left_ref.clone())
     }
 
     fn right_container(&self, ctx: &Context<Self>) -> Html {
@@ -177,18 +194,17 @@ impl PwtSlidable {
         let actions = props.right_actions.clone();
 
         Row::new()
-            .node_ref(self.right_ref.clone())
             .class("pwt-w-100 pwt-h-100")
             .with_child(html! {<div style="flex: 1 1 auto;"></div>})
             .with_child(
                 Container::new()
-                    .node_ref(self.right_action_ref.clone())
                     .height(CssLength::Fraction(1.0))
                     .min_width(0)
                     .style("flex", "0 1 auto")
-                    .with_optional_child(actions),
+                    .with_optional_child(actions)
+                    .into_html_with_ref(self.right_action_ref.clone()),
             )
-            .into()
+            .into_html_with_ref(self.right_ref.clone())
     }
 }
 
@@ -320,6 +336,11 @@ impl Component for PwtSlidable {
                     }
                 }
             },
+            Msg::OnTap(pointer_event) => {
+                if let Some(on_tap) = &ctx.props().on_tap {
+                    on_tap.emit(pointer_event);
+                }
+            }
         }
         let pos = self.start_pos - (self.drag_pos.unwrap_or(0) as f64);
         if pos > 0f64 {
@@ -350,17 +371,18 @@ impl Component for PwtSlidable {
 
         let upper = GestureDetector::new(
             Container::new()
-                .node_ref(self.content_ref.clone())
                 .class("pwt-slidable-slider")
                 .attribute(
                     "style",
                     "touch-action:none;width:100%;flex:0 0 auto;overflow:hidden;",
                 )
-                .with_child(props.content.clone()),
+                .with_child(props.content.clone())
+                .into_html_with_ref(self.content_ref.clone()),
         )
         .on_drag_start(ctx.link().callback(Msg::DragStart))
         .on_drag_end(ctx.link().callback(Msg::DragEnd))
         .on_drag_update(ctx.link().callback(Msg::Drag))
+        .on_tap(ctx.link().callback(Msg::OnTap))
         .on_swipe(ctx.link().callback(Msg::Swipe));
 
         let left_container = Container::new()
@@ -410,17 +432,14 @@ impl Component for PwtSlidable {
             .with_child(right_container)
             .ontransitionend(ctx.link().callback(|_| Msg::TransitionEnd));
 
-        yew::props!(Container {
-            std_props: props.std_props.clone(),
-            listeners: props.listeners.clone(),
-        })
-        .class("pwt-slidable")
-        .with_child(html! {
-            <ContextProvider<SlidableController> context={self.controller.clone()}>
-                {row}
-            </ContextProvider<SlidableController>>
-        })
-        .into()
+        Container::from_widget_props(props.std_props.clone(), Some(props.listeners.clone()))
+            .class("pwt-slidable")
+            .with_child(html! {
+                <ContextProvider<SlidableController> context={self.controller.clone()}>
+                    {row}
+                </ContextProvider<SlidableController>>
+            })
+            .into()
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {

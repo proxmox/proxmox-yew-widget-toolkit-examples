@@ -5,9 +5,9 @@ use gloo_events::EventListener;
 use gloo_timers::callback::Timeout;
 use wasm_bindgen::prelude::Closure;
 use wasm_bindgen::{JsCast, UnwrapThrowExt};
-use web_sys::{window, HtmlElement};
+use web_sys::HtmlElement;
 
-use yew::html::{IntoEventCallback, IntoPropValue};
+use yew::html::{IntoEventCallback, IntoPropValue, Scope};
 use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
@@ -15,7 +15,7 @@ use crate::dom::align::{align_to_viewport, align_to_xy, Point};
 use crate::dom::IntoHtmlElement;
 use crate::prelude::*;
 use crate::props::{AsCssStylesMut, CssStyles};
-use crate::widget::{ActionIcon, Panel};
+use crate::widget::{ActionIcon, Container, Panel};
 
 use pwt_macros::builder;
 
@@ -26,9 +26,6 @@ use pwt_macros::builder;
 #[derive(Properties, Clone, PartialEq)]
 #[builder]
 pub struct Dialog {
-    #[prop_or_default]
-    node_ref: NodeRef,
-
     /// The yew component key.
     #[prop_or_default]
     pub key: Option<Key>,
@@ -48,6 +45,10 @@ pub struct Dialog {
 
     #[prop_or_default]
     pub children: Vec<VNode>,
+
+    /// Tools, displayed right aligned in the header.
+    #[prop_or_default]
+    pub tools: Vec<VNode>,
 
     /// CSS style for the dialog window
     #[prop_or_default]
@@ -97,20 +98,17 @@ impl Dialog {
         })
     }
 
-    /// Builder style method to set the yew `node_ref`
-    pub fn node_ref(mut self, node_ref: ::yew::html::NodeRef) -> Self {
-        self.node_ref = node_ref;
+    crate::impl_yew_std_props_builder!();
+
+    /// Builder style method to add a tool.
+    pub fn with_tool(mut self, tool: impl Into<VNode>) -> Self {
+        self.add_tool(tool);
         self
     }
 
-    /// Builder style method to set the yew `key` property
-    pub fn key(mut self, key: impl IntoOptionalKey) -> Self {
-        self.key = key.into_optional_key();
-        self
-    }
-
-    pub fn html(self) -> VNode {
-        self.into()
+    /// Method to add a tool.
+    pub fn add_tool(&mut self, tool: impl Into<VNode>) {
+        self.tools.push(tool.into());
     }
 }
 
@@ -140,6 +138,7 @@ pub struct PwtDialog {
     last_active: Option<web_sys::HtmlElement>, // last focused element
     resizer_state: HashMap<Point, DragState>,
     center_function: Option<Closure<dyn FnMut()>>,
+    node_ref: NodeRef,
     inner_ref: NodeRef,
 }
 
@@ -154,8 +153,7 @@ impl PwtDialog {
 impl Drop for PwtDialog {
     fn drop(&mut self) {
         if let Some(center_function) = self.center_function.take() {
-            let window = web_sys::window().unwrap();
-            window
+            gloo_utils::window()
                 .remove_event_listener_with_callback(
                     "resize",
                     center_function.as_ref().unchecked_ref(),
@@ -172,9 +170,7 @@ impl Component for PwtDialog {
     fn create(ctx: &Context<Self>) -> Self {
         ctx.link().send_message(Msg::Open);
 
-        let window = web_sys::window().unwrap();
-        let document = window.document().unwrap();
-        let last_active = document
+        let last_active = gloo_utils::document()
             .active_element()
             .and_then(|el| el.dyn_into::<HtmlElement>().ok());
 
@@ -184,7 +180,7 @@ impl Component for PwtDialog {
                 link.send_message(Msg::Center);
             });
 
-            window
+            gloo_utils::window()
                 .add_event_listener_with_callback(
                     "resize",
                     center_function.as_ref().unchecked_ref(),
@@ -200,7 +196,8 @@ impl Component for PwtDialog {
             resizer_state: HashMap::new(),
             last_active,
             center_function,
-            inner_ref: Default::default(),
+            node_ref: NodeRef::default(),
+            inner_ref: NodeRef::default(),
         }
     }
 
@@ -210,7 +207,7 @@ impl Component for PwtDialog {
         match msg {
             Msg::Open => {
                 if !self.open {
-                    if let Some(dialog_node) = props.node_ref.get() {
+                    if let Some(dialog_node) = self.node_ref.get() {
                         crate::show_modal_dialog(dialog_node);
                         self.open = true;
                     }
@@ -219,7 +216,7 @@ impl Component for PwtDialog {
             Msg::Close => {
                 if self.open {
                     if let Some(on_close) = &props.on_close {
-                        if let Some(dialog_node) = props.node_ref.get() {
+                        if let Some(dialog_node) = self.node_ref.get() {
                             crate::close_dialog(dialog_node);
                         }
 
@@ -240,7 +237,7 @@ impl Component for PwtDialog {
                 }
 
                 if props.draggable && is_draggable {
-                    if let Some(element) = props.node_ref.clone().into_html_element() {
+                    if let Some(element) = self.node_ref.clone().into_html_element() {
                         let client = element.get_bounding_client_rect();
                         let x = event.client_x() as f64 - client.x();
                         let y = event.client_y() as f64 - client.y();
@@ -253,10 +250,14 @@ impl Component for PwtDialog {
                         self.dragging_state = DragState::Dragging(
                             x,
                             y,
-                            EventListener::new(&window().unwrap(), "pointermove", move |event| {
-                                onmousemove.emit(event.clone().dyn_into().unwrap());
-                            }),
-                            EventListener::new(&window().unwrap(), "pointerup", move |event| {
+                            EventListener::new(
+                                &gloo_utils::window(),
+                                "pointermove",
+                                move |event| {
+                                    onmousemove.emit(event.clone().dyn_into().unwrap());
+                                },
+                            ),
+                            EventListener::new(&gloo_utils::window(), "pointerup", move |event| {
                                 onpointerup.emit(event.clone().dyn_into().unwrap());
                             }),
                             event.pointer_id(),
@@ -267,12 +268,12 @@ impl Component for PwtDialog {
             }
             Msg::PointerMove(event) => match &self.dragging_state {
                 DragState::Dragging(offset_x, offset_y, _, _, id) if *id == event.pointer_id() => {
-                    let window = window().unwrap();
+                    let window = gloo_utils::window();
                     let width = window.inner_width().unwrap().as_f64().unwrap();
                     let height = window.inner_height().unwrap().as_f64().unwrap();
                     let x = (event.client_x() as f64).max(0.0).min(width) - offset_x;
                     let y = (event.client_y() as f64).max(0.0).min(height) - offset_y;
-                    if let Err(err) = align_to_xy(props.node_ref.clone(), (x, y), Point::TopStart) {
+                    if let Err(err) = align_to_xy(self.node_ref.clone(), (x, y), Point::TopStart) {
                         log::error!("align_to_xy failed: {}", err.to_string());
                     }
                 }
@@ -324,10 +325,10 @@ impl Component for PwtDialog {
                     DragState::Dragging(
                         offset.0,
                         offset.1,
-                        EventListener::new(&window().unwrap(), "pointermove", move |event| {
+                        EventListener::new(&gloo_utils::window(), "pointermove", move |event| {
                             onpointermove.emit(event.clone().dyn_into().unwrap());
                         }),
-                        EventListener::new(&window().unwrap(), "pointerup", move |event| {
+                        EventListener::new(&gloo_utils::window(), "pointerup", move |event| {
                             onpointerup.emit(event.clone().dyn_into().unwrap());
                         }),
                         event.pointer_id(),
@@ -341,10 +342,16 @@ impl Component for PwtDialog {
                         let old_width = rect.width();
                         let old_height = rect.height();
 
-                        let viewport_height =
-                            window().unwrap().inner_height().unwrap().as_f64().unwrap();
-                        let viewport_width =
-                            window().unwrap().inner_width().unwrap().as_f64().unwrap();
+                        let viewport_height = gloo_utils::window()
+                            .inner_height()
+                            .unwrap()
+                            .as_f64()
+                            .unwrap();
+                        let viewport_width = gloo_utils::window()
+                            .inner_width()
+                            .unwrap()
+                            .as_f64()
+                            .unwrap();
 
                         // restrict to viewport
                         let client_x = (event.client_x() as f64).clamp(5.0, viewport_width - 5.0);
@@ -409,7 +416,7 @@ impl Component for PwtDialog {
 
                         if pos.0 != rect.x() || pos.1 != rect.y() {
                             if let Err(err) =
-                                align_to_xy(props.node_ref.clone(), pos, Point::TopStart)
+                                align_to_xy(self.node_ref.clone(), pos, Point::TopStart)
                             {
                                 log::error!("could not align dialog: {}", err.to_string())
                             }
@@ -426,7 +433,7 @@ impl Component for PwtDialog {
             },
             Msg::Center => {
                 if let Err(err) =
-                    align_to_viewport(props.node_ref.clone(), Point::Center, Point::Center)
+                    align_to_viewport(self.node_ref.clone(), Point::Center, Point::Center)
                 {
                     log::error!("err: {}", err.to_string());
                 }
@@ -435,10 +442,9 @@ impl Component for PwtDialog {
         false
     }
 
-    fn destroy(&mut self, ctx: &Context<Self>) {
-        let props = ctx.props();
+    fn destroy(&mut self, _ctx: &Context<Self>) {
         // always close the dialog before restoring the focus
-        if let Some(dialog_node) = props.node_ref.get() {
+        if let Some(dialog_node) = self.node_ref.get() {
             crate::close_dialog(dialog_node);
         }
         self.restore_focus();
@@ -448,15 +454,11 @@ impl Component for PwtDialog {
         let props = ctx.props();
         let link = ctx.link().clone();
 
-        let on_close = link.callback(|_| Msg::Close);
-
-        let oncancel = link.callback(|event: Event| {
+        let onclose = link.callback(|event: Event| {
             event.stop_propagation();
             event.prevent_default();
             Msg::Close
         });
-
-        let onclose = oncancel.clone();
 
         let mut panel = Panel::new()
             .class("pwt-overflow-auto")
@@ -470,11 +472,13 @@ impl Component for PwtDialog {
             .header_class(props.draggable.then_some("pwt-draggable"))
             .border(false);
 
+	panel.tools.extend(props.tools.clone());
+
         if props.on_close.is_some() {
             panel.add_tool(
                 ActionIcon::new("fa fa-close")
                     .aria_label("Close Dialog")
-                    .on_activate(on_close),
+                    .on_activate(link.callback(|_| Msg::Close)),
             );
         };
 
@@ -489,38 +493,56 @@ impl Component for PwtDialog {
 
         let resizable = props.resizable;
 
-        let west_down = link.callback(|e| Msg::ResizeStart(Point::Start, e));
-        let east_down = link.callback(|e| Msg::ResizeStart(Point::End, e));
-        let north_down = link.callback(|e| Msg::ResizeStart(Point::Top, e));
-        let south_down = link.callback(|e| Msg::ResizeStart(Point::Bottom, e));
-
-        let northwest_down = link.callback(|e| Msg::ResizeStart(Point::TopStart, e));
-        let southwest_down = link.callback(|e| Msg::ResizeStart(Point::BottomStart, e));
-        let northeast_down = link.callback(|e| Msg::ResizeStart(Point::TopEnd, e));
-        let southeast_down = link.callback(|e| Msg::ResizeStart(Point::BottomEnd, e));
-
         let is_dragging = !matches!(self.dragging_state, DragState::Idle);
         let classes = classes!("pwt-dialog", is_dragging.then_some("pwt-user-select-none"));
 
-        let style = props.styles.compile_style_attribute(None);
+        //let style = props.styles.compile_style_attribute(None);
 
-        html! {
-            <dialog class={"pwt-outer-dialog"} {onpointerdown} aria-label={props.title.clone()} ref={props.node_ref.clone()} {oncancel} {onclose} >
-                <div class={classes} {style} ref={self.inner_ref.clone()}>
-                {panel}
-                if resizable {
-                    <div onpointerdown={west_down} class="dialog-resize-handle west"></div>
-                    <div onpointerdown={east_down} class="dialog-resize-handle east"></div>
-                    <div onpointerdown={north_down} class="dialog-resize-handle north"></div>
-                    <div onpointerdown={south_down} class="dialog-resize-handle south"></div>
-                    <div onpointerdown={northeast_down} class="dialog-resize-handle north-east"></div>
-                    <div onpointerdown={northwest_down} class="dialog-resize-handle north-west"></div>
-                    <div onpointerdown={southeast_down} class="dialog-resize-handle south-east"></div>
-                    <div onpointerdown={southwest_down} class="dialog-resize-handle south-west"></div>
-                }
-                </div>
-            </dialog>
+        let mut inner = Container::new()
+            .class(classes)
+            .styles(props.styles.clone())
+            .with_child(panel);
+
+        if resizable {
+            let mut add_handle = |link: &Scope<Self>, point, direction| {
+                let callback = link.callback(move |e| Msg::ResizeStart(point, e));
+
+                inner.add_child(
+                    Container::new()
+                        .onpointerdown(callback)
+                        .class("dialog-resize-handle")
+                        .class(direction),
+                );
+            };
+
+            add_handle(&link, Point::Start, "west");
+            add_handle(&link, Point::End, "east");
+            add_handle(&link, Point::Top, "north");
+            add_handle(&link, Point::Bottom, "south");
+            add_handle(&link, Point::TopEnd, "north-east");
+            add_handle(&link, Point::TopStart, "north-west");
+            add_handle(&link, Point::BottomEnd, "south-east");
+            add_handle(&link, Point::BottomStart, "south-west");
         }
+
+        // Make sure we do not send touch event to other dialogs (as chrome, does by default)
+        let cancel_event = Callback::from(|event: TouchEvent| {
+            event.stop_propagation();
+        });
+
+        let dialog = Container::from_tag("dialog")
+            .class("pwt-outer-dialog")
+            .onpointerdown(onpointerdown)
+            .onclose(onclose)
+            .ontouchstart(cancel_event.clone())
+            .ontouchend(cancel_event.clone())
+            .ontouchmove(cancel_event.clone())
+            .ontouchcancel(cancel_event.clone())
+            .attribute("aria-label", props.title.clone())
+            .with_child(inner.into_html_with_ref(self.inner_ref.clone()))
+            .into_html_with_ref(self.node_ref.clone());
+
+        create_portal(dialog, gloo_utils::body().into())
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {

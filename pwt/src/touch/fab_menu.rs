@@ -1,37 +1,85 @@
-use std::rc::Rc;
-
-use yew::html::IntoPropValue;
 use yew::prelude::*;
-use yew::virtual_dom::{Key, VComp, VNode};
 
-use crate::props::{ContainerBuilder, EventSubscriber, WidgetBuilder};
-use crate::widget::Container;
+use crate::css::{self, ColorScheme};
+use crate::props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, WidgetBuilder};
+use crate::touch::{SideDialog, SideDialogController};
+use crate::tr;
+use crate::widget::{Button, Column, Container};
 
+use pwt_macros::{builder, widget};
+
+use super::fab::FabSize;
 use super::Fab;
+
+/// [FabMenu] variant
+#[derive(Copy, Clone, PartialEq, Debug, Default)]
+pub enum FabMenuVariant {
+    #[default]
+    Sheet,
+    Material3,
+}
 
 /// [FabMenu] direction.
 #[derive(Copy, Clone, PartialEq)]
 pub enum FabMenuDirection {
     Up,
     Down,
-    Left,
-    Right,
 }
 
 /// [FabMenu] alignment.
 #[derive(Copy, Clone, PartialEq)]
 pub enum FabMenuAlign {
     Start,
-    Center,
     End,
 }
 
+/// An entry for a [FabMenu]
+#[derive(PartialEq, Clone)]
+pub struct FabMenuEntry {
+    pub text: AttrValue,
+    pub icon: AttrValue,
+    pub on_activate: Callback<MouseEvent>,
+}
+
+impl FabMenuEntry {
+    pub fn new(
+        text: impl Into<AttrValue>,
+        icon: impl Into<AttrValue>,
+        on_activate: impl Into<Callback<MouseEvent>>,
+    ) -> Self {
+        Self {
+            text: text.into(),
+            icon: icon.into(),
+            on_activate: on_activate.into(),
+        }
+    }
+}
+
+/// [FabMenu] Color
+///
+/// Determines the color of the [Fab] and the [FabMenuEntry].
+#[derive(Clone, Copy, PartialEq, Eq, Default)]
+pub enum FabMenuColor {
+    #[default]
+    Primary,
+    Secondary,
+    Tertiary,
+}
+
 /// Favorite actions button Menu.
+#[widget(pwt=crate, comp=PwtFabMenu, @element)]
 #[derive(Properties, Clone, PartialEq)]
+#[builder]
 pub struct FabMenu {
-    /// The yew component key.
+    /// The size of the [Fab]
     #[prop_or_default]
-    pub key: Option<Key>,
+    #[builder]
+    pub size: FabSize,
+
+    /// The color scheme to apply on the [Fab] and the [FabMenuEntry]
+    #[prop_or_default]
+    #[builder]
+    pub color: FabMenuColor,
 
     /// Main button Icon (CSS class).
     #[prop_or_default]
@@ -43,18 +91,25 @@ pub struct FabMenu {
 
     /// Menu popup direction
     #[prop_or(FabMenuDirection::Up)]
+    #[builder]
     pub direction: FabMenuDirection,
 
     /// Menu alignment
     ///
-    #[prop_or(FabMenuAlign::Center)]
+    #[prop_or(FabMenuAlign::End)]
+    #[builder]
     pub align: FabMenuAlign,
+
+    /// Menu variant
+    #[prop_or_default]
+    #[builder]
+    pub variant: FabMenuVariant,
 
     /// Child buttons, which popup when main button is pressed.
     ///
     /// We currently support up to 5 children.
     #[prop_or_default]
-    pub children: Vec<Fab>,
+    pub children: Vec<FabMenuEntry>,
 }
 
 impl Default for FabMenu {
@@ -67,17 +122,6 @@ impl FabMenu {
     /// Create a new instance.
     pub fn new() -> Self {
         yew::props!(Self {})
-    }
-
-    /// Builder style method to set the yew `key` property
-    pub fn key(mut self, key: impl IntoPropValue<Option<Key>>) -> Self {
-        self.set_key(key);
-        self
-    }
-
-    /// Method to set the yew `key` property
-    pub fn set_key(&mut self, key: impl IntoPropValue<Option<Key>>) {
-        self.key = key.into_prop_value();
     }
 
     /// Builder style method to set the icon class for the main button.
@@ -106,36 +150,14 @@ impl FabMenu {
         }
     }
 
-    /// Builder style method to set the popup alignment
-    pub fn align(mut self, align: FabMenuAlign) -> Self {
-        self.set_align(align);
-        self
-    }
-
-    /// Method to set the popup alignment
-    pub fn set_align(&mut self, align: FabMenuAlign) {
-        self.align = align;
-    }
-
-    /// Builder style method to set the popup direction
-    pub fn direction(mut self, direction: FabMenuDirection) -> Self {
-        self.set_direction(direction);
-        self
-    }
-
-    /// Method to set the popup direction
-    pub fn set_direction(&mut self, direction: FabMenuDirection) {
-        self.direction = direction;
-    }
-
     /// Builder style method to add a child button
-    pub fn with_child(mut self, child: impl Into<Fab>) -> Self {
+    pub fn with_child(mut self, child: impl Into<FabMenuEntry>) -> Self {
         self.add_child(child);
         self
     }
 
     /// Method to add a child button
-    pub fn add_child(&mut self, child: impl Into<Fab>) {
+    pub fn add_child(&mut self, child: impl Into<FabMenuEntry>) {
         self.children.push(child.into());
     }
 }
@@ -174,70 +196,121 @@ impl Component for PwtFabMenu {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
 
-        let main_icon_class = match &props.main_icon_class {
-            Some(class) => class.clone(),
-            None => classes!("fa", "fa-plus"),
+        let main_icon_class = match (self.show_items, &props.main_icon_class) {
+            (false, Some(class)) => class.clone(),
+            (false, None) => classes!("fa", "fa-plus"),
+            (true, _) => classes!("fa", "fa-times"),
         };
 
-        let mut container = Container::new()
-            .class("pwt-fab-menu-container")
+        let (close_color, color) = match props.color {
+            FabMenuColor::Primary => (ColorScheme::Primary, ColorScheme::PrimaryContainer),
+            FabMenuColor::Secondary => (ColorScheme::Secondary, ColorScheme::SecondaryContainer),
+            FabMenuColor::Tertiary => (ColorScheme::Tertiary, ColorScheme::TertiaryContainer),
+        };
+
+        let (fab_size, fab_classes) = match (props.variant, self.show_items) {
+            (FabMenuVariant::Material3, true) => (FabSize::Small, classes!(close_color, "rounded")),
+            (_, false) | (FabMenuVariant::Sheet, true) => (props.size, classes!()),
+        };
+
+        let main_button = Fab::new(main_icon_class)
+            .size(fab_size)
+            .class(props.main_button_class.clone())
+            .class(fab_classes)
+            .on_activate(ctx.link().callback(|_| Msg::Toggle));
+
+        let btn_class = match props.variant {
+            FabMenuVariant::Sheet => classes!("pwt-button-text"),
+            FabMenuVariant::Material3 => classes!(color, "pwt-fab-menu-item", "medium"),
+        };
+
+        let children = props.children.iter().enumerate().filter_map(|(i, child)| {
+            if i >= 5 {
+                log::error!("FabMenu only supports 5 child buttons.");
+                return None;
+            }
+
+            let on_activate = child.on_activate.clone();
+            let link = ctx.link().clone();
+
+            Some(
+                Button::new(child.text.clone())
+                    .icon_class(child.icon.clone())
+                    .class(btn_class.clone())
+                    .on_activate(move |event| {
+                        link.send_message(Msg::Toggle);
+                        on_activate.emit(event);
+                    })
+                    .into(),
+            )
+        });
+
+        let container: Option<Html> = match props.variant {
+            FabMenuVariant::Sheet => {
+                let controller = SideDialogController::new();
+                self.show_items.then_some(
+                    SideDialog::new()
+                        .controller(controller.clone())
+                        .location(crate::touch::SideDialogLocation::Bottom)
+                        .on_close(ctx.link().callback(|_| Msg::Toggle))
+                        .with_child(
+                            Column::new()
+                                .class(css::FlexFit)
+                                .padding(2)
+                                .gap(1)
+                                .children(children)
+                                .with_child(html!(<hr />))
+                                .with_child(
+                                    Button::new(tr!("Cancel"))
+                                        .class("pwt-button-text")
+                                        .on_activate(move |_| controller.close_dialog()),
+                                ),
+                        )
+                        .into(),
+                )
+            }
+            FabMenuVariant::Material3 => Some(
+                Container::new()
+                    .with_std_props(&props.std_props)
+                    .listeners(&props.listeners)
+                    .class("pwt-fab-menu-container")
+                    .class(self.show_items.then_some("active"))
+                    .onkeydown({
+                        let link = ctx.link().clone();
+                        move |event: KeyboardEvent| {
+                            if event.key() == "Escape" {
+                                link.send_message(Msg::Close)
+                            }
+                        }
+                    })
+                    .children(children)
+                    .into(),
+            ),
+        };
+
+        Container::new()
+            .with_std_props(&props.std_props)
+            .listeners(&props.listeners)
+            .class("pwt-fab-menu-outer")
             .class(match props.align {
                 FabMenuAlign::Start => Some("pwt-fab-align-start"),
                 FabMenuAlign::End => Some("pwt-fab-align-end"),
-                FabMenuAlign::Center => None,
             })
             .class(match props.direction {
                 FabMenuDirection::Up => "pwt-fab-direction-up",
                 FabMenuDirection::Down => "pwt-fab-direction-down",
-                FabMenuDirection::Left => "pwt-fab-direction-left",
-                FabMenuDirection::Right => "pwt-fab-direction-right",
             })
-            .class(self.show_items.then_some("active"))
-            .onkeydown({
-                let link = ctx.link().clone();
-                move |event: KeyboardEvent| {
-                    if event.key() == "Escape" {
-                        link.send_message(Msg::Close)
-                    }
-                }
-            });
-
-        let main_button = Fab::new(main_icon_class)
-            .class(props.main_button_class.clone())
-            .on_click(ctx.link().callback(|_| Msg::Toggle));
-
-        container.add_child(main_button);
-
-        for (i, child) in props.children.iter().enumerate() {
-            if i >= 5 {
-                log::error!("FabMenu only supports 5 child buttons.");
-                break;
-            }
-            let orig_on_click = child.on_click.clone();
-            let link = ctx.link().clone();
-
-            let child_button =
-                child
-                    .clone()
-                    .small()
-                    .class("pwt-fab-menu-item")
-                    .on_click(move |event| {
-                        link.send_message(Msg::Toggle);
-                        if let Some(on_click) = &orig_on_click {
-                            on_click.emit(event);
-                        }
-                    });
-            container.add_child(child_button);
-        }
-
-        container.into()
-    }
-}
-
-impl From<FabMenu> for VNode {
-    fn from(val: FabMenu) -> Self {
-        let key = val.key.clone();
-        let comp = VComp::new::<PwtFabMenu>(Rc::new(val), key);
-        VNode::from(comp)
+            .with_child(
+                Container::new()
+                    .class("pwt-fab-menu-main")
+                    .class(match props.size {
+                        FabSize::Small => "small",
+                        FabSize::Standard => "",
+                        FabSize::Large => "large",
+                    })
+                    .with_child(main_button),
+            )
+            .with_optional_child(container)
+            .into()
     }
 }

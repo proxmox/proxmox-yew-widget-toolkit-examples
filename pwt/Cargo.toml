@@ -1,6 +1,6 @@
 [package]
 name = "pwt"
-version = "0.4.8"
+version = "0.7.8"
 edition = "2021"
 authors = [
   "Dietmar Maurer <dietmar@proxmox.com>",
@@ -50,6 +50,8 @@ web-sys = { version = "0.3", features = [
   "IntersectionObserver",
   "IntersectionObserverEntry",
   "KeyboardEventInit",
+  "Touch",
+  "TouchList",
 ] }
 js-sys = "0.3"
 log = "0.4.6"
@@ -61,6 +63,7 @@ wasm-logger = "0.2"
 gloo-events = "0.2"
 gloo-timers = "0.3"
 gloo-history = "0.2"
+gloo-utils = "0.2"
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 wasm-bindgen-futures = "0.4"
@@ -68,4 +71,4 @@ url = "2.1"
 percent-encoding = "2.1"
 gettext = "0.4"
 
-pwt-macros = { version = "0.3", path = "pwt-macros" }
+pwt-macros = { version = "0.5", path = "pwt-macros" }

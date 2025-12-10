@@ -14,10 +14,11 @@ use super::{
     IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldState,
     ValidateFn,
 };
-use crate::props::{ContainerBuilder, EventSubscriber, WidgetBuilder};
-use crate::widget::{Container, Input, Tooltip, Trigger};
-
+use crate::props::{
+    ContainerBuilder, EventSubscriber, IntoVTag, WidgetBuilder, WidgetStyleBuilder,
+};
 use crate::tr;
+use crate::widget::{Container, Input, Tooltip, Trigger};
 
 pub type PwtField = ManagedFieldMaster<StandardField>;
 
@@ -100,7 +101,10 @@ impl FromStr for InputType {
     }
 }
 
-/// Checkbox input element, which stores values as boolean
+/// Standard Html input element, which stores values as text
+///
+/// Note: Value is always text, even if you set input type to number
+/// or date.
 #[widget(pwt=crate, comp=ManagedFieldMaster<StandardField>, @input, @element)]
 #[derive(Clone, PartialEq, Properties)]
 #[builder]
@@ -137,7 +141,7 @@ pub struct Field {
     /// any result from the validation function (if any).
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
-    pub valid: Option<Result<(), String>>,
+    pub valid: Option<Result<Value, String>>,
 
     /// Default value.
     #[builder(IntoPropValue, into_prop_value)]
@@ -374,15 +378,9 @@ impl ManagedField for StandardField {
 
         let value: Value = value.clone().into();
 
-        let default = props.default.as_deref().unwrap_or("").into();
+        let default: Value = props.default.as_deref().unwrap_or("").into();
 
-        ManagedFieldState {
-            value,
-            valid: Ok(()),
-            default,
-            radio_group: false,
-            unique: false,
-        }
+        ManagedFieldState::new(value, default)
     }
 
     fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
@@ -444,7 +442,7 @@ impl ManagedField for StandardField {
         let props = ctx.props();
         let state = ctx.state();
 
-        let (value, valid) = (&state.value, &state.valid);
+        let (value, validation_result) = (&state.value, &state.result);
         let value = value_to_text(value);
 
         let input_type = match self.password_state {
@@ -459,7 +457,6 @@ impl ManagedField for StandardField {
 
         let disabled = props.input_props.disabled;
         let input: Html = Input::new()
-            .node_ref(self.input_ref.clone())
             .with_input_props(&props.input_props)
             .class("pwt-flex-fill")
             .attribute("type", Some(input_type.to_string()))
@@ -468,7 +465,7 @@ impl ManagedField for StandardField {
             .attribute("max", props.max.map(|v| v.to_string()))
             .attribute("step", props.step.map(|v| v.to_string()))
             .oninput((!disabled).then_some(oninput))
-            .into();
+            .into_html_with_ref(self.input_ref.clone());
 
         let peek_icon =
             if self.password_state != PasswordState::NotAPassword && props.show_peek_icon {
@@ -494,47 +491,59 @@ impl ManagedField for StandardField {
             } else {
                 None
             };
-        let mut input_container = Container::new()
+
+        let mut input_container = Tooltip::empty()
             .with_std_props(&props.std_props)
             .listeners(&props.listeners)
             .class("pwt-input")
             .class(format!("pwt-input-type-{}", props.input_type))
             .class(disabled.then_some("disabled"))
             .class("pwt-w-100")
-            .class(if valid.is_ok() {
+            .class(if validation_result.is_ok() {
                 "is-valid"
             } else {
                 "is-invalid"
             });
 
+        // Note: Always create 3 children to avoid vdom change triggers
+
+        let mut left_triggers = Container::new().style("display", "contents");
+
         for (trigger, right) in &props.trigger {
             if !right {
                 let outer_class = "pwt-flex-fill-first-child pwt-d-flex pwt-align-self-center";
-                input_container.add_child(html! {<div class={outer_class}>{trigger}</div>});
+                left_triggers.add_child(html! {<div class={outer_class}>{trigger}</div>});
             }
         }
 
+        input_container.add_child(left_triggers);
         input_container.add_child(input);
+
+        let mut right_triggers = Container::new().style("display", "contents");
 
         for (trigger, right) in &props.trigger {
             if *right {
                 let outer_class = "pwt-flex-fill-first-child pwt-d-flex pwt-align-self-center";
-                input_container.add_child(html! {<div class={outer_class}>{trigger}</div>});
-            }
-        }
-        input_container.add_optional_child(peek_icon);
-
-        let mut tooltip = Tooltip::new(input_container);
-
-        if let Err(msg) = &valid {
-            tooltip.set_tip(msg.clone())
-        } else if let Some(tip) = &props.tip {
-            if !disabled {
-                tooltip.set_tip(tip.clone())
+                right_triggers.add_child(html! {<div class={outer_class}>{trigger}</div>});
             }
         }
 
-        tooltip.into()
+        right_triggers.add_optional_child(peek_icon);
+
+        input_container.add_child(right_triggers);
+
+        match &validation_result {
+            Err(msg) => input_container.set_tip(msg.clone()),
+            Ok(_) => {
+                if let Some(tip) = &props.tip {
+                    if !disabled {
+                        input_container.set_tip(tip.clone())
+                    }
+                }
+            }
+        }
+
+        input_container.into()
     }
 
     fn rendered(&mut self, ctx: &ManagedFieldContext<Self>, first_render: bool) {

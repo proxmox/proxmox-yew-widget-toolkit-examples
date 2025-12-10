@@ -9,9 +9,6 @@ use crate::props::{CssStyles, ListenersWrapper};
 /// Standard widget properties.
 #[derive(PartialEq, Debug, Default, Clone)]
 pub struct WidgetStdProps {
-    /// The yew node ref.
-    pub node_ref: NodeRef,
-
     /// The yew component key.
     pub key: Option<Key>,
 
@@ -86,14 +83,16 @@ impl WidgetStdProps {
             (class.into_prop_value(), ApplyAttributeAs::Attribute),
         );
 
-        let style = self
-            .styles
-            .compile_style_attribute(attr_map.get("style").map(|a| a.0.clone()));
+        if !self.styles.is_empty() {
+            let style = self
+                .styles
+                .compile_style_attribute(attr_map.get("style").map(|a| a.0.clone()));
 
-        attr_map.insert(
-            AttrValue::Static("style"),
-            (style, ApplyAttributeAs::Attribute),
-        );
+            attr_map.insert(
+                AttrValue::Static("style"),
+                (style, ApplyAttributeAs::Attribute),
+            );
+        }
 
         attributes
     }
@@ -102,6 +101,7 @@ impl WidgetStdProps {
     pub fn into_vtag(
         self,
         tag: Cow<'static, str>,
+        node_ref: NodeRef,
         additional_class: Option<impl Into<Classes>>,
         listeners: Option<ListenersWrapper>,
         children: Option<Vec<VNode>>,
@@ -119,13 +119,6 @@ impl WidgetStdProps {
             VList::new()
         };
 
-        VTag::__new_other(
-            tag,
-            self.node_ref,
-            self.key,
-            attributes,
-            listeners,
-            vlist.into(),
-        )
+        VTag::__new_other(tag, node_ref, self.key, attributes, listeners, vlist.into())
     }
 }

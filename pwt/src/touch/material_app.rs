@@ -12,9 +12,10 @@ use yew_router::{history::History, Router};
 use pwt_macros::builder;
 
 use crate::prelude::*;
+use crate::props::{IntoOptionalTextRenderFn, TextRenderFn};
 use crate::state::{NavigationContainer, SharedState, SharedStateObserver};
-use crate::touch::{SnackBarController, SnackBarManager};
-use crate::widget::{Container, ThemeLoader};
+use crate::touch::{PageAnimationStyle, SnackBarController, SnackBarManager};
+use crate::widget::{CatalogLoader, Container, ThemeLoader};
 
 use super::{PageStack, SideDialog, SideDialogController, SideDialogLocation};
 
@@ -76,7 +77,7 @@ impl PageController {
     pub fn show_drawer(&self, drawer: impl Into<VNode>) {
         self.show_side_dialog(
             SideDialog::new()
-                .direction(SideDialogLocation::Left)
+                .location(SideDialogLocation::Left)
                 .with_child(drawer.into()),
         );
     }
@@ -87,7 +88,7 @@ impl PageController {
     pub fn show_end_drawer(&self, drawer: impl Into<VNode>) {
         self.show_side_dialog(
             SideDialog::new()
-                .direction(SideDialogLocation::Right)
+                .location(SideDialogLocation::Right)
                 .with_child(drawer.into()),
         );
     }
@@ -98,7 +99,7 @@ impl PageController {
     pub fn show_modal_bottom_sheet(&self, bottom_sheet: impl Into<VNode>) {
         self.show_side_dialog(
             SideDialog::new()
-                .direction(SideDialogLocation::Bottom)
+                .location(SideDialogLocation::Bottom)
                 .with_child(bottom_sheet.into()),
         );
     }
@@ -126,7 +127,8 @@ impl PageController {
 /// This is just a convenient way to set up the following things:
 ///
 /// - Provide a yew_router::HashRouter and [NavigationContainer]
-/// - uses [ThemeLoader] to load the material design theme (dark/light)
+/// - uses [ThemeLoader] to load themes (dark/light)
+/// - uses [CatalogLoader] to load the I18N tranlation catalog.
 /// - Provides a [SnackBarController], and display snackbars using [SnackBarManager]
 /// - Uses [PageStack] to dislay/animate overlapping pages.
 /// - Provides a [PageController] to navigate and control the [PageStack].
@@ -207,6 +209,26 @@ pub struct MaterialApp {
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
     pub history: Option<AnyHistory>,
+
+    /// Page animation style used when switching between pages
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or(Some(PageAnimationStyle::FadeFromRight))]
+    pub page_animation: Option<PageAnimationStyle>,
+
+    /// Returns the server side CSS URLs (see [ThemeLoader]).
+    #[builder_cb(IntoOptionalTextRenderFn, into_optional_text_render_fn, String)]
+    #[prop_or_default]
+    pub theme_url_builder: Option<TextRenderFn<String>>,
+
+    /// Convert ISO 639-1 language code to server side catalog URLs (see [CatalogLoader]).
+    #[builder_cb(IntoOptionalTextRenderFn, into_optional_text_render_fn, String)]
+    #[prop_or_default]
+    pub catalog_url_builder: Option<TextRenderFn<String>>,
+
+    /// Default language (skip catalog loading for this language)
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or(AttrValue::Static("en"))]
+    pub default_lang: AttrValue,
 }
 
 impl MaterialApp {
@@ -302,9 +324,6 @@ impl Component for PwtMaterialApp {
     fn create(ctx: &Context<Self>) -> Self {
         let props = ctx.props();
 
-        static THEMES: &[&str] = &["Material"];
-        crate::state::set_available_themes(THEMES);
-
         let history = props
             .history
             .clone()
@@ -375,7 +394,7 @@ impl Component for PwtMaterialApp {
 
         let app = Container::new()
             .class("pwt-viewport")
-            .with_child(PageStack::new(page_stack))
+            .with_child(PageStack::new(page_stack).animation_style(props.page_animation))
             .with_child(
                 SnackBarManager::new()
                     .controller(self.snackbar_controller.clone())
@@ -383,11 +402,17 @@ impl Component for PwtMaterialApp {
             )
             .with_optional_child(self.dialog.as_ref().map(|(_, dialog)| dialog.clone()));
 
+        let body = ThemeLoader::new(NavigationContainer::new().with_child(app))
+            .theme_url_builder(props.theme_url_builder.clone());
+        let body = CatalogLoader::new(body)
+            .default_lang(props.default_lang.clone())
+            .url_builder(props.catalog_url_builder.clone());
+
         html! {
             <Router history={self.history.clone()} basename={props.basename.clone()}>
                 <ContextProvider<SnackBarController> context={self.snackbar_controller.clone()}>
                     <ContextProvider<PageController> context={self.page_controller.clone()}>
-                    { ThemeLoader::new(NavigationContainer::new().with_child(app))}
+                    { body }
                     </ContextProvider<PageController>>
                 </ContextProvider<SnackBarController>>
             </Router>
@@ -448,5 +473,16 @@ fn strip_basename<'a>(basename: &Option<AttrValue>, path: Cow<'a, str>) -> Cow<'
             path
         }
         None => path,
+    }
+}
+
+pub trait MaterialAppScopeExt {
+    fn page_controller(&self) -> Option<PageController>;
+}
+
+impl<COMP: Component> MaterialAppScopeExt for yew::html::Scope<COMP> {
+    fn page_controller(&self) -> Option<PageController> {
+        self.context::<PageController>(Callback::from(|_| {}))
+            .map(|(c, _)| c)
     }
 }
