@@ -2,6 +2,8 @@
     @include color-scheme-vars(surface);
     @include accent-color-scheme-vars(#{$default-accent-color}-container);
 
+    border-inline-end: 1px solid var(--pwt-color-border);
+
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -38,6 +40,9 @@
             .pwt-navigation-rail-icon-container {
                 cursor: pointer;
 
+                // anchor for the corner badge
+                position: relative;
+
                 //background: red;
                 border-radius: 10rem;
                 padding: 4px;
@@ -66,6 +71,14 @@
                     background-color: var(--pwt-accent-color-background);
                     @include state-layer($base: var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
                 }
+
+                // the icon stays centered, so anchoring past the midpoint tracks its corner
+                // even while the container pill changes width
+                .pwt-navigation-rail-badge {
+                    position: absolute;
+                    inset-block-start: -4px;
+                    inset-inline-start: calc(50% + 4px);
+                }
             }
 
             .pwt-navigation-rail-icon {
@@ -74,6 +87,57 @@
 
             .pwt-navigation-rail-label {
                 font-size: map-get($font-size, "label-medium");
+            }
+        }
+    }
+
+    // Expanded (wide) rail variant: icon and label side by side, with the whole item acting as
+    // the interactive pill instead of the icon container alone.
+    &.pwt-navigation-rail-expanded {
+        // Material Design sizes the expanded rail between 220dp and 360dp; the cap makes overlong
+        // labels wrap instead of growing the rail.
+        min-width: 220px;
+        max-width: 360px;
+
+        .pwt-navigation-rail-tabs {
+            align-self: stretch;
+
+            .pwt-navigation-rail-item {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: var(--pwt-spacer-1);
+
+                cursor: pointer;
+                border-radius: 10rem;
+                padding-inline: var(--pwt-spacer-2);
+                min-height: 56px;
+
+                @include state-layer();
+
+                &.active {
+                    color: var(--pwt-accent-color);
+                    background-color: var(--pwt-accent-color-background);
+                    @include state-layer($base: var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
+                }
+
+                .pwt-navigation-rail-icon-container {
+                    // the item handles all interaction states in this layout
+                    pointer-events: none;
+
+                    &.active {
+                        width: 24px;
+                        background-color: transparent;
+                    }
+                }
+
+                .pwt-navigation-rail-label {
+                    font-size: map-get($font-size, "label-large");
+                }
+
+                // the expanded layout places the badge after the label, at the pill's end
+                .pwt-navigation-rail-badge {
+                    margin-inline-start: auto;
+                }
             }
         }
     }

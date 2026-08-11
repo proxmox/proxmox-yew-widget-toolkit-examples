@@ -87,7 +87,7 @@ input {
     &:disabled,
     &[aria-disabled=true]{
         cursor: auto;
-        opacity: 0.5;
+        opacity: var(--pwt-disabled-opacity);
     }
 }
 
@@ -119,7 +119,7 @@ input {
 }
 
 .pwt-label-disabled {
-    opacity: 0.5;
+    opacity: var(--pwt-disabled-opacity);
 }
 
 .pwt-switch {
@@ -178,7 +178,7 @@ input {
 
     &.disabled {
         cursor: auto;
-        opacity: 0.5;
+        opacity: var(--pwt-disabled-opacity);
     }
 }
 
@@ -187,7 +187,9 @@ input {
     @include accent-color-scheme-vars($default-accent-color);
 
     display: inline-block;
-    padding: max(map-get($line-height, "label-large") - map-get($font-size, "label-large"), var(--pwt-spacer-1));
+    $pwt-checkbox-state-padding: max(map-get($line-height, "label-large") - map-get($font-size, "label-large"), var(--pwt-spacer-1));
+    padding: $pwt-checkbox-state-padding;
+    margin: auto calc(-1 * $pwt-checkbox-state-padding);
     border-radius: 50%;
     transition: background 0.3s;
 
@@ -231,7 +233,7 @@ input {
 
     &.disabled {
         cursor: auto;
-        opacity: 0.5;
+        opacity: var(--pwt-disabled-opacity);
     }
 
     &.disabled.checked {
@@ -279,7 +281,7 @@ input {
 
     &.disabled {
         cursor: auto;
-        opacity: 0.5;
+        opacity: var(--pwt-disabled-opacity);
     }
 }
 
@@ -312,7 +314,7 @@ input {
     &.disabled,
     &:disabled {
         cursor: auto;
-        opacity: 0.5;
+        opacity: var(--pwt-disabled-opacity);
     }
 }
 

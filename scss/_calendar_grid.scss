@@ -1,0 +1,334 @@
+/// ## CalendarGrid
+///
+/// A month or week grid of bordered day cells with multi-day span bars. The
+/// `CalendarGrid` widget emits the structural classes; this partial gives them
+/// a theme. Everything a consumer needs to style a plain calendar lives here,
+/// so passing only `span_bars` yields outlined, fused, scrollable bars.
+///
+/// ### Structure
+/// - `pwt-calendar` - the widget root (weekday header + day grid, stacked).
+/// - `pwt-calendar-fill` - the root when it should grow into the available
+///   height; its grid then slices evenly instead of sizing on content.
+/// - `pwt-calendar-grid` / `-grid-header` - the seven-column day grid and its
+///   weekday-label row; `pwt-calendar-weekday` is one header label.
+/// - `pwt-calendar-day` - one day cell; `-outside` (not the anchored month),
+///   `-today` and `-weekend` tint or mark it. `pwt-calendar-daynum` is the
+///   day number.
+/// - `pwt-calendar-day-pinned` - a consumer-owned zone (via `render_day`) that
+///   stays above the scrolling bars, for content that must never scroll out of
+///   view (a holiday chip, a headcount).
+/// - `pwt-calendar-span-lanes` - the per-cell scroll box holding a day's
+///   segments; a busy day scrolls here instead of growing its row.
+///
+/// ### Span bar
+/// One `CalendarSpanBar` renders as one segment per covered day, fused into a
+/// single outlined shape across the days it spans:
+/// - `pwt-calendar-span` - every segment; `-start` / `-end` round the true
+///   ends, `-start-marker` accents the origin, `-continues-left` / `-right`
+///   drop the border on an internal edge so a run reads as one bar.
+/// - `pwt-calendar-span-label` / `-icon` - the label and its leading glyph,
+///   carried once per week row on the leading cell.
+/// - `pwt-calendar-span-selected` - every segment of the highlighted bar.
+///
+/// ### Color
+/// A bar's color comes from the `--pwt-calendar-span-color` custom property
+/// (set by `CalendarSpanBar::color`). The fill and text are mixed from it
+/// toward the theme's surface and on-surface, so one value drives the whole
+/// bar and adapts to every theme and to dark mode. Pass a color that itself
+/// clears 3:1 on the cell (WCAG 1.4.11): it is used directly as the border,
+/// the only part that carries a perceivable outline against the pale fill.
+///
+/// The mix ratios and geometry are custom-property knobs, so a theme retunes
+/// the palette without forking this partial.
+.pwt-calendar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    // Geometry and color-mix knobs.
+    --pwt-calendar-day-min-height: 96px;
+    --pwt-calendar-span-height: 1.6rem;
+    --pwt-calendar-span-fill: 18%;
+    --pwt-calendar-span-ink: 80%;
+}
+
+// Grow into the available height (dashboard surfaces); without it rows take
+// their natural height (mobile).
+.pwt-calendar-fill {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+// The header row reuses the grid template so weekday labels line up with the
+// columns below.
+.pwt-calendar-grid,
+.pwt-calendar-grid-header {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    width: 100%;
+}
+
+.pwt-calendar-grid-header {
+    gap: 0;
+}
+
+// A 1px collapsed border: the grid background bleeds through a 1px gap so every
+// cell carries a hairline frame without doubling up on shared edges.
+.pwt-calendar-grid {
+    gap: 1px;
+    background-color: var(--pwt-color-outline-variant, rgba(0, 0, 0, 0.12));
+    border: 1px solid var(--pwt-color-outline-variant, rgba(0, 0, 0, 0.12));
+}
+
+.pwt-calendar-fill .pwt-calendar-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    // Fixed fill, not content-sized: every row is an even 1fr slice (floored so
+    // an empty cell still reads as a calendar), so the whole month fits the
+    // viewport and a busy day scrolls its own bars instead of stretching its
+    // row. Only when even the floors overflow does the column scroll the whole
+    // grid as one - the tiny-viewport fallback.
+    grid-auto-rows: minmax(var(--pwt-calendar-day-min-height), 1fr);
+}
+
+.pwt-calendar-weekday {
+    padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
+    text-align: center;
+    font-weight: 600;
+}
+
+// A single day cell: it takes the height of its grid-row slice so the month
+// always fits the viewport, its content stacked top-aligned below the day
+// number. The cell never grows or scrolls; a busy day's bars scroll inside
+// their own zone (`pwt-calendar-span-lanes`).
+.pwt-calendar-day {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pwt-spacer-1);
+    min-height: var(--pwt-calendar-day-min-height);
+    padding: var(--pwt-spacer-1);
+    // Let a multi-day bar bleed horizontally across the 1px grid gap while
+    // clipping any vertical overflow, so a fixed-height cell can never spill
+    // into the row below. A single `overflow` shorthand cannot express this:
+    // the visible inline axis has to survive here, on the cell.
+    overflow-x: visible;
+    overflow-y: clip;
+    // A bare `.pwt-scheme-*` only sets the CSS vars; paint them here so a
+    // holiday / today / out-of-month tint actually shows on the cell.
+    color: var(--pwt-color);
+    background-color: var(--pwt-color-background);
+}
+
+// Days outside the anchored month dim so the in-month block reads as one group.
+.pwt-calendar-day-outside {
+    opacity: 0.55;
+}
+
+// Today gets an accent ring, not a fill, so it stays legible over a tint.
+.pwt-calendar-day-today {
+    box-shadow: inset 0 0 0 2px var(--pwt-color-primary, #3273dc);
+}
+
+// Weekend tint as a background-image overlay so it stacks over any scheme
+// background-color (holiday, leave, ...) instead of fighting it. A 5% black wash reads on light
+// cells; on a dark cell it is imperceptible, so dark mode washes with white instead.
+.pwt-calendar-day-weekend {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05));
+}
+
+:root.pwt-dark-mode .pwt-calendar-day-weekend {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+}
+
+.pwt-calendar-daynum {
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+// A consumer's own `render_day` content, pinned above the scrolling bars.
+.pwt-calendar-day-pinned {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pwt-spacer-1);
+    flex: 0 0 auto;
+}
+
+// The scrolling zone: a day with dozens of bars shows them all by scrolling
+// instead of growing the row, while a day whose bars fit shows no scrollbar and
+// neighbouring cells stay put.
+//
+// `flex-basis: 0` is load-bearing. At `auto` the box reports its full content
+// height as its hypothetical main size, which feeds the cell's max-content
+// height; a `pwt-calendar-fill` grid pins rows at `minmax(min, 1fr)` and never
+// consults that, but a content-sized grid would let a 50-bar day grow its cell
+// past a thousand pixels and drag every row along. `0` is right in either mode.
+//
+// The negative inline margin pulls the box out past the cell padding and 1px
+// into the collapsed grid gap, so a segment meets its neighbour instead of
+// leaving a trench the width of two paddings. It must live here, not on the
+// bars: `overflow-y: auto` makes this box clip its inline axis, so a bar reaches
+// exactly this bled edge and no further. `min-height` keeps one bar visible on a
+// cell whose pinned zone would otherwise starve the box to nothing.
+.pwt-calendar-span-lanes {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: var(--pwt-calendar-span-height);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    margin-inline: calc(-1 * var(--pwt-spacer-1) - 1px);
+}
+
+// The pinned zone above the scroll box: it holds its height (never scrolls) so a pinned bar stays
+// in view while the lanes below it scroll. The same inline bleed as the scroll box, so a multi-day
+// pinned bar fuses across cells too.
+.pwt-calendar-span-pinned {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    margin-inline: calc(-1 * var(--pwt-spacer-1) - 1px);
+}
+
+// An empty lane holder in the pinned zone, matching a bar's full vertical footprint (height plus its
+// margins), so a pinned bar keeps its lane on the days of its row it does not cover.
+.pwt-calendar-span-spacer {
+    flex: 0 0 auto;
+    height: var(--pwt-calendar-span-height);
+    margin: 1.5px 0;
+}
+
+// One continuous bar over the days it covers. Square by default so a
+// week-boundary continuation fuses into one bar; only the true ends round.
+// `flex: 0 0 auto` keeps its height fixed - as a flex item it would otherwise
+// shrink in a packed cell and not in a sparse one, so one multi-day bar would
+// change height from day to day.
+.pwt-calendar-span {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    height: var(--pwt-calendar-span-height);
+    margin: 1.5px 0;
+    padding: 0 5px;
+    font-size: 0.9rem;
+    border-radius: 0;
+    // Default hue for a bar the consumer left uncolored; `CalendarSpanBar::color`
+    // overrides it inline.
+    --pwt-calendar-span-color: var(--pwt-color-outline, #6b7280);
+    // The pastel fill sits far below 3:1 against the cell, so a 1px border in the
+    // bar's own color carries the boundary contrast (WCAG 1.4.11). Fill, text and
+    // border derive from `--pwt-calendar-span-color` through per-part knobs, so
+    // one value drives the whole bar, dark mode retunes only the knobs (below),
+    // and an application override class still wins with a single-class rule.
+    --pwt-calendar-span-border: var(--pwt-calendar-span-color);
+    background: color-mix(
+        in srgb,
+        var(--pwt-calendar-span-color) var(--pwt-calendar-span-fill),
+        var(--pwt-color-surface, #fff)
+    );
+    color: color-mix(
+        in srgb,
+        var(--pwt-calendar-span-color) var(--pwt-calendar-span-ink),
+        var(--pwt-color-on-surface, #10151c)
+    );
+    border: 1px solid var(--pwt-calendar-span-border);
+    cursor: pointer;
+}
+
+// Dark surfaces need a deeper fill under a lighter label, and a border lifted off
+// the base so its edge reads against the dark cell. This block sets only knobs,
+// never the fill / text / border properties, so a higher-specificity dark rule
+// cannot override a consumer's single-class bar-variant class.
+:root.pwt-dark-mode .pwt-calendar-span {
+    --pwt-calendar-span-fill: 42%;
+    --pwt-calendar-span-ink: 26%;
+    --pwt-calendar-span-border: color-mix(
+        in srgb,
+        var(--pwt-calendar-span-color) 55%,
+        var(--pwt-color-on-surface, #fff)
+    );
+}
+
+.pwt-calendar-span-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pwt-calendar-span-icon {
+    flex: 0 0 auto;
+    margin-inline-end: 6px;
+    font-size: 0.95em;
+}
+
+// A bar is a control - it selects its whole run - so keyboard focus must be as
+// visible as the pointer cue, and every segment of the picked bar shows its
+// extent at once.
+.pwt-calendar-span:hover {
+    filter: brightness(0.9);
+}
+
+.pwt-calendar-span:focus-visible {
+    outline: 2px solid var(--pwt-color-primary);
+    outline-offset: -1px;
+}
+
+// The picked bar, every segment: fill it solid in its own colour so the whole multi-day run reads as
+// one highlighted stripe, clearly apart from the pale unselected bars (a per-segment inset outline
+// broke at each cell edge and barely showed on a bar whose colour sat near the accent). The shadowed
+// white label stays legible on any bar colour. The compound selector wins over an app bar-variant
+// class (`.tempo-span-event` and the like).
+.pwt-calendar-span.pwt-calendar-span-selected {
+    background: var(--pwt-calendar-span-color);
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+    font-weight: 600;
+}
+
+.pwt-calendar-span-start {
+    border-start-start-radius: var(--pwt-shape-corner-extra-small, 3px);
+    border-end-start-radius: var(--pwt-shape-corner-extra-small, 3px);
+    margin-inline-start: 3px;
+}
+
+// Pull the true end in and round it: the boundary then reads even between two
+// same-color bars that meet across a day.
+.pwt-calendar-span-end {
+    margin-inline-end: 7px;
+    border-start-end-radius: 999px;
+    border-end-end-radius: 999px;
+}
+
+// Drop the border on the internal edge where two segments of one run meet, so a
+// fused multi-day bar reads as a single outlined shape rather than a row of
+// boxes. Only the run's true start, its true end and each week-row edge stay
+// closed; top and bottom borders always remain.
+.pwt-calendar-span-continues-left {
+    border-inline-start-width: 0;
+}
+
+.pwt-calendar-span-continues-right {
+    border-inline-end-width: 0;
+}
+
+// The true-start accent (`span_start_marker`): dark on light and light on dark
+// so it reads over any fill. `inset 3px` is a physical left offset, so mirror it
+// under RTL to keep the marker on the bar's leading edge.
+.pwt-calendar-span-start-marker {
+    box-shadow: inset 3px 0 0 rgba(0, 0, 0, 0.24);
+}
+
+:root.pwt-dark-mode .pwt-calendar-span-start-marker {
+    box-shadow: inset 3px 0 0 rgba(255, 255, 255, 0.32);
+}
+
+[dir="rtl"] .pwt-calendar-span-start-marker {
+    box-shadow: inset -3px 0 0 rgba(0, 0, 0, 0.24);
+}
+
+[dir="rtl"] :root.pwt-dark-mode .pwt-calendar-span-start-marker {
+    box-shadow: inset -3px 0 0 rgba(255, 255, 255, 0.32);
+}

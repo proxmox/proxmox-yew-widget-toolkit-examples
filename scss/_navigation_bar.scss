@@ -27,6 +27,9 @@
         .pwt-navigation-bar-icon-container {
             cursor: pointer;
 
+            // anchor for the corner badge
+            position: relative;
+
             //background: red;
             border-radius: 10rem;
             padding: 4px;
@@ -53,6 +56,14 @@
                 color: var(--pwt-accent-color);
                 background-color: var(--pwt-accent-color-background);
                 @include state-layer($base: var(--pwt-accent-color-background), $color: var(--pwt-accent-color));
+            }
+
+            // the icon stays centered, so anchoring past the midpoint tracks its corner even
+            // while the container pill changes width
+            .pwt-navigation-bar-badge {
+                position: absolute;
+                inset-block-start: -4px;
+                inset-inline-start: calc(50% + 4px);
             }
         }
 

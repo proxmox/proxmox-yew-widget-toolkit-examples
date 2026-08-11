@@ -57,7 +57,7 @@ dialog.pwt-outer-dialog {
     &.north-west,
     &.south-east,
     &.south-west {
-        width: 5px;
+        width: var(--pwt-spacer-2);
     }
 
     &.north,
@@ -66,34 +66,34 @@ dialog.pwt-outer-dialog {
     &.north-west,
     &.south-east,
     &.south-west {
-        height: 5px;
+        height: var(--pwt-spacer-2);
     }
 
     &.west {
-        top: 5px;
-        bottom: 5px;
+        top: var(--pwt-spacer-2);
+        bottom: var(--pwt-spacer-2);
         left: 0px;
         cursor: w-resize;
     }
 
     &.east {
-        top: 5px;
-        bottom: 5px;
+        top: var(--pwt-spacer-2);
+        bottom: var(--pwt-spacer-2);
         right: 0px;
         cursor: e-resize;
     }
 
     &.north {
         top: 0px;
-        left: 5px;
-        right: 5px;
+        left: var(--pwt-spacer-2);
+        right: var(--pwt-spacer-2);
         cursor: n-resize;
     }
 
     &.south {
         bottom: 0px;
-        left: 5px;
-        right: 5px;
+        left: var(--pwt-spacer-2);
+        right: var(--pwt-spacer-2);
         cursor: s-resize;
     }
 

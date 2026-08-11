@@ -58,13 +58,21 @@
     }
 }
 
+/* Opacity of elements in certain states. */
+:root {
+    @each $level, $value in $element-state-opacity {
+        --pwt-#{$level}-opacity: #{$value};
+    }
+}
+
 /* Font setup */
 @font-face {
     font-family: "Roboto Flex";
     src:
-      url("../fonts/RobotoFlexVariableFont.woff2") format("woff2"),
-      url("../fonts/RobotoFlexVariableFont.ttf") format("truetype");
+        url("../fonts/RobotoFlexVariableFont.woff2") format("woff2"),
+        url("../fonts/RobotoFlexVariableFont.ttf") format("truetype");
 }
+
 $pwt-font-sans-serif: "Roboto Flex";
 $pwt-font-monospace: monospace;
 
@@ -93,10 +101,14 @@ $pwt-font-monospace: monospace;
 }
 
 @import "application_bar";
+@import "badge";
 @import "button";
+@import "calendar_grid";
 @import "card";
+@import "charts";
 @import "content_spacer";
 @import "datatable";
+@import "date_selector";
 @import "dialog";
 @import "dropdown";
 @import "form";
@@ -104,6 +116,7 @@ $pwt-font-monospace: monospace;
 @import "list";
 @import "menu";
 @import "meter";
+@import "segmented_bar";
 @import "miniscroll";
 @import "miscellaneous";
 @import "nav";

@@ -33,7 +33,7 @@
     &[aria-disabled="true"] {
         @include color-scheme-vars("inverse-surface");
         cursor: auto;
-        opacity: 0.5;
+        opacity: var(--pwt-disabled-opacity);
     }
 }
 
@@ -83,7 +83,7 @@ button,
     &:disabled,
     &[aria-disabled="true"] {
         cursor: auto;
-        opacity: 0.5;
+        opacity: var(--pwt-disabled-opacity);
         @include elevation-box-shadow(0);
 
         &:not(.pwt-button-text) {

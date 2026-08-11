@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxmox Yew Widget Toolkit Cheatsheet</title>
+    <link rel="stylesheet" type="text/css" href="css/desktop-yew-style.css" />
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.css" />
+    <style>
+        :root {
+            --cheatsheet-header-bg: var(--pwt-color-primary);
+            --cheatsheet-header-fg: var(--pwt-color-on-primary);
+            --cheatsheet-row-alt: var(--pwt-color-surface);
+            --cheatsheet-border: var(--pwt-color-border);
+        }
+
+        body {
+            margin: 0;
+            padding: 1rem;
+            background-color: #fff;
+        }
+
+        .cheatsheet-container {
+            column-count: 3;
+            column-gap: 1rem;
+            font-family: sans-serif;
+            font-size: 0.75rem;
+            /* Compact font size */
+            color: #333;
+        }
+
+        .cheatsheet-section {
+            break-inside: avoid;
+            margin-bottom: 1rem;
+            border: 1px solid var(--cheatsheet-border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .cheatsheet-header {
+            background-color: var(--cheatsheet-header-bg);
+            color: var(--cheatsheet-header-fg);
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .cheatsheet-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cheatsheet-table th,
+        .cheatsheet-table td {
+            padding: 2px 6px;
+            text-align: left;
+            border-bottom: 1px solid var(--cheatsheet-border);
+        }
+
+        .cheatsheet-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cheatsheet-table tr:nth-child(even) {
+            background-color: var(--cheatsheet-row-alt);
+        }
+
+        .cheatsheet-table code {
+            font-family: monospace;
+            color: var(--pwt-color-primary);
+            background-color: var(--pwt-color-surface);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        /* Force print settings */
+        @media print {
+            @page {
+                margin: 0.5cm;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .cheatsheet-container {
+                width: 100%;
+            }
+        }
+    </style>
+    <style>
+        .color-swatch-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .color-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .color-preview {
+            display: flex;
+            gap: 4px;
+        }
+
+        .color-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: var(--pwt-color);
+            background-color: var(--pwt-color-background);
+        }
+
+        .color-scheme-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            column-gap: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Color Schemes (Header Section) -->
+    <div class="cheatsheet-section" style="margin-bottom: 1rem;">
+        <div class="cheatsheet-header">Color Schemes</div>
+        <div class="color-scheme-grid" style="padding: 4px 8px;">
+
+            <!-- Header 1 -->
+            <div class="color-swatch-row"
+                style="font-weight:bold; border-bottom: 1px solid var(--cheatsheet-border); margin-bottom: 6px;">
+                <div class="color-name">Scheme</div>
+                <div class="color-preview">
+                    <span style="width: 24px; text-align: center; font-size: 0.6rem;">Base</span>
+                    <span style="width: 24px; text-align: center; font-size: 0.6rem;">Cont.</span>
+                </div>
+            </div>
+            <!-- Header 2 -->
+            <div class="color-swatch-row"
+                style="font-weight:bold; border-bottom: 1px solid var(--cheatsheet-border); margin-bottom: 6px;">
+                <div class="color-name">Scheme</div>
+                <div class="color-preview">
+                    <span style="width: 24px; text-align: center; font-size: 0.6rem;">Base</span>
+                    <span style="width: 24px; text-align: center; font-size: 0.6rem;">Cont.</span>
+                </div>
+            </div>
+            <!-- Header 3 -->
+            <div class="color-swatch-row"
+                style="font-weight:bold; border-bottom: 1px solid var(--cheatsheet-border); margin-bottom: 6px;">
+                <div class="color-name">Scheme</div>
+                <div class="color-preview">
+                    <span style="width: 24px; text-align: center; font-size: 0.6rem;">Base</span>
+                    <span style="width: 24px; text-align: center; font-size: 0.6rem;">Cont.</span>
+                </div>
+            </div>
+
+            <!-- Primary -->
+            <div class="color-swatch-row">
+                <div class="color-name">Primary</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-primary" title="pwt-scheme-primary"></div>
+                    <div class="color-box pwt-scheme-primary-container" title="pwt-scheme-primary-container"></div>
+                </div>
+            </div>
+            <!-- Secondary -->
+            <div class="color-swatch-row">
+                <div class="color-name">Secondary</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-secondary" title="pwt-scheme-secondary"></div>
+                    <div class="color-box pwt-scheme-secondary-container" title="pwt-scheme-secondary-container">
+                    </div>
+                </div>
+            </div>
+            <!-- Tertiary -->
+            <div class="color-swatch-row">
+                <div class="color-name">Tertiary</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-tertiary" title="pwt-scheme-tertiary"></div>
+                    <div class="color-box pwt-scheme-tertiary-container" title="pwt-scheme-tertiary-container">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Surface -->
+            <div class="color-swatch-row">
+                <div class="color-name">Surface</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-surface" title="pwt-scheme-surface"></div>
+                    <div class="color-box pwt-scheme-surface-container" title="pwt-scheme-surface-container"></div>
+                </div>
+            </div>
+            <!-- Dark Surface -->
+            <div class="color-swatch-row">
+                <div class="color-name">Dark Surface</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-dark-surface" title="pwt-scheme-dark-surface"></div>
+                    <div class="color-box pwt-scheme-dark-surface-container" title="pwt-scheme-dark-surface-container">
+                    </div>
+                </div>
+            </div>
+            <!-- Inverse Surface -->
+            <div class="color-swatch-row">
+                <div class="color-name">Inv. Surface</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-inverse-surface" title="pwt-scheme-inverse-surface"></div>
+                    <div class="color-box pwt-scheme-inverse-surface-container"
+                        title="pwt-scheme-inverse-surface-container"></div>
+                </div>
+            </div>
+
+            <!-- Neutral -->
+            <div class="color-swatch-row">
+                <div class="color-name">Neutral</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-neutral" title="pwt-scheme-neutral"></div>
+                    <div class="color-box pwt-scheme-neutral-container" title="pwt-scheme-neutral-container"></div>
+                </div>
+            </div>
+            <!-- Neutral Alt -->
+            <div class="color-swatch-row">
+                <div class="color-name">Neutral Alt</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-neutral-alt" title="pwt-scheme-neutral-alt"></div>
+                    <div class="color-box pwt-scheme-neutral-alt-container" title="pwt-scheme-neutral-alt-container">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success -->
+            <div class="color-swatch-row">
+                <div class="color-name">Success</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-success" title="pwt-scheme-success"></div>
+                    <div class="color-box pwt-scheme-success-container" title="pwt-scheme-success-container"></div>
+                </div>
+            </div>
+            <!-- Warning -->
+            <div class="color-swatch-row">
+                <div class="color-name">Warning</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-warning" title="pwt-scheme-warning"></div>
+                    <div class="color-box pwt-scheme-warning-container" title="pwt-scheme-warning-container"></div>
+                </div>
+            </div>
+            <!-- Error -->
+            <div class="color-swatch-row">
+                <div class="color-name">Error</div>
+                <div class="color-preview">
+                    <div class="color-box pwt-scheme-error" title="pwt-scheme-error"></div>
+                    <div class="color-box pwt-scheme-error-container" title="pwt-scheme-error-container"></div>
+                </div>
+            </div>
+        </div>
+        <div style="padding: 0 8px 4px 8px; font-style: italic; font-size: 0.65rem; color: #666;">
+            Accents: <code>pwt-accent-&lt;name&gt;</code>
+        </div>
+    </div>
+
+    <div class="cheatsheet-container">
+
+        <!-- Colors -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Colors</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-color-&lt;name&gt;</code></td>
+                    <td>Text Color</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-bg-color-&lt;name&gt;</code></td>
+                    <td>Background</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-fill-&lt;name&gt;</code></td>
+                    <td>SVG Fill</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-stroke-&lt;name&gt;</code></td>
+                    <td>SVG Stroke</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-dark-mode</code></td>
+                    <td>Dark Mode Root</td>
+                </tr>
+            </table>
+        </div>
+
+
+
+        <!-- Typography -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Typography</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-font-&lt;cat&gt;-&lt;scale&gt;</code></td>
+                    <td>Size & LineHeight</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-font-size-...</code></td>
+                    <td>Size Only</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-line-height-...</code></td>
+                    <td>LineHeight Only</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><i>Cat: display, headline, title, label, body</i></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><i>Scale: large, medium, small</i></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Spacing Density -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Spacing Density</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-density-high</code></td>
+                    <td>3px (Dense)</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-density-medium</code></td>
+                    <td>5px (Desktop)</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-density-touch</code></td>
+                    <td>10px (Mobile)</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Layout -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Layout & Panels</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-panel</code></td>
+                    <td>Flex Column Panel</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-panel-header</code></td>
+                    <td>Header Container</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-panel-header-text</code></td>
+                    <td>Header Title</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-content-spacer</code></td>
+                    <td>Smart Container</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-menubar</code></td>
+                    <td>Menu Bar</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-nav-menu</code></td>
+                    <td>Nav Menu</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Buttons -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Buttons</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-button</code></td>
+                    <td>Base Button</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-button-text</code></td>
+                    <td>Text Only</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-button-outline</code></td>
+                    <td>Outlined</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-button-elevated</code></td>
+                    <td>Elevated</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-segmented-button</code></td>
+                    <td>Segmented Grp</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- FAB -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">FAB</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-fab</code></td>
+                    <td>Floating Action</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-fab-small</code></td>
+                    <td>Small FAB</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-fab-large</code></td>
+                    <td>Large FAB</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-fab-menu-container</code></td>
+                    <td>Menu Container</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Padding & Margin -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Padding & Margin (0-4)</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-p-&lt;size&gt;</code></td>
+                    <td>Padding All</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-pt/pb-&lt;size&gt;</code></td>
+                    <td>Top / Bottom</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-ps/pe-&lt;size&gt;</code></td>
+                    <td>Start / End</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-px/py-&lt;size&gt;</code></td>
+                    <td>X / Y Axis</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-m-&lt;size&gt;</code></td>
+                    <td>Margin All</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-mt/mb-&lt;size&gt;</code></td>
+                    <td>Top / Bottom</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-ms/me-&lt;size&gt;</code></td>
+                    <td>Start / End</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-mx/my-&lt;size&gt;</code></td>
+                    <td>X / Y Axis</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Gap -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Gap (0-4)</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-gap-&lt;size&gt;</code></td>
+                    <td>Flex/Grid Gap</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-column-gap-...</code></td>
+                    <td>Col Gap</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-row-gap-...</code></td>
+                    <td>Row Gap</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Sizing -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Sizing</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-w-&lt;val&gt;</code></td>
+                    <td>Width</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-h-&lt;val&gt;</code></td>
+                    <td>Height</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-size-&lt;val&gt;</code></td>
+                    <td>Width & Height</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-fit</code></td>
+                    <td>Fit Parent (100%)</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-viewport</code></td>
+                    <td>Full Viewport</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><i>Val: 25, 50, 75, 100, auto, fit-content...</i></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Flexbox -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Flexbox</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-d-flex</code></td>
+                    <td>Display Flex</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-flex-fit</code></td>
+                    <td>Flex 1 + Auto</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-flex-fill</code></td>
+                    <td>Flex 1 1 Auto</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-flex-none</code></td>
+                    <td>Flex 0 0 Auto</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-flex-direction-...</code></td>
+                    <td>Direction</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-flex-wrap-...</code></td>
+                    <td>Wrap</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-justify-content-...</code></td>
+                    <td>Justify</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-align-items-...</code></td>
+                    <td>Align Items</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-align-self-...</code></td>
+                    <td>Align Self</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Text Util -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Text Utilities</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-text-truncate</code></td>
+                    <td>Ellipsis</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-text-align-...</code></td>
+                    <td>Align</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-white-space-...</code></td>
+                    <td>White Space</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-user-select-...</code></td>
+                    <td>User Select</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Borders & Shapes -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Borders & Shapes</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-border</code></td>
+                    <td>Border All</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-border-&lt;side&gt;</code></td>
+                    <td>Border Side</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-no-border</code></td>
+                    <td>No Border</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-shape-circle</code></td>
+                    <td>Circle</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-shape-&lt;val&gt;</code></td>
+                    <td>Radius</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-shadow-&lt;0-5&gt;</code></td>
+                    <td>Shadow Level</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Misc -->
+        <div class="cheatsheet-section">
+            <div class="cheatsheet-header">Misc</div>
+            <table class="cheatsheet-table">
+                <tr>
+                    <td><code>pwt-overflow-...</code></td>
+                    <td>Overflow</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-position-...</code></td>
+                    <td>Position</td>
+                </tr>
+                <tr>
+                    <td><code>pwt-opacity-...</code></td>
+                    <td>Opacity</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

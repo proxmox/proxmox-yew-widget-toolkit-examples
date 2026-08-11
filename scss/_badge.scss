@@ -1,0 +1,40 @@
+/// ## Badge
+///
+/// A small rounded status label (badge / chip / tag): an inline pill with an
+/// optional leading icon and short text, tinted by the applied color scheme.
+///
+/// The pill paints from the current color-scheme variables, exactly like a
+/// filled button, so it inherits the tint of the `pwt-scheme-*` class on the
+/// element and works unchanged across every theme. The widget always applies a
+/// scheme (a neutral one by default), so a badge always has a legible fill.
+///
+/// The geometry is exposed as `--pwt-badge-*` custom properties so a consumer
+/// can retune it per density without editing this partial.
+.pwt-badge {
+    @include font_and_line_height("label-small");
+
+    --pwt-badge-gap: var(--pwt-spacer-1);
+    --pwt-badge-padding-x: var(--pwt-spacer-2);
+    --pwt-badge-padding-y: calc(var(--pwt-spacer-1) / 2);
+    --pwt-badge-radius: var(--pwt-shape-corner-small);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pwt-badge-gap);
+    padding: var(--pwt-badge-padding-y) var(--pwt-badge-padding-x);
+    border-radius: var(--pwt-badge-radius);
+    // keep the pill on one line; the surrounding layout decides where it wraps
+    white-space: nowrap;
+    // never grow to fill a flex parent, only as wide as its content
+    flex: 0 0 auto;
+    width: fit-content;
+    // paint from the applied scheme; a pwt-scheme-* class sets these vars
+    // (with !important), which is how the tint reaches the pill in any theme
+    background-color: var(--pwt-color-background);
+    color: var(--pwt-color);
+
+    // the leading icon rides the text without extra spacing of its own
+    > .fa {
+        font-size: 1em;
+    }
+}

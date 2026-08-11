@@ -1,0 +1,60 @@
+// Styles for the Date Selector component
+.pwt-date-panel {
+
+    display: grid;
+    text-align: center;
+    align-items: center;
+
+    .pwt-date-panel-item {
+        @include font_and_line_height("title-small");
+        @include color-scheme-vars("neutral");
+
+        color: var(--pwt-color);
+        background-color: var(--pwt-color-background);
+
+        cursor: pointer;
+
+        padding: var(--pwt-spacer-1);
+        border-radius: var(--pwt-shape-corner-small) !important;
+        min-width: 2em;
+
+        &:hover {
+            @include elevation-background-color($level: 0, $state: hover);
+        }
+
+        &:focus,
+        &.focused {
+            outline: 2px solid var(--pwt-color-on-surface);
+            outline-offset: -2px;
+        }
+
+        &.selected {
+            @include color-scheme-vars("primary");
+        }
+
+        &.disabled {
+            opacity: var(--pwt-disabled-opacity);
+            cursor: default !important;
+        }
+
+        &.other-month {
+            opacity: var(--pwt-dimmed-opacity);
+        }
+
+        &.pwt-today {
+            @include color-scheme-vars("secondary-container");
+        }
+    }
+
+    .pwt-date-panel-header {
+        @include font_and_line_height("label-small");
+        opacity: var(--pwt-dimmed-opacity);
+        padding: var(--pwt-spacer-1);
+    }
+
+    .pwt-date-panel-week-number {
+        @include font_and_line_height("label-small");
+        opacity: var(--pwt-dimmed-opacity);
+        padding: var(--pwt-spacer-1);
+    }
+}

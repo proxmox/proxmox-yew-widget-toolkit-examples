@@ -77,6 +77,57 @@ hr,
     line-height: map-get($line-height, "body-small");
 }
 
+// Priority coloring for the structured (-J) journal view. The classes are emitted per syslog
+// priority (0 emerg .. 7 debug); 6 (informational) keeps the default text color. Values are tuned
+// for AA contrast against the respective background.
+.pwt-journal-prio-0,
+.pwt-journal-prio-1,
+.pwt-journal-prio-2 {
+    color: #c0392b;
+    font-weight: bold;
+}
+
+.pwt-journal-prio-3 {
+    color: #c0392b;
+}
+
+.pwt-journal-prio-4 {
+    color: #aa5500;
+}
+
+.pwt-journal-prio-5 {
+    font-weight: bold;
+}
+
+.pwt-journal-prio-7 {
+    color: #767676;
+}
+
+// a full-width hairline marking a boot boundary between log lines
+.pwt-journal-reboot {
+    display: block;
+    margin: 6px 0;
+    padding-top: 4px;
+    border-top: 1px solid currentColor;
+}
+
+:root.pwt-dark-mode {
+    .pwt-journal-prio-0,
+    .pwt-journal-prio-1,
+    .pwt-journal-prio-2,
+    .pwt-journal-prio-3 {
+        color: #ff7a7a;
+    }
+
+    .pwt-journal-prio-4 {
+        color: #ffb454;
+    }
+
+    .pwt-journal-prio-7 {
+        color: #aaaaaa;
+    }
+}
+
 .pwt-no-outline {
     outline: 0;
 }
