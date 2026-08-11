@@ -1,0 +1,77 @@
+/// ## Helper classes for chart widgets
+
+
+/// Class `pwt-legend-color`
+///
+/// This class uses the variable `--pwt-legend-color` to set the correct text
+/// color. Used for the icon in the legend.
+///
+/// This is necessary since we can't access the style of the icon in a `Button`
+/// directly, and with this, we can set the variable on the button instead,
+/// and give only the icon this class.
+.pwt-legend-color {
+    color: var(--pwt-legend-color)
+}
+
+/// Class `pwt-map-info`
+///
+/// Used for the info panel shown when a point is clicked on a map. The transition
+/// is reset so the panel does not inherit one and lag when it is repositioned.
+.pwt-map-info {
+    transition: 0s;
+    z-index: 100;
+}
+
+/// Class `pwt-map`
+///
+/// Used for the base SVG element of the map.
+.pwt-map {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    display: block;
+}
+
+/// Class `pwt-map-location`
+///
+/// Used for a location displayed on a `Map`. Its color can be overridden via the
+/// `--pwt-map-location-color` custom property.
+.pwt-map-location {
+    --pwt-map-location-color: var(--pwt-color-primary);
+    cursor: pointer;
+
+    & > circle {
+        fill: color-mix(in srgb, var(--pwt-map-location-color), transparent 80%);
+        stroke: var(--pwt-map-location-color);
+        stroke-width: 2px;
+        r: calc(var(--pwt-map-location-radius) - 2px);
+        vector-effect: non-scaling-stroke;
+    }
+}
+
+/// Class `pwt-map-interaction-panel`
+///
+/// This is used for positioning the panel containing the interactive elements
+/// of a map.
+.pwt-map-interaction-panel {
+    position: absolute;
+    inset: var(--pwt-spacer-2) var(--pwt-spacer-2) auto auto;
+}
+
+/// Class `pwt-map-location-animated`
+///
+/// Used to animate a selected location with a pulsing ring.
+.pwt-map-location-animated {
+    animation: pwt-map-location-pulse 1.2s infinite;
+}
+
+@keyframes pwt-map-location-pulse {
+    from {
+        r: var(--pwt-map-location-radius);
+        opacity: 100%;
+    }
+    to {
+        r: calc(var(--pwt-map-location-radius) * 1.5);
+        opacity: 0%;
+    }
+}

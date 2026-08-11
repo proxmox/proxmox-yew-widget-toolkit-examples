@@ -8,7 +8,6 @@
 .pwt-datatable-content {
     @include font_and_line_height("body-medium");
     border-collapse: collapse;
-    user-select: none;
 
     td {
         outline: 0;

@@ -1,0 +1,58 @@
+/// ## SegmentedBar
+///
+/// A stacked proportional bar: one horizontal track split into colored
+/// segments whose widths are proportional to their values - quota usage,
+/// batch pass / fail / pending, resource pools, and the like. An optional
+/// inline legend below the track labels the segments.
+///
+/// The legend swatch geometry is exposed as `--pwt-segmented-bar-legend-*`
+/// custom properties so a consumer can retune it per density without editing
+/// this partial. The legend wraps left-aligned under the track.
+.pwt-segmented-bar {
+    @include font_and_line_height("label-medium");
+
+    --pwt-segmented-bar-legend-gap: var(--pwt-spacer-3);
+    --pwt-segmented-bar-legend-margin-top: var(--pwt-spacer-1);
+    --pwt-segmented-bar-legend-item-gap: var(--pwt-spacer-1);
+    --pwt-segmented-bar-legend-swatch-size: var(--pwt-spacer-2);
+    --pwt-segmented-bar-legend-swatch-radius: var(--pwt-shape-corner-extra-small);
+
+    .pwt-segmented-bar-track {
+        border: 1px solid var(--pwt-color-outline);
+        border-radius: var(--pwt-progress-corner-shape);
+        overflow: hidden;
+        min-height: calc(map-get($line-height, "label-medium") + 2 * var(--pwt-spacer-1));
+        background: var(--pwt-color-surface-variant);
+    }
+
+    .pwt-segmented-bar-row {
+        min-height: calc(map-get($line-height, "label-medium") + 2 * var(--pwt-spacer-1));
+        display: flex;
+    }
+
+    .pwt-segmented-bar-segment {
+        background-color: var(--pwt-color-background);
+    }
+
+    .pwt-segmented-bar-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--pwt-segmented-bar-legend-gap);
+        margin-top: var(--pwt-segmented-bar-legend-margin-top);
+    }
+
+    .pwt-segmented-bar-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--pwt-segmented-bar-legend-item-gap);
+    }
+
+    .pwt-segmented-bar-legend-swatch {
+        display: inline-block;
+        width: var(--pwt-segmented-bar-legend-swatch-size);
+        height: var(--pwt-segmented-bar-legend-swatch-size);
+        border-radius: var(--pwt-segmented-bar-legend-swatch-radius);
+        background-color: var(--pwt-color-background);
+        border: 1px solid var(--pwt-color-outline-variant);
+    }
+}

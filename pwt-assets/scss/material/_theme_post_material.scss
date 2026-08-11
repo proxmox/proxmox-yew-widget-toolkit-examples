@@ -35,13 +35,25 @@ ul.pwt-menubar {
 
         span {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 0;
+        }
+    }
 
-            &:before {
-                font-size: map-get($font-size, "headline-small");
+    &.primary {
+        .pwt-nav-link {
+            span {
+                gap: 0;
+                flex-direction: column;
+
+                &:before {
+                    font-size: map-get($font-size, "headline-small");
+                }
             }
+        }
+    }
+    &.secondary {
+        span {
+            flex-direction: row;
         }
     }
 }

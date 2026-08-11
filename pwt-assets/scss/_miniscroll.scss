@@ -59,7 +59,7 @@
 
         &.disabled {
             cursor: auto;
-            opacity: 0.5;
+            opacity: var(--pwt-disabled-opacity);
         }
     }
 
@@ -81,7 +81,7 @@
 
         &.disabled {
             cursor: auto;
-            opacity: 0.5;
+            opacity: var(--pwt-disabled-opacity);
         }
     }
 }

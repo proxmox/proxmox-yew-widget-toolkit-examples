@@ -1,5 +1,10 @@
 FONT_DIR = ./assets/fonts
 
+PRECOMPILED_CSS=			\
+	docs/css/crisp-yew-style.css	\
+	docs/css/desktop-yew-style.css  \
+	docs/css/material-yew-style.css
+
 # Nothing to do by default
 all:
 
@@ -25,3 +30,18 @@ $(FONT_DIR)/$(ROBOTO_FLEX_FILENAME_WOFF2): $(FONT_DIR)/$(ROBOTO_FLEX_FILENAME_TT
 .PHONY: Documentation.md
 Documentation.md:
 	./extract-scss-doc.sh > $@
+
+# refresh docs
+.PHONY: refresh
+refresh:
+	rm -f ${PRECOMPILED_CSS}
+	make Documentation.md ${PRECOMPILED_CSS}
+
+docs/css/crisp-yew-style.css: scss/crisp-yew-style.scss $(wildcard scss/_*.scss scss/*/*.scss)
+	rust-grass $< $@
+
+docs/css/desktop-yew-style.css: scss/desktop-yew-style.scss $(wildcard scss/_*.scss scss/*/*.scss)
+	rust-grass $< $@
+
+docs/css/material-yew-style.css: scss/material-yew-style.scss $(wildcard scss/_*.scss scss/*/*.scss)
+	rust-grass $< $@

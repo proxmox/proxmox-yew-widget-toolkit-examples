@@ -62,5 +62,10 @@ $elevation-levels-tint-opacity: (
     5: 14%,
 );
 
+$element-state-opacity: (
+    disabled: 0.38,
+    dimmed: 0.5,
+);
+
 // default accent color (primary, secentary or tertiary)
 $default-accent-color: secondary;

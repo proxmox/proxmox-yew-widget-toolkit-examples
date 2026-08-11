@@ -43,3 +43,4 @@ extract_doc "scss/_content_spacer.scss"
 # Explain individual widget classes
 extract_doc "scss/_button.scss"
 extract_doc "scss/_panel.scss"
+extract_doc "scss/_segmented_bar.scss"

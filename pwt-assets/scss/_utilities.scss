@@ -471,6 +471,13 @@ $position-values: absolute fixed relative sticky static;
     }
 }
 
+@each $state, $value in $element-state-opacity {
+    .pwt-opacity-#{$state} {
+        $var: "var(--pwt-" + $state + "-opacity)";
+        opacity: #{$var};
+    }
+}
+
 @keyframes delay-visibility {
     from {
         opacity: 0

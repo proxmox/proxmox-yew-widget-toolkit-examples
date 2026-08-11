@@ -108,6 +108,10 @@ changes the colors of the widget. The `pwt-scheme-<name>` and
 `pwt-scheme-<name>-container` helper classes can be used to set
 those variables.
 
+There is also the `pwt-default-colors` class to set the `color` and
+`background-color` properties directly to the `--pwt-color` and
+`--pwt-color-background` respectively.
+
 A similar scheme is used for widgets with an associated accent color, using
 the following CSS variables:
 
@@ -234,6 +238,8 @@ This theme uses the [material design baseline colors](https://m3.material.io/sty
 
 - use elevated box with box-shadow
 
+`pwt-side-dialog-bottom`
+: overwrite corner radius
 
 ### The "Crisp" Theme
 
@@ -397,6 +403,7 @@ For the following elevation levels: 0, 1, 2, 3, 4, 5
 
 - `pwt-opacity-<value>`: set `opacity` property to percentage for values in
   - 0, 25, 50, 75, 100
+- `pwt-delay-visibility`: delay visibility by animating opacity from 0 to 1
 
 ## Content Spacer Class
 
@@ -456,9 +463,26 @@ The following classes can be used to adopt the button style for mobile/touch dev
 
 ##### FAB Menus
 
+Class `pwt-fab-menu-outer`
+
+This class is used to arrange the FAB and the menu.
+
+Class `pwt-fab-menu-main`
+
+This class is the container for the main button, and uses for aligning
+the close button correctly for different directions and sizes.
+
 Class `pwt-fab-menu-container`
 
-This class is used to arrange FABs as a menu.
+This class is the container for the fab menu items.
+
+Classes `pwt-fab-direction-{up,down}`
+
+These are used to control the layout of the FAB to the menu and the direction of the animations
+
+Classes `pwt-fab-align-{start,end}`
+
+These are used to align the button according to the alignment
 
 
 ## Panel Widget
@@ -483,4 +507,15 @@ Class `pwt-panel-header-text`
 
 Header text uses font `headline-small` and the accent color from the panel.
 
+
+## SegmentedBar
+
+A stacked proportional bar: one horizontal track split into colored
+segments whose widths are proportional to their values - quota usage,
+batch pass / fail / pending, resource pools, and the like. An optional
+inline legend below the track labels the segments.
+
+The legend swatch geometry is exposed as `--pwt-segmented-bar-legend-*`
+custom properties so a consumer can retune it per density without editing
+this partial. The legend wraps left-aligned under the track.
 
