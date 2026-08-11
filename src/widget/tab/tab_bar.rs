@@ -4,11 +4,11 @@ use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::virtual_dom::{Key, VComp, VNode};
 
 use crate::dom::focus::roving_tabindex_next;
-use crate::dom::{element_direction_rtl, DomSizeObserver, IntoHtmlElement};
+use crate::dom::{DomSizeObserver, IntoHtmlElement, element_direction_rtl};
 use crate::props::{IntoStorageLocation, StorageLocation};
 use crate::state::{NavigationContext, NavigationContextExt, PersistentState, Selection};
 use crate::web_sys_ext::{ResizeObserverBoxOptions, ResizeObserverOptions};
-use crate::widget::Container;
+use crate::widget::{Container, Tooltip};
 use crate::{impl_class_prop_builder, impl_yew_std_props_builder, prelude::*};
 
 use super::TabBarItem;
@@ -264,8 +264,10 @@ impl Component for PwtTabBar {
 
                 if !(active.is_some() && (path.is_empty() || path == "_")) {
                     active = get_active_or_default(props, &Some(Key::from(path)));
-                } else if let Some(active) = active.as_deref() {
-                    ctx.link().push_relative_route(active);
+                } else if active != props.get_default_active() {
+                    if let Some(active) = active.as_deref() {
+                        ctx.link().replace_relative_route(active);
+                    }
                 }
             }
         }
@@ -448,7 +450,7 @@ impl Component for PwtTabBar {
                         let key = panel.key.clone();
                         let on_activate = panel.on_activate.clone();
                         move |event: KeyboardEvent| {
-                            if event.key() == " " {
+                            if crate::dom::event_key(&event) == " " {
                                 if let Some(on_activate) = &on_activate {
                                     on_activate.emit(());
                                 }
@@ -462,15 +464,22 @@ impl Component for PwtTabBar {
                 let aria_disabled = if disabled { "true" } else { "false" };
                 let style = format!("grid-column: {};", i + 1);
 
-                html! {
+                let content = html! {
                     <a ref={active_ref} aria-disabled={aria_disabled} {style} {onclick} {onkeyup} class={nav_class} {tabindex}>
                         <span ref={size_ref}>
                         if let Some(class) = &panel.icon_class {
                             <span class={class.to_string()} role="none"/>
                         }
                         {panel.label.as_deref().unwrap_or("")}
+                        {panel.badge.clone().unwrap_or_default()}
                         </span>
                     </a>
+                };
+
+                if let Some(tip) = panel.tip.clone() {
+                    Tooltip::new(content).rich_tip(tip).into()
+                } else {
+                    content
                 }
             })
             .collect::<Html>();
@@ -479,13 +488,13 @@ impl Component for PwtTabBar {
         let rtl = self.rtl.unwrap_or(false);
 
         let (variant_class, indicator_class) = match ctx.props().style {
-            TabBarStyle::Pills => ("pwt-nav-pills", classes!()),
+            TabBarStyle::Pills => (classes!("pwt-nav-pills"), classes!()),
             TabBarStyle::MaterialPrimary => (
-                "pwt-tab-material",
+                classes!("pwt-tab-material", "primary"),
                 classes!("pwt-tab-active-indicator", "primary"),
             ),
             TabBarStyle::MaterialSecondary => (
-                "pwt-tab-material",
+                classes!("pwt-tab-material", "secondary"),
                 classes!("pwt-tab-active-indicator", "secondary"),
             ),
         };
@@ -503,7 +512,7 @@ impl Component for PwtTabBar {
             .with_child(tabs)
             .with_optional_child(indicator)
             .onkeydown(move |event: KeyboardEvent| {
-                match event.code().as_str() {
+                match crate::dom::event_code(&event).as_str() {
                     "ArrowRight" => {
                         roving_tabindex_next(&tabs_ref, rtl, false);
                     }

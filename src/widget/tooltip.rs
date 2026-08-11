@@ -3,7 +3,7 @@ use gloo_timers::callback::Timeout;
 use yew::html::IntoPropValue;
 use yew::virtual_dom::VNode;
 
-use crate::dom::align::{align_to, AlignOptions, GrowDirection, Point};
+use crate::dom::align::{AlignOptions, GrowDirection, Point, align_to};
 use crate::prelude::*;
 use crate::widget::Container;
 
@@ -174,7 +174,7 @@ impl Component for PwtTooltip {
             .onkeydown(Callback::from({
                 let link = ctx.link().clone();
                 move |event: KeyboardEvent| {
-                    if show_tooltip && event.key() == "Escape" {
+                    if show_tooltip && crate::dom::event_key(&event) == "Escape" {
                         link.send_message(Msg::Hide);
                         event.prevent_default();
                     }

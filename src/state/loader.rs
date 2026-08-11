@@ -3,15 +3,15 @@ use std::rc::Rc;
 use anyhow::Error;
 use derivative::Derivative;
 
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 use yew::html::IntoEventCallback;
 use yew::prelude::*;
 
+use crate::AsyncAbortGuard;
 use crate::prelude::*;
 use crate::props::{IntoLoadCallback, IntoStorageLocation, LoadCallback, StorageLocation};
 use crate::state::{SharedState, SharedStateObserver, SharedStateReadGuard, SharedStateWriteGuard};
-use crate::widget::{error_message, Button, Container, Fa};
-use crate::AsyncAbortGuard;
+use crate::widget::{Button, Container, Fa, error_message};
 
 /// Shared HTTP load state
 ///
@@ -153,7 +153,7 @@ impl<T: 'static + DeserializeOwned + Serialize> Loader<T> {
                 .with_child(Fa::new("spinner").margin_end(1).pulse())
                 .with_child(tr!("Loading..."))
                 .into(),
-            Some(Ok(ref data)) => render(Rc::clone(data)).into(),
+            Some(Ok(data)) => render(Rc::clone(data)).into(),
             Some(Err(err)) => error_message(&format!("Error: {}", err)).padding(2).into(),
         }
     }

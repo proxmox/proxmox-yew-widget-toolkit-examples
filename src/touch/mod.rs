@@ -1,11 +1,20 @@
 //! ### Widgets for Touch devices
 //!
 
+mod adaptive_dialog;
+pub use adaptive_dialog::{AdaptiveDialog, PwtAdaptiveDialog};
+
+mod adaptive_scaffold;
+pub use adaptive_scaffold::{AdaptiveScaffold, PwtAdaptiveScaffold};
+
 mod application_bar;
 pub use application_bar::{ApplicationBar, PwtApplicationBar};
 
 mod gesture_detector;
-pub use gesture_detector::{GestureDetector, GestureSwipeEvent, InputEvent, PwtGestureDetector};
+pub use gesture_detector::{
+    GestureDetector, GestureDragEvent, GesturePhase, GesturePinchZoomEvent, GestureSwipeEvent,
+    InputEvent, PinchPoint, PwtGestureDetector,
+};
 
 mod fab;
 pub use fab::{Fab, FabSize, PwtFab};

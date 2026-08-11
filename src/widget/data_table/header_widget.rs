@@ -11,7 +11,7 @@ use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
 use crate::widget::menu::{Menu, MenuCheckbox, MenuEvent, MenuItem};
-use crate::widget::{get_unique_element_id, Container, Fa};
+use crate::widget::{Container, Fa, get_unique_element_id};
 use crate::{impl_yew_std_props_builder, prelude::*};
 
 use super::{
@@ -253,11 +253,24 @@ impl<T: 'static> PwtHeaderWidget<T> {
 
         let mut attributes = IndexMap::new();
         let mut header_class = props.header_class.clone();
+
+        // Align the header with the column's cell justification; the header content inherits
+        // the text-align. Custom header renderers receive the class via the render args and can
+        // still override the alignment there.
+        match cell.column.justify.as_str() {
+            "start" => {}
+            justify @ ("end" | "left" | "right" | "center" | "justify") => {
+                header_class.push(format!("pwt-text-align-{justify}"));
+            }
+            _ => {}
+        }
+
         let header_content = match &cell.column.render_header {
             Some(render_header) => {
                 let mut args = DataTableHeaderRenderArgs {
                     column_index: column_idx,
                     selection_status: props.selection_status,
+                    sort_order,
                     link: DataTableHeaderTableLink {
                         on_message: props.on_message.clone(),
                     },
@@ -343,7 +356,7 @@ impl<T: 'static> PwtHeaderWidget<T> {
                                 return;
                             }
                         }
-                        if sortable && event.key().as_str() == "Enter" {
+                        if sortable && crate::dom::event_key(&event).as_str() == "Enter" {
                             link.send_message(Msg::ColumnSortChange(
                                 cell_idx,
                                 event.ctrl_key(),
@@ -475,6 +488,48 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
         }
     }
 
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
+        let props = ctx.props();
+        // The state indexes cells by the column list it was built from; a parent swapping in a
+        // different column set (a conditional column appearing on a mounted table) would
+        // otherwise index the new cells against the mount-time list - out of bounds on growth,
+        // silently wrong on shrink. The change signal is the column SHAPE (the ordered column
+        // names), never Rc or structural identity: callers routinely rebuild their header
+        // vectors inside view(), whose closures compare unequal every render, and resetting on
+        // that would wipe the user's sort and dragged widths on every ordinary re-render.
+        let shape_changed = {
+            let mut new_columns = Vec::new();
+            for header in props.headers.iter() {
+                header.extract_column_list(&mut new_columns);
+            }
+            let old = self.state.columns();
+            old.len() != new_columns.len()
+                || old
+                    .iter()
+                    .zip(new_columns.iter())
+                    .any(|(a, b)| a.column.name != b.column.name)
+        };
+        if shape_changed {
+            self.state = HeaderState::new(Rc::clone(&props.headers));
+            let sorter = self.state.create_combined_sorter_fn();
+            props.on_message.emit(HeaderMsg::ChangeSort(sorter));
+            self.observed_widths = self
+                .state
+                .columns()
+                .iter()
+                .enumerate()
+                .map(|(col_idx, _)| {
+                    if self.state.get_column_hidden(col_idx) {
+                        Some(0.0)
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+        }
+        true
+    }
+
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         let props = ctx.props();
         match msg {
@@ -597,7 +652,7 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
             .onkeydown({
                 let link = ctx.link().clone();
                 move |event: KeyboardEvent| {
-                    match event.key().as_str() {
+                    match crate::dom::event_key(&event).as_str() {
                         "ArrowRight" => link.send_message(Msg::MoveCursor(true)),
                         "ArrowLeft" => link.send_message(Msg::MoveCursor(false)),
                         _ => return,

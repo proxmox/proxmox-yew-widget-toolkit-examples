@@ -8,9 +8,9 @@ use yew::html::{IntoEventCallback, IntoPropValue};
 
 use yew::virtual_dom::{Key, VComp, VNode};
 
-use crate::dom::focus::{get_first_focusable, FocusTracker};
+use crate::dom::focus::{FocusTracker, get_first_focusable};
 use crate::state::{SharedState, SharedStateObserver};
-use crate::widget::{get_unique_element_id, Container};
+use crate::widget::{Container, get_unique_element_id};
 use crate::{impl_class_prop_builder, impl_yew_std_props_builder, prelude::*};
 
 use pwt_macros::builder;
@@ -680,7 +680,7 @@ impl Component for PwtMenu {
                         let link = ctx.link().clone();
                         move |event: KeyboardEvent| {
                             if menubar {
-                                match event.key().as_str() {
+                                match crate::dom::event_key(&event).as_str() {
                                     "ArrowRight" => link.send_message(Msg::Next),
                                     "ArrowLeft" => link.send_message(Msg::Previous),
                                     "Enter" | "ArrowDown" | " " => {
@@ -691,7 +691,7 @@ impl Component for PwtMenu {
                                     _ => return,
                                 }
                             } else {
-                                match event.key().as_str() {
+                                match crate::dom::event_key(&event).as_str() {
                                     "ArrowDown" => link.send_message(Msg::Next),
                                     "ArrowUp" => link.send_message(Msg::Previous),
                                     "Enter" | " " => {

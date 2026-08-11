@@ -3,6 +3,11 @@
 mod action_icon;
 pub use action_icon::ActionIcon;
 
+mod badge;
+pub use badge::Badge;
+#[doc(hidden)]
+pub use badge::PwtBadge;
+
 mod alert_dialog;
 pub use alert_dialog::AlertDialog;
 #[doc(hidden)]
@@ -28,10 +33,12 @@ pub use catalog_loader::CatalogLoader;
 #[doc(hidden)]
 pub use catalog_loader::PwtCatalogLoader;
 
+pub mod charts;
+
 mod column;
 pub use column::Column;
 
-mod container;
+pub mod container;
 pub use container::Container;
 
 mod confirm_dialog;
@@ -79,10 +86,6 @@ pub use language_selector::LanguageSelector;
 #[doc(hidden)]
 pub use language_selector::PwtLanguageSelector;
 
-// Old code, no longer used.
-// mod list_simple;
-// pub use list_simple::{List, PwtList};
-
 mod list;
 pub use list::{List, ListTile, ListTileObserver};
 
@@ -105,6 +108,18 @@ pub mod menu;
 
 mod meter;
 pub use meter::Meter;
+
+mod week_start;
+pub use week_start::WeekStart;
+
+mod segmented_bar;
+pub use segmented_bar::{Segment, SegmentedBar};
+
+mod calendar_grid;
+pub use calendar_grid::{
+    CalendarGrid, CalendarGridDay, CalendarGridView, CalendarSpanBar, CalendarSpanClick,
+    CalendarSpanSegment,
+};
 
 mod split_pane;
 #[doc(hidden)]

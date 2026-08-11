@@ -38,6 +38,12 @@ pub struct MenuItem {
     #[prop_or_default]
     pub submenu: Option<Menu>,
 
+    /// Start this item's submenu collapsed until the user expands it or
+    /// navigates into it. Ignored for an item without a submenu.
+    #[prop_or_default]
+    #[builder]
+    pub default_collapsed: bool,
+
     /// Selectable flag.
     #[prop_or(true)]
     #[builder]
@@ -49,6 +55,11 @@ pub struct MenuItem {
     #[builder_cb(IntoEventCallback, into_event_callback, ())]
     #[prop_or_default]
     pub on_activate: Option<Callback<()>>,
+
+    /// An optional trailing element that comes after the label.
+    #[prop_or_default]
+    #[builder(IntoPropValue, into_prop_value)]
+    pub trailing: Option<Html>,
 }
 
 impl MenuItem {

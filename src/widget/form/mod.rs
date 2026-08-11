@@ -38,7 +38,8 @@ pub use hidden::PwtHidden;
 
 mod managed_field;
 pub use managed_field::{
-    ManagedField, ManagedFieldContext, ManagedFieldLink, ManagedFieldMaster, ManagedFieldState,
+    ManagedField, ManagedFieldContext, ManagedFieldLink, ManagedFieldMaster, ManagedFieldScopeExt,
+    ManagedFieldState,
 };
 
 mod field;
@@ -78,3 +79,9 @@ pub use submit_validate::{IntoSubmitValidateFn, SubmitValidateFn};
 
 mod validate;
 pub use validate::{IntoValidateFn, ValidateFn};
+
+mod date_field;
+pub use date_field::DateField;
+#[doc(hidden)]
+pub use date_field::DateFieldComp;
+pub use date_field::PlainDate;

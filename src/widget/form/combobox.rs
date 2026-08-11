@@ -76,7 +76,7 @@ pub struct Combobox {
 
     /// Show filter
     ///
-    /// Defaul behavior is to show the filter for pickers with more than 10 items.
+    /// Default behavior is to show the filter for pickers with more than 10 items.
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
     pub show_filter: Option<bool>,
@@ -99,6 +99,11 @@ pub struct Combobox {
     #[prop_or_default]
     #[builder]
     pub trigger: Vec<(Trigger, bool)>,
+
+    /// Whether the filter should be auto-selected when the picker is displayed.
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or_default]
+    pub autoselect_filter: Option<bool>,
 }
 
 impl Default for Combobox {
@@ -204,6 +209,26 @@ pub enum Msg {
     Reposition,
 }
 
+/// Collect the plain text a [VNode] renders, approximating the visible label. Child components
+/// and raw HTML cannot be inspected without rendering them and are skipped.
+fn vnode_text(node: &yew::virtual_dom::VNode, out: &mut String) {
+    use yew::virtual_dom::VNode;
+    match node {
+        VNode::VText(text) => out.push_str(&text.text),
+        VNode::VTag(tag) => {
+            if let Some(children) = tag.children() {
+                vnode_text(children, out);
+            }
+        }
+        VNode::VList(list) => {
+            for child in list.iter() {
+                vnode_text(child, out);
+            }
+        }
+        _ => {}
+    }
+}
+
 #[doc(hidden)]
 pub struct PwtCombobox {
     store: Store<AttrValue>,
@@ -256,10 +281,12 @@ impl Component for PwtCombobox {
             .render_value
             .clone()
             .unwrap_or_else(|| RenderFn::new(|value: &AttrValue| html! {value}));
-        let columns = Rc::new(vec![DataTableColumn::new("Value")
-            .show_menu(false)
-            .render(render_value)
-            .into()]);
+        let columns = Rc::new(vec![
+            DataTableColumn::new("Value")
+                .show_menu(false)
+                .render(render_value)
+                .into(),
+        ]);
 
         Self {
             store,
@@ -283,6 +310,18 @@ impl Component for PwtCombobox {
                 self.store.clear();
             }
         }
+        // Rebuild the column so options whose labels load asynchronously render their names; else
+        // the create()-time render_value sticks and shows raw keys.
+        let render_value = props
+            .render_value
+            .clone()
+            .unwrap_or_else(|| RenderFn::new(|value: &AttrValue| html! {value}));
+        self.columns = Rc::new(vec![
+            DataTableColumn::new("Value")
+                .show_menu(false)
+                .render(render_value)
+                .into(),
+        ]);
         self.validate = Self::create_validate(props);
         true
     }
@@ -295,7 +334,26 @@ impl Component for PwtCombobox {
             .show_filter
             .unwrap_or_else(|| self.store.data_len() > 10);
 
-        let filter = props.filter.clone();
+        let auto_select_filter = ctx.props().autoselect_filter;
+
+        // The filter should match what the user sees: with a render_value the visible label
+        // usually differs from the raw item value, and a filter that only matches the value
+        // looks broken. Still match the value too, so queries that worked before keep working.
+        let filter = match (&props.filter, &props.render_value) {
+            (None, Some(render_value)) => {
+                let render_value = render_value.clone();
+                Some(TextFilterFn::new(move |item: &AttrValue, query: &str| {
+                    let query = query.to_lowercase();
+                    if item.to_lowercase().contains(&query) {
+                        return true;
+                    }
+                    let mut label = String::new();
+                    vnode_text(&render_value.apply(item), &mut label);
+                    label.to_lowercase().contains(&query)
+                }))
+            }
+            _ => props.filter.clone(),
+        };
 
         let columns = Rc::clone(&self.columns);
         let picker = move |args: &SelectorRenderArgs<Store<AttrValue>>| {
@@ -311,7 +369,9 @@ impl Component for PwtCombobox {
                 .selection(args.selection.clone())
                 .show_filter(show_filter)
                 .filter(filter.clone())
-                .on_select(args.controller.on_select_callback());
+                .autoselect_filter(auto_select_filter)
+                .on_select(args.controller.on_select_callback())
+                .filter_below(args.controller.dropup());
 
             if show_filter {
                 picker.set_on_filter_change({

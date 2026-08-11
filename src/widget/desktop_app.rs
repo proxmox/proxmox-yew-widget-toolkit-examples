@@ -7,7 +7,7 @@ use yew_router::Router;
 use gloo_history::{AnyHistory, HashHistory};
 
 use crate::prelude::*;
-use crate::props::{IntoOptionalTextRenderFn, TextRenderFn};
+use crate::props::{IntoOptionalRenderFn, RenderFn};
 use crate::state::NavigationContainer;
 use crate::widget::{CatalogLoader, ThemeLoader};
 
@@ -41,14 +41,19 @@ pub struct DesktopApp {
     pub history: Option<AnyHistory>,
 
     /// Convert ISO 639-1 language code to server side catalog URLs (see [CatalogLoader]).
-    #[builder_cb(IntoOptionalTextRenderFn, into_optional_text_render_fn, String)]
+    #[builder_cb(IntoOptionalRenderFn, into_optional_render_fn, String, String)]
     #[prop_or_default]
-    pub catalog_url_builder: Option<TextRenderFn<String>>,
+    pub catalog_url_builder: Option<RenderFn<String, String>>,
 
     /// Default language (skip catalog loading for this language)
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or(AttrValue::Static("en"))]
     pub default_lang: AttrValue,
+
+    /// Returns the server side CSS URLs (see [ThemeLoader]).
+    #[builder_cb(IntoOptionalRenderFn, into_optional_render_fn, String, String)]
+    #[prop_or_default]
+    pub theme_url_builder: Option<RenderFn<String, String>>,
 }
 
 impl DesktopApp {
@@ -86,7 +91,8 @@ impl Component for PwtDesktopApp {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
 
-        let body = ThemeLoader::new(props.body.clone());
+        let body =
+            ThemeLoader::new(props.body.clone()).theme_url_builder(props.theme_url_builder.clone());
         let body = CatalogLoader::new(body)
             .default_lang(props.default_lang.clone())
             .url_builder(props.catalog_url_builder.clone());

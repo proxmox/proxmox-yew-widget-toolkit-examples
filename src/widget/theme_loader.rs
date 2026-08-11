@@ -5,32 +5,86 @@ use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
 use crate::impl_to_html;
-use crate::props::{IntoOptionalTextRenderFn, TextRenderFn};
+use crate::props::{IntoOptionalRenderFn, RenderFn};
 use crate::state::{Theme, ThemeDensity, ThemeObserver};
 
-/// Dynamically load selected theme
+/// Dynamic theme loader component.
 ///
-/// Displays an empty page until the first theme is successfully loaded.
+/// This widget serves as the root boundary for theming in the application. It manages:
+/// - Loading the appropriate CSS file for the active theme.
+/// - Applying global CSS classes for density (e.g., `pwt-density-high`) to the document root.
+/// - Applying global CSS classes for dark/light mode (e.g., `pwt-dark-mode`) to the document root.
+/// - Handling transitions between themes by loading the new CSS before removing the old one to avoid FOUC.
+/// - Exposing the application content only after the initial theme is loaded.
 ///
-/// This is usually one of the first widget inside the widget tree, and is
-/// used by scaffold widgets like [DesktopApp][crate::widget::DesktopApp]
-/// and [MaterialApp][crate::touch::MaterialApp].
+/// It uses [ThemeObserver] internally to react to system and application-level theme changes, and
+/// displays an empty page until the first theme is successfully loaded.
+///
+/// This is typically the root of the widget tree, and is used by scaffold widgets
+/// like [DesktopApp][crate::widget::DesktopApp] and
+/// [MaterialApp][crate::touch::MaterialApp].
+///
+/// Usage:
+/// ```rust
+/// use pwt::widget::ThemeLoader;
+/// use yew::prelude::*;
+///
+/// #[function_component(App)]
+/// fn app() -> Html {
+///     ThemeLoader::new(html! {
+///         <div>{"My App Content"}</div>
+///     })
+///     .into()
+/// }
+/// ```
 #[derive(Properties, Clone, PartialEq)]
 #[builder]
 pub struct ThemeLoader {
+    // The application root content.
     body: VNode,
 
-    /// Returns the server side CSS URL (full path)
+    /// Optional custom builder for the theme CSS path.
     ///
+    /// If provided, this function generates the URL for the CSS file based on the theme name.
+    ///
+    /// Default behavior: `format!("{}-yew-style.css", theme_name.to_lowercase())`
     /// Default is "{lc(theme_name)}-yew-style.css".
-    #[builder_cb(IntoOptionalTextRenderFn, into_optional_text_render_fn, String)]
+    #[builder_cb(IntoOptionalRenderFn, into_optional_render_fn, String, String)]
     #[prop_or_default]
-    pub theme_url_builder: Option<TextRenderFn<String>>,
+    pub theme_url_builder: Option<RenderFn<String, String>>,
 }
 
 impl ThemeLoader {
+    /// Create a new instance wrapping the given content.
     pub fn new(body: impl Into<VNode>) -> Self {
         yew::props!(Self { body: body.into() })
+    }
+
+    /// Set the dark/light mode class on the document root (`<html>`).
+    ///
+    /// This removes any existing `pwt-dark-mode` or `pwt-light-mode` classes and adds
+    /// the appropriate one based on the `dark` argument.
+    ///
+    /// # Static Usage
+    ///
+    /// While [ThemeLoader] calls this automatically, this function is exposed for applications
+    /// that might need to manually control the theme class on the document root, primarily
+    /// for integration with other frameworks or in scenarios without a [ThemeLoader].
+    pub fn set_dark_mode_on_document_root(dark: bool) {
+        let root = match get_document_root() {
+            Some(root) => root,
+            None => return,
+        };
+
+        let class_list = root.class_list();
+
+        let _ = class_list.remove_2("pwt-dark-mode", "pwt-light-mode");
+
+        let _ = class_list.add_1(if dark {
+            "pwt-dark-mode"
+        } else {
+            "pwt-light-mode"
+        });
     }
 }
 
@@ -78,24 +132,6 @@ fn set_css_density(density: ThemeDensity) {
         ThemeDensity::Preset => { /* do nothing */ }
     };
 }
-
-fn set_dark_mode(dark: bool) {
-    let root = match get_document_root() {
-        Some(root) => root,
-        None => return,
-    };
-
-    let class_list = root.class_list();
-
-    let _ = class_list.remove_2("pwt-dark-mode", "pwt-light-mode");
-
-    let _ = class_list.add_1(if dark {
-        "pwt-dark-mode"
-    } else {
-        "pwt-light-mode"
-    });
-}
-
 impl PwtThemeLoader {
     fn get_css_filename(props: &ThemeLoader, theme: &Theme) -> String {
         match &props.theme_url_builder {
@@ -120,7 +156,7 @@ impl PwtThemeLoader {
         }
 
         set_css_density(theme.density);
-        set_dark_mode(dark_mode);
+        ThemeLoader::set_dark_mode_on_document_root(dark_mode);
 
         if self.new_theme_css.is_some() && loaded {
             self.theme_css = self.new_theme_css.take().unwrap();

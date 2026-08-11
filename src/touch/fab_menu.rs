@@ -1,15 +1,17 @@
 use yew::prelude::*;
 
 use crate::css::{self, ColorScheme};
-use crate::props::{ContainerBuilder, CssPaddingBuilder, EventSubscriber, WidgetBuilder};
+use crate::props::{
+    ContainerBuilder, CssPaddingBuilder, EventSubscriber, WidgetBuilder, WidgetStyleBuilder,
+};
 use crate::touch::{SideDialog, SideDialogController};
 use crate::tr;
 use crate::widget::{Button, Column, Container};
 
 use pwt_macros::{builder, widget};
 
-use super::fab::FabSize;
 use super::Fab;
+use super::fab::FabSize;
 
 /// [FabMenu] variant
 #[derive(Copy, Clone, PartialEq, Debug, Default)]
@@ -219,15 +221,18 @@ impl Component for PwtFabMenu {
             .class(fab_classes)
             .on_activate(ctx.link().callback(|_| Msg::Toggle));
 
-        let btn_class = match props.variant {
-            FabMenuVariant::Sheet => classes!("pwt-button-text"),
-            FabMenuVariant::Material3 => classes!(color, "pwt-fab-menu-item", "medium"),
+        let (btn_class, btn_limit) = match props.variant {
+            FabMenuVariant::Sheet => (classes!("pwt-button-text"), None),
+            FabMenuVariant::Material3 => (classes!(color, "pwt-fab-menu-item", "medium"), Some(6)),
         };
 
         let children = props.children.iter().enumerate().filter_map(|(i, child)| {
-            if i >= 5 {
-                log::error!("FabMenu only supports 5 child buttons.");
-                return None;
+            match btn_limit {
+                Some(limit) if i >= limit => {
+                    log::error!("FabMenu only supports {limit} child buttons.");
+                    return None;
+                }
+                _ => {}
             }
 
             let on_activate = child.on_activate.clone();
@@ -253,12 +258,14 @@ impl Component for PwtFabMenu {
                         .controller(controller.clone())
                         .location(crate::touch::SideDialogLocation::Bottom)
                         .on_close(ctx.link().callback(|_| Msg::Toggle))
+                        .style("max-height", "90dvh")
                         .with_child(
                             Column::new()
                                 .class(css::FlexFit)
+                                .style("overscroll-behavior", "contain")
                                 .padding(2)
                                 .gap(1)
-                                .children(children)
+                                .with_child(Column::new().class(css::FlexFit).children(children))
                                 .with_child(html!(<hr />))
                                 .with_child(
                                     Button::new(tr!("Cancel"))
@@ -278,7 +285,7 @@ impl Component for PwtFabMenu {
                     .onkeydown({
                         let link = ctx.link().clone();
                         move |event: KeyboardEvent| {
-                            if event.key() == "Escape" {
+                            if crate::dom::event_key(&event) == "Escape" {
                                 link.send_message(Msg::Close)
                             }
                         }

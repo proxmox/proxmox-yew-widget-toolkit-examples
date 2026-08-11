@@ -11,8 +11,8 @@ use yew::html::{IntoEventCallback, IntoPropValue, Scope};
 use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
-use crate::dom::align::{align_to_viewport, align_to_xy, Point};
 use crate::dom::IntoHtmlElement;
+use crate::dom::align::{Point, align_to_viewport, align_to_xy};
 use crate::prelude::*;
 use crate::props::{AsCssStylesMut, CssStyles};
 use crate::widget::{ActionIcon, Container, Panel};
@@ -114,6 +114,7 @@ impl Dialog {
 
 pub enum Msg {
     Open,
+    KeyDown(KeyboardEvent),
     Close,
     PointerDown(PointerEvent),
     PointerMove(PointerEvent),
@@ -211,6 +212,13 @@ impl Component for PwtDialog {
                         crate::show_modal_dialog(dialog_node);
                         self.open = true;
                     }
+                }
+            }
+            Msg::KeyDown(event) => {
+                // prevent autoclosing of modal windows that can't be closed
+                if crate::dom::event_key(&event) == "Escape" && props.on_close.is_none() {
+                    event.stop_propagation();
+                    event.prevent_default();
                 }
             }
             Msg::Close => {
@@ -460,6 +468,8 @@ impl Component for PwtDialog {
             Msg::Close
         });
 
+        let onkeydown = link.callback(Msg::KeyDown);
+
         let mut panel = Panel::new()
             .class("pwt-overflow-auto")
             .class("pwt-flex-fill")
@@ -472,7 +482,7 @@ impl Component for PwtDialog {
             .header_class(props.draggable.then_some("pwt-draggable"))
             .border(false);
 
-	panel.tools.extend(props.tools.clone());
+        panel.tools.extend(props.tools.clone());
 
         if props.on_close.is_some() {
             panel.add_tool(
@@ -533,6 +543,7 @@ impl Component for PwtDialog {
         let dialog = Container::from_tag("dialog")
             .class("pwt-outer-dialog")
             .onpointerdown(onpointerdown)
+            .onkeydown(onkeydown)
             .onclose(onclose)
             .ontouchstart(cancel_event.clone())
             .ontouchend(cancel_event.clone())

@@ -9,9 +9,9 @@ use yew::prelude::*;
 use yew::virtual_dom::{Key, VComp, VNode};
 
 use crate::css::ColorScheme;
+use crate::dom::DomSizeObserver;
 use crate::dom::element_direction_rtl;
 use crate::dom::focus::FocusTracker;
-use crate::dom::DomSizeObserver;
 use crate::props::{BuilderFn, IntoOptionalBuilderFn};
 use crate::widget::menu::{Menu, MenuButton, MenuController};
 use crate::widget::{Container, Row};
@@ -284,7 +284,7 @@ impl Component for PwtResizableHeader {
             .onkeydown({
                 let link = ctx.link().clone();
                 move |event: KeyboardEvent| {
-                    if event.key().as_str() == "ArrowDown" {
+                    if crate::dom::event_key(&event).as_str() == "ArrowDown" {
                         event.stop_propagation();
                         link.send_message(Msg::ShowPicker);
                     }
