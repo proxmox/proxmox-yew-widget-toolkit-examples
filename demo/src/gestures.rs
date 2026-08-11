@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use pwt::css::{Flex, FlexFit};
 use pwt::prelude::*;
 use pwt::touch::{
-    GestureDetector, GestureSwipeEvent, InputEvent, Slidable, SlidableAction,
+    GestureDetector, GestureDragEvent, GesturePhase, GestureSwipeEvent, Slidable, SlidableAction,
     SlidableActionMouseEvent,
 };
 use pwt::widget::{Button, Column, Container, Panel, Row};
@@ -62,11 +62,16 @@ impl Component for GestureDetectorDemo {
             );
 
         let detector = GestureDetector::new(content)
-            .on_drag_start(ctx.link().callback(|_| Msg::Log("DRAG START".to_string())))
-            .on_drag_end(ctx.link().callback(|_| Msg::Log("DRAG END".to_string())))
-            .on_drag_update(ctx.link().callback(|event: InputEvent| {
-                Msg::Log(format!("DRAG UPDATE {} {}", event.x(), event.y(),))
-            }))
+            .on_drag(
+                ctx.link()
+                    .callback(|event: GestureDragEvent| match event.phase {
+                        GesturePhase::Start => Msg::Log("DRAG START".to_string()),
+                        GesturePhase::Update => {
+                            Msg::Log(format!("DRAG UPDATE {} {}", event.x(), event.y(),))
+                        }
+                        GesturePhase::End => Msg::Log("DRAG END".to_string()),
+                    }),
+            )
             .on_swipe(ctx.link().callback(|event: GestureSwipeEvent| {
                 Msg::Log(format!("SWIPE direction {}", event.direction,))
             }))
