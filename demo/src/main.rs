@@ -4,6 +4,9 @@ use align::AlignDemo;
 mod buttons;
 use buttons::ButtonsDemo;
 
+mod calendar;
+use calendar::CalendarDemo;
+
 mod canvas;
 use canvas::CanvasDemo;
 
@@ -143,6 +146,14 @@ fn MainMenu() -> Html {
         "Cards",
         "cards_panel",
         |_| html! {<CardsDemo/>},
+    );
+
+    register_view(
+        &mut menu,
+        &mut content,
+        "Calendar",
+        "calendar_panel",
+        |_| html! {<CalendarDemo/>},
     );
 
     register_view(
