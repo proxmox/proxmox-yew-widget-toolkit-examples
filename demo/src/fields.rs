@@ -4,8 +4,8 @@ use pwt::prelude::*;
 use pwt::state::Store;
 use pwt::widget::data_table::{DataTableColumn, DataTableHeader};
 use pwt::widget::form::{
-    Checkbox, Combobox, DisplayField, Field, Form, FormContext, InputType, Number, RadioButton,
-    TextArea, Tristate, TristateBoolean,
+    Checkbox, Combobox, DateField, DisplayField, Field, Form, FormContext, InputType, Number,
+    PlainDate, RadioButton, TextArea, Tristate, TristateBoolean,
 };
 use pwt::widget::{AlertDialog, InputPanel, SearchDropdown, Trigger};
 use yew::virtual_dom::Key;
@@ -47,6 +47,13 @@ fn demo_input_panel(alert: UseStateHandle<Option<String>>) -> Html {
         .with_field(
             "Numberfield with limits",
             Number::new().min(0.0).max(150.0).step(2.0),
+        )
+        .with_field("Date", DateField::new())
+        .with_field(
+            "Date with limits (one week around today)",
+            DateField::new()
+                .min_value(PlainDate::today().add_days(-7))
+                .max_value(PlainDate::today().add_days(7)),
         )
         .with_field("Disabled Textfield", Field::new().disabled(true))
         .with_field("Checkbox", Checkbox::new().default(true))
