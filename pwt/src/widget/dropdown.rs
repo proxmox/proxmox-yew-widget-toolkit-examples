@@ -1,6 +1,9 @@
+use gloo_events::{EventListener, EventListenerOptions};
 use html::Scope;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
+
+use crate::dom::IntoHtmlElement;
 
 use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::prelude::*;
@@ -13,16 +16,31 @@ use pwt_macros::{builder, widget};
 
 use crate::dom::align::{AlignOptions, AutoFloatingPlacement, GrowDirection, Point};
 
-use crate::dom::focus::{element_is_focusable, get_first_focusable, FocusTracker};
+use crate::dom::focus::{FocusTracker, element_is_focusable, get_first_focusable};
+
+/// Padding kept between the picker and the viewport edges, in pixels. Shared by the placement
+/// fallbacks and the picker height cap so the two stay in sync.
+const VIEWPORT_PADDING: f64 = 5.0;
+
+/// Minimum space below the input, in pixels, for the picker to still open downward; below this it
+/// opens upward instead (when there is more room above), biasing toward a normal downward dropdown.
+const MIN_SPACE_BELOW: f64 = 160.0;
+
+fn window_inner_height() -> Option<f64> {
+    web_sys::window()?.inner_height().ok()?.as_f64()
+}
 
 /// Parameters passed to the [Dropdown] picker callback.
 #[derive(Clone)]
 pub struct DropdownController {
     link: Scope<PwtDropdown>,
+    dropup: bool,
 }
 
 impl DropdownController {
     /// Change the [Dropdown] input element value.
+    ///
+    /// If the picker is currently shown, it is closed.
     pub fn change_value(&self, value: String) {
         self.link.send_message(Msg::ChangeValue(value));
     }
@@ -33,6 +51,12 @@ impl DropdownController {
         Callback::from(move |key: S| {
             controller.change_value(key.to_string());
         })
+    }
+
+    /// Whether the picker should be rendered in "dropup" mode, meaning it is being rendered above
+    /// the [Dropdown].
+    pub fn dropup(&self) -> bool {
+        self.dropup
     }
 }
 /// Base widget to implement [Combobox](crate::widget::form::Combobox) like widgets.
@@ -92,6 +116,11 @@ pub struct Dropdown {
     #[prop_or_default]
     #[builder]
     pub trigger: Vec<(Trigger, bool)>,
+
+    /// Alignment options for the picker.
+    #[builder(IntoPropValue, into_prop_value)]
+    #[prop_or_default]
+    pub align_options: Option<AlignOptions>,
 }
 
 impl Dropdown {
@@ -120,6 +149,7 @@ pub enum Msg {
     Input(String),
     MouseDownInput,
     FocusChange(bool),
+    Dismiss,
 }
 
 #[doc(hidden)]
@@ -130,37 +160,68 @@ pub struct PwtDropdown {
     // fire on_change() event delayed, after the popover is closed, so that
     // other widget can grep the focus after a change (if the want)
     pending_change: bool,
-    change_from_input: bool,
     focus_on_field: bool,
 
-    node_ref: NodeRef,
     input_ref: NodeRef,
     picker_ref: NodeRef,
     dropdown_ref: NodeRef,
     picker_id: String,
     picker_placer: Option<AutoFloatingPlacement>,
     focus_tracker: FocusTracker,
+    // whether the picker opens upward; decided once at open and drives both the placement and a
+    // combobox filter's position
+    dropup: bool,
+    // dismiss-on-outside-interaction listeners, present only while the picker is open
+    dismiss_listeners: Vec<EventListener>,
 }
 
 impl PwtDropdown {
     // focus the input elelent (after closing the dropdown popover)
     fn restore_focus(&mut self) {
-        if let Some(el) = self.node_ref.cast::<web_sys::HtmlElement>() {
+        if let Some(el) = self.input_ref.cast::<web_sys::HtmlElement>() {
             let _ = el.focus();
         }
     }
 
-    fn update_picker_placer(&mut self, _props: &Dropdown) {
+    // Space above and below the input within the viewport, in pixels.
+    fn dropdown_space(&self) -> Option<(f64, f64)> {
+        let dropdown = self.dropdown_ref.clone().into_html_element()?;
+        let window_height = window_inner_height()?;
+        let rect = dropdown.get_bounding_client_rect();
+        let above = rect.y();
+        let below = window_height - (rect.y() + rect.height());
+        Some((above, below))
+    }
+
+    fn update_picker_placer(&mut self, props: &Dropdown) {
+        // Primary placement is the side chosen at open (see `dropup`), so the picker opens there
+        // directly and never flips between below and above as content grows or a filter narrows.
+        let default = if self.dropup {
+            AlignOptions::new(Point::TopStart, Point::BottomStart, GrowDirection::None)
+                .viewport_padding(VIEWPORT_PADDING)
+                .align_width(true)
+                .with_fallback_placement(
+                    Point::BottomStart,
+                    Point::TopStart,
+                    GrowDirection::TopBottom,
+                )
+        } else {
+            AlignOptions::new(Point::BottomStart, Point::TopStart, GrowDirection::None)
+                .viewport_padding(VIEWPORT_PADDING)
+                .align_width(true)
+                .with_fallback_placement(Point::TopStart, Point::BottomStart, GrowDirection::None)
+                .with_fallback_placement(
+                    Point::BottomStart,
+                    Point::TopStart,
+                    GrowDirection::TopBottom,
+                )
+        };
+
+        let align_options = props.align_options.clone().unwrap_or(default);
         self.picker_placer = match AutoFloatingPlacement::new(
             self.dropdown_ref.clone(),
             self.picker_ref.clone(),
-            AlignOptions::new(
-                Point::BottomStart,
-                Point::TopStart,
-                GrowDirection::TopBottom,
-            )
-            .viewport_padding(5.0)
-            .align_width(true),
+            align_options,
         ) {
             Ok(placer) => Some(placer),
             Err(err) => {
@@ -183,14 +244,14 @@ impl Component for PwtDropdown {
             pending_change: false,
             value: ctx.props().value.clone().unwrap_or_default(),
             focus_on_field: false,
-            change_from_input: false,
-            node_ref: NodeRef::default(),
             input_ref: NodeRef::default(),
             picker_ref: NodeRef::default(),
             dropdown_ref: NodeRef::default(),
             picker_id: crate::widget::get_unique_element_id(),
             picker_placer: None,
             focus_tracker,
+            dropup: false,
+            dismiss_listeners: Vec::new(),
         }
     }
 
@@ -232,20 +293,21 @@ impl Component for PwtDropdown {
                 if props.input_props.disabled {
                     return false;
                 }
+                // decide the side before the picker renders so the filter ordering is right on the
+                // first frame; only when we own the placement, as a custom align_options means the
+                // caller controls the side.
+                self.dropup = props.align_options.is_none()
+                    && self
+                        .dropdown_space()
+                        .is_some_and(|(above, below)| below < MIN_SPACE_BELOW && above > below);
                 self.show = true;
-                //log::info!("ShowPicker {}", self.show);
                 true
             }
             Msg::ChangeValue(value) => {
                 self.value = value;
                 if self.show {
                     self.pending_change = true;
-                    if !self.change_from_input {
-                        yew::Component::update(self, ctx, Msg::HidePicker)
-                    } else {
-                        self.change_from_input = false;
-                        true
-                    }
+                    yew::Component::update(self, ctx, Msg::HidePicker)
                 } else {
                     //log::info!("ChangeValue {} {}", key, value);
                     if let Some(on_change) = &ctx.props().on_change {
@@ -259,9 +321,6 @@ impl Component for PwtDropdown {
                 //log::info!("Input {}", value);
                 if props.editable {
                     self.value = value;
-                    if self.show {
-                        self.change_from_input = true;
-                    }
                     if let Some(on_change) = &ctx.props().on_change {
                         on_change.emit(self.value.clone());
                     }
@@ -277,6 +336,21 @@ impl Component for PwtDropdown {
             Msg::FocusChange(has_focus) => {
                 if !has_focus {
                     self.show = false;
+                }
+                true
+            }
+            Msg::Dismiss => {
+                if !self.show {
+                    return false;
+                }
+                self.show = false;
+                // closing by interaction elsewhere does not grab focus back to the input, unlike
+                // HidePicker; emit a pending change so a prior selection is not lost
+                if self.pending_change {
+                    self.pending_change = false;
+                    if let Some(on_change) = &ctx.props().on_change {
+                        on_change.emit(self.value.clone());
+                    }
                 }
                 true
             }
@@ -309,7 +383,7 @@ impl Component for PwtDropdown {
             let link = ctx.link().clone();
             let show = self.show;
             move |event: KeyboardEvent| {
-                match event.key().as_str() {
+                match crate::dom::event_key(&event).as_str() {
                     "Escape" => {
                         if !show {
                             return;
@@ -333,6 +407,7 @@ impl Component for PwtDropdown {
 
         let controller = DropdownController {
             link: ctx.link().clone(),
+            dropup: self.dropup,
         };
 
         let data_show = self.show.then_some("true");
@@ -454,7 +529,7 @@ impl Component for PwtDropdown {
                     .attribute("id", self.picker_id.clone())
                     .attribute("data-show", data_show)
                     .onkeydown(ctx.link().batch_callback(|event: KeyboardEvent| {
-                        if event.key() == "Escape" {
+                        if crate::dom::event_key(&event) == "Escape" {
                             // handle escape ourselves since it's a non modal popover
                             event.prevent_default();
                             event.stop_propagation();
@@ -492,8 +567,6 @@ impl Component for PwtDropdown {
         if first_render {
             let props = ctx.props();
 
-            self.update_picker_placer(props);
-
             if props.input_props.autofocus {
                 if let Some(el) = self.input_ref.cast::<web_sys::HtmlElement>() {
                     let _ = el.focus();
@@ -506,6 +579,23 @@ impl Component for PwtDropdown {
             if let Some(popover_node) = self.picker_ref.get() {
                 if self.show {
                     crate::show_popover(popover_node);
+
+                    // cap the height to the side it opens toward so a long list scrolls instead of
+                    // overflowing; only when we own the placement (a custom align_options sizes it)
+                    if ctx.props().align_options.is_none()
+                        && let (Some(picker), Some((above, below))) = (
+                            self.picker_ref.clone().into_html_element(),
+                            self.dropdown_space(),
+                        )
+                    {
+                        let space = if self.dropup { above } else { below };
+                        let max_height = (space - VIEWPORT_PADDING).max(0.0);
+                        let _ = picker
+                            .style()
+                            .set_property("max-height", &format!("{max_height}px"));
+                    }
+                    self.update_picker_placer(ctx.props());
+
                     if self.focus_on_field {
                         if let Some(el) = self.input_ref.cast::<web_sys::HtmlElement>() {
                             let _ = el.focus();
@@ -513,14 +603,62 @@ impl Component for PwtDropdown {
                     } else {
                         focus_selected_element(&self.picker_ref);
                     }
+
+                    // While open, dismiss the picker on a pointer-down outside it (such as grabbing
+                    // a dialog to move or resize it), a window resize, or a page scroll, so it is
+                    // not stranded at its open position. Capture phase so a stopped-propagation
+                    // handler cannot hide the event.
+                    let document = gloo_utils::document();
+                    let outside_pointerdown = {
+                        let link = ctx.link().clone();
+                        let picker_ref = self.picker_ref.clone();
+                        let dropdown_ref = self.dropdown_ref.clone();
+                        EventListener::new_with_options(
+                            &document,
+                            "pointerdown",
+                            EventListenerOptions::run_in_capture_phase(),
+                            move |event| {
+                                if !event_target_within(event, &[&picker_ref, &dropdown_ref]) {
+                                    link.send_message(Msg::Dismiss);
+                                }
+                            },
+                        )
+                    };
+                    let outside_scroll = {
+                        let link = ctx.link().clone();
+                        let picker_ref = self.picker_ref.clone();
+                        EventListener::new_with_options(
+                            &document,
+                            "scroll",
+                            EventListenerOptions::run_in_capture_phase(),
+                            move |event| {
+                                // ignore the picker's own list scrolling
+                                if !event_target_within(event, &[&picker_ref]) {
+                                    link.send_message(Msg::Dismiss);
+                                }
+                            },
+                        )
+                    };
+                    let on_resize = {
+                        let link = ctx.link().clone();
+                        EventListener::new(&gloo_utils::window(), "resize", move |_| {
+                            link.send_message(Msg::Dismiss);
+                        })
+                    };
+                    self.dismiss_listeners = vec![outside_pointerdown, outside_scroll, on_resize];
                 } else {
                     crate::hide_popover(popover_node);
+                    self.dismiss_listeners.clear();
+                    // The placer lives only while the picker shows: aligning a
+                    // hidden picker is wasted work, and its size observer would
+                    // keep realigning it on every layout change. Opening
+                    // creates a fresh one above.
+                    self.picker_placer = None;
                 }
             }
         }
 
-        // update picker placement after we opened/closed to cope with a bug that only seems to
-        // affect webkit based browsers like Safari
+        // keep the placement fresh for content growth and a webkit/Safari re-align bug
         if let Some(placer) = &self.picker_placer {
             if let Err(err) = placer.update() {
                 log::error!("error updating placement: {}", err.to_string());
@@ -531,6 +669,18 @@ impl Component for PwtDropdown {
     }
 }
 
+fn event_target_within(event: &web_sys::Event, node_refs: &[&NodeRef]) -> bool {
+    let Some(target) = event.target() else {
+        return false;
+    };
+    let Ok(node) = target.dyn_into::<web_sys::Node>() else {
+        return false;
+    };
+    node_refs
+        .iter()
+        .any(|node_ref| node_ref.get().is_some_and(|el| el.contains(Some(&node))))
+}
+
 // Focus selected element
 // Note: this scrolls the selected element into the view.
 pub fn focus_selected_element(node_ref: &NodeRef) {
@@ -538,7 +688,7 @@ pub fn focus_selected_element(node_ref: &NodeRef) {
         if let Ok(Some(selected_el)) = el.query_selector(".selected") {
             let selected_el = selected_el.dyn_into::<web_sys::HtmlElement>().unwrap();
             if element_is_focusable(&selected_el) {
-                let _ = el.focus();
+                let _ = selected_el.focus();
             } else if let Some(focusable_el) = get_first_focusable(selected_el.into()) {
                 let _ = focusable_el.focus();
             }

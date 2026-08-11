@@ -31,6 +31,17 @@ function toggle_popover(popover) {
     popover.togglePopover();
 }
 
+function client_to_svg_coords(svg, x, y) {
+    const ctm = svg.getScreenCTM();
+    if (!ctm) {
+        // not laid out yet (detached/hidden); fall back to the input coordinates
+        return [x, y];
+    }
+    const pt = new DOMPoint(x, y);
+    const svgPt = pt.matrixTransform(ctm.inverse());
+    return [svgPt.x, svgPt.y];
+}
+
 export {
     test_alert,
     show_dialog,
@@ -39,4 +50,5 @@ export {
     hide_popover,
     show_popover,
     toggle_popover,
+    client_to_svg_coords,
 };

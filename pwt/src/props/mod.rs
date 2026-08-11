@@ -154,7 +154,7 @@ mod extract_key_function;
 pub use extract_key_function::{ExtractKeyFn, ExtractPrimaryKey, IntoExtractKeyFn};
 
 mod load_callback;
-pub use load_callback::{set_http_get_method, IntoLoadCallback, LoadCallback};
+pub use load_callback::{IntoLoadCallback, LoadCallback, set_http_get_method};
 
 mod submit_callback;
 pub use submit_callback::{IntoSubmitCallback, SubmitCallback};
@@ -200,10 +200,7 @@ mod padding;
 pub use padding::CssPaddingBuilder;
 
 mod render_function;
-pub use render_function::{
-    BuilderFn, IntoOptionalBuilderFn, IntoOptionalRenderFn, IntoOptionalTextRenderFn, RenderFn,
-    TextRenderFn,
-};
+pub use render_function::{BuilderFn, IntoOptionalBuilderFn, IntoOptionalRenderFn, RenderFn};
 
 mod sorter_function;
 pub use sorter_function::{IntoSorterFn, SorterFn};

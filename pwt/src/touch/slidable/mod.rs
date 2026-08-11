@@ -12,10 +12,13 @@ use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 
+use crate::css;
 use crate::dom::DomSizeObserver;
 use crate::prelude::*;
 use crate::props::CssLength;
-use crate::touch::{GestureDetector, GestureSwipeEvent, InputEvent};
+use crate::touch::{
+    GestureDetector, GestureDragEvent, GesturePhase, GestureSwipeEvent, InputEvent,
+};
 use crate::widget::{Container, Row};
 
 use pwt_macros::widget;
@@ -30,13 +33,23 @@ use pwt_macros::widget;
 pub struct Slidable {
     content: VNode,
 
-    /// Widget displayed on the left side (below the slider).
+    /// Widget displayed on the left side (below the slider). Takes precedence over
+    /// `left_action_list` and `with/add_left_action`.
     #[prop_or_default]
     pub left_actions: Option<VNode>,
 
-    /// Widget displayed on the right side (below the slider).
+    /// Widget displayed on the right side (below the slider). Takes precedence over
+    /// `right_action_list` and `with/add_right_action`.
     #[prop_or_default]
     pub right_actions: Option<VNode>,
+
+    #[prop_or_default]
+    /// A list of left hand side slidable actions.
+    pub left_action_list: Vec<SlidableAction>,
+
+    #[prop_or_default]
+    /// A list of right hand side slidable actions.
+    pub right_action_list: Vec<SlidableAction>,
 
     /// Dismiss callback.
     ///
@@ -97,6 +110,28 @@ impl Slidable {
     pub fn set_on_tap(&mut self, cb: impl IntoEventCallback<InputEvent>) {
         self.on_tap = cb.into_event_callback();
     }
+
+    /// Method to add a left hand side action
+    pub fn add_left_action(&mut self, action: impl Into<SlidableAction>) {
+        self.left_action_list.push(action.into());
+    }
+
+    /// Builder style method to add a left hand side action
+    pub fn with_left_action(mut self, action: impl Into<SlidableAction>) -> Self {
+        self.add_left_action(action);
+        self
+    }
+
+    /// Method to add a right hand side action
+    pub fn add_right_action(&mut self, action: impl Into<SlidableAction>) {
+        self.right_action_list.push(action.into());
+    }
+
+    /// Builder style method to add a right hand side action
+    pub fn with_right_action(mut self, action: impl Into<SlidableAction>) -> Self {
+        self.add_right_action(action);
+        self
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -133,9 +168,7 @@ pub struct PwtSlidable {
 
 pub enum Msg {
     StartDismissTransition,
-    Drag(InputEvent),
-    DragStart(InputEvent),
-    DragEnd(InputEvent),
+    Drag(GestureDragEvent),
     Swipe(GestureSwipeEvent),
     LeftResize(f64),
     RightResize(f64),
@@ -173,16 +206,28 @@ impl PwtSlidable {
 
     fn left_container(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
-        let actions = props.left_actions.clone();
+        let actions = match props.left_actions.clone() {
+            Some(actions) => vec![actions],
+            None => props
+                .left_action_list
+                .iter()
+                .map(|action| action.clone().into())
+                .collect(),
+        };
 
         Row::new()
             .class("pwt-w-100 pwt-h-100")
             .with_child(
                 Container::new()
                     .height(CssLength::Fraction(1.0))
+                    .class(if actions.len() > 1 {
+                        Some(classes!(css::FlexDirection::Row, css::Display::Flex))
+                    } else {
+                        None
+                    })
                     .min_width(0)
                     .style("flex", "0 1 auto")
-                    .with_optional_child(actions)
+                    .children(actions)
                     .into_html_with_ref(self.left_action_ref.clone()),
             )
             .with_child(html! {<div style="flex: 1 1 auto;"></div>})
@@ -191,17 +236,29 @@ impl PwtSlidable {
 
     fn right_container(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
-        let actions = props.right_actions.clone();
+        let actions = match props.right_actions.clone() {
+            Some(action) => vec![action],
+            None => props
+                .right_action_list
+                .iter()
+                .map(|action| action.clone().into())
+                .collect(),
+        };
 
         Row::new()
             .class("pwt-w-100 pwt-h-100")
             .with_child(html! {<div style="flex: 1 1 auto;"></div>})
             .with_child(
                 Container::new()
+                    .class(if actions.len() > 1 {
+                        Some(classes!(css::FlexDirection::Row, css::Display::Flex))
+                    } else {
+                        None
+                    })
                     .height(CssLength::Fraction(1.0))
                     .min_width(0)
                     .style("flex", "0 1 auto")
-                    .with_optional_child(actions)
+                    .children(actions)
                     .into_html_with_ref(self.right_action_ref.clone()),
             )
             .into_html_with_ref(self.right_ref.clone())
@@ -245,17 +302,15 @@ impl Component for PwtSlidable {
             Msg::StartDismissTransition => {
                 self.view_state = ViewState::DismissTransition;
             }
-            Msg::Drag(event) => {
-                self.drag_pos = Some(self.drag_start - event.x());
-            }
-            Msg::DragStart(event) => {
-                self.drag_start = event.x();
-            }
-            Msg::DragEnd(_event) => {
-                self.drag_start = 0;
-                self.start_pos -= self.drag_pos.take().unwrap_or(0) as f64;
-                self.finalize_drag();
-            }
+            Msg::Drag(event) => match event.phase {
+                GesturePhase::Start => self.drag_start = event.x(),
+                GesturePhase::Update => self.drag_pos = Some(self.drag_start - event.x()),
+                GesturePhase::End => {
+                    self.drag_start = 0;
+                    self.start_pos -= self.drag_pos.take().unwrap_or(0) as f64;
+                    self.finalize_drag();
+                }
+            },
             Msg::ContentResize(width, height) => {
                 if self.start_pos == 0f64 && self.drag_pos.is_none() && !self.switch_back {
                     self.content_width = width.max(0f64);
@@ -268,8 +323,9 @@ impl Component for PwtSlidable {
                     .left_action_ref
                     .cast::<web_sys::HtmlElement>()
                     .unwrap()
-                    .offset_width()
-                    .max(0) as f64;
+                    .get_bounding_client_rect()
+                    .width()
+                    .max(0.0);
 
                 if width > (left_size + 1.0) {
                     self.left_size = left_size;
@@ -285,8 +341,9 @@ impl Component for PwtSlidable {
                     .right_action_ref
                     .cast::<web_sys::HtmlElement>()
                     .unwrap()
-                    .offset_width()
-                    .max(0) as f64;
+                    .get_bounding_client_rect()
+                    .width()
+                    .max(0.0);
 
                 if width > (right_size + 1.0) {
                     self.right_size = right_size;
@@ -364,7 +421,7 @@ impl Component for PwtSlidable {
 
         // no animation during drag
         let transition = if self.drag_pos.is_none() {
-            "transition: width 0.1s ease-out;"
+            "width 0.1s ease-out"
         } else {
             ""
         };
@@ -372,61 +429,51 @@ impl Component for PwtSlidable {
         let upper = GestureDetector::new(
             Container::new()
                 .class("pwt-slidable-slider")
-                .attribute(
-                    "style",
-                    "touch-action:none;width:100%;flex:0 0 auto;overflow:hidden;",
-                )
+                .class(css::Overflow::Hidden)
+                .flex(0.0)
+                .width(CssLength::Fraction(1.0))
+                .style("touch-action", "none")
                 .with_child(props.content.clone())
                 .into_html_with_ref(self.content_ref.clone()),
         )
-        .on_drag_start(ctx.link().callback(Msg::DragStart))
-        .on_drag_end(ctx.link().callback(Msg::DragEnd))
-        .on_drag_update(ctx.link().callback(Msg::Drag))
+        .on_drag(ctx.link().callback(Msg::Drag))
         .on_tap(ctx.link().callback(Msg::OnTap))
         .on_swipe(ctx.link().callback(Msg::Swipe));
 
         let left_container = Container::new()
-            .attribute(
-                "style",
-                format!(
-                    "width:{left}px;flex: 0 0 auto;{};overflow:hidden;",
-                    transition
-                ),
-            )
+            .width(CssLength::Px(left))
+            .flex(0.0)
+            .class(css::Overflow::Hidden)
+            .style("transition", transition)
             .with_child(self.left_container(ctx));
 
         let right_container = Container::new()
-            .attribute(
-                "style",
-                format!(
-                    "width:{right}px;flex: 0 0 auto;{};overflow:hidden;",
-                    transition
-                ),
-            )
+            .width(CssLength::Px(right))
+            .flex(0.0)
+            .class(css::Overflow::Hidden)
+            .style("transition", transition)
             .with_child(self.right_container(ctx));
 
         let row = Row::new()
-            .attribute(
-                "style",
-                format!(
-                    "width:{};overflow:hidden;justify-content:{};transition:height 0.2s ease-out;{}",
-                    if self.start_pos == 0f64 && self.drag_pos.is_none() && !self.switch_back {
-                        String::from("100%")
-                    } else {
-                        format!("{}px", self.content_width)
-                    },
-                    if self.last_action_left {
-                        "left"
-                    } else {
-                        "right"
-                    },
-                    match self.view_state {
-                        ViewState::Normal => String::new(),
-                        ViewState::DismissStart => format!("height:{}px;", self.content_height),
-                        ViewState::DismissTransition | ViewState::Dismissed => String::from("height:0px;"),
-                    }
-                ),
+            .width(
+                if self.start_pos == 0f64 && self.drag_pos.is_none() && !self.switch_back {
+                    CssLength::Fraction(1.0)
+                } else {
+                    CssLength::Px(self.content_width)
+                },
             )
+            .class(css::Overflow::Hidden)
+            .class(if self.last_action_left {
+                css::JustifyContent::Left
+            } else {
+                css::JustifyContent::Right
+            })
+            .style("transition", "height 0.2s ease-out")
+            .height(match self.view_state {
+                ViewState::Normal => CssLength::None,
+                ViewState::DismissStart => CssLength::Px(self.content_height),
+                ViewState::DismissTransition | ViewState::Dismissed => CssLength::Px(0.0),
+            })
             .with_child(left_container)
             .with_child(upper)
             .with_child(right_container)

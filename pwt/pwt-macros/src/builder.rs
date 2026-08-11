@@ -1,10 +1,10 @@
 use proc_macro::TokenStream;
-use quote::{format_ident, quote, quote_spanned, ToTokens};
+use quote::{ToTokens, format_ident, quote, quote_spanned};
 
 use syn::spanned::Spanned;
-use syn::{parse::Parse, parse_macro_input, Data, DeriveInput, Token};
+use syn::{Data, DeriveInput, Token, parse::Parse, parse_macro_input};
 
-use syn::{parenthesized, Error, Fields, Result};
+use syn::{Error, Fields, Result, parenthesized};
 
 pub(crate) fn handle_builder_struct(input: TokenStream) -> TokenStream {
     let builder = parse_macro_input!(input as DeriveInput);
@@ -85,7 +85,7 @@ impl Parse for FieldOptions {
 struct CallbackOptions {
     into_trait: syn::Type,
     into_fn: syn::Ident,
-    inner_type: syn::Type,
+    inner_types: Vec<syn::Type>,
 }
 
 impl Parse for CallbackOptions {
@@ -105,16 +105,27 @@ impl Parse for CallbackOptions {
             .parse()
             .map_err(|err| Error::new(err.span(), format!("expected into function: {err}")))?;
 
+        let mut inner_types = Vec::new();
+
         parse_comma(&content).map_err(|err| Error::new(err.span(), "missing inner type"))?;
 
         let inner_type: syn::Type = content.parse().map_err(|err| {
             Error::new(err.span(), format!("expected inner callback type: {err}"))
         })?;
 
+        inner_types.push(inner_type);
+
+        while parse_comma(&content).is_ok() {
+            let inner_type: syn::Type = content.parse().map_err(|err| {
+                Error::new(err.span(), format!("expected inner callback type: {err}"))
+            })?;
+            inner_types.push(inner_type);
+        }
+
         Ok(Self {
             into_trait,
             into_fn,
-            inner_type,
+            inner_types,
         })
     }
 }
@@ -153,24 +164,43 @@ fn derive_builder(builder: DeriveInput) -> Result<proc_macro2::TokenStream> {
     //    let mut setters = Vec::new();
     let mut builder = Vec::new();
     for field in fields.iter_mut() {
-        for (i, attr) in field.attrs.iter_mut().enumerate() {
+        let builder_type = field.attrs.iter().find_map(|attr| {
             if attr.path().is_ident("builder") {
-                let attr = attr.clone();
-                builder.push((field.clone(), attr, BuilderType::Field));
-                field.attrs.remove(i);
-                break;
+                Some(BuilderType::Field)
             } else if attr.path().is_ident("builder_cb") {
-                let attr = attr.clone();
-                builder.push((field.clone(), attr, BuilderType::Callback));
-                field.attrs.remove(i);
-                break;
+                Some(BuilderType::Callback)
+            } else {
+                None
             }
-        }
+        });
+        let Some(builder_type) = builder_type else {
+            continue;
+        };
+        let attr = field
+            .attrs
+            .iter()
+            .find(|a| a.path().is_ident("builder") || a.path().is_ident("builder_cb"))
+            .cloned()
+            .unwrap();
+        // Move a #[deprecated] from the field onto the generated builder method so callers get
+        // the warning, but strip it from the field: the generated setter assigns the field
+        // directly, which would otherwise raise the warning inside this macro's own output.
+        let deprecated = field
+            .attrs
+            .iter()
+            .find(|a| a.path().is_ident("deprecated"))
+            .cloned();
+        field.attrs.retain(|a| {
+            !a.path().is_ident("builder")
+                && !a.path().is_ident("builder_cb")
+                && !a.path().is_ident("deprecated")
+        });
+        builder.push((field.clone(), attr, builder_type, deprecated));
     }
 
     let mut quotes = quote! {};
 
-    for (field, attr, builder_type) in builder {
+    for (field, attr, builder_type, deprecated) in builder {
         let field_ident = field.ident.unwrap();
         let field_name = field_ident.to_string();
         let field_type = field.ty;
@@ -229,9 +259,9 @@ fn derive_builder(builder: DeriveInput) -> Result<proc_macro2::TokenStream> {
                     let options = syn::parse2::<CallbackOptions>(tokens)?;
                     let into_fn = options.into_fn;
                     let into_trait = options.into_trait;
-                    let inner_type = options.inner_type;
+                    let inner_types = options.inner_types;
                     (
-                        quote_spanned! { attr_span => impl #into_trait<#inner_type>},
+                        quote_spanned! { attr_span => impl #into_trait<#(#inner_types),*>},
                         quote_spanned! { attr_span => #field_ident.#into_fn()},
                     )
                 }
@@ -246,9 +276,14 @@ fn derive_builder(builder: DeriveInput) -> Result<proc_macro2::TokenStream> {
                     return Err(Error::new(
                         attr_span,
                         "missing 'builder_cb' parameters, maybe you want to use 'builder'?",
-                    ))
+                    ));
                 }
             }
+        };
+
+        let deprecated = match deprecated {
+            Some(attr) => quote! { #attr },
+            None => quote! {},
         };
 
         quotes.extend(quote_spanned! { attr_span =>
@@ -258,6 +293,7 @@ fn derive_builder(builder: DeriveInput) -> Result<proc_macro2::TokenStream> {
             }
 
             #[doc = #builder_doc]
+            #deprecated
             pub fn #field_ident(mut self, #field_ident: #param_type) -> Self {
                 self.#setter(#field_ident);
                 self

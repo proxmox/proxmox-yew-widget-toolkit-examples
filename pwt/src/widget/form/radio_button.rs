@@ -12,8 +12,8 @@ use crate::tr;
 use crate::widget::{Container, Fa, FieldLabel, Row, Tooltip};
 
 use super::{
-    IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldState,
-    ValidateFn,
+    IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldScopeExt,
+    ManagedFieldState, ValidateFn,
 };
 
 pub type PwtRadioButton = ManagedFieldMaster<RadioButtonField>;
@@ -69,14 +69,14 @@ pub struct RadioButton {
     ///
     /// Called on user interaction:
     ///
-    /// - Click on the checkbox.
+    /// - Click on the radio button.
     /// - Click on the associated input label.
     /// - Activation by keyboard (space press).
     #[builder_cb(IntoEventCallback, into_event_callback, String)]
     #[prop_or_default]
     pub on_input: Option<Callback<String>>,
 
-    /// A right side label for the checkbox, to display additional information
+    /// A right side label for the radio button, to display additional information
     #[prop_or_default]
     pub box_label: Option<FieldLabel>,
 }
@@ -102,7 +102,7 @@ impl RadioButton {
 
     /// Method to set the box label.
     ///
-    /// A right side label for the checkbox to display additional information
+    /// A right side label for the radio button to display additional information
     pub fn set_box_label(&mut self, box_label: impl Into<FieldLabel>) {
         self.box_label = Some(box_label.into());
     }
@@ -122,8 +122,11 @@ pub enum Msg {
 
 #[doc(hidden)]
 pub struct RadioButtonField {
+    state: ManagedFieldState,
     node_ref: NodeRef,
 }
+
+crate::impl_deref_mut_property!(RadioButtonField, state, ManagedFieldState);
 
 #[derive(PartialEq)]
 pub struct ValidateClosure {
@@ -160,7 +163,8 @@ impl ManagedField for RadioButtonField {
         })
     }
 
-    fn setup(props: &RadioButton) -> ManagedFieldState {
+    fn create(ctx: &ManagedFieldContext<Self>) -> Self {
+        let props = ctx.props();
         let on_value = props.value.to_string();
 
         let default = match props.default {
@@ -176,20 +180,9 @@ impl ManagedField for RadioButtonField {
 
         let mut state = ManagedFieldState::new(value.into(), default.into());
         state.radio_group = true;
-        state
-    }
 
-    fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
-        let props = ctx.props();
-        let state = ctx.state();
-        let value = state.value.as_str().unwrap_or("").to_string();
-        if let Some(on_change) = &props.on_change {
-            on_change.emit(value);
-        }
-    }
-
-    fn create(_ctx: &ManagedFieldContext<Self>) -> Self {
         Self {
+            state,
             node_ref: NodeRef::default(),
         }
     }
@@ -199,9 +192,16 @@ impl ManagedField for RadioButtonField {
         false
     }
 
+    fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
+        let props = ctx.props();
+        let value = self.value.as_str().unwrap_or("").to_string();
+        if let Some(on_change) = &props.on_change {
+            on_change.emit(value);
+        }
+    }
+
     fn update(&mut self, ctx: &ManagedFieldContext<Self>, msg: Self::Message) -> bool {
         let props = ctx.props();
-        let state = ctx.state();
 
         match msg {
             Msg::Toggle => {
@@ -209,7 +209,7 @@ impl ManagedField for RadioButtonField {
                     return true;
                 }
                 let on_value = props.value.to_string();
-                let value = state.value.clone();
+                let value = self.value.clone();
 
                 let changes = value != on_value;
 
@@ -239,19 +239,18 @@ impl ManagedField for RadioButtonField {
 
     fn view(&self, ctx: &ManagedFieldContext<Self>) -> Html {
         let props = ctx.props();
-        let state = ctx.state();
 
         let disabled = props.input_props.disabled;
 
         let on_value = props.value.to_string();
-        let (value, validation_result) = (&state.value, &state.result);
+        let (value, validation_result) = (&self.value, &self.result);
         let checked = *value == on_value;
 
         let onclick = ctx.link().callback(|_| Msg::Toggle);
         let onkeyup = Callback::from({
             let link = ctx.link().clone();
             move |event: KeyboardEvent| {
-                if event.key() == " " {
+                if crate::dom::event_key(&event) == " " {
                     link.send_message(Msg::Toggle);
                 }
             }
@@ -277,13 +276,17 @@ impl ManagedField for RadioButtonField {
                     "tabindex",
                     props.input_props.tabindex.unwrap_or(0).to_string(),
                 )
-                .attribute("role", "checkbox")
+                .attribute("role", "radio")
                 .attribute("aria-checked", checked.then_some("true"))
                 .onkeyup(onkeyup)
                 .into_html_with_ref(self.node_ref.clone()),
         );
 
-        let box_label = props.box_label.clone().map(|label| label.padding_start(2));
+        let box_label = props.box_label.clone().map(|label| {
+            label
+                .padding_start(2)
+                .class(disabled.then_some("pwt-opacity-disabled"))
+        });
 
         let checkbox = Row::new()
             .class(AlignItems::Center)

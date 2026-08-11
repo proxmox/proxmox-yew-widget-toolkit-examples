@@ -1,3 +1,26 @@
+rust-pwt-macros (0.5.3) trixie; urgency=medium
+
+  * builder: carry a field's #[deprecated] attribute onto the generated
+    builder method, so deprecating a builder field warns its callers while
+    the macro's own field access stays quiet.
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 29 Jun 2026 02:36:41 +0200
+
+rust-pwt-macros (0.5.2) trixie; urgency=medium
+
+  * widget: implement WidgetStyleBuilder for SVG elements.
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 10 Apr 2026 17:31:17 +0200
+
+rust-pwt-macros (0.5.1) trixie; urgency=medium
+
+  * builder: allow multiple generic types in callback variant. If there is a
+    callback type with multiple generic variants, e.g., Foo<A,B> we currently
+    can't use it since we only expect one type in the macro. Now one can also
+    use multiple generics, like `Callback<A, B>`.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 17 Dec 2025 16:38:27 +0100
+
 rust-pwt-macros (0.5.0) trixie; urgency=medium
 
   * update macro to node_ref having been removed from widget standard

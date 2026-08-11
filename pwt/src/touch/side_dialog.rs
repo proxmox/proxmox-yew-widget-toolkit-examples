@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use wasm_bindgen::JsCast;
-use web_sys::HtmlElement;
+use web_sys::{Element, EventTarget, HtmlElement};
 
 use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::prelude::*;
@@ -10,10 +10,11 @@ use yew::virtual_dom::{Key, VComp, VNode};
 use crate::dom::IntoHtmlElement;
 use crate::props::{AsCssStylesMut, CssStyles};
 use crate::state::{SharedState, SharedStateObserver};
+use crate::touch::GestureDragEvent;
 use crate::widget::Container;
 use crate::{impl_yew_std_props_builder, prelude::*};
 
-use super::{GestureDetector, GestureSwipeEvent, InputEvent};
+use super::{GestureDetector, GesturePhase, GestureSwipeEvent, InputEvent};
 
 // Messages sent from the [SideDialogController].
 pub enum SideDialogControllerMsg {
@@ -125,9 +126,7 @@ pub enum Msg {
     Close,
     Dismiss, // Slide out, then close
     SliderAnimationEnd,
-    DragStart(InputEvent),
-    DragEnd(InputEvent),
-    Drag(InputEvent),
+    Drag(GestureDragEvent),
     Swipe(GestureSwipeEvent),
     Controller,
 }
@@ -262,45 +261,63 @@ impl Component for PwtSideDialog {
                 };
                 true
             }
-            Msg::DragStart(event) => {
+            Msg::Drag(event) => {
+                if event.phase == GesturePhase::End {
+                    let mut dismiss = false;
+                    let threshold = 100.0;
+                    if let Some((delta_x, delta_y)) = self.drag_delta {
+                        dismiss = match props.location {
+                            SideDialogLocation::Left => delta_x < -threshold,
+                            SideDialogLocation::Right => delta_x > threshold,
+                            SideDialogLocation::Top => delta_y < -threshold,
+                            SideDialogLocation::Bottom => delta_y > threshold,
+                        };
+                    }
+                    self.drag_start = None;
+                    self.drag_delta = None;
+
+                    if dismiss {
+                        ctx.link().send_message(Msg::Dismiss);
+                    }
+                    return true;
+                }
+
+                if scrolling_element_in_range(
+                    event.target(),
+                    self.slider_ref.clone(),
+                    props.location,
+                ) {
+                    // don't do anything, children is scrolling
+                    return false;
+                }
+
                 let x = event.x() as f64;
                 let y = event.y() as f64;
-                if x > 0.0 && y > 0.0 {
-                    // prevent divide by zero
-                    self.drag_start = Some((x, y));
-                    self.drag_delta = Some((0.0, 0.0));
-                }
-                false
-            }
-            Msg::DragEnd(_event) => {
-                let mut dismiss = false;
-                let threshold = 100.0;
-                if let Some((delta_x, delta_y)) = self.drag_delta {
-                    dismiss = match props.location {
-                        SideDialogLocation::Left => delta_x < -threshold,
-                        SideDialogLocation::Right => delta_x > threshold,
-                        SideDialogLocation::Top => delta_y < -threshold,
-                        SideDialogLocation::Bottom => delta_y > threshold,
-                    };
-                }
-                self.drag_start = None;
-                self.drag_delta = None;
 
-                if dismiss {
-                    ctx.link().send_message(Msg::Dismiss);
+                match self.drag_start {
+                    None => {
+                        if x > 0.0 && y > 0.0 {
+                            // prevent divide by zero
+                            self.drag_start = Some((x, y));
+                            self.drag_delta = Some((0.0, 0.0));
+                        }
+                        false
+                    }
+                    Some(start) => {
+                        self.drag_delta = Some((x - start.0, y - start.1));
+                        true
+                    }
                 }
-                true
-            }
-            Msg::Drag(event) => {
-                if let Some(start) = &self.drag_start {
-                    let x = event.x() as f64;
-                    let y = event.y() as f64;
-
-                    self.drag_delta = Some((x - start.0, y - start.1));
-                }
-                true
             }
             Msg::Swipe(event) => {
+                if scrolling_element_in_range(
+                    event.target(),
+                    self.slider_ref.clone(),
+                    props.location,
+                ) {
+                    // don't do anything, children is scrolling
+                    return false;
+                }
                 let angle = event.direction; // -180 to + 180
                 let dismiss = match props.location {
                     SideDialogLocation::Left => !(-135.0..=135.0).contains(&angle),
@@ -421,9 +438,7 @@ impl Component for PwtSideDialog {
                     }
                 }
             })
-            .on_drag_start(ctx.link().callback(Msg::DragStart))
-            .on_drag_end(ctx.link().callback(Msg::DragEnd))
-            .on_drag_update(ctx.link().callback(Msg::Drag))
+            .on_drag(ctx.link().callback(Msg::Drag))
             .on_swipe(ctx.link().callback(Msg::Swipe));
 
         let controller_context = html! {
@@ -449,4 +464,73 @@ impl From<SideDialog> for VNode {
         let comp = VComp::new::<PwtSideDialog>(Rc::new(val), key);
         VNode::from(comp)
     }
+}
+
+/// Checks if any element from `target` up to, but excluding, `boundary` can scroll in the
+/// direction we would close the side dialog.
+///
+/// Returns `false` if `target` is not a descendant of `boundary`, so a gesture starting
+/// outside the dialog content (such as on the backdrop) is not suppressed by the scroll
+/// state of unrelated ancestors.
+fn scrolling_element_in_range(
+    target: Option<EventTarget>,
+    boundary: NodeRef,
+    location: SideDialogLocation,
+) -> bool {
+    let Some(element) = target.and_then(|t| t.dyn_into::<Element>().ok()) else {
+        return false;
+    };
+
+    let Some(boundary) = boundary.cast::<Element>() else {
+        return false;
+    };
+
+    if !boundary.contains(element.dyn_ref::<web_sys::Node>()) {
+        return false;
+    }
+
+    let mut element = Some(element);
+
+    while let Some(el) = element {
+        if el == boundary {
+            break;
+        }
+        if let Some(html) = el.dyn_ref::<HtmlElement>()
+            && check_scrolling(html, location)
+        {
+            return true;
+        }
+        element = el.parent_element();
+    }
+
+    false
+}
+
+/// Returns true if the element is in a state where it can scroll relative to the direction we
+/// would like to close the side dialog, e.g. for SideDialogLocation::Bottom it means returning
+/// true if the element can scroll up, etc.
+fn check_scrolling(el: &HtmlElement, location: SideDialogLocation) -> bool {
+    match location {
+        SideDialogLocation::Bottom => {
+            if el.scroll_top() > 0 {
+                return true;
+            }
+        }
+        SideDialogLocation::Top => {
+            if el.scroll_top() < el.scroll_height() - el.client_height() {
+                return true;
+            }
+        }
+        SideDialogLocation::Right => {
+            if el.scroll_left() > 0 {
+                return true;
+            }
+        }
+        SideDialogLocation::Left => {
+            if el.scroll_left() < el.scroll_width() - el.client_width() {
+                return true;
+            }
+        }
+    }
+    false
 }

@@ -4,9 +4,9 @@
 //! is available in all browsers we want to target:
 //! <https://developer.chrome.com/blog/anchor-positioning-api>
 use js_sys::Error;
-use web_sys::{window, HtmlElement};
+use web_sys::{HtmlElement, window};
 
-use crate::dom::{element_direction_rtl, DomSizeObserver, IntoHtmlElement};
+use crate::dom::{DomSizeObserver, IntoHtmlElement, element_direction_rtl};
 
 /// Defines a point on a rectangle
 ///
@@ -49,14 +49,14 @@ impl Point {
 }
 
 /// Defines a direction in which the element is allowed to grow and move
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum GrowDirection {
     None,
     TopBottom,
     StartEnd,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 struct Placement {
     base: Point,
     element: Point,
@@ -86,7 +86,7 @@ struct Placement {
 /// with setting [`Self::set_align_width`].
 ///
 /// There is a builder style method for each of the options.
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct AlignOptions {
     placements: Vec<Placement>,
     offset: (f64, f64),
@@ -456,7 +456,11 @@ where
         style.remove_property("overflow")?;
     }
     let padding = 2.0 * options.viewport_padding;
-    style.set_property("max-height", &format!("calc(100dvh - {padding}px)"))?;
+
+    if style.get_property_value("max-height")? == "" {
+        style.set_property("max-height", &format!("calc(100dvh - {padding}px)"))?;
+    }
+
     style.set_property("max-width", &format!("calc(100dvw - {padding}px)"))?;
 
     if options.align_width {
@@ -476,16 +480,15 @@ where
     );
 
     // try fallback placements if the first one does not fit
-    if options.placements.len() > 1 && !fits(&rect, &window_rect, &options.placements[0].direction)
-    {
-        for (idx, placement) in options.placements.iter().skip(1).enumerate() {
+    if num_placements > 1 && !fits(&rect, &window_rect, &options.placements[0].direction) {
+        for (idx, placement) in options.placements.iter().enumerate().skip(1) {
             let new_rect = try_fit_rect(
                 &base,
                 &element,
                 &window_rect,
                 placement,
                 options.offset,
-                idx < num_placements,
+                idx + 1 < num_placements,
             );
 
             if fits(&new_rect, &window_rect, &placement.direction) {

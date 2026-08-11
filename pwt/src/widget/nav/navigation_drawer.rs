@@ -15,8 +15,8 @@ use crate::props::{
 use crate::state::{NavigationContext, NavigationContextExt, Selection};
 use crate::{impl_class_prop_builder, impl_yew_std_props_builder};
 
-use crate::dom::focus::roving_tabindex_next;
-use crate::widget::{Column, Container};
+use crate::dom::focus::roving_tabindex_next_recursive;
+use crate::widget::{Column, Container, Fa};
 
 use super::{Menu, MenuEntry, MenuItem};
 
@@ -75,6 +75,13 @@ pub struct NavigationDrawer {
     #[builder]
     #[prop_or_default]
     router: bool,
+
+    /// Enables animations
+    ///
+    /// If enabled, expanding/collapsing is animated
+    #[builder]
+    #[prop_or(true)]
+    animated: bool,
 }
 
 impl AsClassesMut for NavigationDrawer {
@@ -197,7 +204,7 @@ impl PwtNavigationDrawer {
                     Some(key) => key,
                     None => return None,
                 };
-                match event.key().as_str() {
+                match crate::dom::event_key(&event).as_str() {
                     " " => Some(Msg::Select(Some(key.clone()), true, true)),
                     "ArrowRight" if is_menu => Some(Msg::MenuOpen(key.clone())),
                     "ArrowLeft" if is_menu => Some(Msg::MenuClose(key.clone())),
@@ -221,7 +228,6 @@ impl PwtNavigationDrawer {
                 (!hidden).then_some(if is_active { "0" } else { "-1" }),
             )
             .class("pwt-nav-link")
-            .class(hidden.then_some("pwt-d-none"))
             .class(crate::css::AlignItems::Baseline)
             .class(is_active.then_some("active"))
             .onclick(onclick)
@@ -236,17 +242,18 @@ impl PwtNavigationDrawer {
                     |icon| html! { <i class={classes!(icon.to_string(), "pwt-nav-menu-icon")}/>},
                 ),
             )
-            // add memu label
+            // add menu label
             .with_child(html! {<div class="pwt-text-truncate pwt-flex-fill">{&item.label}</div>})
+            // add the optional trailer
+            .with_optional_child(item.trailing.clone())
             // add optional menu-open icon
             .with_optional_child(is_menu.then(|| {
-                Container::from_tag("i")
+                Fa::new("caret-down")
+                    .fixed_width()
                     .attribute("role", "none")
-                    .class("fa fa-caret-down")
                     .class("pwt-nav-menu-item-arrow")
                     .class(open.then_some("expanded"))
                     .onclick(ontoggle)
-                    .with_child("\u{00a0}")
             }))
             .into()
     }
@@ -262,17 +269,40 @@ impl PwtNavigationDrawer {
     ) {
         match item {
             MenuEntry::Item(child) => {
+                // An absent state means the user has not toggled this submenu yet, so fall back
+                // to its default: open, unless the item opted into starting collapsed. A submenu
+                // on the path to the active item is force-opened by open_ancestors, so a
+                // deep-linked target stays visible even under default_collapsed.
                 let open = match &child.key {
-                    Some(key) => *self.menu_states.get(key).unwrap_or(&true),
+                    Some(key) => self
+                        .menu_states
+                        .get(key)
+                        .copied()
+                        .unwrap_or(!child.default_collapsed),
                     None => false,
                 };
 
                 menu.add_child(self.render_single_item(ctx, child, active, level, open, hidden));
 
                 if let Some(submenu) = &child.submenu {
+                    let mut items = Column::new().min_height(0);
+                    // hide children when this submenu is collapsed or an ancestor already is
                     for sub in submenu.children.iter() {
-                        self.render_menu_entry(ctx, sub, menu, active, level + 1, !open)
+                        self.render_menu_entry(
+                            ctx,
+                            sub,
+                            &mut items,
+                            active,
+                            level + 1,
+                            hidden || !open,
+                        )
                     }
+                    menu.add_child(
+                        Container::new()
+                            .class("pwt-nav-menu-animation-container")
+                            .class(open.then_some("expanded"))
+                            .with_child(items),
+                    );
                 }
             }
             MenuEntry::Component(comp) => {
@@ -352,6 +382,36 @@ impl PwtNavigationDrawer {
         }
     }
 
+    /// Open every submenu on the path to `key`, so a selected or deep-linked item is not
+    /// hidden inside a collapsed submenu.
+    fn open_ancestors(&mut self, props: &NavigationDrawer, key: &Key) {
+        fn collect(entries: &[MenuEntry], target: &Key, path: &mut Vec<Key>) -> bool {
+            for entry in entries {
+                if let MenuEntry::Item(item) = entry {
+                    if item.key.as_ref() == Some(target) {
+                        return true;
+                    }
+                    if let Some(submenu) = &item.submenu {
+                        if collect(&submenu.children, target, path) {
+                            if let Some(key) = &item.key {
+                                path.push(key.clone());
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+            false
+        }
+
+        let mut path = Vec::new();
+        if collect(&props.menu.children, key, &mut path) {
+            for key in path {
+                self.menu_states.insert(key, true);
+            }
+        }
+    }
+
     fn init_selection(
         ctx: &Context<Self>,
         selection: Option<Selection>,
@@ -426,13 +486,20 @@ impl Component for PwtNavigationDrawer {
             on_select.emit(active.clone());
         }
 
-        Self {
+        let mut this = Self {
             node_ref: NodeRef::default(),
-            active,
+            active: active.clone(),
             selection,
             menu_states: HashMap::new(),
             _nav_ctx_handle,
+        };
+
+        // expand the path to the initially active item, so a deep-linked entry is visible
+        if let Some(active) = &active {
+            this.open_ancestors(props, active);
         }
+
+        this
     }
 
     fn update(&mut self, ctx: &yew::Context<Self>, msg: Self::Message) -> bool {
@@ -462,6 +529,7 @@ impl Component for PwtNavigationDrawer {
                 }
 
                 if let Some(key) = &key {
+                    self.open_ancestors(props, key);
                     self.emit_item_activate(key, ctx);
                 }
 
@@ -507,6 +575,7 @@ impl Component for PwtNavigationDrawer {
 
                 if let Some(key) = &key {
                     self.selection.select(key.clone());
+                    self.open_ancestors(props, key);
                     self.emit_item_activate(key, ctx);
                 } else {
                     self.selection.clear();
@@ -551,12 +620,12 @@ impl Component for PwtNavigationDrawer {
 
         let menu_ref = self.node_ref.clone();
         let onkeydown = Callback::from(move |event: KeyboardEvent| {
-            match event.key().as_str() {
+            match crate::dom::event_key(&event).as_str() {
                 "ArrowDown" => {
-                    roving_tabindex_next(&menu_ref, false, false);
+                    roving_tabindex_next_recursive(&menu_ref, false, false);
                 }
                 "ArrowUp" => {
-                    roving_tabindex_next(&menu_ref, true, false);
+                    roving_tabindex_next_recursive(&menu_ref, true, false);
                 }
                 _ => return,
             }
@@ -570,6 +639,7 @@ impl Component for PwtNavigationDrawer {
             .attribute("role", "navigation")
             .attribute("aria-label", props.aria_label.clone())
             .class("pwt-nav-menu")
+            .class(props.animated.then_some("animated"))
             .class(OverflowX::Hidden)
             .class(OverflowY::Auto)
             .class(props.class.clone())

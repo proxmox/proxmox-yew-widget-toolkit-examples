@@ -5,7 +5,7 @@ use yew::virtual_dom::VNode;
 use gloo_events::EventListener;
 use wasm_bindgen::{JsCast, UnwrapThrowExt};
 
-use crate::css::{Display, FlexFillFirstChild, Overflow};
+use crate::css::{Display, FlexFillFirstChild, Overflow, UserSelect};
 use crate::props::{
     ContainerBuilder, EventSubscriber, IntoVTag, WidgetBuilder, WidgetStyleBuilder,
 };
@@ -288,7 +288,7 @@ impl PwtSplitPane {
         let onkeydown = Callback::from({
             let link = ctx.link().clone();
             move |event: KeyboardEvent| {
-                let key: &str = &event.key();
+                let key: &str = &crate::dom::event_key(&event);
                 match key {
                     "Enter" => {
                         event.stop_propagation();
@@ -344,6 +344,9 @@ impl PwtSplitPane {
             } else {
                 "row-split-handle"
             })
+            // a pointer press on the handle would otherwise anchor a text selection that the drag
+            // then extends over the panes
+            .class(UserSelect::None)
             .onkeydown(onkeydown)
             .ondblclick(ctx.link().callback(|_| Msg::ResetSize))
             .onpointerdown(ctx.link().callback(move |event: PointerEvent| {

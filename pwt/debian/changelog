@@ -1,3 +1,362 @@
+rust-pwt (0.8.16) trixie; urgency=medium
+
+  * data table: rebuild the header's interactive state when the column set
+    changes. The header built its state once at mount, so a column that
+    appeared or disappeared on a mounted table indexed the new cells
+    against the old column list and crashed the page when the list grew.
+    The rebuild compares the ordered column names, so an ordinary
+    re-render with unchanged columns still keeps the user's sort order and
+    column widths.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 05 Aug 2026 17:57:44 +0200
+
+rust-pwt (0.8.15) trixie; urgency=medium
+
+  * props: stop a synthetic event from taking down the page when it reaches
+    a keyboard handler. Yew types every listener event as the one the
+    handler expects, so reading a member that such an event does not have
+    panicked and left the page dead until a reload. Autofilling the user
+    name on a login mask in Chrome triggered exactly that.
+
+  * dom: add public helpers to read the key and code members of an event
+    safely, for handlers that applications register through the html!
+    macro, which the check on the builder-registered listeners cannot
+    reach. The tab bar uses them for its keyup handler.
+
+  * widget: split pane: do not select text when dragging the divider, which
+    made resizing a master-detail layout read as selecting rows in the
+    master list rather than as moving the divider.
+
+  * css: fix the class names that the UserSelect variants map to; they
+    never matched the ones the stylesheet defines, so the property had no
+    effect at all.
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 03 Aug 2026 23:02:01 +0200
+
+rust-pwt (0.8.14) trixie; urgency=medium
+
+  * touch: stop an open dialog and unsaved input from being discarded when
+    the layout switches as the viewport crosses the breakpoint, for example
+    when a phone rotates:
+    - scaffold: keep the page body mounted across the switch between the
+      side navigation rail and the bottom navigation bar.
+    - adaptive dialog: hold the layout chosen when the dialog opened for its
+      lifetime instead of rebuilding it into the other shell, which had
+      remounted the form and wiped the entry.
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 24 Jul 2026 14:05:59 +0200
+
+rust-pwt (0.8.13) trixie; urgency=medium
+
+  * widget: add a Badge widget, a small rounded status label (badge / chip /
+    tag) with an optional icon and a color-scheme tint, for statuses, counts
+    and short tags beside the item they describe.
+
+  * dom: add a copy_to_clipboard helper wrapping the async Clipboard API, so
+    consumers stop re-implementing the navigator.clipboard.writeText dance.
+
+  * dom: promote the media-query subscription used by AdaptiveScaffold to a
+    public dom::ViewportQuery, so other adaptive widgets can reuse it.
+
+  * touch: add an AdaptiveDialog modal that renders a centered Dialog on wide
+    viewports and a slide-up bottom-sheet SideDialog on narrow ones, wrapping
+    arbitrary children so a dialog body keeps its layout across the swap.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sat, 18 Jul 2026 21:00:00 +0200
+
+rust-pwt (0.8.12) trixie; urgency=medium
+
+  * widget: calendar grid:
+    - keep a week view's days inside the anchor month, so a week straddling
+      a month boundary no longer dims the days on the far side of it.
+    - support multi-day span bars: a date range draws as one continuous bar
+      instead of a mark per day, with color, icon, selection, and click
+      handling built in; each cell scrolls its own stack, so a busy day
+      does not stretch the row.
+    - add opt-in rich hover tooltips on span bars, and pinned bars that
+      keep a fixed lane above the scrolling ones on every day they span.
+    - add an opt-in leading gutter column with an optional header label,
+      for a per-row marker like the ISO week number.
+
+  * widget: input panel: demote the keyless-child warnings to bounded
+    debug notes; they fired per child on every render, burying real ones.
+
+  * widget: dialog: prevent Escape from closing a non-closable modal and
+    leaving the widget state out of sync with the native dialog.
+
+  * form: date field: reject days past the end of the month, like a
+    February 31st, instead of validating them and letting the JS date
+    machinery silently roll them over into the next month.
+
+  * form: combobox: filter on the rendered label by default when a
+    render_value is set, so typing what one reads in the dropdown works;
+    the raw value keeps matching as well.
+
+  * widget: search dropdown: show an explicit "No results found" hint for
+    an empty result set instead of a blank strip, and surface the actual
+    load error instead of a generic "no data loaded" message.
+
+  * widget: data table: align the header text with the column's cell
+    justification, so a right-aligned numeric column carries its title
+    over the digits, and expose the live sort state to custom header
+    renderers so they can draw the sort arrow the stock header shows.
+
+  * widget: form: radio button: dim the box label while disabled and use the
+    "radio" ARIA role instead of "checkbox", matching the checkbox widget and
+    the ARIA reference.
+
+  * dom: align: fix an off-by-one in the fallback placement check that treated
+    the last placement as if it still had a fallback, so a popup near a screen
+    edge could settle on a worse position.
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 17 Jul 2026 23:41:45 +0200
+
+rust-pwt (0.8.11) trixie; urgency=medium
+
+  * touch: navigation rail: add an expanded (wide) layout variant with icon
+    and label side by side in full-width pills, following Material Design.
+
+  * touch: adaptive scaffold: switch the rail to its expanded variant on
+    large viewports, Material's 1200px breakpoint by default, overridable.
+
+  * touch: navigation bar, rail: render the optional tab item badge on the
+    icon corner, or at the item pill's end in the expanded rail, so
+    per-destination status like counts also shows on the touch layout.
+
+  * widget: input panel: keep invisible custom children off the grid row
+    counters; each skipped row index cost one row-gap of blank space in
+    forms with many collapsed advanced or hidden rows.
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 06 Jul 2026 04:28:37 +0200
+
+rust-pwt (0.8.10) trixie; urgency=medium
+
+  * widget: date field: type the first day of the week as a new WeekStart
+    enum and default it to Monday (ISO 8601), aligning the picker with the
+    ISO week numbers shown alongside; the numeric start_day prop is
+    deprecated but still honored.
+
+  * widget: tab bar: let a tab item carry an optional status badge rendered
+    after its label.
+
+  * widget: navigation drawer: let a menu item start its submenu collapsed,
+    and expand the submenus on the path to the active or deep-linked item so
+    it stays visible even if a parent was collapsed.
+
+  * widget: selection view: seed the active key from the selection on create,
+    so a deep-linked tab renders on the first paint.
+
+  * widget: add a CalendarGrid week/month grid widget.
+
+  * widget: add a SegmentedBar widget.
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 29 Jun 2026 02:44:57 +0200
+
+rust-pwt (0.8.9) trixie; urgency=medium
+
+  * touch: add an AdaptiveScaffold that renders the Material navigation
+    layout matching the viewport from a single tab-item list: a bottom
+    navigation bar on phones and narrow windows, a side navigation rail on
+    wider ones. It swaps layouts live as the viewport crosses the breakpoint
+    (the Material medium width by default, overridable) and preserves the
+    navigation state across the swap, so an application targeting both form
+    factors no longer needs its own switch-and-duplicate logic.
+
+  * touch: scaffold: support a side navigation rail as an alternative to the
+    bottom navigation bar, which moves the application bar and body beside the
+    rail; the rail takes precedence over the bar when both are set.
+
+  * touch: slidable: restore the simpler non-flex markup for a slidable that
+    has a single action, working around a Chrome/Chromium layout bug that
+    left the action text invisible until the next relayout.
+
+  * widget: checkbox: apply the disabled opacity to the box-label variant, so
+    a disabled checkbox using a box-label now also looks disabled.
+
+  * widget: combobox: show the correct label for options whose data loads
+    asynchronously after first paint, which previously kept rendering as raw
+    keys.
+
+  * widget: date field: show a preloaded value in the configured display
+    format right away, instead of its raw stored form until the field is first
+    edited.
+
+  * widget: input panel: generate unique keys for custom children, fixing
+    glitchy rendering when a row held a custom element on both its left and
+    right side.
+
+  * widget: navigation drawer:
+    - add an optional trailing element to menu items, for example a button or
+      status indicator shown after the label.
+    - hide nested submenu entries when an outer menu is collapsed; previously
+      only the direct children were hidden while entries nested deeper stayed
+      visible.
+
+  * widget: search dropdown: highlight the entry under the cursor on hover,
+    making it easier to see which element is currently targeted.
+
+  * widget: selector: only autoselect or apply the default value once, so
+    clearing a combobox and reopening its picker no longer snaps the value
+    back to the default instead of opening.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 21 Jun 2026 21:58:25 +0200
+
+rust-pwt (0.8.8) trixie; urgency=medium
+
+  * touch: fab menu: the Sheet variant now supports unlimited actions, listed
+    in a scrollable bottom sheet that keeps the Cancel button visible; the
+    Material 3 variant allows up to six actions, up from five.
+
+  * touch: side dialog: do not treat dragging or swiping a scrollable child as
+    a dismiss gesture, so scrolling content inside a drawer or bottom sheet no
+    longer closes it; dismissing still works once the content is scrolled to
+    its edge.
+
+  * touch: slidable widget:
+    - add with_left_action() and with_right_action() builder methods to add
+      multiple actions without wrapping them in a row manually.
+    - measure action widths via the bounding client rect to avoid sub-pixel
+      rounding that could wrap action labels.
+
+  * widget: theme mode selector: show a tooltip naming the active mode and use
+    a "desktop" icon for the system theme, which is clearer than the
+    previously used asterisk.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 09 Jun 2026 18:34:24 +0200
+
+rust-pwt (0.8.7) trixie; urgency=medium
+
+  * input panel: track whether the panel contains advanced fields via a
+    has_advanced() getter, and add a matching has_advanced flag to the
+    FormContext, so form containers can auto-show an "Advanced" toggle only
+    when there is something to toggle.
+
+  * message box: add an autofocus_confirm option to focus the confirming
+    (Yes/Ok) button instead of the dismissing (No/Cancel) one.
+
+  * confirm dialog: do not style routine confirmations as errors; default to
+    a neutral question icon with the affirmative button focused, and add a
+    dangerous() option that uses the alerting icon and keeps the safe button
+    focused for destructive actions.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 27 May 2026 19:29:05 +0200
+
+rust-pwt (0.8.6) trixie; urgency=medium
+
+  * widget: charts: map: keep an open info card aligned with its point while
+    the surrounding container is scrolled, instead of leaving it behind.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 27 May 2026 16:38:17 +0200
+
+rust-pwt (0.8.5) trixie; urgency=medium
+
+  * form: selector: re-assert a controlled selector's value after it is
+    cleared in place, so the field no longer stays blank when the parent maps
+    the clear back to the same value.
+
+  * widget: charts: map: fix the info card position on Firefox and stop the
+    invisible positioning anchor from intercepting pointer events over the
+    selected point.
+
+  * widget: charts: world map: expose the maximum zoom level and the info
+    point radius as builder options.
+
+  * widget: dropdown: open the picker above the input when there is too little
+    room below it, cap its height to the available space, and keep a
+    combobox's filter field next to the input field in that case.
+
+  * widget: toolbar: let a focused text input keep the arrow keys for caret
+    movement instead of the toolbar consuming them for navigation.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 26 May 2026 22:56:23 +0200
+
+rust-pwt (0.8.4) trixie; urgency=medium
+
+  * touch: gesture detector: add a pinch-zoom gesture, unify the separate
+    on_drag start/update/end callbacks into a single on_drag, and derive Clone
+    and PartialEq for gesture events.
+
+  * add interactive map and world-map chart widgets supporting zoom, pan,
+    point clustering, touch gestures and GeoJSON rendering.
+
+  * widget: segmented button: expose it as an accessible role="group" with an
+    optional aria-label.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sat, 23 May 2026 22:59:44 +0200
+
+rust-pwt (0.8.3) trixie; urgency=medium
+
+  * switch to Rust 2024 edition.
+
+  * add pie chart widget with gauge, pie and donut variants, supporting
+    customizable colors, tooltips, legends and segment visibility toggling.
+
+  * widget: add 'div' and 'span' convenience helpers for wrapping bare text in
+    flex layouts.
+
+  * widget: svg: allow auto conversion from f64 for SvgLength.
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 10 Apr 2026 17:33:49 +0200
+
+rust-pwt (0.8.2) trixie; urgency=medium
+
+  * gridpicker, combobox: allow auto-selecting the filter field.
+
+  * widget: form: number: fix focusing the input on click by dropping the
+    unneeded .prevent_default() on the mousedown handler.
+
+  * bump serde-wasm-bindgen to 0.6.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 29 Mar 2026 00:15:04 +0100
+
+rust-pwt (0.8.1) trixie; urgency=medium
+
+  * widget: desktop app: expose theme_url_builder property
+
+  * widget: tab panel: mark material tabs with css class for variants
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 19 Feb 2026 17:01:32 +0100
+
+rust-pwt (0.8.0) trixie; urgency=medium
+
+  * Refactor ManagedField trait and state management
+
+  * Add simple Deref/DerefMut macro
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 08 Jan 2026 08:30:34 +0100
+
+rust-pwt (0.7.9) trixie; urgency=medium
+
+  * expose set_dark_mode_on_document_root helper to allow one setting the dark
+    mode class on the document root directly, which is useful for applications
+    that do not use the `ThemeLoader` component.
+
+  * improve Theme and ThemeLoader documentation.
+
+  * props: make RenderFn's return type generic and use that with the type
+    `String` instead of our TextRenderFn, that is now obsolete.
+
+  * widget: drop down combobox: add align_options property to allow
+    customizing the picker alignment.
+
+  * widget: data table: don't fire extra selection change event to avoid
+    multiple selection change events when a user clicks a line in the data
+    table, namely one from the clear, and one from the toggle.
+
+  * state: navigation: add 'replace_relative_route' to NavigationContextExt so
+    we can not only push new relative routes, but also replace the current
+    one.
+
+  * widget: tab panel: improve route handling on creation instead of always
+    pushing the route, replace the route, and only if the selected tab is not
+    the default one.
+
+  * form: generate DateField widget for selecting calendar dates.
+
+  * tab bar: make `TabBarItem::tip` work as intended.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 17 Dec 2025 16:40:24 +0100
+
 rust-pwt (0.7.8) trixie; urgency=medium
 
   * form context: add method to check dirtiness of a specific field.

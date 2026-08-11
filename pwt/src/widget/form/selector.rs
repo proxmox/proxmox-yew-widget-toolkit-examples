@@ -1,4 +1,4 @@
-use anyhow::{bail, Error};
+use anyhow::{Error, bail};
 use derivative::Derivative;
 use serde_json::Value;
 
@@ -7,15 +7,16 @@ use yew::prelude::*;
 use yew::virtual_dom::Key;
 
 use super::{
-    IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldState,
-    ValidateFn,
+    IntoValidateFn, ManagedField, ManagedFieldContext, ManagedFieldMaster, ManagedFieldScopeExt,
+    ManagedFieldState, ValidateFn,
 };
+use crate::AsyncAbortGuard;
 use crate::css;
 use crate::prelude::*;
 use crate::props::{IntoLoadCallback, IntoOptionalRenderFn, LoadCallback, RenderFn};
-use crate::state::{DataStore, Selection};
-use crate::widget::{error_message, Container, Dropdown, DropdownController, Mask, Trigger};
-use crate::AsyncAbortGuard;
+use crate::state::DataStore;
+use crate::state::Selection;
+use crate::widget::{Container, Dropdown, DropdownController, Mask, Trigger, error_message};
 
 use pwt_macros::{builder, widget};
 
@@ -162,10 +163,26 @@ pub enum Msg<S: DataStore> {
 
 #[doc(hidden)]
 pub struct SelectorField<S: DataStore> {
+    state: ManagedFieldState,
     selection: Selection,
+    value_set: bool,
     load_error: Option<String>,
     _store_observer: S::Observer,
     abort_load_guard: Option<AsyncAbortGuard>,
+}
+
+impl<S: DataStore> std::ops::Deref for SelectorField<S> {
+    type Target = ManagedFieldState;
+
+    fn deref(&self) -> &Self::Target {
+        &self.state
+    }
+}
+
+impl<S: DataStore> std::ops::DerefMut for SelectorField<S> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.state
+    }
 }
 
 impl<S: DataStore + 'static> SelectorField<S> {
@@ -173,15 +190,16 @@ impl<S: DataStore + 'static> SelectorField<S> {
         let props = ctx.props();
         let link = ctx.link().clone();
         self.abort_load_guard = None; // abort any previous load
-        if let Some(loader) = props.loader.clone() {
+        if let Some(loader) = &props.loader {
             if !props.is_disabled() {
+                let loader = loader.clone();
                 self.abort_load_guard = Some(AsyncAbortGuard::spawn(async move {
                     let res = loader.apply().await;
                     link.send_message(Msg::LoadResult(res));
                 }));
             }
         } else {
-            // just trigger a data change to set the default value.
+            // if we have no loader, we simply trigger a redraw (ignoring the result)
             link.send_message(Msg::DataChange);
         }
     }
@@ -234,37 +252,24 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
         Ok(Value::String(value))
     }
 
-    fn setup(props: &Self::Properties) -> ManagedFieldState {
-        let default: Value = props.default.as_deref().unwrap_or("").to_string().into();
-
-        let value = if let Some(force_value) = &props.value {
-            force_value.to_string().into()
-        } else {
-            default.clone()
-        };
-
-        ManagedFieldState::new(value, default)
-    }
-
-    fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
-        let props = ctx.props();
-        let state = ctx.state();
-        let key = Key::from(state.value.as_str().unwrap_or(""));
-
-        self.selection.select(key.clone());
-
-        if let Some(on_change) = &props.on_change {
-            on_change.emit(key);
-        }
-    }
-
     fn create(ctx: &ManagedFieldContext<Self>) -> Self {
         let props = ctx.props();
 
-        let default = props.default.as_deref().unwrap_or("").to_string();
+        let value: Value = match &props.value {
+            Some(value) => value.to_string().into(),
+            None => Value::Null,
+        };
+
+        let default = match &props.default {
+            Some(default) => default.to_string().into(),
+            None => Value::Null,
+        };
+
         let selection = Selection::new();
-        if !default.is_empty() {
-            selection.select(default.clone());
+        if let Some(s) = value.as_str() {
+            if !s.is_empty() {
+                selection.select(s.to_string());
+            }
         }
 
         let _store_observer = props
@@ -272,7 +277,9 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
             .add_listener(ctx.link().callback(|_| Msg::DataChange));
 
         let mut me = Self {
+            state: ManagedFieldState::new(value, default),
             selection,
+            value_set: false,
             load_error: None,
             _store_observer,
             abort_load_guard: None,
@@ -281,6 +288,21 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
         me.load(ctx);
 
         me
+    }
+
+    fn value_changed(&mut self, ctx: &super::ManagedFieldContext<Self>) {
+        let props = ctx.props();
+        let key = self
+            .value
+            .as_str()
+            .map(|s| Key::from(s))
+            .unwrap_or(Key::from(""));
+
+        self.selection.select(key.clone());
+
+        if let Some(on_change) = &props.on_change {
+            on_change.emit(key);
+        }
     }
 
     fn update(&mut self, ctx: &ManagedFieldContext<Self>, msg: Self::Message) -> bool {
@@ -307,10 +329,9 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
                 true
             }
             Msg::DataChange => {
-                let state = ctx.state();
-                let value = state.value.as_str().unwrap_or("").to_owned();
+                let value = self.value.as_str().unwrap_or("").to_owned();
 
-                if self.load_error.is_none() && value.is_empty() {
+                if self.load_error.is_none() && value.is_empty() && !self.value_set {
                     let mut default = props.default.clone();
 
                     if default.is_none() && props.autoselect {
@@ -322,6 +343,7 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
                     if let Some(default) = default {
                         ctx.link().update_value(default.to_string());
                         ctx.link().update_default(default.to_string());
+                        self.value_set = true;
                     }
                 }
                 ctx.link().validate(); // re-evaluate
@@ -359,6 +381,16 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
         if props.value != old_props.value {
             ctx.link()
                 .force_value(props.value.as_ref().map(|v| v.to_string()), None);
+        } else if !props.editable && props.input_props.name.is_none() {
+            // A controlled non-editable field cleared in place stays blank if the parent maps the
+            // clear back to the same value, so re-assert. Limited to nameless fields, matching
+            // the `value` prop's documented controlled use. Relies on changed() running, which
+            // Yew only does when some other prop differs between renders.
+            if let Some(value) = &props.value {
+                if self.value.as_str().unwrap_or("").is_empty() && !value.is_empty() {
+                    ctx.link().force_value(Some(value.to_string()), None);
+                }
+            }
         }
 
         if reload {
@@ -370,10 +402,9 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
 
     fn view(&self, ctx: &ManagedFieldContext<Self>) -> Html {
         let props = ctx.props();
-        let state = ctx.state();
 
-        let value = state.value.as_str().unwrap_or("").to_owned();
-        let validation_result = &state.result;
+        let value = self.value.as_str().unwrap_or("").to_owned();
+        let validation_result = &self.result;
 
         let picker = {
             let picker = props.picker.clone();
@@ -427,7 +458,7 @@ impl<S: DataStore + 'static> ManagedField for SelectorField<S> {
 
         let onkeydown = Callback::from({
             let link = ctx.link().clone();
-            move |event: KeyboardEvent| match event.key().as_str() {
+            move |event: KeyboardEvent| match crate::dom::event_key(&event).as_str() {
                 "Delete" | "Backspace" => link.send_message(Msg::DeleteKey),
                 _ => {}
             }
