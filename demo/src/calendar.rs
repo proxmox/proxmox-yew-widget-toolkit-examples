@@ -161,6 +161,7 @@ impl Component for CalendarDemo {
         let grid = CalendarGrid::new(self.anchor.format("Y-m-d"))
             .view(self.view)
             .today(self.today.format("Y-m-d"))
+            .fill_height(true)
             .span_bars(demo_span_bars(self.today))
             .selected_span(self.selected.clone().map(AttrValue::from))
             .render_span_tooltip(|bar: &CalendarSpanBar| {
@@ -175,12 +176,15 @@ impl Component for CalendarDemo {
             .on_day_click(link.callback(Msg::DayClick));
 
         let log_panel = Panel::new().title("Calendar click log").with_child(
-            Container::from_tag("pre").padding(2).with_child({
-                self.logs
-                    .iter()
-                    .map(|t| html! {format!("{t}\n")})
-                    .collect::<Html>()
-            }),
+            Container::from_tag("pre")
+                .padding(2)
+                .height(100)
+                .with_child({
+                    self.logs
+                        .iter()
+                        .map(|t| html! {format!("{t}\n")})
+                        .collect::<Html>()
+                }),
         );
 
         Panel::new()
