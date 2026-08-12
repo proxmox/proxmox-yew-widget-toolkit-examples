@@ -2,10 +2,10 @@ use std::collections::VecDeque;
 
 use pwt::css::FlexFit;
 use pwt::prelude::*;
-use pwt::widget::form::PlainDate;
+use pwt::widget::form::{Combobox, PlainDate};
 use pwt::widget::{
     Button, CalendarGrid, CalendarGridDay, CalendarGridView, CalendarSpanBar, CalendarSpanClick,
-    Container, Panel, Toolbar,
+    Container, FieldLabel, Panel, Toolbar, WeekStart,
 };
 
 static MONTH_NAMES: &[&str] = &[
@@ -60,6 +60,7 @@ pub enum Msg {
     View(CalendarGridView),
     SpanClick(CalendarSpanClick),
     DayClick(CalendarGridDay),
+    SetWeekStart(String),
 }
 
 pub struct CalendarDemo {
@@ -68,6 +69,7 @@ pub struct CalendarDemo {
     view: CalendarGridView,
     selected: Option<String>,
     logs: VecDeque<String>,
+    week_start: String,
 }
 
 impl CalendarDemo {
@@ -104,6 +106,7 @@ impl Component for CalendarDemo {
             view: CalendarGridView::Month,
             selected: None,
             logs: VecDeque::new(),
+            week_start: "Monday".to_string(),
         }
     }
 
@@ -126,6 +129,7 @@ impl Component for CalendarDemo {
                 ));
             }
             Msg::DayClick(day) => self.log(format!("DAY CLICK {}", day.date)),
+            Msg::SetWeekStart(day) => self.week_start = day,
         }
         true
     }
@@ -147,6 +151,22 @@ impl Component for CalendarDemo {
             )
             .with_child(Container::new().padding_x(2).with_child(self.title()))
             .with_flex_spacer()
+            .with_child(FieldLabel::new("Start of the week"))
+            .with_child(
+                Combobox::new()
+                    .items(std::rc::Rc::new(vec![
+                        "Monday".into(),
+                        "Tuesday".into(),
+                        "Wednesday".into(),
+                        "Thursday".into(),
+                        "Friday".into(),
+                        "Saturday".into(),
+                        "Sunday".into(),
+                    ]))
+                    .required(true)
+                    .on_change(link.callback(Msg::SetWeekStart))
+                    .default("Monday"),
+            )
             .with_child(
                 Button::new("Week")
                     .pressed(self.view == CalendarGridView::Week)
@@ -159,6 +179,16 @@ impl Component for CalendarDemo {
             );
 
         let grid = CalendarGrid::new(self.anchor.format("Y-m-d"))
+            .week_start(match self.week_start.as_str() {
+                "Monday" => WeekStart::Monday,
+                "Tuesday" => WeekStart::Tuesday,
+                "Wednesday" => WeekStart::Wednesday,
+                "Thursday" => WeekStart::Thursday,
+                "Friday" => WeekStart::Friday,
+                "Saturday" => WeekStart::Saturday,
+                "Sunday" => WeekStart::Sunday,
+                _ => WeekStart::Monday,
+            })
             .view(self.view)
             .today(self.today.format("Y-m-d"))
             .fill_height(true)
