@@ -17,6 +17,16 @@
 
     @include elevation-background-color($level: 0);
 
+    .pwt-navigation-rail-expand-button {
+        .pwt-action-icon {
+            // the accent color is reserved for the selected item
+            color: var(--pwt-color-on-surface);
+
+            // hide the background for the action icon
+            @include state-layer($base: transparent, $color: transparent);
+        }
+    }
+
     .pwt-navigation-rail-tabs {
         display: flex;
         flex-direction: column;
@@ -33,9 +43,31 @@
             justify-content: center;
             min-width: 64px;
             min-height: 48px;
+            outline: 0;
 
             display: flex;
             flex-direction: column;
+
+            &:focus-visible {
+                border-radius: var(--pwt-nav-link-corner-shape);
+                outline: 2px solid var(--pwt-color-on-surface);
+                outline-offset: -2px;
+
+                .pwt-navigation-rail-icon-container {
+                    width: 56px;
+                    @include elevation-background-color($level: 2, $state: hover);
+                }
+            }
+
+            &.disabled {
+                cursor: auto;
+                opacity: var(--pwt-disabled-opacity);
+
+                .pwt-navigation-rail-icon-container {
+                    cursor: auto;
+                    pointer-events: none;
+                }
+            }
 
             .pwt-navigation-rail-icon-container {
                 cursor: pointer;
@@ -54,7 +86,6 @@
                 width: 24px;
                 transition: width 0.2s;
 
-                &:focus-within,
                 &:hover {
                     width: 56px;
                     @include elevation-background-color($level: 2, $state: hover);
@@ -99,6 +130,13 @@
         min-width: 220px;
         max-width: 360px;
 
+        // the expanded rail lines its content up at the inline start, the margin matches the item
+        // padding so the button keeps sitting above the item icons
+        .pwt-navigation-rail-expand-button {
+            align-self: flex-start;
+            margin-inline-start: var(--pwt-spacer-2);
+        }
+
         .pwt-navigation-rail-tabs {
             align-self: stretch;
 
@@ -113,6 +151,15 @@
                 min-height: 56px;
 
                 @include state-layer();
+
+                &.disabled {
+                    cursor: auto;
+                }
+
+                &:focus-visible .pwt-navigation-rail-icon-container {
+                    width: 24px;
+                    background-color: transparent;
+                }
 
                 &.active {
                     color: var(--pwt-accent-color);

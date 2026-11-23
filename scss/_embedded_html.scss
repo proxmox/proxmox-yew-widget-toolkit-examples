@@ -17,11 +17,13 @@
     ul {
         list-style: revert;
         padding: revert;
+        margin: revert;
     }
 
     ol {
         list-style: revert;
         padding: revert;
+        margin: revert;
     }
 
     // space between list items
@@ -43,7 +45,7 @@
     }
 
     strong {
-        font-variation-settings: "wght" 700; // works with Roboto Flex
+        font-weight: bold;
     }
 
     em {

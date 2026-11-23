@@ -1,11 +1,10 @@
 /// ### The "Material" Theme
 ///
-/// This theme is intended for use on mobile/touch devices and uses a very
-/// large `10px` spacer. It is broadly similar to material design as
-/// described in <https://m3.material.io/>.
+/// This theme uses an `8px` default spacer, with relaxed spacing and coarse-pointer control sizing
+/// available. It is broadly similar to Material Design as described in <https://m3.material.io/>.
 ///
 
-$spacer: 10px;
+$spacer: 8px;
 
 $button-corner-shape: map-get($shape-corner, full);
 $fab-corner-shape: map-get($shape-corner, large);

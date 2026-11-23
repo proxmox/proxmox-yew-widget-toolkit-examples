@@ -318,6 +318,14 @@ input {
     }
 }
 
+// The browsers keep their own placeholder grey whatever the scheme. Chromium's #757575 reads at
+// about 2:1 on a dark field; the variant tone 80 keeps 4.5:1 there and still reads lighter than
+// the field's text.
+:root.pwt-dark-mode ::placeholder {
+    color: var(--pwt-color-neutral-alt-80);
+    opacity: 1;
+}
+
 .pwt-input-display {
     font-size: map-get($font-size, "body-medium");
     line-height: map-get($line-height, "body-medium");
@@ -340,4 +348,9 @@ input::-webkit-inner-spin-button {
 input::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+// Firefox has no pseudo-elements for the spin buttons, only the text field appearance hides them.
+input[type="number"] {
+    appearance: textfield;
 }

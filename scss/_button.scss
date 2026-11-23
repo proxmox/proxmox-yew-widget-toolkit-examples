@@ -92,6 +92,12 @@ button,
         &.pwt-button-text {
             @include color-scheme-vars("inverse-surface", $important: true);
         }
+
+        // A button busy with its own action shows a spinning icon. Keep it legible, so the
+        // progress reads as such and not as an action that is unavailable.
+        &:has(.fa-spin) {
+            opacity: 1;
+        }
     }
 
     &.medium {

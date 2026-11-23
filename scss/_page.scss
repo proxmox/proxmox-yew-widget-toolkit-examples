@@ -3,6 +3,8 @@
     --page-animation-in: page-animation-push-in var(--page-animation-time) ease-out;
     --page-animation-out: page-animation-push-out var(--page-animation-time) ease-out;
     --page-animation-rtl-factor: 1;
+    // Material's emphasized easing, as used by the Android page transition
+    --page-animation-emphasized-easing: cubic-bezier(0.2, 0, 0, 1);
 }
 
 html[dir="rtl"] {
@@ -24,6 +26,11 @@ html[dir="rtl"] {
     box-sizing: border-box;
 
     display: none !important;
+
+    // Going back plays the animations in reverse, unless a style sets its own way back.
+    // Reset here so that a nested page stack does not inherit them.
+    --page-animation-in-reverse: initial;
+    --page-animation-out-reverse: initial;
 }
 
 @keyframes page-animation-push-in {
@@ -66,25 +73,120 @@ html[dir="rtl"] {
     }
 }
 
+// Like the Android page transition: both pages move by a quarter of the width, the page that goes
+// away fades out quickly and the page that appears fades in over most of the animation, in either
+// direction.
 @keyframes page-animation-fade-from-right-in {
     from {
         opacity: 0;
-        transform: translateX(calc(10% *var(--page-animation-rtl-factor)));
+        transform: translateX(calc(25% * var(--page-animation-rtl-factor)));
+    }
+    75% {
+        opacity: 1;
     }
     to {
         opacity: 1;
-        transform: translateX(0%);
+        transform: translateX(0);
     }
 }
 
+@keyframes page-animation-fade-from-right-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    25% {
+        opacity: 0;
+    }
+    to {
+        opacity: 0;
+        transform: translateX(calc(-25% * var(--page-animation-rtl-factor)));
+    }
+}
+
+@keyframes page-animation-fade-from-right-in-reverse {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    25% {
+        opacity: 0;
+    }
+    to {
+        opacity: 0;
+        transform: translateX(calc(25% * var(--page-animation-rtl-factor)));
+    }
+}
+
+@keyframes page-animation-fade-from-right-out-reverse {
+    from {
+        opacity: 0;
+        transform: translateX(calc(-25% * var(--page-animation-rtl-factor)));
+    }
+    75% {
+        opacity: 1;
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+// The vertical counterpart of fade from right: both pages move up by a tenth of the height, which
+// is about as far as fade from right moves sideways on a portrait screen.
 @keyframes page-animation-fade-from-bottom-in {
     from {
         opacity: 0;
         transform: translateY(10%);
     }
+    75% {
+        opacity: 1;
+    }
     to {
         opacity: 1;
-        transform: translateY(0%);
+        transform: translateY(0);
+    }
+}
+
+@keyframes page-animation-fade-from-bottom-out {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    25% {
+        opacity: 0;
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+}
+
+@keyframes page-animation-fade-from-bottom-in-reverse {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    25% {
+        opacity: 0;
+    }
+    to {
+        opacity: 0;
+        transform: translateY(10%);
+    }
+}
+
+@keyframes page-animation-fade-from-bottom-out-reverse {
+    from {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+    75% {
+        opacity: 1;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -134,7 +236,7 @@ html[dir="rtl"] {
 
 @keyframes page-animation-cover-in {
     from {
-        transform: translateX(100%);
+        transform: translateX(calc(100% * var(--page-animation-rtl-factor)));
         transform-origin: left;
     }
     to {
@@ -154,6 +256,49 @@ html[dir="rtl"] {
     }
 }
 
+// The page below moves slower and darkens, so the new page appears to slide over it.
+@keyframes page-animation-parallax-in {
+    from {
+        transform: translateX(calc(100% * var(--page-animation-rtl-factor)));
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes page-animation-parallax-out {
+    from {
+        transform: translateX(0);
+        filter: brightness(1);
+    }
+    to {
+        transform: translateX(calc(-30% * var(--page-animation-rtl-factor)));
+        filter: brightness(0.8);
+    }
+}
+
+@keyframes page-animation-zoom-in {
+    from {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes page-animation-zoom-out {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(1.05);
+    }
+}
+
 .pwt-page-container.pwt-page-visible {
     display: block !important;
 }
@@ -165,7 +310,7 @@ html[dir="rtl"] {
 
 .pwt-page-container.pwt-page-shrink-reverse {
     display: block !important;
-    animation: var(--page-animation-out) reverse;
+    animation: var(--page-animation-out-reverse, var(--page-animation-out) reverse);
 }
 
 .pwt-page-container.pwt-page-grow {
@@ -175,7 +320,7 @@ html[dir="rtl"] {
 
 .pwt-page-container.pwt-page-grow-reverse {
     display: block !important;
-    animation: var(--page-animation-in) reverse;
+    animation: var(--page-animation-in-reverse, var(--page-animation-in) reverse);
 }
 
 .pwt-page-animation-fade {
@@ -184,13 +329,25 @@ html[dir="rtl"] {
 }
 
 .pwt-page-animation-fade-from-right {
-    --page-animation-in: page-animation-fade-from-right-in var(--page-animation-time) ease-out;
-    --page-animation-out: page-animation-fade-out var(--page-animation-time) ease-out;
+    --page-animation-in: page-animation-fade-from-right-in var(--page-animation-time)
+        var(--page-animation-emphasized-easing);
+    --page-animation-out: page-animation-fade-from-right-out var(--page-animation-time)
+        var(--page-animation-emphasized-easing);
+    --page-animation-in-reverse: page-animation-fade-from-right-in-reverse
+        var(--page-animation-time) var(--page-animation-emphasized-easing);
+    --page-animation-out-reverse: page-animation-fade-from-right-out-reverse
+        var(--page-animation-time) var(--page-animation-emphasized-easing);
 }
 
 .pwt-page-animation-fade-from-bottom {
-    --page-animation-in: page-animation-fade-from-bottom-in var(--page-animation-time) ease-out;
-    --page-animation-out: page-animation-fade-out var(--page-animation-time) ease-out;
+    --page-animation-in: page-animation-fade-from-bottom-in var(--page-animation-time)
+        var(--page-animation-emphasized-easing);
+    --page-animation-out: page-animation-fade-from-bottom-out var(--page-animation-time)
+        var(--page-animation-emphasized-easing);
+    --page-animation-in-reverse: page-animation-fade-from-bottom-in-reverse
+        var(--page-animation-time) var(--page-animation-emphasized-easing);
+    --page-animation-out-reverse: page-animation-fade-from-bottom-out-reverse
+        var(--page-animation-time) var(--page-animation-emphasized-easing);
 }
 
 .pwt-page-animation-flip {
@@ -202,4 +359,98 @@ html[dir="rtl"] {
 .pwt-page-animation-cover {
     --page-animation-in: page-animation-cover-in var(--page-animation-time) ease-out;
     --page-animation-out: page-animation-cover-out var(--page-animation-time) ease-out;
+}
+
+.pwt-page-animation-parallax {
+    --page-animation-in: page-animation-parallax-in var(--page-animation-time) ease-out;
+    --page-animation-out: page-animation-parallax-out var(--page-animation-time) ease-out;
+}
+
+.pwt-page-animation-zoom {
+    --page-animation-in: page-animation-zoom-in var(--page-animation-time) ease-out;
+    --page-animation-out: page-animation-zoom-out var(--page-animation-time) ease-out;
+}
+
+// A floating action button does not move with the page content. It hides while its page animates
+// and appears in place once the page arrived. Not with visibility: buttons transition all their
+// properties, and a button that inherits visible again stays hidden for the first frame.
+@keyframes page-fab-scale-in {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.pwt-page-container:is(
+        .pwt-page-grow,
+        .pwt-page-shrink,
+        .pwt-page-grow-reverse,
+        .pwt-page-shrink-reverse
+    )
+    .pwt-scaffold-fab {
+    opacity: 0;
+    pointer-events: none;
+}
+
+// A button that flew to its place is already there.
+.pwt-page-container.pwt-page-visible .pwt-scaffold-fab:not(.pwt-hero-landed) {
+    animation: page-fab-scale-in calc(var(--page-animation-time) / 2)
+        var(--page-animation-emphasized-easing);
+}
+
+// Heroes fly from the old page to the new one in a layer above both pages. The page stack places
+// the flying copy at the target and sets the transform it starts from.
+.pwt-page-hero-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+@keyframes page-hero-flight {
+    from {
+        transform: var(--pwt-hero-from);
+    }
+    to {
+        transform: none;
+    }
+}
+
+.pwt-page-hero-layer .pwt-hero-flight {
+    transform-origin: 0 0;
+    animation: page-hero-flight var(--page-animation-time) var(--page-animation-emphasized-easing)
+        both;
+}
+
+// Not with visibility, see the floating action button above.
+.pwt-hero-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+// Set while the page stack measures where the heroes of the new page end up.
+.pwt-page-outer.pwt-page-measure > .pwt-page-container {
+    animation: none !important;
+}
+
+// Users who asked their system for less motion get a plain cross-fade. The animation itself must
+// stay, as the page stack waits for its end.
+@media (prefers-reduced-motion: reduce) {
+    .pwt-page-outer .pwt-page-container {
+        --page-animation-in: page-animation-fade-in var(--page-animation-time) ease-out;
+        --page-animation-out: page-animation-fade-out var(--page-animation-time) ease-out;
+        --page-animation-in-reverse: initial;
+        --page-animation-out-reverse: initial;
+    }
+
+    .pwt-page-container.pwt-page-visible .pwt-scaffold-fab:not(.pwt-hero-landed) {
+        animation-name: page-animation-fade-in;
+    }
+
+    // The hero waits at its destination while the pages cross-fade.
+    .pwt-page-hero-layer .pwt-hero-flight {
+        animation: none;
+    }
 }
