@@ -17,6 +17,8 @@ We currently have the following example:
    how they interact with the form context.
 * `loader`:  Async load data and correcty show load mask and load  errors.
 * `themes`: Show available themes.
+* `mobile-demo`: Travel explorer app showing the widgets for touch devices,
+   like hero animations, swipeable pages, and bottom sheets.
 
 The rest of the examples is experimental, unfinished code
 for mobile devices:
