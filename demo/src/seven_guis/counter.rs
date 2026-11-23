@@ -11,15 +11,15 @@ pub fn Counter() -> Html {
         })
         .into();
 
-    Row::new()
+    Panel::new()
+        .border(true)
+        .title("Counter")
         .with_child(
-            Panel::new().border(true).title("Counter").with_child(
-                Row::new()
-                    .class("pwt-align-items-center")
-                    .padding(2)
-                    .gap(2)
-                    .children([label, button]),
-            ),
+            Row::new()
+                .class("pwt-align-items-center")
+                .padding(2)
+                .gap(2)
+                .children([label, button]),
         )
         .into()
 }

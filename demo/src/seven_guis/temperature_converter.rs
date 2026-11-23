@@ -1,6 +1,6 @@
 use pwt::prelude::*;
 use pwt::widget::form::Field;
-use pwt::widget::{InputPanel, Panel, Row};
+use pwt::widget::{InputPanel, Panel};
 
 pub struct TemperatureConverter {
     celsius: Option<f64>,
@@ -59,13 +59,10 @@ impl Component for TemperatureConverter {
                     .on_input(ctx.link().callback(Msg::Fahrenheit)),
             );
 
-        Row::new()
-            .with_child(
-                Panel::new()
-                    .border(true)
-                    .title("Temperature Converter (Controlled)")
-                    .with_child(body),
-            )
+        Panel::new()
+            .border(true)
+            .title("Temperature Converter (Controlled)")
+            .with_child(body)
             .into()
     }
 }

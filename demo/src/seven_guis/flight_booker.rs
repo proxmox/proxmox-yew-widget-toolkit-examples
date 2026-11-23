@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use pwt::prelude::*;
 use pwt::widget::form::{Combobox, Field, InputType};
-use pwt::widget::{Button, Column, Container, Panel, Row};
+use pwt::widget::{Button, Column, Container, Panel};
 
 thread_local! {
     static FLIGHT_MODE: Rc<Vec<AttrValue>> = Rc::new(vec![
@@ -150,13 +150,10 @@ impl Component for FlightBooker {
             None => self.view_form(ctx),
         };
 
-        Row::new()
-            .with_child(
-                Panel::new()
-                    .border(true)
-                    .title("Flight Booker")
-                    .with_child(body),
-            )
+        Panel::new()
+            .border(true)
+            .title("Flight Booker")
+            .with_child(body)
             .into()
     }
 }

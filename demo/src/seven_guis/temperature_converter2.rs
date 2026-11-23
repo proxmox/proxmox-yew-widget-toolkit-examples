@@ -1,6 +1,6 @@
 use pwt::prelude::*;
 use pwt::widget::form::{Field, Form, FormContext};
-use pwt::widget::{InputPanel, Panel, Row};
+use pwt::widget::{InputPanel, Panel};
 
 pub struct TemperatureConverter2 {
     form_ctx: FormContext,
@@ -76,13 +76,10 @@ impl Component for TemperatureConverter2 {
                 ),
         );
 
-        Row::new()
-            .with_child(
-                Panel::new()
-                    .border(true)
-                    .title("Temperature Converter (FormContext)")
-                    .with_child(body),
-            )
+        Panel::new()
+            .border(true)
+            .title("Temperature Converter (FormContext)")
+            .with_child(body)
             .into()
     }
 }
