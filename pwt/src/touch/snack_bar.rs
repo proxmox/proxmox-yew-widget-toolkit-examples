@@ -101,7 +101,6 @@ impl IntoVTag for SnackBar {
         if let Some(action_label) = &self.action_label {
             children.push(
                 Button::new(action_label.clone())
-                    .class("pwt-button-filled")
                     .class("pwt-snackbar-action")
                     .class("pwt-scheme-inverse-surface")
                     .onclick({
@@ -118,6 +117,8 @@ impl IntoVTag for SnackBar {
         if self.show_close_icon {
             children.push(
                 ActionIcon::new("fa fa-lg fa-close")
+                    .tabindex(0)
+                    .aria_label(crate::tr!("Close"))
                     .on_activate(
                         self.on_close
                             .clone()

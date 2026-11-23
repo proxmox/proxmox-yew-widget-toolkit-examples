@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use web_sys::{ResizeObserverBoxOptions, ResizeObserverOptions};
 use yew::html::{IntoEventCallback, IntoPropValue};
 use yew::virtual_dom::{Key, VComp, VNode};
 
@@ -7,7 +8,6 @@ use crate::dom::focus::roving_tabindex_next;
 use crate::dom::{DomSizeObserver, IntoHtmlElement, element_direction_rtl};
 use crate::props::{IntoStorageLocation, StorageLocation};
 use crate::state::{NavigationContext, NavigationContextExt, PersistentState, Selection};
-use crate::web_sys_ext::{ResizeObserverBoxOptions, ResizeObserverOptions};
 use crate::widget::{Container, Tooltip};
 use crate::{impl_class_prop_builder, impl_yew_std_props_builder, prelude::*};
 
@@ -159,6 +159,8 @@ pub enum Msg {
     Select(Option<Key>, bool),
     SelectionChange(Selection),
     UpdateIndicator,
+    /// The box that scrolls the bar sideways changed width.
+    ScrollerResize,
 }
 
 #[doc(hidden)]
@@ -173,6 +175,12 @@ pub struct PwtTabBar {
     active_ref: NodeRef,
     size_ref: NodeRef,
     active_size_observer: Option<DomSizeObserver>,
+    /// The tab last kept in view, so a render without a switch leaves the reader's own scrolling
+    /// of the bar alone.
+    shown_active: Option<Key>,
+    /// Watches the box that scrolls the bar sideways, and which box it is: a mini scroll shows
+    /// its arrows only after measuring, which narrows the box and can cut off the open tab again.
+    scroller_observer: Option<(web_sys::Element, DomSizeObserver)>,
 }
 
 fn get_active_or_default(props: &TabBar, active: &Option<Key>) -> Option<Key> {
@@ -181,11 +189,18 @@ fn get_active_or_default(props: &TabBar, active: &Option<Key>) -> Option<Key> {
     }
 
     if let Some(active_key) = active.as_deref() {
-        if !active_key.is_empty() && active_key != "_" {
+        if !active_key.is_empty() && active_key != "_" && has_tab(props, active_key) {
             return active.clone();
         }
     }
     props.get_default_active()
+}
+
+/// Whether one of the bar's tabs carries `key`. A key none does, such as a stale link or a saved
+/// tab the reader may no longer see, would select no tab at all, so it falls back like an empty
+/// one. A bar without tabs yet cannot tell, and keeps the key.
+fn has_tab(props: &TabBar, key: &str) -> bool {
+    props.tabs.is_empty() || props.tabs.iter().any(|tab| tab.key.as_deref() == Some(key))
 }
 
 impl PwtTabBar {
@@ -238,7 +253,7 @@ impl Component for PwtTabBar {
 
         if let Some(active_cache) = &active_cache {
             let last_active: &str = active_cache;
-            if !last_active.is_empty() {
+            if !last_active.is_empty() && has_tab(props, last_active) {
                 active = Some(Key::from(last_active));
             }
         }
@@ -288,6 +303,8 @@ impl Component for PwtTabBar {
             active_ref: NodeRef::default(),
             size_ref: NodeRef::default(),
             active_size_observer: None,
+            shown_active: None,
+            scroller_observer: None,
         }
     }
 
@@ -347,6 +364,12 @@ impl Component for PwtTabBar {
                 }
 
                 true
+            }
+            Msg::ScrollerResize => {
+                if let Some(element) = self.active_ref.clone().into_html_element() {
+                    keep_in_view_sideways(&element, &self.node_ref);
+                }
+                false
             }
             Msg::UpdateIndicator => {
                 let use_full_width = match ctx.props().style {
@@ -528,10 +551,40 @@ impl Component for PwtTabBar {
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
+        // The open tab as drawn, which a forced `active` decides over the bar's own record.
+        let active = get_active_or_default(ctx.props(), &self.active);
+        if self.shown_active != active {
+            // A tab that is not drawn yet is brought into view once it is.
+            if let Some(element) = self.active_ref.clone().into_html_element() {
+                keep_in_view_sideways(&element, &self.node_ref);
+                self.shown_active = active;
+            }
+        }
+        let scroller = self
+            .active_ref
+            .clone()
+            .into_html_element()
+            .and_then(|tab| sideways_scroller(&tab, &self.node_ref));
+        match scroller {
+            None => self.scroller_observer = None,
+            Some(scroller) => {
+                if self
+                    .scroller_observer
+                    .as_ref()
+                    .is_none_or(|(watched, _)| *watched != scroller)
+                {
+                    let link = ctx.link().clone();
+                    let observer = DomSizeObserver::new(&scroller, move |_: (f64, f64)| {
+                        link.send_message(Msg::ScrollerResize)
+                    });
+                    self.scroller_observer = Some((scroller, observer));
+                }
+            }
+        }
         let link = ctx.link().clone();
         if let Some(element) = self.active_ref.clone().into_html_element() {
-            let mut options = ResizeObserverOptions::new();
-            options.box_(ResizeObserverBoxOptions::BorderBox);
+            let options = ResizeObserverOptions::new();
+            options.set_box(ResizeObserverBoxOptions::BorderBox);
             self.active_size_observer = Some(DomSizeObserver::new_with_options(
                 &element,
                 move |(_, _)| {
@@ -543,6 +596,42 @@ impl Component for PwtTabBar {
             self.active_size_observer = None;
         }
     }
+}
+
+/// Scroll the nearest ancestor that scrolls sideways, such as a narrow screen's tab bar, just far
+/// enough to show `tab` whole. Only sideways: a bar further down a page must not pull the page up.
+fn keep_in_view_sideways(tab: &web_sys::HtmlElement, bar_ref: &NodeRef) {
+    let Some(el) = sideways_scroller(tab, bar_ref) else {
+        return;
+    };
+    let (bar, item) = (
+        el.get_bounding_client_rect(),
+        tab.get_bounding_client_rect(),
+    );
+    let delta = if item.left() < bar.left() {
+        item.left() - bar.left()
+    } else if item.right() > bar.right() {
+        item.right() - bar.right()
+    } else {
+        return;
+    };
+    el.set_scroll_left(el.scroll_left() + delta.round() as i32);
+}
+
+/// The nearest ancestor of the tab whose content is wider than its box, because the bar does not
+/// fit into it. Other content can make an ancestor overflow too, like a page sliding in from the
+/// side of a page stack, which must not be scrolled.
+fn sideways_scroller(tab: &web_sys::HtmlElement, bar_ref: &NodeRef) -> Option<web_sys::Element> {
+    let bar_width = bar_ref.cast::<web_sys::Element>()?.scroll_width();
+    let mut node = tab.parent_element();
+    while let Some(el) = node {
+        let width = el.client_width();
+        if el.scroll_width() > width && bar_width > width {
+            return Some(el);
+        }
+        node = el.parent_element();
+    }
+    None
 }
 
 impl From<TabBar> for VNode {

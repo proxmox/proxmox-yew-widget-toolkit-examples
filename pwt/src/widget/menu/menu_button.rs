@@ -28,6 +28,13 @@ pub struct MenuButton {
     #[prop_or_default]
     pub icon_class: Option<Classes>,
 
+    /// Accessible name for the button. Defaults to its text content when omitted.
+    ///
+    /// Set the name through this property instead of a standard `aria-label` attribute.
+    #[prop_or_default]
+    #[builder(IntoPropValue, into_prop_value)]
+    pub aria_label: Option<AttrValue>,
+
     /// Optional Submenu
     #[prop_or_default]
     pub menu: Option<Menu>,
@@ -104,7 +111,7 @@ pub enum Msg {
     ShowMenu,
     CloseMenu,
     FocusChange(bool),
-    Controller, // MenuController has new messages
+    Controller(Vec<MenuControllerMsg>),
 }
 
 #[doc(hidden)]
@@ -127,14 +134,7 @@ impl PwtMenuButton {
         }
     }
 
-    fn handle_controller_messages(&mut self, ctx: &Context<Self>) {
-        let count = self.menu_controller.state.read().len();
-        if count == 0 {
-            return;
-        } // Note: avoid endless loop
-
-        let list = self.menu_controller.state.write().split_off(0);
-
+    fn handle_controller_messages(&mut self, ctx: &Context<Self>, list: Vec<MenuControllerMsg>) {
         for msg in list.into_iter() {
             match msg {
                 MenuControllerMsg::Open => {
@@ -167,9 +167,8 @@ impl Component for PwtMenuButton {
             .clone()
             .unwrap_or_else(|| MenuController::new());
 
-        let _menu_controller_observer = menu_controller
-            .state
-            .add_listener(ctx.link().callback(|_| Msg::Controller));
+        let _menu_controller_observer =
+            menu_controller.add_listener(ctx.link().callback(Msg::Controller));
 
         let focus_tracker = FocusTracker::new(ctx.link().callback(Msg::FocusChange));
 
@@ -187,8 +186,8 @@ impl Component for PwtMenuButton {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         let props = ctx.props();
         match msg {
-            Msg::Controller => {
-                self.handle_controller_messages(ctx);
+            Msg::Controller(list) => {
+                self.handle_controller_messages(ctx, list);
                 true
             }
             Msg::ShowMenu => {
@@ -244,17 +243,19 @@ impl Component for PwtMenuButton {
                 .into_html_with_ref(self.submenu_ref.clone())
         });
 
-        let mut button = Button::new(&props.text)
+        let mut button = Button::new(&props.text);
+        button.std_props = props.std_props.clone();
+        button.listeners = props.listeners.clone();
+
+        let button = button
             .node_ref(self.align_ref.clone())
+            .aria_label(props.aria_label.clone())
             .show_arrow(props.show_arrow)
             .disabled(props.disabled)
             .attribute("aria-haspopup", "true")
             .attribute("aria-expanded", self.show_submenu.then_some("true"))
             .tabindex(props.tabindex)
             .icon_class(props.icon_class.clone());
-
-        button.std_props = props.std_props.clone();
-        button.listeners = props.listeners.clone();
 
         let show_submenu = self.show_submenu;
         let autoshow_menu = props.autoshow_menu;

@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use std::rc::Rc;
 
 use derivative::Derivative;
@@ -13,7 +12,9 @@ use pwt_macros::builder;
 
 use crate::prelude::*;
 use crate::props::{IntoOptionalRenderFn, RenderFn};
-use crate::state::{NavigationContainer, SharedState, SharedStateObserver};
+use crate::state::{
+    NavigationContainer, NavigationContext, SharedState, SharedStateObserver, strip_basename,
+};
 use crate::touch::{PageAnimationStyle, SnackBarController, SnackBarManager};
 use crate::widget::{CatalogLoader, Container, ThemeLoader};
 
@@ -137,6 +138,16 @@ impl PageController {
 /// More specifically, each route can reeturn a stack of pages.
 /// Internally, this stack is passed to a [PageStack] widget that provides
 /// animations when switching between pages.
+///
+/// Each page gets the [NavigationContext] of the route it was rendered for, so
+/// a page leaving the stack does not follow the new route while it animates out.
+/// Pages should therefore get their route from the render function or that
+/// context, and not from the `yew_router` location (`Switch`, `use_location`),
+/// which is always the current one.
+///
+/// Give a page a key if it takes values from the route as properties, like the ID of
+/// the item it shows. It is then updated when the route changes, instead of created
+/// again, which would lose its state.
 ///
 /// First, one usually defines a routable enum to express routes using
 /// static rust types. Then you define you render functions to map the
@@ -382,9 +393,8 @@ impl Component for PwtMaterialApp {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
 
-        let basename: Option<AttrValue> = None;
         let location = self.history.location();
-        let path = strip_basename(&basename, location.path().into());
+        let path = strip_basename(props.basename.as_deref(), location.path());
 
         let mut page_stack = Vec::new();
 
@@ -394,7 +404,11 @@ impl Component for PwtMaterialApp {
 
         let app = Container::new()
             .class("pwt-viewport")
-            .with_child(PageStack::new(page_stack).animation_style(props.page_animation))
+            .with_child(
+                PageStack::new(page_stack)
+                    .animation_style(props.page_animation)
+                    .navigation_context(NavigationContext::from_path(&path)),
+            )
             .with_child(
                 SnackBarManager::new()
                     .controller(self.snackbar_controller.clone())
@@ -454,25 +468,6 @@ impl PageRenderFn {
 impl<F: 'static + Fn(&str) -> Vec<Html>> From<F> for PageRenderFn {
     fn from(renderer: F) -> Self {
         PageRenderFn(Rc::new(renderer))
-    }
-}
-
-// copied from yew_router::Router, because its not acessible from outside
-fn strip_basename<'a>(basename: &Option<AttrValue>, path: Cow<'a, str>) -> Cow<'a, str> {
-    match basename.as_deref() {
-        Some(m) => {
-            let mut path = path
-                .strip_prefix(m)
-                .map(|m| Cow::from(m.to_owned()))
-                .unwrap_or(path);
-
-            if !path.starts_with('/') {
-                path = format!("/{m}").into();
-            }
-
-            path
-        }
-        None => path,
     }
 }
 
