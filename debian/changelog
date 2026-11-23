@@ -1,3 +1,199 @@
+rust-pwt (0.8.23) trixie; urgency=medium
+
+  * button: translate the refresh button's accessible name and also show it
+    as its tooltip, so applications no longer set both on every refresh
+    button.
+
+  * date field: add an input callback with the entered text and the date it
+    reads as, so a component that controls the value can keep a partly typed
+    date instead of clearing it.
+
+  * data table: extend the selection to rows added later only after the
+    table's own select-all. Selecting the single row a filter left could
+    select every row once the filter widened. Selecting all current keys
+    programmatically no longer opts into extending the selection.
+
+  * calendar grid: optionally mark days whose bars do not all show, with the
+    number of bars below the visible part for the theme to display, since
+    overlay scrollbars do not reveal that a day holds more.
+
+  * dropdown: close the picker on Tab, and on Enter while it is open instead
+    of submitting the surrounding form. Keys that accept an input method
+    candidate are left alone.
+
+  * use the ResizeObserver bindings from web-sys instead of an own copy.
+    DomSizeObserver::new_with_options now takes web_sys::ResizeObserverOptions,
+    and the doc-hidden web_sys_ext module is gone.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 01 Nov 2026 23:04:28 +0100
+
+rust-pwt (0.8.22) trixie; urgency=medium
+
+  * data table:
+    - add a sample store, whose records are rendered invisibly to size
+      columns without an explicit width, such as an action column whose
+      icons should always fit in every theme and density.
+    - keep a column hidden through the header menu when the parent creates
+      the headers anew on each render, as the running tasks list does.
+    - follow a store, selection or cell configuration passed after the
+      table was created, instead of only the first ones.
+    - header: let the arrow keys move from a group header, and skip hidden
+      columns.
+
+  * loader: center the loading placeholder, which sat left-aligned.
+
+  * menu: close a menu button's menu after a mouse click on an item, as a
+    keyboard pick already did. Split buttons and menubars use the same
+    mechanism and are fixed as well.
+
+  * menu button: keep the aria-haspopup and aria-expanded attributes, so
+    assistive technology announces it as a button that opens a menu.
+
+  * calendar grid:
+    - let pinned bars share a lane across priorities, so a week no longer
+      reserves an empty lane for its bars below a higher-priority one.
+    - add an optional detail to span bars, drawn after the label, such as
+      an event's hours, which a theme can show only while it fits.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 27 Oct 2026 15:12:41 +0100
+
+rust-pwt (0.8.21) trixie; urgency=medium
+
+  * navigation drawer:
+    - fix #8057: keep the menu scrollable in Firefox when submenus make it
+      taller than the window. Firefox shrank the submenus instead, so their
+      entries were cut off and could not be reached.
+    - open a submenu that starts collapsed on the first click of its arrow,
+      not only on the second.
+    - add the state_id option, which stores which submenus are open, so they
+      keep their last state across page loads.
+
+  * store, tree store: fix a panic when a change listener accesses the
+    store. Listeners were notified while the store was still locked by
+    the write that triggered them.
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 15 Oct 2026 15:51:54 +0200
+
+rust-pwt (0.8.20) trixie; urgency=medium
+
+  * calendar grid: add the hide_weekends option, which leaves out Saturday
+    and Sunday so the five working days share the full width. A bar running
+    over a hidden weekend continues as one bar from Friday to Monday, and a
+    month starting on a weekend opens on its first working week.
+
+  * calendar grid: add the stable_lanes option, which keeps each bar in one
+    lane on all days of a week row it covers and scrolls the cells of a row
+    together. It is off by default, as it leaves gaps and takes more height;
+    bars then still move up a lane as earlier ones end.
+
+  * data table: base the row height estimate on the actual layout. A table
+    laid out before its header reported the column widths could estimate
+    rows hundreds of pixels tall, which made the scroll area far too long
+    and left blank areas while scrolling.
+
+  * grid picker: open with the selected entry in view, also in long lists
+    such as the time zone selector, which always opened at the top.
+
+  * split button: give the menu arrow an accessible name, "More" by default,
+    and add the menu_aria_label property to set a more specific one.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 11 Oct 2026 14:59:09 +0200
+
+rust-pwt (0.8.19) trixie; urgency=medium
+
+  * mini scroll:
+    - show the scroll arrows also when the content overflows by less than
+      two arrow widths. They could stay hidden after the first render,
+      leaving the end of a tab bar or toolbar cut off with no way to scroll
+      to it.
+    - follow a scroll it did not make itself, such as keyboard focus moving
+      to an item out of view, so its arrows show the right state and the
+      next arrow step continues from the actual position.
+
+  * date field:
+    - refuse an empty value when the field is required, like the other
+      input fields do.
+    - show the correct ISO week numbers in the date picker. They could be
+      one too high, for example the first week of 2027 showed as week 2.
+
+  * dialog: keep a dialog centered while its content grows, for example
+    after loading, until the user moves or resizes it.
+
+  * tab bar:
+    - scroll the open tab into view in a bar that scrolls sideways, such as
+      a tab bar inside a mini scroll on a narrow screen.
+    - open the default tab when the requested key, for example from an old
+      link, matches no tab, instead of showing no tab as selected.
+
+  * grid picker: translate the filter label and link it to its input field.
+
+  * data table: use the column name as tooltip of its header, so a header
+    cut off by a narrow column can still be read.
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 05 Oct 2026 07:31:52 +0200
+
+rust-pwt (0.8.18) trixie; urgency=medium
+
+  * shared state: fix a panic that could occur when removing listeners.
+
+  * loader: fix refresh buttons that remain busy after a load is canceled.
+    Cancel pending loads when the last loader handle is released.
+
+  * dialog:
+    - keep dialog buttons visible when expanded details or error messages
+      increase the dialog's size.
+    - prevent text selection while dragging side dialogs, so later drags
+      can still close them.
+    - allow applications to keep a dialog open while asking whether to
+      discard changes, preserving entered data and blocking interaction
+      with the page behind it.
+
+  * form: add a check for changed input that does not count validation
+    errors alone as edits. Applications can use it to avoid warnings about
+    unsaved changes when default values are invalid but unchanged.
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 10 Sep 2026 00:08:24 +0200
+
+rust-pwt (0.8.17) trixie; urgency=medium
+
+  * dropdown: create picker placement only while the picker is open, avoiding
+    synchronous layout work for closed fields.
+
+  * dropdown: close the picker after an explicit selection instead of inferring
+    one from timing. This fixes the first SearchDropdown result or editable
+    DateField calendar selection being ignored after typing. Selecting the
+    current entry now closes the picker too, and GridPicker reports selections
+    only for direct user interaction.
+
+  * touch: navigation rail: add opt-in viewport-based expansion through
+    `auto_expand` and `expanded_query`, so rails in a plain Scaffold can adapt
+    without parent-managed state. The opt-in avoids unexpectedly widening a
+    parent. AdaptiveScaffold opts in, replaces `large_query` with
+    `rail_expanded_query`, leaves navigator choice to `wide_query`, and passes
+    through `rail_group_alignment`.
+
+  * touch: navigation rail: add an optional button that lets users expand or
+    collapse the rail independently of its configured layout. AdaptiveScaffold
+    exposes it as `rail_expand_button`, and `on_expand_change` reports layout
+    changes.
+
+  * accessibility: improve keyboard and screen-reader support:
+    - checkbox: expose checked, disabled, read-only, and required state; derive
+      the accessible name from visible labels; keep disabled controls out of
+      the tab order; prevent read-only controls from toggling; and let Space
+      activate the checkbox without scrolling the page.
+    - action icons: prevent keyboard activation from scrolling the page. Give
+      dialog and snackbar close controls translated names and tab stops, and
+      let callers set an explicit accessible name on menu buttons.
+    - primary navigation: expose landmark names, link roles, current-page
+      state, and Enter-key activation. Disabled destinations remain inert and
+      are excluded from both the tab order and default selection.
+    - calendar grid: add named keyboard controls to clickable day and gutter
+      cells. Keep one control of each type in the tab order, move the tab stop
+      with arrow-key focus, and stop horizontal movement at week boundaries.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 30 Aug 2026 18:46:14 +0200
+
 rust-pwt (0.8.16) trixie; urgency=medium
 
   * data table: rebuild the header's interactive state when the column set

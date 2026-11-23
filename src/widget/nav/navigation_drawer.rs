@@ -10,9 +10,10 @@ use pwt_macros::builder;
 use crate::css::{OverflowX, OverflowY};
 use crate::props::{
     AsClassesMut, AsCssStylesMut, ContainerBuilder, CssBorderBuilder, CssPaddingBuilder, CssStyles,
-    EventSubscriber, IntoOptionalKey, IntoVTag, WidgetBuilder, WidgetStyleBuilder,
+    EventSubscriber, IntoOptionalKey, IntoStorageLocation, IntoVTag, StorageLocation,
+    WidgetBuilder, WidgetStyleBuilder,
 };
-use crate::state::{NavigationContext, NavigationContextExt, Selection};
+use crate::state::{NavigationContext, NavigationContextExt, PersistentState, Selection};
 use crate::{impl_class_prop_builder, impl_yew_std_props_builder};
 
 use crate::dom::focus::roving_tabindex_next_recursive;
@@ -82,6 +83,12 @@ pub struct NavigationDrawer {
     #[builder]
     #[prop_or(true)]
     animated: bool,
+
+    /// Store which submenus are open, so they keep their last state across page loads.
+    ///
+    /// Without it, every submenu starts from its default on each load.
+    #[prop_or_default]
+    pub state_id: Option<StorageLocation>,
 }
 
 impl AsClassesMut for NavigationDrawer {
@@ -131,6 +138,17 @@ impl NavigationDrawer {
         self.header = Some(header.into());
     }
 
+    /// Builder style method to set the persistent state ID.
+    pub fn state_id(mut self, state_id: impl IntoStorageLocation) -> Self {
+        self.set_state_id(state_id);
+        self
+    }
+
+    /// Method to set the persistent state ID.
+    pub fn set_state_id(&mut self, state_id: impl IntoStorageLocation) {
+        self.state_id = state_id.into_storage_location();
+    }
+
     fn get_default_active(&self) -> Option<Key> {
         if self.default_active.is_some() {
             return self.default_active.clone();
@@ -154,12 +172,24 @@ pub enum Msg {
     MenuOpen(Key),
 }
 
+fn find_menu_item<'a>(entries: &'a [MenuEntry], key: &Key) -> Option<&'a MenuItem> {
+    entries.iter().find_map(|entry| match entry {
+        MenuEntry::Item(item) if item.key.as_ref() == Some(key) => Some(item),
+        MenuEntry::Item(item) => item
+            .submenu
+            .as_ref()
+            .and_then(|submenu| find_menu_item(&submenu.children, key)),
+        _ => None,
+    })
+}
+
 #[doc(hidden)]
 pub struct PwtNavigationDrawer {
     node_ref: NodeRef,
     active: Option<Key>,
     selection: Selection,
     menu_states: HashMap<Key, bool>, // true = open
+    menu_cache: Option<PersistentState<HashMap<String, bool>>>,
     _nav_ctx_handle: Option<ContextHandle<NavigationContext>>,
 }
 
@@ -373,13 +403,32 @@ impl PwtNavigationDrawer {
                     if item.selectable {
                         Some(entry)
                     } else {
-                        self.menu_states.insert(desired.clone(), true);
+                        self.set_menu_open(desired.clone(), true);
                         find_first_key_recursive(&submenu.children)
                     }
                 }
             },
             _ => None,
         }
+    }
+
+    fn set_menu_open(&mut self, key: Key, open: bool) {
+        self.menu_states.insert(key, open);
+        if let Some(cache) = &mut self.menu_cache {
+            cache.update(
+                self.menu_states
+                    .iter()
+                    .map(|(key, open)| (key.to_string(), *open))
+                    .collect(),
+            );
+        }
+    }
+
+    /// Whether the submenu of `key` shows: the last toggle, else the item's default.
+    fn menu_open(&self, props: &NavigationDrawer, key: &Key) -> bool {
+        self.menu_states.get(key).copied().unwrap_or_else(|| {
+            !find_menu_item(&props.menu.children, key).is_some_and(|item| item.default_collapsed)
+        })
     }
 
     /// Open every submenu on the path to `key`, so a selected or deep-linked item is not
@@ -407,7 +456,7 @@ impl PwtNavigationDrawer {
         let mut path = Vec::new();
         if collect(&props.menu.children, key, &mut path) {
             for key in path {
-                self.menu_states.insert(key, true);
+                self.set_menu_open(key, true);
             }
         }
     }
@@ -491,8 +540,17 @@ impl Component for PwtNavigationDrawer {
             active: active.clone(),
             selection,
             menu_states: HashMap::new(),
+            menu_cache: None,
             _nav_ctx_handle,
         };
+        if let Some(state_id) = &props.state_id {
+            let cache = PersistentState::<HashMap<String, bool>>::new(state_id.clone());
+            this.menu_states = cache
+                .iter()
+                .map(|(key, open)| (Key::from(key.as_str()), *open))
+                .collect();
+            this.menu_cache = Some(cache);
+        }
 
         // expand the path to the initially active item, so a deep-linked entry is visible
         if let Some(active) = &active {
@@ -562,9 +620,8 @@ impl Component for PwtNavigationDrawer {
                             self.emit_item_activate(&key, ctx);
                         }
                         if toggle {
-                            let entry =
-                                *self.menu_states.entry(key.clone()).or_insert_with(|| true);
-                            self.menu_states.insert(key, !entry);
+                            let open = self.menu_open(props, &key);
+                            self.set_menu_open(key, !open);
                         }
                     }
                     return true;
@@ -592,16 +649,16 @@ impl Component for PwtNavigationDrawer {
                 true
             }
             Msg::MenuToggle(key) => {
-                let entry = *self.menu_states.entry(key.clone()).or_insert_with(|| true);
-                self.menu_states.insert(key, !entry);
+                let open = self.menu_open(props, &key);
+                self.set_menu_open(key, !open);
                 true
             }
             Msg::MenuClose(key) => {
-                self.menu_states.insert(key, false);
+                self.set_menu_open(key, false);
                 true
             }
             Msg::MenuOpen(key) => {
-                self.menu_states.insert(key, true);
+                self.set_menu_open(key, true);
                 true
             }
         }
@@ -632,7 +689,7 @@ impl Component for PwtNavigationDrawer {
             event.prevent_default();
         });
 
-        let mut column = Column::new()
+        let menu = Column::new()
             .onkeydown(onkeydown)
             // avoid https://bugzilla.mozilla.org/show_bug.cgi?id=1069739
             .attribute("tabindex", "-1")
@@ -649,11 +706,15 @@ impl Component for PwtNavigationDrawer {
         let active = get_active_or_default(props, &self.active);
         let active = active.as_deref().unwrap_or("");
 
+        // inner container that can take the full height of the children,
+        // so the outer one can scroll
+        let mut column = Column::new();
         for item in props.menu.children.iter() {
             self.render_menu_entry(ctx, item, &mut column, active, 0, false);
         }
 
-        column.into_html_with_ref(self.node_ref.clone())
+        menu.with_child(column)
+            .into_html_with_ref(self.node_ref.clone())
     }
 }
 
@@ -662,5 +723,24 @@ impl From<NavigationDrawer> for VNode {
         let key = val.key.clone();
         let comp = VComp::new::<PwtNavigationDrawer>(Rc::new(val), key);
         VNode::from(comp)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn nested_items_are_found_with_their_default_state() {
+        let menu = Menu::new().with_item(
+            MenuItem::new("Website")
+                .key("website")
+                .default_collapsed(true)
+                .submenu(Menu::new().with_item(MenuItem::new("Partners").key("partners"))),
+        );
+        let find = |key: &str| find_menu_item(&menu.children, &Key::from(key));
+        assert!(find("website").is_some_and(|item| item.default_collapsed));
+        assert!(find("partners").is_some_and(|item| !item.default_collapsed));
+        assert!(find("missing").is_none());
     }
 }

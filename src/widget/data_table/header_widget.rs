@@ -43,6 +43,12 @@ pub struct HeaderWidget<T: 'static> {
     pub focusable: bool,
 
     reserve_scroll_space: f64,
+
+    /// Invisible content per visible column, used to size the column tracks. Contains
+    /// the visible column index, the `colspan` value and the content.
+    #[prop_or_default]
+    #[derivative(PartialEq(compare_with = "Rc::ptr_eq"))]
+    pub column_sizers: Rc<Vec<(usize, usize, Html)>>,
 }
 
 impl<T: 'static> HeaderWidget<T> {
@@ -94,6 +100,17 @@ impl<T: 'static> HeaderWidget<T> {
     /// Method to set if space should be reserved for the scroller.
     pub fn set_reserve_scroll_space(&mut self, reserve_scroll_space: f64) {
         self.reserve_scroll_space = reserve_scroll_space;
+    }
+
+    /// Builder style method to set the column sizers.
+    pub fn column_sizers(mut self, column_sizers: Rc<Vec<(usize, usize, Html)>>) -> Self {
+        self.set_column_sizers(column_sizers);
+        self
+    }
+
+    /// Method to set the column sizers.
+    pub fn set_column_sizers(&mut self, column_sizers: Rc<Vec<(usize, usize, Html)>>) {
+        self.column_sizers = column_sizers;
     }
 }
 
@@ -193,6 +210,21 @@ impl<T: 'static> PwtHeaderWidget<T> {
         span
     }
 
+    fn cell_visible(&self, cell_idx: usize) -> bool {
+        cell_idx < self.state.cell_count() && !self.state.get_cell_hidden(cell_idx)
+    }
+
+    // The cell that gets focus when tabbing into the header. Hidden cells are not rendered, so
+    // fall back to the first visible one.
+    fn tab_stop(&self) -> Option<usize> {
+        match self.cursor {
+            Some(cursor) if self.cell_visible(cursor) => Some(cursor),
+            Some(_) | None => {
+                (0..self.state.cell_count()).find(|cell_idx| self.cell_visible(*cell_idx))
+            }
+        }
+    }
+
     fn unique_cell_id(&self, cell_idx: usize) -> String {
         format!("{}-cell-{}", self.unique_id, cell_idx)
     }
@@ -208,11 +240,7 @@ impl<T: 'static> PwtHeaderWidget<T> {
     ) {
         let column_idx = cell.start_col;
         let cell_idx = cell.cell_idx;
-        let active = self
-            .cursor
-            .map(|cursor| cursor == cell_idx)
-            .unwrap_or(false);
-        let tabindex = if active || (self.cursor.is_none() && (cell_idx == 0)) {
+        let tabindex = if self.tab_stop() == Some(cell_idx) {
             AttrValue::Static("0")
         } else {
             AttrValue::Static("-1")
@@ -289,6 +317,13 @@ impl<T: 'static> PwtHeaderWidget<T> {
             attributes.insert(AttrValue::Static("tabindex"), tabindex);
         }
         attributes.insert(AttrValue::Static("aria-label"), cell.column.name.clone());
+        // A column narrower than its name cuts the header off; the tooltip still names it, unless
+        // a header renderer says something else.
+        if !cell.column.name.is_empty() {
+            attributes
+                .entry(AttrValue::Static("title"))
+                .or_insert_with(|| cell.column.name.clone());
+        }
 
         header_row.push(
             Container::from_tag("th")
@@ -380,11 +415,7 @@ impl<T: 'static> PwtHeaderWidget<T> {
         header_row: &mut Vec<Html>,
     ) -> usize {
         let cell_idx = group.cell_idx;
-        let active = self
-            .cursor
-            .map(|cursor| cursor == cell_idx)
-            .unwrap_or(false);
-        let tabindex = if active || (self.cursor.is_none() && (cell_idx == 0)) {
+        let tabindex = if self.tab_stop() == Some(cell_idx) {
             "0"
         } else {
             "-1"
@@ -418,6 +449,7 @@ impl<T: 'static> PwtHeaderWidget<T> {
                     format!("grid-column: {} / span {}", start_col + 1, span,),
                 )
                 .with_child(group.name.clone())
+                .onfocusin(link.callback(move |_| Msg::FocusCell(cell_idx)))
                 .into(),
         );
 
@@ -585,28 +617,22 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
                 true
             }
             Msg::MoveCursor(direction) => {
-                let last = self.state.cell_count().saturating_sub(1);
+                let count = self.state.cell_count();
                 let cursor = match self.cursor {
                     Some(cursor) => cursor,
                     None => return false,
                 };
-                self.cursor = Some(match direction {
-                    false => {
-                        if cursor > 0 {
-                            cursor - 1
-                        } else {
-                            last
-                        }
-                    }
-                    true => {
-                        if (cursor + 1) <= last {
-                            cursor + 1
-                        } else {
-                            0
-                        }
-                    }
-                });
-                self.focus_active_cell();
+                // Wrap around at either end and skip hidden cells, as they are not rendered.
+                let next = (1..count)
+                    .map(|step| match direction {
+                        true => (cursor + step) % count,
+                        false => (cursor + count - step) % count,
+                    })
+                    .find(|cell_idx| self.cell_visible(*cell_idx));
+                if let Some(next) = next {
+                    self.cursor = Some(next);
+                    self.focus_active_cell();
+                }
                 true
             }
         }
@@ -627,6 +653,36 @@ impl<T: 'static> Component for PwtHeaderWidget<T> {
         );
 
         let column_count = self.state.visible_column_count();
+
+        // Put the sizers into their column tracks, so that content based track sizes account for
+        // them. They have no height and are invisible, so they do not change the header layout.
+        // Header cells end at row line 10, so use the row after that to avoid interfering with
+        // the auto placed group headers.
+        for (i, (grid_start, colspan, sizer)) in props.column_sizers.iter().enumerate() {
+            if *grid_start >= column_count {
+                continue;
+            }
+            let cols_left = column_count - grid_start;
+            let colspan = (*colspan).min(cols_left);
+
+            header_row.push(
+                Container::new()
+                    .key(Key::from(format!("sizer-{i}")))
+                    .class("pwt-datatable-content")
+                    .attribute("role", "none")
+                    .attribute("aria-hidden", "true")
+                    .style("height", "0px")
+                    .style("overflow", "clip")
+                    .style("visibility", "hidden")
+                    .style("grid-row", "10")
+                    .style(
+                        "grid-column",
+                        format!("{} / span {}", grid_start + 1, colspan),
+                    )
+                    .with_child(sizer.clone())
+                    .into(),
+            );
+        }
 
         // add some space at the end to make room for the tables vertical scrollbar
         let scrollbar_size = ctx.props().reserve_scroll_space;

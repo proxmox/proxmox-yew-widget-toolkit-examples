@@ -21,10 +21,17 @@ use crate::props::{
 use crate::state::{DataStore, Selection, SelectionObserver};
 use crate::widget::{Column, Container, get_unique_element_id};
 
+use pwt_macros::builder;
+
+#[path = "selection_state.rs"]
+mod selection_state;
+use selection_state::TableSelection;
+
 use super::{
-    CellConfiguration, DataTableColumn, DataTableHeader, DataTableKeyboardEvent,
-    DataTableMouseEvent, DataTableRow, DataTableRowRenderCallback, HeaderWidget, IndexedHeader,
-    IntoOptionalDataTableRowRenderCallback, create_indexed_header_list,
+    CellConfiguration, DataTableCellRenderArgs, DataTableColumn, DataTableHeader,
+    DataTableKeyboardEvent, DataTableMouseEvent, DataTableRow, DataTableRowRenderCallback,
+    HeaderWidget, IndexedHeader, IntoOptionalDataTableRowRenderCallback,
+    create_indexed_header_list, render_row_cells,
 };
 
 pub enum HeaderMsg<T: 'static> {
@@ -109,6 +116,7 @@ pub enum MultiSelectMode {
 /// * `End`: moves focus to the last cell in the row that contains focus.
 #[derive(Properties, Derivative)]
 #[derivative(Clone(bound = ""), PartialEq(bound = ""))]
+#[builder]
 pub struct DataTable<S: DataStore> {
     /// Yew key property.
     #[prop_or_default]
@@ -173,7 +181,26 @@ pub struct DataTable<S: DataStore> {
     #[prop_or(22)]
     pub min_row_height: usize,
 
+    /// Sample store used for sizing the columns.
+    ///
+    /// Default column widths are computed from the header, because the table rows are rendered
+    /// separately (and only partially with virtual scrolling). These records are rendered
+    /// invisibly inside the header, using the column render functions, so content based widths
+    /// like "auto" or "max-content" account for them. For flex widths, they act as minimum width.
+    ///
+    /// The sample store data should be static and not change during runtime. (Changes are not
+    /// monitored.)
+    ///
+    /// NOTE: Only up to [`VIRTUAL_SCROLL_TRIGGER`] records are supported for performance reasons.
+    #[prop_or_default]
+    #[builder(IntoPropValue, into_prop_value)]
+    pub sample_store: Option<S>,
+
     /// Selection object.
+    ///
+    /// Only the table's select-all action opts into selecting newly shown rows. Programmatically
+    /// selecting every current key does not establish that intent. An empty view, a clear,
+    /// deselection, or replacement of this object cancels it.
     #[prop_or_default]
     pub selection: Option<Selection>,
 
@@ -240,7 +267,9 @@ impl<S: DataStore> CssPaddingBuilder for DataTable<S> {}
 impl<S: DataStore> CssMarginBuilder for DataTable<S> {}
 impl<S: DataStore> WidgetStyleBuilder for DataTable<S> {}
 
-static VIRTUAL_SCROLL_TRIGGER: usize = 30;
+/// The automatic cut-off for virtual scrolling. When the DataTable can be scrolled
+/// and there are more rows than this limit, virtual scrolling is automatically enabled.
+pub const VIRTUAL_SCROLL_TRIGGER: usize = 30;
 
 impl<S: DataStore> DataTable<S> {
     /// Create a new instance.
@@ -496,7 +525,7 @@ pub struct PwtDataTable<S: DataStore> {
     active_column: usize, // which colums has focus?
     cursor: Option<Cursor>,
     last_select_position: Option<usize>,
-    selection_status: RowSelectionStatus,
+    selection_state: TableSelection,
 
     _selection_observer: Option<SelectionObserver>,
 
@@ -526,11 +555,24 @@ pub struct PwtDataTable<S: DataStore> {
     table_size_observer: Option<DomSizeObserver>,
 
     row_height: f64,
+    /// The table width `row_height` was measured at.
+    row_height_width: f64,
+    /// Measure the table after the next render, as getting its column widths need not change its
+    /// size, so the size observer might not report it again.
+    measure_table: bool,
     scrollbar_size: Option<f64>,
 
     keypress_timeout: Option<Timeout>,
 
     focus_table: bool,
+
+    /// Cached column sizers so recalculation does not happen too frequently.
+    column_sizers: Rc<Vec<(usize, usize, Html)>>,
+}
+
+/// Whether the header has measured the columns. A hidden header measures them as 0.
+fn columns_measured(column_widths: &[f64]) -> bool {
+    column_widths.iter().sum::<f64>() > 0.0
 }
 
 // Generate first table row using the width from the column definitions.
@@ -573,29 +615,27 @@ fn render_empty_row_with_sizes(widths: &[f64], column_hidden: &[bool], bordered:
         .into()
 }
 
+// Cells get the default class, unless the configuration sets its own.
+fn cell_config(config: &CellConfiguration) -> Rc<CellConfiguration> {
+    Rc::new(if config.class.is_empty() {
+        CellConfiguration::new().class("pwt-datatable-cell")
+    } else {
+        config.clone()
+    })
+}
+
 impl<S: DataStore> PwtDataTable<S> {
     // avoid slow search by lookup up keys nearby cursor first
     fn filtered_record_pos(&self, props: &DataTable<S>, key: &Key) -> Option<usize> {
         if let Some(Cursor { pos, .. }) = &self.cursor {
-            let test_pos = *pos;
-            if let Some(record_key) = props.store.lookup_filtered_record_key(test_pos) {
-                if &record_key == key {
+            for test_pos in [Some(*pos), pos.checked_add(1), pos.checked_sub(1)]
+                .into_iter()
+                .flatten()
+            {
+                if let Some(record_key) = props.store.lookup_filtered_record_key(test_pos)
+                    && &record_key == key
+                {
                     return Some(test_pos);
-                }
-            }
-
-            let test_pos = pos + 1;
-            if let Some(record_key) = props.store.lookup_filtered_record_key(test_pos) {
-                if &record_key == key {
-                    return Some(test_pos);
-                }
-            }
-            if *pos > 0 {
-                let test_pos = pos - 1;
-                if let Some(record_key) = props.store.lookup_filtered_record_key(test_pos) {
-                    if &record_key == key {
-                        return Some(test_pos);
-                    }
                 }
             }
         }
@@ -711,83 +751,6 @@ impl<S: DataStore> PwtDataTable<S> {
                 self.last_select_position = Some(end);
             } else {
                 self.select_position(props, selection, new_cursor, shift, ctrl);
-            }
-        }
-    }
-
-    fn select_all(&mut self, props: &DataTable<S>) {
-        let selection = match &props.selection {
-            Some(selection) => selection,
-            None => {
-                self.selection_status = RowSelectionStatus::Nothing;
-                return;
-            }
-        };
-        let record_count = props.store.filtered_data_len();
-        // use write lock to avoid multiple notification
-        let mut selection = selection.write();
-        if !selection.is_multiselect() {
-            return;
-        }
-
-        let mut keys: HashSet<Key> = HashSet::new();
-        for pos in 0..record_count {
-            if let Some(key) = props.store.lookup_filtered_record_key(pos) {
-                keys.insert(key);
-            }
-        }
-        selection.bulk_select(keys);
-        self.selection_status = RowSelectionStatus::All;
-    }
-
-    fn clear_selection(&mut self, props: &DataTable<S>) {
-        if let Some(selection) = &props.selection {
-            selection.clear();
-        }
-    }
-
-    fn update_selection_status(&mut self, props: &DataTable<S>) {
-        let selection = match &props.selection {
-            Some(selection) => selection,
-            None => {
-                self.selection_status = RowSelectionStatus::Nothing;
-                return;
-            }
-        };
-
-        let record_count = props.store.filtered_data_len();
-        if record_count == 0 {
-            self.selection_status = RowSelectionStatus::Nothing;
-            return;
-        }
-
-        let selection_len = selection.len();
-        if record_count == selection_len {
-            self.selection_status = RowSelectionStatus::All;
-        } else if selection_len > 0 {
-            self.selection_status = RowSelectionStatus::Some;
-        } else {
-            self.selection_status = RowSelectionStatus::Nothing;
-        }
-    }
-
-    // remove stale keys from selection
-    fn cleanup_selection(&mut self, props: &DataTable<S>) {
-        if let Some(selection) = &props.selection {
-            let mut selection = selection.write();
-            if selection.is_multiselect() {
-                let mut keys: HashSet<Key> = HashSet::new();
-                for (_pos, node) in props.store.filtered_data() {
-                    let key = props.store.extract_key(&node.record());
-                    if selection.contains(&key) {
-                        keys.insert(key);
-                    }
-                }
-                selection.bulk_select(keys);
-            } else if let Some(key) = selection.selected_key() {
-                if props.store.filtered_record_pos(&key).is_none() {
-                    selection.clear();
-                }
             }
         }
     }
@@ -1049,6 +1012,74 @@ impl<S: DataStore> PwtDataTable<S> {
         };
     }
 
+    // Calculate and render the cells of the sizing records with the column renderers, wrapped like
+    // table cells, so that they get the same font and padding when the header measures them.
+    fn calculate_column_sizers(&mut self, props: &DataTable<S>) {
+        let Some(store) = props.sample_store.clone() else {
+            self.column_sizers = Rc::new(Vec::new());
+            return;
+        };
+
+        if store.is_empty() {
+            self.column_sizers = Rc::new(Vec::new());
+            return;
+        }
+
+        debug_assert!(
+            store.filtered_data_len() <= VIRTUAL_SCROLL_TRIGGER,
+            "More than {VIRTUAL_SCROLL_TRIGGER} sample records can have a negative performance \
+             impact. Anything more than that will not be rendered."
+        );
+
+        let len = store.filtered_data_len();
+
+        let records = store.filtered_data().take(VIRTUAL_SCROLL_TRIGGER);
+
+        let mut res = Vec::with_capacity(len.min(VIRTUAL_SCROLL_TRIGGER) * self.columns.len());
+
+        for (row_index, node) in records {
+            let record = node.record();
+            let record_key = store.extract_key(&record);
+            let rendered_cells =
+                render_row_cells(&self.columns, &self.column_hidden, |column_index| {
+                    DataTableCellRenderArgs {
+                        selection: props.selection.clone(),
+                        record: &record,
+                        record_key: &record_key,
+                        row_index,
+                        column_index,
+                        selected: false,
+                        config: (*self.cell_config).clone(),
+                        is_expanded: false,
+                        is_leaf: node.is_leaf(),
+                        level: node.level(),
+                    }
+                });
+
+            for cell in rendered_cells {
+                let mut cell_container = Container::new()
+                    .class(cell.config.class)
+                    .styles(cell.config.style)
+                    .style("white-space", "nowrap")
+                    // cell widths get reduced by the border width, see
+                    // render_empty_row_with_sizes
+                    .style(
+                        "border-inline-end",
+                        props.bordered.then_some("1px solid transparent"),
+                    )
+                    .with_child(html! {<div role="none">{cell.content}</div>});
+
+                cell_container
+                    .as_std_props_mut()
+                    .add_attributes(cell.config.attributes);
+
+                res.push((cell.col_index, cell.colspan, cell_container.into()));
+            }
+        }
+
+        self.column_sizers = Rc::new(res);
+    }
+
     fn init_headers(&mut self, props: &DataTable<S>) {
         let headers = create_indexed_header_list(&props.headers);
 
@@ -1057,13 +1088,20 @@ impl<S: DataStore> PwtDataTable<S> {
         for header in props.headers.iter() {
             header.extract_column_list(&mut columns);
         }
-        let mut column_hidden = Vec::new();
-        for column in columns.iter() {
-            column_hidden.push(column.hidden);
+        // Like the header widget, keep the hidden state while the column names stay the same.
+        // Callers sometimes recreate the headers on every render, and resetting it here would show
+        // columns in the rows that the user hid in the header.
+        let same_columns = self.columns.len() == columns.len()
+            && self
+                .columns
+                .iter()
+                .zip(columns.iter())
+                .all(|(old, new)| old.name == new.name);
+        if !same_columns {
+            self.column_hidden = Rc::new(columns.iter().map(|column| column.hidden).collect());
         }
         self.headers = Rc::new(headers);
         self.columns = Rc::new(columns);
-        self.column_hidden = Rc::new(column_hidden);
     }
 }
 
@@ -1073,12 +1111,6 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
 
     fn create(ctx: &Context<Self>) -> Self {
         let props = ctx.props();
-
-        let cell_config = if props.cell_configuration.class.is_empty() {
-            CellConfiguration::new().class("pwt-datatable-cell")
-        } else {
-            props.cell_configuration.clone()
-        };
 
         let _store_observer = props
             .store
@@ -1098,7 +1130,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             take_focus: false,
             cursor: None,
             last_select_position: None,
-            selection_status: RowSelectionStatus::Nothing,
+            selection_state: TableSelection::default(),
             _selection_observer,
 
             active_column: 0,
@@ -1106,7 +1138,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             column_widths: Vec::new(),
             column_hidden: Rc::new(Vec::new()),
             scroll_info: VirtualScrollInfo::default(),
-            cell_config: Rc::new(cell_config),
+            cell_config: cell_config(&props.cell_configuration),
             scroll_top: 0,
             set_scroll_top: None,
             viewport_height: 0.0,
@@ -1120,16 +1152,22 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             table_height: 0.0,
 
             row_height: props.min_row_height as f64,
+            row_height_width: 0.0,
+            measure_table: false,
             scrollbar_size: None,
             keypress_timeout: None,
 
             focus_table: false,
+            column_sizers: Rc::new(Vec::new()),
         };
         me.init_headers(props);
 
         me.update_scroll_info(props);
         // fixme: remove unknown keys from selection
-        me.update_selection_status(props);
+        me.selection_state.update_status(props);
+
+        me.calculate_column_sizers(props);
+
         me
     }
 
@@ -1137,7 +1175,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
         let props = ctx.props();
         match msg {
             Msg::SelectionChange => {
-                self.update_selection_status(props);
+                self.selection_state.update_status(props);
                 true
             }
             Msg::DataChange => {
@@ -1152,12 +1190,7 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
                 }
                 self.update_scroll_info(props);
 
-                if self.selection_status == RowSelectionStatus::All {
-                    self.select_all(props);
-                } else {
-                    self.cleanup_selection(props);
-                }
-                self.update_selection_status(props);
+                self.selection_state.data_changed(props);
 
                 true
             }
@@ -1184,17 +1217,30 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
 
                 true
             }
-            Msg::TableResize(_width, height) => {
+            Msg::TableResize(width, height) => {
                 let height = height.max(0.0);
-                if self.table_height == height {
+                // In fixed layout the table is 1px wide until the header has measured its columns,
+                // and its cells can wrap at every character. Wait for those widths, but still record
+                // the zero height of a hidden table, so that showing it again counts as a resize.
+                let fixed_mode = props.show_header || props.virtual_scroll.unwrap_or(true);
+                if fixed_mode && !columns_measured(&self.column_widths) && height > 0.0 {
+                    return false;
+                }
+                // A new width alone can rewrap the rows, so it counts as a resize as well.
+                if self.table_height == height && width == self.row_height_width {
                     return false;
                 };
                 self.table_height = height;
                 let visible_rows = self.scroll_info.visible_rows();
                 if (height > 0.0) && (visible_rows > 0) {
-                    let row_height = height / visible_rows as f64;
-                    if row_height > self.row_height {
+                    let row_height =
+                        (height / visible_rows as f64).max(props.min_row_height as f64);
+                    // A new width can rewrap the rows, so take their new average. At the same
+                    // width only grow: the rendered rows start at scroll_top / row_height, so
+                    // following their average could keep alternating between two estimates.
+                    if width != self.row_height_width || row_height > self.row_height {
                         self.row_height = row_height;
+                        self.row_height_width = width;
                     }
                 }
                 self.update_scroll_info(props);
@@ -1613,6 +1659,11 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
                 true
             }
             Msg::Header(HeaderMsg::ColumnWidthChange(column_widths)) => {
+                // The table sizes reported before the columns had widths were not taken, so take
+                // one once the new widths are laid out.
+                if !columns_measured(&self.column_widths) && columns_measured(&column_widths) {
+                    self.measure_table = true;
+                }
                 self.column_widths = column_widths;
                 true
             }
@@ -1623,13 +1674,14 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
             }
             Msg::Header(HeaderMsg::ColumnHiddenChange(column_hidden)) => {
                 self.column_hidden = Rc::new(column_hidden);
+                self.calculate_column_sizers(props);
                 true
             }
             Msg::Header(HeaderMsg::ToggleSelectAll) => {
-                if self.selection_status == RowSelectionStatus::All {
-                    self.clear_selection(props);
+                if self.selection_state.status == RowSelectionStatus::All {
+                    self.selection_state.clear(props);
                 } else {
-                    self.select_all(props);
+                    self.selection_state.select_all(props);
                 }
                 false
             }
@@ -1762,9 +1814,10 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
                     .with_child(
                         HeaderWidget::new(self.headers.clone(), ctx.link().callback(Msg::Header))
                             .focusable(props.header_focusable && props.show_header)
-                            .selection_status(self.selection_status)
+                            .selection_status(self.selection_state.status)
                             .header_class(header_class)
-                            .reserve_scroll_space(self.scrollbar_size.unwrap_or_default()),
+                            .reserve_scroll_space(self.scrollbar_size.unwrap_or_default())
+                            .column_sizers(self.column_sizers.clone()),
                     )
                     .into_html_with_ref(self.header_scroll_ref.clone()),
             )
@@ -1776,12 +1829,38 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
         let props = ctx.props();
 
         if props.store != old_props.store {
-            // store changed
+            self._store_observer = props
+                .store
+                .add_listener(ctx.link().callback(|_| Msg::DataChange));
             self.update_scroll_info(props);
+        }
+
+        let mut recalculate_sizers = false;
+
+        if props.selection != old_props.selection {
+            self._selection_observer = props.selection.as_ref().map(|selection| {
+                selection.add_listener(ctx.link().callback(|_| Msg::SelectionChange))
+            });
+            self.selection_state.replace(props);
+            recalculate_sizers = true;
+        }
+
+        if props.cell_configuration != old_props.cell_configuration {
+            self.cell_config = cell_config(&props.cell_configuration);
+            recalculate_sizers = true;
         }
 
         if props.headers != old_props.headers {
             self.init_headers(props);
+            recalculate_sizers = true;
+        }
+
+        if props.sample_store != old_props.sample_store || props.bordered != old_props.bordered {
+            recalculate_sizers = true;
+        }
+
+        if recalculate_sizers || props.sample_store != old_props.sample_store {
+            self.calculate_column_sizers(props);
         }
 
         true
@@ -1805,6 +1884,13 @@ impl<S: DataStore + 'static> Component for PwtDataTable<S> {
                 });
                 self.table_size_observer = Some(size_observer);
             }
+        }
+        if std::mem::take(&mut self.measure_table)
+            && let Some(el) = self.table_ref.cast::<web_sys::Element>()
+        {
+            let rect = el.get_bounding_client_rect();
+            ctx.link()
+                .send_message(Msg::TableResize(rect.width(), rect.height()));
         }
         if let Some(top) = self.set_scroll_top.take() {
             // Note: we delay setting ScrollTop until we rendered the

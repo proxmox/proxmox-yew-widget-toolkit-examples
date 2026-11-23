@@ -29,6 +29,9 @@ pub use cell_configuration::CellConfiguration;
 mod cell_render_callback;
 pub use cell_render_callback::{DataTableCellRenderArgs, DataTableCellRenderer};
 
+mod rendered_cell;
+pub(crate) use rendered_cell::render_row_cells;
+
 mod header_render_callback;
 pub use header_render_callback::{
     DataTableHeaderRenderArgs, DataTableHeaderRenderer, DataTableHeaderTableLink,
@@ -45,7 +48,7 @@ mod data_table;
 pub(crate) use data_table::HeaderMsg;
 #[doc(hidden)]
 pub use data_table::PwtDataTable;
-pub use data_table::{DataTable, MultiSelectMode, RowSelectionStatus};
+pub use data_table::{DataTable, MultiSelectMode, RowSelectionStatus, VIRTUAL_SCROLL_TRIGGER};
 
 use yew::prelude::*;
 

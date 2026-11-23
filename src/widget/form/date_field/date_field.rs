@@ -48,6 +48,16 @@ pub struct DateField {
     #[prop_or_default]
     pub on_change: Option<Callback<Option<PlainDate>>>,
 
+    /// Input callback
+    ///
+    /// This callback is emitted when the user types or picks a date, with the entered text and
+    /// the date it reads as. Unlike [`on_change`](Self::on_change), it tells a cleared field
+    /// (empty text) from one whose text is not a date yet, which a controlled field needs to keep
+    /// the text as typed.
+    #[builder_cb(IntoEventCallback, into_event_callback, (String, Option<PlainDate>))]
+    #[prop_or_default]
+    pub on_input: Option<Callback<(String, Option<PlainDate>)>>,
+
     /// Days of the week to disable in the calendar (0 = Sunday, 6 = Saturday).
     #[builder(IntoPropValue, into_prop_value)]
     #[prop_or_default]
@@ -139,6 +149,7 @@ impl DateFieldComp {
 
 #[derive(Clone, PartialEq)]
 pub struct DateFieldValidationArgs {
+    pub required: bool,
     pub min_value: Option<PlainDate>,
     pub max_value: Option<PlainDate>,
     pub format: AttrValue,
@@ -155,6 +166,7 @@ impl ManagedField for DateFieldComp {
 
     fn validation_args(props: &Self::Properties) -> Self::ValidateClosure {
         DateFieldValidationArgs {
+            required: props.input_props.required,
             min_value: props.min_value,
             max_value: props.max_value,
             format: props.format.clone(),
@@ -166,6 +178,14 @@ impl ManagedField for DateFieldComp {
     }
 
     fn validator(args: &Self::ValidateClosure, value: &Value) -> Result<Value, Error> {
+        let empty = match value {
+            Value::Null => true,
+            Value::String(s) => s.is_empty(),
+            _ => false,
+        };
+        if empty && args.required {
+            return Err(anyhow::anyhow!(tr!("Field may not be empty.")));
+        }
         match value {
             Value::Null => Ok(value.clone()),
             Value::String(s) => {
@@ -228,11 +248,13 @@ impl ManagedField for DateFieldComp {
     fn update(&mut self, ctx: &ManagedFieldContext<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::ValueChange(val) => {
-                ctx.link().update_value(val);
+                ctx.link().update_value(val.clone());
+                if let Some(on_input) = &ctx.props().on_input {
+                    let props = ctx.props();
+                    let date = Self::try_parse(&val, &props.format, &props.alt_formats);
+                    on_input.emit((val, date));
+                }
                 true
-                //if let Some(on_input) = &ctx.props().on_input {
-                //    on_input.emit(None);
-                //}
             }
         }
     }
@@ -318,5 +340,33 @@ impl ManagedField for DateFieldComp {
             .on_change(ctx.link().callback(move |val| Msg::ValueChange(val)))
             .with_trigger("fa fa-calendar", true)
             .into()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::Value;
+
+    use super::*;
+
+    fn args(required: bool) -> DateFieldValidationArgs {
+        DateFieldValidationArgs {
+            required,
+            min_value: None,
+            max_value: None,
+            format: "Y-m-d".into(),
+            submit_format: None,
+            alt_formats: "".into(),
+            disabled_days: Vec::new(),
+            disabled_dates: None,
+        }
+    }
+
+    #[test]
+    fn a_required_date_refuses_to_stay_empty() {
+        for empty in [Value::Null, Value::String(String::new())] {
+            assert!(DateFieldComp::validator(&args(true), &empty).is_err());
+            assert!(DateFieldComp::validator(&args(false), &empty).is_ok());
+        }
     }
 }
