@@ -19,9 +19,3 @@ We currently have the following example:
 * `themes`: Show available themes.
 * `mobile-demo`: Travel explorer app showing the widgets for touch devices,
    like hero animations, swipeable pages, and bottom sheets.
-
-The rest of the examples is experimental, unfinished code
-for mobile devices:
-
-* `mobile`: Very simple mobile app with page animation.
-* `mobile2`: More complex mobile app.
