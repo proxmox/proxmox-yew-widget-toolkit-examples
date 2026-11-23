@@ -23,6 +23,28 @@
         justify-content: center;
         min-width: 64px;
         min-height: 48px;
+        outline: 0;
+
+        &:focus-visible {
+            border-radius: var(--pwt-nav-link-corner-shape);
+            outline: 2px solid var(--pwt-color-on-surface);
+            outline-offset: -2px;
+
+            .pwt-navigation-bar-icon-container {
+                width: 56px;
+                @include elevation-background-color($level: 2, $state: hover);
+            }
+        }
+
+        &.disabled {
+            cursor: auto;
+            opacity: var(--pwt-disabled-opacity);
+
+            .pwt-navigation-bar-icon-container {
+                cursor: auto;
+                pointer-events: none;
+            }
+        }
 
         .pwt-navigation-bar-icon-container {
             cursor: pointer;
@@ -40,7 +62,6 @@
 
             width: 24px;
             transition: width 0.2s;
-            &:focus-within,
             &:hover {
                 width: 56px;
                 @include elevation-background-color($level: 2, $state: hover);

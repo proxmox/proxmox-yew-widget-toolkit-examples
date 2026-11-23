@@ -38,6 +38,13 @@ ul.pwt-menubar {
 	}
 
 	.pwt-menubar-item {
+		// A flex row like the menu item: the icon and the label keep their
+		// own boxes and one gap variable spaces them, instead of the item's
+		// size and baseline following from inline layout.
+		display: flex;
+		align-items: baseline;
+		gap: var(--pwt-icon-spacer);
+
 		cursor: pointer;
 		outline: 0;
 		@include font("label-large");
@@ -63,7 +70,6 @@ ul.pwt-menubar {
 	.pwt-menubar-item-icon {
 		font-size: map-get($font-size, "title-medium");
 		line-height: map-get($line-height, "title-medium");
-		margin-inline-end: var(--pwt-icon-spacer);
 	}
 
 	.pwt-menubar-item-arrow {

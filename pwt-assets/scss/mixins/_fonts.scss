@@ -1,8 +1,9 @@
 @use "sass:math";
 
+// Without the weight, which font-weight sets: font-variation-settings is inherited and a weight
+// there would override the font-weight of every descendant, like bold text.
 @function get-font-variant-settings($name) {
-    @return "opsz" math.div(map-get($font-size, $name), 1px), "wdth" map-get($font-width, $name),
-        "wght" map-get($font-weight, $name);
+    @return "opsz" math.div(map-get($font-size, $name), 1px), "wdth" map-get($font-width, $name);
 }
 
 @mixin font($name, $important: false) {

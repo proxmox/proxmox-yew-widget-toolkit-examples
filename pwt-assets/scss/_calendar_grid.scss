@@ -11,12 +11,23 @@
 ///   height; its grid then slices evenly instead of sizing on content.
 /// - `pwt-calendar-grid` / `-grid-header` - the seven-column day grid and its
 ///   weekday-label row; `pwt-calendar-weekday` is one header label.
+/// - `pwt-calendar-hide-weekends` - the root when the widget drops Saturday and
+///   Sunday (`hide_weekends`); both grids then narrow to five columns.
+/// - `pwt-calendar-gutter` - the root when the widget draws a leading column
+///   (`render_gutter`), such as week numbers; both grids then gain that column.
+///   `pwt-calendar-gutter-cell` is one of its cells, the header corner included.
 /// - `pwt-calendar-day` - one day cell; `-outside` (not the anchored month),
 ///   `-today` and `-weekend` tint or mark it. `pwt-calendar-daynum` is the
 ///   day number.
 /// - `pwt-calendar-day-pinned` - a consumer-owned zone (via `render_day`) that
 ///   stays above the scrolling bars, for content that must never scroll out of
 ///   view (a holiday chip, a headcount).
+/// - `pwt-calendar-day-activate` / `pwt-calendar-gutter-activate` - the
+///   keyboard control the widget lays over a cell that has a click callback.
+///   It is transparent and takes no pointer events, so only its focus ring is
+///   ever seen. The widget places that ring, set in from the cell's edge to
+///   leave the edge to the application's own selection marker, so a theme sets
+///   only its color and width.
 /// - `pwt-calendar-span-lanes` - the per-cell scroll box holding a day's
 ///   segments; a busy day scrolls here instead of growing its row.
 ///
@@ -28,6 +39,9 @@
 ///   drop the border on an internal edge so a run reads as one bar.
 /// - `pwt-calendar-span-label` / `-icon` - the label and its leading glyph,
 ///   carried once per week row on the leading cell.
+/// - `pwt-calendar-span-label-detail` - a label with a detail after its text
+///   (`pwt-calendar-span-text`, `pwt-calendar-span-detail`), the detail shown
+///   only while it fits.
 /// - `pwt-calendar-span-selected` - every segment of the highlighted bar.
 ///
 /// ### Color
@@ -61,19 +75,47 @@
 
 // The header row reuses the grid template so weekday labels line up with the
 // columns below.
+//
+// Both keep their frame inside that 100%, so a scroll parent gains no horizontal scrollbar: the
+// grid's hairline border, and a pixel of inline padding for the span bars, which reach that far
+// past their cell so a run fuses across the gap and would otherwise hang outside the first and
+// last column. A consumer that scrolls the grid in one axis gets the other unless it says
+// otherwise, and either overhang is enough for a permanent scrollbar. The padding is on both
+// rather than the grid alone, or the labels would sit a pixel off their columns.
 .pwt-calendar-grid,
 .pwt-calendar-grid-header {
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
+    padding-inline: 1px;
     width: 100%;
+}
+
+// The working week: the widget emits no cell at all for Saturday and Sunday, so
+// both grids drop to five columns and the remaining days share the full width.
+.pwt-calendar-hide-weekends .pwt-calendar-grid,
+.pwt-calendar-hide-weekends .pwt-calendar-grid-header {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+// The gutter: a content-sized leading column in both grids, so each row's eight cells fill one row
+// and the weekday labels stay over their days.
+.pwt-calendar-gutter .pwt-calendar-grid,
+.pwt-calendar-gutter .pwt-calendar-grid-header {
+    grid-template-columns: minmax(2.75em, max-content) repeat(7, minmax(0, 1fr));
+}
+
+.pwt-calendar-gutter.pwt-calendar-hide-weekends .pwt-calendar-grid,
+.pwt-calendar-gutter.pwt-calendar-hide-weekends .pwt-calendar-grid-header {
+    grid-template-columns: minmax(2.75em, max-content) repeat(5, minmax(0, 1fr));
 }
 
 .pwt-calendar-grid-header {
     gap: 0;
 }
 
-// A 1px collapsed border: the grid background bleeds through a 1px gap so every
-// cell carries a hairline frame without doubling up on shared edges.
+// A 1px collapsed border: the grid background bleeds through a 1px gap so every cell carries a
+// hairline frame without doubling up on shared edges.
 .pwt-calendar-grid {
     gap: 1px;
     background-color: var(--pwt-color-outline-variant, rgba(0, 0, 0, 0.12));
@@ -89,6 +131,12 @@
     // row. Only when even the floors overflow does the column scroll the whole
     // grid as one - the tiny-viewport fallback.
     grid-auto-rows: minmax(var(--pwt-calendar-day-min-height), 1fr);
+}
+
+// The row floor above is the fill grid's minimum. A cell keeps no minimum of its own there: with
+// its padding on top it would be taller than a floored row and paint over the row below.
+.pwt-calendar-fill .pwt-calendar-day {
+    min-height: 0;
 }
 
 .pwt-calendar-weekday {
@@ -143,6 +191,36 @@
 .pwt-calendar-daynum {
     font-weight: 600;
     line-height: 1.1;
+}
+
+// A gutter cell is a quiet marker at the top of its row, level with the day numbers.
+.pwt-calendar-gutter-cell {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: var(--pwt-spacer-1);
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--pwt-color-on-neutral-alt);
+    white-space: nowrap;
+}
+
+// With a click callback a gutter cell acts on its row, and shows that on hover.
+.pwt-calendar-grid .pwt-calendar-gutter-cell:has(.pwt-calendar-gutter-activate) {
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--pwt-color-neutral-alt);
+        color: var(--pwt-color-primary);
+    }
+}
+
+// The overlaid keyboard controls are transparent except for their focus rings. The widget places
+// each ring inside application-owned selection and current-day indicators; the theme supplies its
+// width and focus color so it remains distinct from those accent-colored indicators.
+.pwt-calendar-day-activate:focus-visible,
+.pwt-calendar-gutter-activate:focus-visible {
+    outline: 2px solid var(--pwt-color-focus);
 }
 
 // A consumer's own `render_day` content, pinned above the scrolling bars.
@@ -256,6 +334,30 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+// A detail, such as an event's hours, follows the label only while both fit whole: text and detail
+// form a wrapping row one line high, so a detail without room wraps out of sight instead of being
+// cut, and the text still shortens with an ellipsis like a plain label.
+.pwt-calendar-span-label-detail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.4em;
+    height: 1lh;
+}
+
+.pwt-calendar-span-text {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pwt-calendar-span-detail {
+    flex: 0 0 auto;
+    opacity: 0.8;
+    font-variant-numeric: tabular-nums;
 }
 
 .pwt-calendar-span-icon {

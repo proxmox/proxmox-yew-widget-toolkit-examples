@@ -195,14 +195,14 @@ table {
   --pwt-color-on-success: var(--pwt-color-success-20);
   --pwt-color-success-container: var(--pwt-color-success-30);
   --pwt-color-on-success-container: var(--pwt-color-success-90);
-  --pwt-color-error: var(--pwt-color-error-70);
+  --pwt-color-error: var(--pwt-color-error-80);
   --pwt-color-on-error: var(--pwt-color-error-10);
   --pwt-color-error-container: var(--pwt-color-error-20);
   --pwt-color-on-error-container: var(--pwt-color-error-90);
   --pwt-color-warning: var(--pwt-color-warning-80);
   --pwt-color-on-warning: var(--pwt-color-warning-20);
-  --pwt-color-warning-container: var(--pwt-color-warning-60);
-  --pwt-color-on-warning-container: var(--pwt-color-warning-100);
+  --pwt-color-warning-container: var(--pwt-color-warning-30);
+  --pwt-color-on-warning-container: var(--pwt-color-warning-90);
   --pwt-color-neutral: var(--pwt-color-neutral-30);
   --pwt-color-on-neutral: var(--pwt-color-neutral-90);
   --pwt-color-neutral-container: var(--pwt-color-neutral-20);
@@ -376,6 +376,7 @@ table {
 @font-face {
   font-family: "Roboto Flex";
   src: url("../fonts/RobotoFlexVariableFont.woff2") format("woff2"), url("../fonts/RobotoFlexVariableFont.ttf") format("truetype");
+  font-weight: 100 1000;
 }
 .pwt-font-monospace {
   font-family: monospace;
@@ -385,7 +386,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 50px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 50, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 50, "wdth" 100 !important;
   line-height: 64px !important;
 }
 
@@ -401,7 +402,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 45px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 45, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 45, "wdth" 100 !important;
   line-height: 52px !important;
 }
 
@@ -417,7 +418,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 36px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 36, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 36, "wdth" 100 !important;
   line-height: 44px !important;
 }
 
@@ -433,7 +434,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 32px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 32, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 32, "wdth" 100 !important;
   line-height: 40px !important;
 }
 
@@ -449,7 +450,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 28px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 28, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 28, "wdth" 100 !important;
   line-height: 36px !important;
 }
 
@@ -465,7 +466,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 20px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 20, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 20, "wdth" 100 !important;
   line-height: 24px !important;
 }
 
@@ -481,7 +482,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 22px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 22, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 22, "wdth" 100 !important;
   line-height: 28px !important;
 }
 
@@ -497,7 +498,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 16px !important;
   font-weight: 500 !important;
-  font-variation-settings: "opsz" 16, "wdth" 110, "wght" 500 !important;
+  font-variation-settings: "opsz" 16, "wdth" 110 !important;
   line-height: 24px !important;
 }
 
@@ -513,7 +514,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 14px !important;
   font-weight: 500 !important;
-  font-variation-settings: "opsz" 14, "wdth" 110, "wght" 500 !important;
+  font-variation-settings: "opsz" 14, "wdth" 110 !important;
   line-height: 20px !important;
 }
 
@@ -529,7 +530,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 14px !important;
   font-weight: 350 !important;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350 !important;
+  font-variation-settings: "opsz" 14, "wdth" 100 !important;
   line-height: 20px !important;
 }
 
@@ -545,7 +546,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 12px !important;
   font-weight: 500 !important;
-  font-variation-settings: "opsz" 12, "wdth" 100, "wght" 500 !important;
+  font-variation-settings: "opsz" 12, "wdth" 100 !important;
   line-height: 16px !important;
 }
 
@@ -561,7 +562,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 11px !important;
   font-weight: 500 !important;
-  font-variation-settings: "opsz" 11, "wdth" 130, "wght" 500 !important;
+  font-variation-settings: "opsz" 11, "wdth" 130 !important;
   line-height: 16px !important;
 }
 
@@ -577,7 +578,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 16px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 16, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 16, "wdth" 100 !important;
   line-height: 24px !important;
 }
 
@@ -593,7 +594,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 14px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 14, "wdth" 100 !important;
   line-height: 20px !important;
 }
 
@@ -609,7 +610,7 @@ table {
   font-family: "Roboto Flex" !important;
   font-size: 12px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 12, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 12, "wdth" 100 !important;
   line-height: 16px !important;
 }
 
@@ -625,7 +626,7 @@ table {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 400;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 14, "wdth" 100;
 }
 
 p {
@@ -654,7 +655,7 @@ h1,
   font-family: "Roboto Flex";
   font-size: 50px;
   font-weight: 400;
-  font-variation-settings: "opsz" 50, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 50, "wdth" 100;
   line-height: 64px;
 }
 
@@ -663,7 +664,7 @@ h2,
   font-family: "Roboto Flex";
   font-size: 45px;
   font-weight: 400;
-  font-variation-settings: "opsz" 45, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 45, "wdth" 100;
   line-height: 52px;
 }
 
@@ -672,7 +673,7 @@ h3,
   font-family: "Roboto Flex";
   font-size: 36px;
   font-weight: 400;
-  font-variation-settings: "opsz" 36, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 36, "wdth" 100;
   line-height: 44px;
 }
 
@@ -681,7 +682,7 @@ h4,
   font-family: "Roboto Flex";
   font-size: 32px;
   font-weight: 400;
-  font-variation-settings: "opsz" 32, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 32, "wdth" 100;
   line-height: 40px;
 }
 
@@ -690,7 +691,7 @@ h5,
   font-family: "Roboto Flex";
   font-size: 28px;
   font-weight: 400;
-  font-variation-settings: "opsz" 28, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 28, "wdth" 100;
   line-height: 36px;
 }
 
@@ -699,7 +700,7 @@ h6,
   font-family: "Roboto Flex";
   font-size: 20px;
   font-weight: 400;
-  font-variation-settings: "opsz" 20, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 20, "wdth" 100;
   line-height: 24px;
 }
 
@@ -4003,7 +4004,7 @@ h6,
   font-family: "Roboto Flex";
   font-size: 11px;
   font-weight: 500;
-  font-variation-settings: "opsz" 11, "wdth" 130, "wght" 500;
+  font-variation-settings: "opsz" 11, "wdth" 130;
   line-height: 16px;
   --pwt-badge-gap: var(--pwt-spacer-1);
   --pwt-badge-padding-x: var(--pwt-spacer-2);
@@ -4067,7 +4068,7 @@ button,
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 350;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 20px;
 }
 
@@ -4106,11 +4107,14 @@ button,
   --pwt-color-background: var(--pwt-color-inverse-surface) !important;
   --pwt-color: var(--pwt-color-on-inverse-surface)  !important;
 }
+.pwt-button.disabled:has(.fa-spin), .pwt-button:disabled:has(.fa-spin), .pwt-button[aria-disabled=true]:has(.fa-spin) {
+  opacity: 1;
+}
 .pwt-button.medium {
   font-family: "Roboto Flex";
   font-size: 16px;
   font-weight: 500;
-  font-variation-settings: "opsz" 16, "wdth" 110, "wght" 500;
+  font-variation-settings: "opsz" 16, "wdth" 110;
   line-height: 24px;
   padding: 16px 24px;
 }
@@ -4565,9 +4569,26 @@ button,
 
 .pwt-calendar-grid,
 .pwt-calendar-grid-header {
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
+  padding-inline: 1px;
   width: 100%;
+}
+
+.pwt-calendar-hide-weekends .pwt-calendar-grid,
+.pwt-calendar-hide-weekends .pwt-calendar-grid-header {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.pwt-calendar-gutter .pwt-calendar-grid,
+.pwt-calendar-gutter .pwt-calendar-grid-header {
+  grid-template-columns: minmax(2.75em, max-content) repeat(7, minmax(0, 1fr));
+}
+
+.pwt-calendar-gutter.pwt-calendar-hide-weekends .pwt-calendar-grid,
+.pwt-calendar-gutter.pwt-calendar-hide-weekends .pwt-calendar-grid-header {
+  grid-template-columns: minmax(2.75em, max-content) repeat(5, minmax(0, 1fr));
 }
 
 .pwt-calendar-grid-header {
@@ -4584,6 +4605,10 @@ button,
   flex: 1 1 auto;
   min-height: 0;
   grid-auto-rows: minmax(var(--pwt-calendar-day-min-height), 1fr);
+}
+
+.pwt-calendar-fill .pwt-calendar-day {
+  min-height: 0;
 }
 
 .pwt-calendar-weekday {
@@ -4623,6 +4648,30 @@ button,
 .pwt-calendar-daynum {
   font-weight: 600;
   line-height: 1.1;
+}
+
+.pwt-calendar-gutter-cell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--pwt-spacer-1);
+  font-size: 0.8em;
+  font-weight: 600;
+  color: var(--pwt-color-on-neutral-alt);
+  white-space: nowrap;
+}
+
+.pwt-calendar-grid .pwt-calendar-gutter-cell:has(.pwt-calendar-gutter-activate) {
+  cursor: pointer;
+}
+.pwt-calendar-grid .pwt-calendar-gutter-cell:has(.pwt-calendar-gutter-activate):hover {
+  background-color: var(--pwt-color-neutral-alt);
+  color: var(--pwt-color-primary);
+}
+
+.pwt-calendar-day-activate:focus-visible,
+.pwt-calendar-gutter-activate:focus-visible {
+  outline: 2px solid var(--pwt-color-focus);
 }
 
 .pwt-calendar-day-pinned {
@@ -4686,6 +4735,27 @@ button,
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pwt-calendar-span-label-detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.4em;
+  height: 1lh;
+}
+
+.pwt-calendar-span-text {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pwt-calendar-span-detail {
+  flex: 0 0 auto;
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
 }
 
 .pwt-calendar-span-icon {
@@ -4924,7 +4994,7 @@ button,
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 400;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 20px;
   border-collapse: collapse;
   /* disbale row corsor for now (cell cursor is enough)
@@ -5001,7 +5071,7 @@ tr.row-cursor {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 350;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 20px;
   display: flex;
   align-items: baseline;
@@ -5035,7 +5105,7 @@ tr.row-cursor {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 350;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 20px;
   position: relative;
   padding: var(--pwt-spacer-2);
@@ -5114,7 +5184,7 @@ tr.row-cursor {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 500;
-  font-variation-settings: "opsz" 14, "wdth" 110, "wght" 500;
+  font-variation-settings: "opsz" 14, "wdth" 110;
   line-height: 20px;
   --pwt-color-background: var(--pwt-color-neutral) ;
   --pwt-color: var(--pwt-color-on-neutral)  ;
@@ -5152,7 +5222,7 @@ tr.row-cursor {
   font-family: "Roboto Flex";
   font-size: 11px;
   font-weight: 500;
-  font-variation-settings: "opsz" 11, "wdth" 130, "wght" 500;
+  font-variation-settings: "opsz" 11, "wdth" 130;
   line-height: 16px;
   opacity: var(--pwt-dimmed-opacity);
   padding: var(--pwt-spacer-1);
@@ -5161,7 +5231,7 @@ tr.row-cursor {
   font-family: "Roboto Flex";
   font-size: 11px;
   font-weight: 500;
-  font-variation-settings: "opsz" 11, "wdth" 130, "wght" 500;
+  font-variation-settings: "opsz" 11, "wdth" 130;
   line-height: 16px;
   opacity: var(--pwt-dimmed-opacity);
   padding: var(--pwt-spacer-1);
@@ -5713,6 +5783,11 @@ input[aria-disabled=true] {
   opacity: var(--pwt-disabled-opacity);
 }
 
+:root.pwt-dark-mode ::placeholder {
+  color: var(--pwt-color-neutral-alt-80);
+  opacity: 1;
+}
+
 .pwt-input-display {
   font-size: 14px;
   line-height: 20px;
@@ -5733,6 +5808,10 @@ input::-webkit-inner-spin-button {
 input::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+input[type=number] {
+  appearance: textfield;
 }
 
 .pwt-list-tile {
@@ -5810,12 +5889,15 @@ ul.pwt-menubar > li:hover:not([aria-disabled=true]) {
   background-color: var(--pwt-elevated-background-color);
 }
 ul.pwt-menubar .pwt-menubar-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pwt-icon-spacer);
   cursor: pointer;
   outline: 0;
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 350;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 24px;
   padding: var(--pwt-spacer-1) var(--pwt-spacer-2);
   border: 0;
@@ -5833,7 +5915,6 @@ ul.pwt-menubar .pwt-menubar-item[disabled], ul.pwt-menubar .pwt-menubar-item[ari
 ul.pwt-menubar .pwt-menubar-item-icon {
   font-size: 16px;
   line-height: 24px;
-  margin-inline-end: var(--pwt-icon-spacer);
 }
 ul.pwt-menubar .pwt-menubar-item-arrow {
   display: none;
@@ -5858,7 +5939,7 @@ ul.pwt-menu .pwt-menu-item {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 350;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 24px;
   border: 0;
   white-space: nowrap;
@@ -5896,7 +5977,7 @@ ul.pwt-menu .pwt-menu-item-arrow:dir(rtl) {
   font-family: "Roboto Flex";
   font-size: 12px;
   font-weight: 500;
-  font-variation-settings: "opsz" 12, "wdth" 100, "wght" 500;
+  font-variation-settings: "opsz" 12, "wdth" 100;
   line-height: 16px;
   position: relative;
   background: var(--pwt-color-background);
@@ -5950,7 +6031,7 @@ ul.pwt-menu .pwt-menu-item-arrow:dir(rtl) {
   font-family: "Roboto Flex";
   font-size: 12px;
   font-weight: 500;
-  font-variation-settings: "opsz" 12, "wdth" 100, "wght" 500;
+  font-variation-settings: "opsz" 12, "wdth" 100;
   line-height: 16px;
   --pwt-segmented-bar-legend-gap: var(--pwt-spacer-3);
   --pwt-segmented-bar-legend-margin-top: var(--pwt-spacer-1);
@@ -6282,7 +6363,7 @@ a:focus-within, a:hover {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 350;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 20px;
 }
 .pwt-nav-link span {
@@ -6504,6 +6585,26 @@ a:focus-within, a:hover {
   justify-content: center;
   min-width: 64px;
   min-height: 48px;
+  outline: 0;
+}
+.pwt-navigation-bar .pwt-navigation-bar-item:focus-visible {
+  border-radius: var(--pwt-nav-link-corner-shape);
+  outline: 2px solid var(--pwt-color-on-surface);
+  outline-offset: -2px;
+}
+.pwt-navigation-bar .pwt-navigation-bar-item:focus-visible .pwt-navigation-bar-icon-container {
+  width: 56px;
+  --pwt-tmp-elevation-color: color-mix(in srgb, var(--pwt-color-surface-tint) var(--pwt-state-layer-opacity-2), var(--pwt-color-background));
+  --pwt-elevated-background-color: color-mix( in srgb, var(--pwt-color) var(--pwt-state-layer-opacity-hover), var(--pwt-tmp-elevation-color) );
+  background-color: var(--pwt-elevated-background-color);
+}
+.pwt-navigation-bar .pwt-navigation-bar-item.disabled {
+  cursor: auto;
+  opacity: var(--pwt-disabled-opacity);
+}
+.pwt-navigation-bar .pwt-navigation-bar-item.disabled .pwt-navigation-bar-icon-container {
+  cursor: auto;
+  pointer-events: none;
 }
 .pwt-navigation-bar .pwt-navigation-bar-item .pwt-navigation-bar-icon-container {
   cursor: pointer;
@@ -6516,7 +6617,7 @@ a:focus-within, a:hover {
   width: 24px;
   transition: width 0.2s;
 }
-.pwt-navigation-bar .pwt-navigation-bar-item .pwt-navigation-bar-icon-container:focus-within, .pwt-navigation-bar .pwt-navigation-bar-item .pwt-navigation-bar-icon-container:hover {
+.pwt-navigation-bar .pwt-navigation-bar-item .pwt-navigation-bar-icon-container:hover {
   width: 56px;
   --pwt-tmp-elevation-color: color-mix(in srgb, var(--pwt-color-surface-tint) var(--pwt-state-layer-opacity-2), var(--pwt-color-background));
   --pwt-elevated-background-color: color-mix( in srgb, var(--pwt-color) var(--pwt-state-layer-opacity-hover), var(--pwt-tmp-elevation-color) );
@@ -6570,6 +6671,17 @@ a:focus-within, a:hover {
   --pwt-elevated-background-color: color-mix( in srgb, var(--pwt-color) var(--pwt-state-layer-opacity-none), var(--pwt-color-background) );
   background-color: var(--pwt-elevated-background-color);
 }
+.pwt-navigation-rail .pwt-navigation-rail-expand-button .pwt-action-icon {
+  color: var(--pwt-color-on-surface);
+}
+.pwt-navigation-rail .pwt-navigation-rail-expand-button .pwt-action-icon:focus-within:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed), .pwt-navigation-rail .pwt-navigation-rail-expand-button .pwt-action-icon:hover:not(:disabled):not(.disabled):not([aria-disabled=true]):not(:active):not(.pressed) {
+  --pwt-elevated-background-color: color-mix( in srgb, transparent var(--pwt-state-layer-opacity-hover), transparent );
+  background-color: var(--pwt-elevated-background-color);
+}
+.pwt-navigation-rail .pwt-navigation-rail-expand-button .pwt-action-icon.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]), .pwt-navigation-rail .pwt-navigation-rail-expand-button .pwt-action-icon:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
+  --pwt-elevated-background-color: color-mix( in srgb, transparent var(--pwt-state-layer-opacity-press), transparent );
+  background-color: var(--pwt-elevated-background-color);
+}
 .pwt-navigation-rail .pwt-navigation-rail-tabs {
   display: flex;
   flex-direction: column;
@@ -6584,8 +6696,28 @@ a:focus-within, a:hover {
   justify-content: center;
   min-width: 64px;
   min-height: 48px;
+  outline: 0;
   display: flex;
   flex-direction: column;
+}
+.pwt-navigation-rail .pwt-navigation-rail-tabs .pwt-navigation-rail-item:focus-visible {
+  border-radius: var(--pwt-nav-link-corner-shape);
+  outline: 2px solid var(--pwt-color-on-surface);
+  outline-offset: -2px;
+}
+.pwt-navigation-rail .pwt-navigation-rail-tabs .pwt-navigation-rail-item:focus-visible .pwt-navigation-rail-icon-container {
+  width: 56px;
+  --pwt-tmp-elevation-color: color-mix(in srgb, var(--pwt-color-surface-tint) var(--pwt-state-layer-opacity-2), var(--pwt-color-background));
+  --pwt-elevated-background-color: color-mix( in srgb, var(--pwt-color) var(--pwt-state-layer-opacity-hover), var(--pwt-tmp-elevation-color) );
+  background-color: var(--pwt-elevated-background-color);
+}
+.pwt-navigation-rail .pwt-navigation-rail-tabs .pwt-navigation-rail-item.disabled {
+  cursor: auto;
+  opacity: var(--pwt-disabled-opacity);
+}
+.pwt-navigation-rail .pwt-navigation-rail-tabs .pwt-navigation-rail-item.disabled .pwt-navigation-rail-icon-container {
+  cursor: auto;
+  pointer-events: none;
 }
 .pwt-navigation-rail .pwt-navigation-rail-tabs .pwt-navigation-rail-item .pwt-navigation-rail-icon-container {
   cursor: pointer;
@@ -6598,7 +6730,7 @@ a:focus-within, a:hover {
   width: 24px;
   transition: width 0.2s;
 }
-.pwt-navigation-rail .pwt-navigation-rail-tabs .pwt-navigation-rail-item .pwt-navigation-rail-icon-container:focus-within, .pwt-navigation-rail .pwt-navigation-rail-tabs .pwt-navigation-rail-item .pwt-navigation-rail-icon-container:hover {
+.pwt-navigation-rail .pwt-navigation-rail-tabs .pwt-navigation-rail-item .pwt-navigation-rail-icon-container:hover {
   width: 56px;
   --pwt-tmp-elevation-color: color-mix(in srgb, var(--pwt-color-surface-tint) var(--pwt-state-layer-opacity-2), var(--pwt-color-background));
   --pwt-elevated-background-color: color-mix( in srgb, var(--pwt-color) var(--pwt-state-layer-opacity-hover), var(--pwt-tmp-elevation-color) );
@@ -6638,6 +6770,10 @@ a:focus-within, a:hover {
   min-width: 220px;
   max-width: 360px;
 }
+.pwt-navigation-rail.pwt-navigation-rail-expanded .pwt-navigation-rail-expand-button {
+  align-self: flex-start;
+  margin-inline-start: var(--pwt-spacer-2);
+}
 .pwt-navigation-rail.pwt-navigation-rail-expanded .pwt-navigation-rail-tabs {
   align-self: stretch;
 }
@@ -6657,6 +6793,13 @@ a:focus-within, a:hover {
 .pwt-navigation-rail.pwt-navigation-rail-expanded .pwt-navigation-rail-tabs .pwt-navigation-rail-item.pressed:not(:disabled):not(.disabled):not([aria-disabled=true]), .pwt-navigation-rail.pwt-navigation-rail-expanded .pwt-navigation-rail-tabs .pwt-navigation-rail-item:active:not(:disabled):not(.disabled):not([aria-disabled=true]) {
   --pwt-elevated-background-color: color-mix( in srgb, var(--pwt-color) var(--pwt-state-layer-opacity-press), var(--pwt-color-background) );
   background-color: var(--pwt-elevated-background-color);
+}
+.pwt-navigation-rail.pwt-navigation-rail-expanded .pwt-navigation-rail-tabs .pwt-navigation-rail-item.disabled {
+  cursor: auto;
+}
+.pwt-navigation-rail.pwt-navigation-rail-expanded .pwt-navigation-rail-tabs .pwt-navigation-rail-item:focus-visible .pwt-navigation-rail-icon-container {
+  width: 24px;
+  background-color: transparent;
 }
 .pwt-navigation-rail.pwt-navigation-rail-expanded .pwt-navigation-rail-tabs .pwt-navigation-rail-item.active {
   color: var(--pwt-accent-color);
@@ -6689,6 +6832,7 @@ a:focus-within, a:hover {
   --page-animation-in: page-animation-push-in var(--page-animation-time) ease-out;
   --page-animation-out: page-animation-push-out var(--page-animation-time) ease-out;
   --page-animation-rtl-factor: 1;
+  --page-animation-emphasized-easing: cubic-bezier(0.2, 0, 0, 1);
 }
 
 html[dir=rtl] {
@@ -6709,6 +6853,8 @@ html[dir=rtl] {
   overflow: hidden !important;
   box-sizing: border-box;
   display: none !important;
+  --page-animation-in-reverse: initial;
+  --page-animation-out-reverse: initial;
 }
 
 @keyframes page-animation-push-in {
@@ -6750,11 +6896,53 @@ html[dir=rtl] {
 @keyframes page-animation-fade-from-right-in {
   from {
     opacity: 0;
-    transform: translateX(calc(10% * var(--page-animation-rtl-factor)));
+    transform: translateX(calc(25% * var(--page-animation-rtl-factor)));
+  }
+  75% {
+    opacity: 1;
   }
   to {
     opacity: 1;
-    transform: translateX(0%);
+    transform: translateX(0);
+  }
+}
+@keyframes page-animation-fade-from-right-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  25% {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(calc(-25% * var(--page-animation-rtl-factor)));
+  }
+}
+@keyframes page-animation-fade-from-right-in-reverse {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  25% {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(calc(25% * var(--page-animation-rtl-factor)));
+  }
+}
+@keyframes page-animation-fade-from-right-out-reverse {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-25% * var(--page-animation-rtl-factor)));
+  }
+  75% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 @keyframes page-animation-fade-from-bottom-in {
@@ -6762,9 +6950,51 @@ html[dir=rtl] {
     opacity: 0;
     transform: translateY(10%);
   }
+  75% {
+    opacity: 1;
+  }
   to {
     opacity: 1;
-    transform: translateY(0%);
+    transform: translateY(0);
+  }
+}
+@keyframes page-animation-fade-from-bottom-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  25% {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+}
+@keyframes page-animation-fade-from-bottom-in-reverse {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  25% {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10%);
+  }
+}
+@keyframes page-animation-fade-from-bottom-out-reverse {
+  from {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+  75% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 @keyframes page-animation-flip-in {
@@ -6805,7 +7035,7 @@ html[dir=rtl] {
 }
 @keyframes page-animation-cover-in {
   from {
-    transform: translateX(100%);
+    transform: translateX(calc(100% * var(--page-animation-rtl-factor)));
     transform-origin: left;
   }
   to {
@@ -6823,6 +7053,44 @@ html[dir=rtl] {
     transform-origin: center;
   }
 }
+@keyframes page-animation-parallax-in {
+  from {
+    transform: translateX(calc(100% * var(--page-animation-rtl-factor)));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes page-animation-parallax-out {
+  from {
+    transform: translateX(0);
+    filter: brightness(1);
+  }
+  to {
+    transform: translateX(calc(-30% * var(--page-animation-rtl-factor)));
+    filter: brightness(0.8);
+  }
+}
+@keyframes page-animation-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes page-animation-zoom-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
 .pwt-page-container.pwt-page-visible {
   display: block !important;
 }
@@ -6834,7 +7102,7 @@ html[dir=rtl] {
 
 .pwt-page-container.pwt-page-shrink-reverse {
   display: block !important;
-  animation: var(--page-animation-out) reverse;
+  animation: var(--page-animation-out-reverse, var(--page-animation-out) reverse);
 }
 
 .pwt-page-container.pwt-page-grow {
@@ -6844,7 +7112,7 @@ html[dir=rtl] {
 
 .pwt-page-container.pwt-page-grow-reverse {
   display: block !important;
-  animation: var(--page-animation-in) reverse;
+  animation: var(--page-animation-in-reverse, var(--page-animation-in) reverse);
 }
 
 .pwt-page-animation-fade {
@@ -6853,13 +7121,17 @@ html[dir=rtl] {
 }
 
 .pwt-page-animation-fade-from-right {
-  --page-animation-in: page-animation-fade-from-right-in var(--page-animation-time) ease-out;
-  --page-animation-out: page-animation-fade-out var(--page-animation-time) ease-out;
+  --page-animation-in: page-animation-fade-from-right-in var(--page-animation-time) var(--page-animation-emphasized-easing);
+  --page-animation-out: page-animation-fade-from-right-out var(--page-animation-time) var(--page-animation-emphasized-easing);
+  --page-animation-in-reverse: page-animation-fade-from-right-in-reverse var(--page-animation-time) var(--page-animation-emphasized-easing);
+  --page-animation-out-reverse: page-animation-fade-from-right-out-reverse var(--page-animation-time) var(--page-animation-emphasized-easing);
 }
 
 .pwt-page-animation-fade-from-bottom {
-  --page-animation-in: page-animation-fade-from-bottom-in var(--page-animation-time) ease-out;
-  --page-animation-out: page-animation-fade-out var(--page-animation-time) ease-out;
+  --page-animation-in: page-animation-fade-from-bottom-in var(--page-animation-time) var(--page-animation-emphasized-easing);
+  --page-animation-out: page-animation-fade-from-bottom-out var(--page-animation-time) var(--page-animation-emphasized-easing);
+  --page-animation-in-reverse: page-animation-fade-from-bottom-in-reverse var(--page-animation-time) var(--page-animation-emphasized-easing);
+  --page-animation-out-reverse: page-animation-fade-from-bottom-out-reverse var(--page-animation-time) var(--page-animation-emphasized-easing);
 }
 
 .pwt-page-animation-flip {
@@ -6871,6 +7143,16 @@ html[dir=rtl] {
 .pwt-page-animation-cover {
   --page-animation-in: page-animation-cover-in var(--page-animation-time) ease-out;
   --page-animation-out: page-animation-cover-out var(--page-animation-time) ease-out;
+}
+
+.pwt-page-animation-parallax {
+  --page-animation-in: page-animation-parallax-in var(--page-animation-time) ease-out;
+  --page-animation-out: page-animation-parallax-out var(--page-animation-time) ease-out;
+}
+
+.pwt-page-animation-zoom {
+  --page-animation-in: page-animation-zoom-in var(--page-animation-time) ease-out;
+  --page-animation-out: page-animation-zoom-out var(--page-animation-time) ease-out;
 }
 
 .pwt-panel {
@@ -6901,7 +7183,7 @@ html[dir=rtl] {
   font-family: "Roboto Flex";
   font-size: 20px;
   font-weight: 400;
-  font-variation-settings: "opsz" 20, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 20, "wdth" 100;
   line-height: 24px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -6923,7 +7205,7 @@ html[dir=rtl] {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 350;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 20px;
   position: relative;
   background: var(--pwt-color-border);
@@ -7001,7 +7283,7 @@ html[dir=rtl] {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 350;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 350;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 20px;
   --pwt-color-background: var(--pwt-color-surface) ;
   --pwt-color: var(--pwt-color-on-surface)  ;
@@ -7043,7 +7325,7 @@ html[dir=rtl] {
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 400;
-  font-variation-settings: "opsz" 14, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 14, "wdth" 100;
   line-height: 20px;
   border-radius: var(--pwt-shape-corner-extra-small);
   position: fixed;
@@ -7120,7 +7402,7 @@ html[dir=rtl] {
   font-family: "Roboto Flex" !important;
   font-size: 16px !important;
   font-weight: 400 !important;
-  font-variation-settings: "opsz" 16, "wdth" 100, "wght" 400 !important;
+  font-variation-settings: "opsz" 16, "wdth" 100 !important;
   line-height: 24px !important;
 }
 
@@ -7151,10 +7433,12 @@ html[dir=rtl] {
 .pwt-embedded-html ul {
   list-style: revert;
   padding: revert;
+  margin: revert;
 }
 .pwt-embedded-html ol {
   list-style: revert;
   padding: revert;
+  margin: revert;
 }
 .pwt-embedded-html li + li {
   margin-top: var(--pwt-spacer-2);
@@ -7171,7 +7455,7 @@ html[dir=rtl] {
   border-left: var(--pwt-spacer-1) solid var(--pwt-color-primary);
 }
 .pwt-embedded-html strong {
-  font-variation-settings: "wght" 700;
+  font-weight: bold;
 }
 .pwt-embedded-html em {
   font-variation-settings: "slnt" -10;
@@ -7293,7 +7577,7 @@ h1,
   font-family: "Roboto Flex";
   font-size: 32px;
   font-weight: 400;
-  font-variation-settings: "opsz" 32, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 32, "wdth" 100;
   line-height: 40px;
 }
 
@@ -7302,7 +7586,7 @@ h2,
   font-family: "Roboto Flex";
   font-size: 28px;
   font-weight: 400;
-  font-variation-settings: "opsz" 28, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 28, "wdth" 100;
   line-height: 36px;
 }
 
@@ -7311,7 +7595,7 @@ h3,
   font-family: "Roboto Flex";
   font-size: 22px;
   font-weight: 400;
-  font-variation-settings: "opsz" 22, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 22, "wdth" 100;
   line-height: 28px;
 }
 
@@ -7320,7 +7604,7 @@ h4,
   font-family: "Roboto Flex";
   font-size: 20px;
   font-weight: 400;
-  font-variation-settings: "opsz" 20, "wdth" 100, "wght" 400;
+  font-variation-settings: "opsz" 20, "wdth" 100;
   line-height: 24px;
 }
 
@@ -7329,7 +7613,7 @@ h5,
   font-family: "Roboto Flex";
   font-size: 16px;
   font-weight: 500;
-  font-variation-settings: "opsz" 16, "wdth" 110, "wght" 500;
+  font-variation-settings: "opsz" 16, "wdth" 110;
   line-height: 24px;
 }
 
@@ -7338,6 +7622,6 @@ h6,
   font-family: "Roboto Flex";
   font-size: 14px;
   font-weight: 500;
-  font-variation-settings: "opsz" 14, "wdth" 110, "wght" 500;
+  font-variation-settings: "opsz" 14, "wdth" 110;
   line-height: 20px;
 }
