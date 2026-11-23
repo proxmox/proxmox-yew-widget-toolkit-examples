@@ -5,7 +5,7 @@ use pwt::prelude::*;
 use pwt::widget::form::{Combobox, PlainDate};
 use pwt::widget::{
     Button, CalendarGrid, CalendarGridDay, CalendarGridView, CalendarSpanBar, CalendarSpanClick,
-    Container, FieldLabel, Panel, Toolbar, WeekStart,
+    Container, FieldLabel, MiniScrollMode, Panel, Toolbar, WeekStart,
 };
 
 static MONTH_NAMES: &[&str] = &[
@@ -138,6 +138,7 @@ impl Component for CalendarDemo {
         let link = ctx.link();
 
         let toolbar = Toolbar::new()
+            .scroll_mode(MiniScrollMode::Native)
             .with_child(
                 Button::new_icon("fa fa-chevron-left")
                     .aria_label("Previous")
