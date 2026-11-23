@@ -2,7 +2,7 @@ use pwt::prelude::*;
 
 use pwt::widget::form::Form;
 use pwt::widget::menu::{dispatch_menu_close_event, Menu, MenuButton, MenuCheckbox, MenuItem};
-use pwt::widget::{Button, Column, Container, Panel, Toolbar};
+use pwt::widget::{Button, Column, Container, MiniScroll, MiniScrollMode, Panel, Toolbar};
 
 fn panel_with_menu_button() -> Html {
     let submenu1 = MenuItem::new("Submenu1").menu(
@@ -119,7 +119,11 @@ fn panel_with_menubar() -> Html {
         .title("Menubar Example")
         .with_child(
             Form::new()
-                .with_child(menubar.clone())
+                .with_child(
+                    MiniScroll::new(menubar)
+                        .class("pwt-flex-fill")
+                        .scroll_mode(MiniScrollMode::Native),
+                )
                 .class("pwt-border-bottom"),
         )
         .with_child(Container::from_tag("p").padding(2).with_child(text))
