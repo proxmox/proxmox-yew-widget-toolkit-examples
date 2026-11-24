@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pwt example: mobile demo</title>
+
+  <link data-trunk type="text/css" href="../pwt-assets/assets/font-awesome.css" rel="css" />
+  <link data-trunk href="../pwt-assets/assets/fonts" rel="copy-dir" />
+  <link data-trunk href="images" rel="copy-dir" />
+
+  <style>
+    /* All pictures share the 4:3 aspect ratio of the illustrations, because a hero flight
+       scales width and height separately and would stretch a picture otherwise. */
+    .travel-picture {
+      display: block;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+
+    .travel-thumb {
+      width: 96px;
+      border-radius: var(--pwt-shape-corner-medium, 12px);
+    }
+
+    .travel-small {
+      width: 120px;
+      border-radius: var(--pwt-shape-corner-small, 8px);
+    }
+
+    .travel-wide {
+      width: 100%;
+    }
+
+    /* Fit the viewport height without changing the aspect ratio. */
+    .travel-gallery-picture {
+      width: min(100%, calc((100dvh - 180px) * 4 / 3));
+    }
+
+    /* The column of a page, limited to a readable width on wide screens. */
+    .travel-content {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* The actions of a picture card, in its corner and readable on any picture. The action icon
+       class clears the background, so this needs the higher specificity. */
+    .pwt-action-icon.travel-card-actions {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      border-radius: 50%;
+      background-color: var(--pwt-color-surface);
+    }
+
+    .travel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: currentColor;
+      opacity: 0.4;
+    }
+
+    .travel-dot.active {
+      opacity: 1;
+    }
+
+    html.slow-motion {
+      --page-animation-time: 2s;
+    }
+  </style>
+</head>
+
+<body></body>
+
+</html>

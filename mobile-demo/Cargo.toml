@@ -1,0 +1,18 @@
+[package]
+name = "mobile-demo"
+version = "1.0.0"
+authors = [
+  "Dietmar Maurer <dietmar@proxmox.com>",
+]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+
+[dependencies]
+wasm-logger = "0.2"
+yew = { version = "0.21",  features = ["csr"] }
+yew-router = { version = "0.18" }
+pwt = { path = "../pwt" }
+gloo-timers = "0.3"
+gloo-utils = "0.2"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = ["DomTokenList", "Element"] }

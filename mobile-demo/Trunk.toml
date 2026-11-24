@@ -1,0 +1,7 @@
+[[hooks]]
+stage="build"
+command="rust-grass"
+command_arguments= ["../pwt-assets/scss/material-yew-style.scss", "dist/.stage/material-yew-style.css"]
+
+[watch]
+watch = ["./src", "./images", "../pwt", "../pwt-assets"]

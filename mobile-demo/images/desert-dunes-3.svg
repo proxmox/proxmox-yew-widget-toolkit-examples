@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" preserveAspectRatio="xMidYMid slice">
+<title>Desert Dunes (dawn)</title>
+<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b4a7a"/><stop offset="0.55" stop-color="#c8789a"/><stop offset="0.64" stop-color="#ffc98f"/><stop offset="1" stop-color="#ffc98f"/></linearGradient><radialGradient id="r2"><stop offset="0" stop-color="#fff1c9" stop-opacity="0.45"/><stop offset="1" stop-color="#fff1c9" stop-opacity="0"/></radialGradient></defs>
+<rect width="800" height="600" fill="url(#g1)"/>
+<circle cx="400" cy="372" r="240" fill="url(#r2)"/>
+<circle cx="400" cy="372" r="60" fill="#fff1c9"/>
+<path d="M-20,600 L-20,360 Q85,346 138,338 Q190,330 242,325 Q295,320 348,305 Q400,290 452,290 Q505,290 558,296 Q610,302 662,313 Q715,325 768,342 L820,360 L820,600 Z" fill="#f4bb83"/>
+<path d="M-20,600 L-20,378 Q85,364 138,356 Q190,348 242,343 Q295,338 348,323 Q400,308 452,308 Q505,308 558,314 Q610,320 662,331 Q715,343 768,360 L820,378 L820,600 Z" fill="#e5ab78" opacity="0.55"/>
+<path d="M-20,600 L-20,415 Q85,398 138,403 Q190,408 242,392 Q295,376 348,358 Q400,340 452,358 Q505,375 558,398 Q610,420 662,415 Q715,411 768,413 L820,415 L820,600 Z" fill="#ebab74"/>
+<path d="M-20,600 L-20,433 Q85,416 138,421 Q190,426 242,410 Q295,394 348,376 Q400,358 452,376 Q505,393 558,416 Q610,438 662,433 Q715,429 768,431 L820,433 L820,600 Z" fill="#db9b69" opacity="0.55"/>
+<path d="M-20,600 L-20,490 Q85,435 138,420 Q190,405 242,402 Q295,400 348,404 Q400,409 452,405 Q505,401 558,407 Q610,413 662,423 Q715,432 768,461 L820,490 L820,600 Z" fill="#de975f"/>
+<path d="M-20,600 L-20,508 Q85,453 138,438 Q190,423 242,420 Q295,418 348,422 Q400,427 452,423 Q505,419 558,425 Q610,431 662,441 Q715,450 768,479 L820,508 L820,600 Z" fill="#cd8755" opacity="0.55"/>
+<path d="M-20,600 L-20,480 Q85,498 138,508 Q190,518 242,535 Q295,552 348,556 Q400,560 452,536 Q505,512 558,500 Q610,488 662,491 Q715,494 768,487 L820,480 L820,600 Z" fill="#cb804a"/>
+<path d="M-20,600 L-20,498 Q85,516 138,526 Q190,536 242,553 Q295,570 348,574 Q400,578 452,554 Q505,530 558,518 Q610,506 662,509 Q715,512 768,505 L820,498 L820,600 Z" fill="#ba7142" opacity="0.55"/>
+<g fill="#603c2a" transform="translate(470,418) scale(0.9)"><ellipse cx="0" cy="0" rx="20" ry="9"/><circle cx="-5" cy="-8" r="7"/><path d="M16,-4 Q26,-22 30,-20 L33,-18 L30,-14 Q26,-12 20,2 Z"/><rect x="-15" y="4" width="3" height="20"/><rect x="-6" y="4" width="3" height="20"/><rect x="6" y="4" width="3" height="20"/><rect x="13" y="4" width="3" height="20"/></g>
+<g fill="#603c2a" transform="translate(515,414) scale(0.9)"><ellipse cx="0" cy="0" rx="20" ry="9"/><circle cx="-5" cy="-8" r="7"/><path d="M16,-4 Q26,-22 30,-20 L33,-18 L30,-14 Q26,-12 20,2 Z"/><rect x="-15" y="4" width="3" height="20"/><rect x="-6" y="4" width="3" height="20"/><rect x="6" y="4" width="3" height="20"/><rect x="13" y="4" width="3" height="20"/></g>
+<g fill="#603c2a" transform="translate(560,410) scale(0.9)"><ellipse cx="0" cy="0" rx="20" ry="9"/><circle cx="-5" cy="-8" r="7"/><path d="M16,-4 Q26,-22 30,-20 L33,-18 L30,-14 Q26,-12 20,2 Z"/><rect x="-15" y="4" width="3" height="20"/><rect x="-6" y="4" width="3" height="20"/><rect x="6" y="4" width="3" height="20"/><rect x="13" y="4" width="3" height="20"/></g>
+</svg>
