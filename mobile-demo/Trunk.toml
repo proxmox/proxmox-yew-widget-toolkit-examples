@@ -3,5 +3,11 @@ stage="build"
 command="rust-grass"
 command_arguments= ["../pwt-assets/scss/material-yew-style.scss", "dist/.stage/material-yew-style.css"]
 
+# the world map of the map view, see the proxmox-geojson-data package
+[[hooks]]
+stage="build"
+command="sh"
+command_arguments= ["-c", "mkdir -p ./dist/.stage/geojson && cp /usr/share/proxmox-geojson-data/world-map.json ./dist/.stage/geojson/"]
+
 [watch]
 watch = ["./src", "./images", "../pwt", "../pwt-assets"]

@@ -1,4 +1,4 @@
-//! The explore tab: the destinations as a list, and the hero helpers shared with the
+//! The explore tab: the destinations as a list or on a map, and the hero helpers shared with the
 //! other pages that show destinations.
 
 mod explore_list;

@@ -12,6 +12,7 @@ A travel explorer that shows the touch widgets of the toolkit in one app:
 - Adaptive dialog: a bottom sheet on phones, a centered dialog on wide screens
 - Slidable list items, a floating action button, and a FAB menu
 - Long press gestures and snackbars with undo
+- World map with the destinations
 
 Settings has a slow motion switch, which makes the hero animations easy to
 follow, and lets you choose the page animation style.
@@ -19,6 +20,12 @@ follow, and lets you choose the page animation style.
 The illustrations in `images/` were made for this demo and share its license.
 
 ## Running
+
+The map view needs the world map of the `proxmox-geojson-data` package:
+
+```bash
+apt install proxmox-geojson-data
+```
 
 Run a debug version of this application:
 

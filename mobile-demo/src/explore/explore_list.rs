@@ -8,6 +8,7 @@ use pwt::widget::{Button, Column, Container, Fa, List, ListTile};
 use super::{destination_badges, picture_hero, title_hero};
 use crate::data::{Destination, DESTINATIONS};
 use crate::favorites::FavoriteButton;
+use crate::map::DestinationMap;
 use crate::notice::notice;
 use crate::route::Route;
 use crate::{app_state, observe_app_state, AppState, Filter};
@@ -61,7 +62,12 @@ impl Component for ExploreListComp {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let filter = app_state().read().filter.clone();
+        let state = app_state();
+        if state.read().show_map {
+            return DestinationMap::new().into();
+        }
+
+        let filter = state.read().filter.clone();
         let destinations: Vec<&'static Destination> =
             DESTINATIONS.iter().filter(|d| filter.matches(d)).collect();
 

@@ -11,6 +11,7 @@ use pwt::widget::{ActionIcon, Container, Fa, Row, TabBarItem, ThemeModeSelector}
 
 use crate::explore::{ExploreList, FilterButton, SurpriseFab};
 use crate::favorites::FavoriteGrid;
+use crate::map::MapToggle;
 use crate::route::Route;
 use crate::settings::SettingsPanel;
 use crate::trips::{TripList, TripsFab};
@@ -155,7 +156,7 @@ impl Component for HomePageComp {
         let (body, actions, fab): (Html, Vec<VNode>, Option<Html>) = match self.tab {
             Tab::Explore => (
                 ExploreList::new().into(),
-                vec![FilterButton::new().into()],
+                vec![MapToggle::new().into(), FilterButton::new().into()],
                 Some(SurpriseFab::new().into()),
             ),
             Tab::Favorites => (FavoriteGrid::new().into(), Vec::new(), None),

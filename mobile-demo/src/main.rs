@@ -28,6 +28,7 @@ mod explore;
 mod favorites;
 mod gallery;
 mod home;
+mod map;
 mod messages;
 mod notice;
 mod route;
@@ -86,6 +87,8 @@ pub struct AppState {
     /// The trips in no particular order, the trip list sorts them by date.
     pub trips: Vec<Trip>,
     pub filter: Filter,
+    /// Show the destinations on a map instead of a list.
+    pub show_map: bool,
     pub animation: AnimationSettings,
     next_trip_id: u32,
 }
@@ -112,6 +115,7 @@ impl Default for AppState {
                 },
             ],
             filter: Filter::default(),
+            show_map: false,
             animation: AnimationSettings::default(),
             next_trip_id: 3,
         }
